@@ -6,7 +6,7 @@ WORKDIR /opt
 #Update apt and install git
 RUN apt-get update && apt-get install -y git
 #Clone the latest UOJ Community verison to local
-RUN git clone https://github.com/UniversalOJ/UOJ-System.git --depth 1 --single-branch ${CLONE_ADDFLAG} uoj
+RUN git clone https://github.com/renbaoshuo/UOJ-System.git --depth 1 --single-branch ${CLONE_ADDFLAG} uoj
 #Install environment and set startup script
 RUN cd uoj/install/bundle && sh install.sh -p && echo "\
 #!/bin/sh\n\
