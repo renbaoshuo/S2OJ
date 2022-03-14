@@ -1,5 +1,6 @@
 <?php
 
+require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 require $_SERVER['DOCUMENT_ROOT'] . '/app/libs/uoj-lib.php';
 
 require UOJContext::documentRoot().'/app/route.php';

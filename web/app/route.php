@@ -50,6 +50,7 @@ Route::group([
 		Route::any('/faq', '/faq.php');
 		Route::any('/ranklist', '/ranklist.php?type=rating');
 		
+		Route::any('/captcha', '/captcha.php');
 		Route::any('/login', '/login.php');
 		Route::any('/logout', '/logout.php');
 		Route::any('/register', '/register.php');

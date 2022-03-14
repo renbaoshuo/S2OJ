@@ -1,4 +1,7 @@
 <?php
+	use Gregwar\Captcha\PhraseBuilder;
+	use Gregwar\Captcha\CaptchaBuilder;
+
 	if (Auth::check()) {
 		redirectTo('/');
 	}
@@ -15,6 +18,11 @@
 		}
 		$username = $_POST['username'];
 		$password = $_POST['password'];
+		$captcha = $_POST['captcha'];
+
+		if (!isset($_SESSION['phrase']) || !PhraseBuilder::comparePhrases($_SESSION['phrase'], $captcha)) {
+			return "bad_captcha";
+		}
 		
 		if (!validateUsername($username)) {
 			return "failed";
@@ -38,6 +46,7 @@
 	
 	if (isset($_POST['login'])) {
 		echo handleLoginPost();
+		unset($_SESSION['phrase']);
 		die();
 	}
 ?>
@@ -61,6 +70,16 @@
       <span class="help-block" id="help-password"></span>
     </div>
   </div>
+  <div id="div-captcha" class="form-group">
+    <label for="input-captcha" class="col-sm-2 control-label"><?= UOJLocale::get('verification code') ?></label>
+    <div class="col-sm-3" style="max-width: 60%">
+      <input type="text" class="form-control" id="input-captcha" name="captcha" placeholder="<?= UOJLocale::get('enter verification code') ?>" maxlength="20" style="display: inline-block; width: 12em;" />
+	  <div style="display: inline-block; margin-left: 8px; position: relative; top: -2px; cursor: pointer;">
+	  	<img id="captcha" src="" />
+	  </div>
+      <span class="help-block" id="help-captcha" style="display: block"></span>
+    </div>
+  </div>
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-3">
       <button type="submit" id="button-submit" class="btn btn-secondary"><?= UOJLocale::get('submit') ?></button>
@@ -76,6 +95,11 @@ function validateLoginPost() {
 	return ok;
 }
 
+function refreshCaptcha() {
+	var timestamp = new Date().getTime();
+	$("#captcha").attr("src", "/captcha" + '?' + timestamp);
+}
+
 function submitLoginPost() {
 	if (!validateLoginPost()) {
 		return false;
@@ -85,25 +109,40 @@ function submitLoginPost() {
 		_token : "<?= crsf_token() ?>",
 		login : '',
 		username : $('#input-username').val(),
-		password : md5($('#input-password').val(), "<?= getPasswordClientSalt() ?>")
+		password : md5($('#input-password').val(), "<?= getPasswordClientSalt() ?>"),
+		captcha: $('#input-captcha').val(),
 	}, function(msg) {
+		$('#div-captcha').removeClass('has-error');
+		$('#div-username').removeClass('has-error');
+		$('#div-password').removeClass('has-error');
+		$('#help-captcha').html('');
+		$('#help-username').html('');
+		$('#help-password').html('');
+
 		if (msg == 'ok') {
 			var prevUrl = document.referrer;
 			if (prevUrl == '' || /.*\/login.*/.test(prevUrl) || /.*\/logout.*/.test(prevUrl) || /.*\/register.*/.test(prevUrl) || /.*\/reset-password.*/.test(prevUrl)) {
 				prevUrl = '/';
 			};
 			window.location.href = prevUrl;
+		} else if (msg == 'bad_captcha') {
+			$('#div-captcha').addClass('has-error');
+			$('#help-captcha').html('验证码错误。');
+			refreshCaptcha();
 		} else if (msg == 'banned') {
 			$('#div-username').addClass('has-error');
 			$('#help-username').html('该用户已被封停，请联系管理员。');
+			refreshCaptcha();
 		} else if (msg == 'expired') {
 			$('#div-username').addClass('has-error');
 			$('#help-username').html('页面会话已过期。');
+			refreshCaptcha();
 		} else {
 			$('#div-username').addClass('has-error');
 			$('#help-username').html('用户名或密码错误。');
 			$('#div-password').addClass('has-error');
 			$('#help-password').html('用户名或密码错误。<a href="/forgot-password">忘记密码？</a>');
+			refreshCaptcha();
 		}
 	});
 	return true;
@@ -113,6 +152,9 @@ $(document).ready(function() {
 	$('#form-login').submit(function(e) {
 		e.preventDefault();
 		submitLoginPost();
+	});
+	$("#captcha").click(function(e) {
+		refreshCaptcha();
 	});
 });
 
