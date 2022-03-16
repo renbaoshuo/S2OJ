@@ -2,7 +2,9 @@ version: "3"
 services:
 
   uoj-db:
-    image: universaloj/uoj-system:db
+    build:
+      context: ./db/
+      dockerfile: Dockerfile
     container_name: uoj-db
     restart: always
     volumes:
@@ -12,7 +14,9 @@ services:
       - MYSQL_ROOT_PASSWORD=root
   
   uoj-judger:
-    image: universaloj/uoj-system:judger
+    build:
+      context: ./judger/
+      dockerfile: Dockerfile
     container_name: uoj-judger
     restart: always
     stdin_open: true
@@ -20,7 +24,7 @@ services:
     cap_add:
       - SYS_PTRACE
     volumes:
-      - ./uoj_data/judger/log:/opt/uoj/judger/log
+      - ./uoj_data/judger/log:/opt/uoj_judger/log
     environment:
       - UOJ_PROTOCOL=http
       - UOJ_HOST=uoj-web
@@ -30,7 +34,9 @@ services:
       - SOCKET_PASSWORD=_judger_socket_password_
   
   uoj-web:
-    image: universaloj/uoj-system:web
+    build:
+      context: ./
+      dockerfile: web/Dockerfile
     container_name: uoj-web
     restart: always
     stdin_open: true
