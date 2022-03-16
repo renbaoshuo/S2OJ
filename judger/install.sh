@@ -8,6 +8,10 @@ getAptPackage(){
 
 setJudgeConf(){
     printf "\n\n==> Setting judger files\n"
+    #specify environment
+    cat > /etc/environment <<UOJEOF
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+UOJEOF
     #Add judger user
     adduser judger --gecos "" --disabled-password
     #Set uoj_data path
