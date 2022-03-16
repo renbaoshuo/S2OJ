@@ -237,10 +237,10 @@ void parse_args(int argc, char **argv) {
 	}
 
 	if (run_program_config.type == "python2") {
-		string pre[4] = {"/usr/bin/python2", "-E", "-s", "-B"};
+		string pre[4] = {"/usr/bin/python2.7", "-E", "-s", "-B"};
 		run_program_config.argv.insert(run_program_config.argv.begin(), pre, pre + 4);
 	} else if (run_program_config.type == "python3") {
-		string pre[3] = {"/usr/bin/python3", "-I", "-B"};
+		string pre[3] = {"/usr/bin/python3.8", "-I", "-B"};
 		run_program_config.argv.insert(run_program_config.argv.begin(), pre, pre + 3);
 	} else if (run_program_config.type == "java8") {
 		string pre[3] = {"/usr/lib/jvm/java-8-openjdk-amd64/bin/java", "-Xmx1024m", "-Xss1024m"};

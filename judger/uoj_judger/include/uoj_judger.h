@@ -1152,12 +1152,12 @@ RunCompilerResult compile_cpp11(const string &name, const string &path = work_pa
 }
 RunCompilerResult compile_python2(const string &name, const string &path = work_path) {
 	return run_compiler(path.c_str(),
-			"/usr/bin/python2", "-E", "-s", "-B", "-O", "-c",
+			"/usr/bin/python2.7", "-E", "-s", "-B", "-O", "-c",
 			("import py_compile\nimport sys\ntry:\n    py_compile.compile('" + name + ".code'" + ", '" + name + "', doraise=True)\n    sys.exit(0)\nexcept Exception as e:\n    print e\n    sys.exit(1)").c_str(), NULL);
 }
 RunCompilerResult compile_python3(const string &name, const string &path = work_path) {
 	return run_compiler(path.c_str(),
-			"/usr/bin/python3", "-I", "-B", "-O", "-c", ("import py_compile\nimport sys\ntry:\n    py_compile.compile('" + name + ".code'" + ", '" + name + "', doraise=True)\n    sys.exit(0)\nexcept Exception as e:\n    print(e)\n    sys.exit(1)").c_str(), NULL);
+			"/usr/bin/python3.8", "-I", "-B", "-O", "-c", ("import py_compile\nimport sys\ntry:\n    py_compile.compile('" + name + ".code'" + ", '" + name + "', doraise=True)\n    sys.exit(0)\nexcept Exception as e:\n    print(e)\n    sys.exit(1)").c_str(), NULL);
 }
 RunCompilerResult compile_java8(const string &name, const string &path = work_path) {
 	RunCompilerResult ret = prepare_java_source(name, path);
@@ -1250,12 +1250,12 @@ RunCompilerResult compile_cpp11_with_implementer(const string &name, const strin
 /*
 RunCompilerResult compile_python2(const string &name, const string &path = work_path) {
 	return run_compiler(path.c_str(),
-			"/usr/bin/python2", "-E", "-s", "-B", "-O", "-c",
+			"/usr/bin/python2.7", "-E", "-s", "-B", "-O", "-c",
 			("import py_compile\nimport sys\ntry:\n    py_compile.compile('" + name + ".code'" + ", '" + name + "', doraise=True)\n    sys.exit(0)\nexcept Exception as e:\n    print e\n    sys.exit(1)").c_str(), NULL);
 }
 RunCompilerResult compile_python3(const string &name, const string &path = work_path) {
 	return run_compiler(path.c_str(),
-			"/usr/bin/python3", "-I", "-B", "-O", "-c", ("import py_compile\nimport sys\ntry:\n    py_compile.compile('" + name + ".code'" + ", '" + name + "', doraise=True)\n    sys.exit(0)\nexcept Exception as e:\n    print(e)\n    sys.exit(1)").c_str(), NULL);
+			"/usr/bin/python3.8", "-I", "-B", "-O", "-c", ("import py_compile\nimport sys\ntry:\n    py_compile.compile('" + name + ".code'" + ", '" + name + "', doraise=True)\n    sys.exit(0)\nexcept Exception as e:\n    print(e)\n    sys.exit(1)").c_str(), NULL);
 }
 */
 RunCompilerResult compile_with_implementer(const char *name)  {
