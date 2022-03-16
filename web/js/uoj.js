@@ -607,9 +607,6 @@ function get_codemirror_mode(lang) {
 		case 'Python2':
 		case 'Python3':
 			return 'text/x-python';
-		case 'Java8':
-		case 'Java11':
-			return 'text/x-java';
 		case 'Pascal':
 			return 'text/x-pascal';
 		case 'text':
@@ -623,7 +620,6 @@ function require_codemirror_mode(mode, callback) {
 	switch (mode) {
 		case 'text/x-c++src':
 		case 'text/x-csrc':
-		case 'text/x-java':
 			name = 'clike';
 			break;
 		case 'text/x-python':
@@ -713,14 +709,6 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 				.append($('<span class="help-block" id="' + help_file_id + '"></span>'))
 		var div_help_language = $('<div id="' + div_help_language_id + '" class="col-sm-12 text-warning top-buffer-sm">');
 
-		var show_help_lang = function() {
-			if ($(this).val() == 'Java8' || $(this).val() == 'Java11') {
-				div_help_language.text('注意：Java 程序源代码中不应指定所在的 package。我们会在源代码中找到第一个被定义的类并以它的 main 函数为程序入口点。');
-			} else {
-				div_help_language.text('');
-			}
-		};
-
 		var advanced_editor = null;
 		var advanced_editor_init = function() {
 			require_codemirror({}, function() {
@@ -770,8 +758,6 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 			}
 		}
 
-		input_language.each(show_help_lang);
-		input_language.change(show_help_lang);
 		input_language.change(function() {
 			if (advanced_editor != null) {
 				var mode = get_codemirror_mode(input_language.val());

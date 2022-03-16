@@ -592,12 +592,6 @@ struct RunProgramConfig {
 			type = "python2";
 		} else if (lang == "Python3") {
 			type = "python3";
-		} else if (lang == "Java8") {
-			program_name += "." + conf_str(name + "_main_class");
-			type = "java8";
-		} else if (lang == "Java11") {
-			program_name += "." + conf_str(name + "_main_class");
-			type = "java11";
 		}
 
 		set_argv(program_name.c_str(), NULL);
@@ -977,163 +971,6 @@ bool has_illegal_keywords_in_file(const string &name) {
 	return false;
 }
 
-RunCompilerResult prepare_java_source(const string &name, const string &path = work_path) {
-	FILE *f = fopen((path + "/" + name + ".code").c_str(), "r");
-
-	const int L = 1024;
-
-	std::string s;
-	char buf[L + 1];
-
-	int mode = 0;
-
-	while (!feof(f)) {
-		buf[fread(buf, 1, L, f)] = '\0';
-
-		for (char *p = buf; *p; p++) {
-			s += *p;
-			switch (mode) {
-				case 0:
-					switch (*p) {
-						case '/':
-							mode = 1;
-							break;
-						case '\'':
-							mode = 5;
-							break;
-						case '\"':
-							mode = 6;
-							break;
-					}
-					break;
-				case 1:
-					switch (*p) {
-						case '/':
-							mode = 2;
-							s.resize(s.length() - 2);
-							break;
-						case '*':
-							mode = 3;
-							s.resize(s.length() - 2);
-							break;
-					}
-					break;
-				case 2:
-					s.resize(s.length() - 1);
-					switch (*p) {
-						case '\n':
-							s += '\n';
-							mode = 0;
-							break;
-					}
-					break;
-				case 3:
-					s.resize(s.length() - 1);
-					switch (*p) {
-						case '*':
-							mode = 4;
-							break;
-					}
-					break;
-				case 4:
-					s.resize(s.length() - 1);
-					switch (*p) {
-						case '/':
-							s += ' ';
-							mode = 0;
-							break;
-					}
-					break;
-				case 5:
-					switch (*p) {
-						case '\'':
-							mode = 0;
-							break;
-						case '\\':
-							mode = 7;
-							break;
-					}
-				case 6:
-					switch (*p) {
-						case '\"':
-							mode = 0;
-							break;
-						case '\\':
-							mode = 8;
-							break;
-					}
-				case 7:
-					mode = 5;
-					break;
-				case 8:
-					mode = 6;
-					break;
-			}
-		}
-	}
-
-	bool valid[256];
-	fill(valid, valid + 256, false);
-	for (int c = 'a'; c <= 'z'; c++)
-		valid[c] = true;
-	for (int c = 'A'; c <= 'Z'; c++)
-		valid[c] = true;
-	valid['.'] = true;
-	valid['_'] = true;
-
-	vector<string> tokens;
-	for (int p = 0, np = 0; p < (int)s.length(); p = np) {
-		while (np < (int)s.length() && valid[(unsigned char)s[np]]) {
-			np++;
-		}
-		if (np == p) {
-			np++;
-		} else {
-			tokens.push_back(s.substr(p, np - p));
-		}
-	}
-	if (tokens.size() > 0 && tokens[0] == "package") {
-		RunCompilerResult res;
-		res.type = RS_WA;
-		res.ust = -1;
-		res.usm = -1;
-		res.succeeded = false;
-		res.info = "Please don't specify the package.";
-		return res;
-	}
-
-	for (int i = 0; i + 1 < (int)tokens.size(); i++) {
-		if (tokens[i] == "class") {
-			if (tokens[i + 1].length() <= 100) {
-				config[name + "_main_class"] = tokens[i + 1];
-
-				RunCompilerResult res;
-				res.type = RS_AC;
-				res.ust = 0;
-				res.usm = 0;
-				res.succeeded = true;
-				return res;
-			} else {
-				RunCompilerResult res;
-				res.type = RS_WA;
-				res.ust = -1;
-				res.usm = -1;
-				res.succeeded = false;
-				res.info = "The name of the main class is too long.";
-				return res;
-			}
-		}
-	}
-
-	RunCompilerResult res;
-	res.type = RS_WA;
-	res.ust = -1;
-	res.usm = -1;
-	res.succeeded = false;
-	res.info = "Can't find the main class.";
-	return res;
-}
-
 RunCompilerResult compile_c(const string &name, const string &path = work_path) {
 	return run_compiler(path.c_str(), 
 			"/usr/bin/gcc", "-o", name.c_str(), "-x", "c", (name + ".code").c_str(), "-lm", "-O2", "-DONLINE_JUDGE", NULL);
@@ -1158,32 +995,6 @@ RunCompilerResult compile_python2(const string &name, const string &path = work_
 RunCompilerResult compile_python3(const string &name, const string &path = work_path) {
 	return run_compiler(path.c_str(),
 			"/usr/bin/python3.8", "-I", "-B", "-O", "-c", ("import py_compile\nimport sys\ntry:\n    py_compile.compile('" + name + ".code'" + ", '" + name + "', doraise=True)\n    sys.exit(0)\nexcept Exception as e:\n    print(e)\n    sys.exit(1)").c_str(), NULL);
-}
-RunCompilerResult compile_java8(const string &name, const string &path = work_path) {
-	RunCompilerResult ret = prepare_java_source(name, path);
-	if (!ret.succeeded)
-		return ret;
-
-	string main_class = conf_str(name + "_main_class");
-
-	executef("rm %s/%s -rf 2>/dev/null; mkdir %s/%s", path.c_str(), name.c_str(), path.c_str(), name.c_str());
-	executef("echo package %s\\; | cat - %s/%s.code >%s/%s/%s.java", name.c_str(), path.c_str(), name.c_str(), path.c_str(), name.c_str(), main_class.c_str());
-
-	return run_compiler((path + "/" + name).c_str(),
-			"/usr/lib/jvm/java-8-openjdk-amd64/bin/javac", (main_class + ".java").c_str(), NULL);
-}
-RunCompilerResult compile_java11(const string &name, const string &path = work_path) {
-	RunCompilerResult ret = prepare_java_source(name, path);
-	if (!ret.succeeded)
-		return ret;
-
-	string main_class = conf_str(name + "_main_class");
-
-	executef("rm %s/%s -rf 2>/dev/null; mkdir %s/%s", path.c_str(), name.c_str(), path.c_str(), name.c_str());
-	executef("echo package %s\\; | cat - %s/%s.code >%s/%s/%s.java", name.c_str(), path.c_str(), name.c_str(), path.c_str(), name.c_str(), main_class.c_str());
-
-	return run_compiler((path + "/" + name).c_str(),
-			"/usr/lib/jvm/java-11-openjdk-amd64/bin/javac", (main_class + ".java").c_str(), NULL);
 }
 
 RunCompilerResult compile(const char *name)  {
@@ -1211,12 +1022,6 @@ RunCompilerResult compile(const char *name)  {
 	}
 	if (lang == "Python3") {
 		return compile_python3(name);
-	}
-	if (lang == "Java8") {
-		return compile_java8(name);
-	}
-	if (lang == "Java11") {
-		return compile_java11(name);
 	}
 	if (lang == "C") {
 		return compile_c(name);

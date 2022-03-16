@@ -297,16 +297,7 @@ void init_conf(const RunProgramConfig &config) {
 	}
 	statable_file_name_set.insert(config.work_path + "/");
 
-	if (config.type != "java8" && config.type != "java11") {
-		add_file_permission(config.program_name, 'r');
-	} else {
-		int p = config.program_name.find('.');
-		if (p == string::npos) {
-			readable_file_name_set.insert(config.work_path + "/");
-		} else {
-			readable_file_name_set.insert(config.work_path + "/" + config.program_name.substr(0, p) + "/");
-		}
-	}
+	add_file_permission(config.program_name, 'r');
 	add_file_permission(config.work_path, 'r');
 
 	for (vector<string>::const_iterator it = config.extra_readable_files.begin(); it != config.extra_readable_files.end(); it++) {
@@ -398,112 +389,6 @@ void init_conf(const RunProgramConfig &config) {
 		# ifdef UOJ_JUDGER_BASESYSTEM_UBUNTU1804
 		statable_file_name_set.insert("/usr/lib/python38.zip");
 		# endif
-	} else if (config.type == "java8") {
-		syscall_max_cnt[__NR_gettid         ] = -1;
-		syscall_max_cnt[__NR_set_tid_address] = 1;
-		syscall_max_cnt[__NR_set_robust_list] = 14;
-		syscall_max_cnt[__NR_futex          ] = -1;
-
-		syscall_max_cnt[__NR_uname          ] = 1;
-
-		syscall_max_cnt[__NR_clone          ] = 13;
-
-		syscall_max_cnt[__NR_getdents       ] = 4;
-		syscall_max_cnt[__NR_getdents64     ] = 4;
-
-		syscall_max_cnt[__NR_clock_getres   ] = 2;
-
-		syscall_max_cnt[__NR_setrlimit      ] = 1;
-
-		syscall_max_cnt[__NR_sched_getaffinity] = -1;
-		syscall_max_cnt[__NR_sched_yield    ] = -1;
-
-		# ifdef UOJ_JUDGER_BASESYSTEM_UBUNTU1804
-		syscall_max_cnt[__NR_prlimit64      ] = -1;
-		syscall_max_cnt[__NR_getpid         ] = -1;
-		syscall_max_cnt[__NR_sysinfo        ] = -1;
-		syscall_max_cnt[__NR_clone          ] = -1;
-		syscall_max_cnt[__NR_set_robust_list] = -1;
-		syscall_max_cnt[__NR_prctl          ] = -1;
-		# endif
-
-		syscall_should_soft_ban[__NR_socket   ] = true;
-		syscall_should_soft_ban[__NR_connect  ] = true;
-		syscall_should_soft_ban[__NR_geteuid  ] = true;
-		syscall_should_soft_ban[__NR_getuid   ] = true;
-
-		soft_ban_file_name_set.insert("/etc/nsswitch.conf");
-		soft_ban_file_name_set.insert("/etc/passwd");
-
-		add_file_permission("/usr/lib/jvm/java-8-openjdk-amd64/", 'r');
-		readable_file_name_set.insert("/sys/devices/system/cpu/");
-		readable_file_name_set.insert("/proc/");
-		# ifdef UOJ_JUDGER_BASESYSTEM_UBUNTU1804
-		readable_file_name_set.insert("/sys/fs/cgroup/cpu/");
-		readable_file_name_set.insert("/sys/fs/cgroup/cpu,cpuacct/");
-		readable_file_name_set.insert("/sys/fs/cgroup/memory/");
-		readable_file_name_set.insert("/usr/lib/locale/");
-		# endif
-		statable_file_name_set.insert("/usr/java/");
-		statable_file_name_set.insert("/tmp/");
-	} else if (config.type == "java11") {
-		syscall_max_cnt[__NR_gettid         ] = -1;
-		syscall_max_cnt[__NR_set_tid_address] = 1;
-		syscall_max_cnt[__NR_set_robust_list] = 15;
-		syscall_max_cnt[__NR_futex          ] = -1;
-
-		syscall_max_cnt[__NR_uname          ] = 1;
-
-		syscall_max_cnt[__NR_clone          ] = 14;
-
-		syscall_max_cnt[__NR_getdents       ] = 4;
-		syscall_max_cnt[__NR_getdents64     ] = 4;
-
-		syscall_max_cnt[__NR_clock_getres   ] = 2;
-
-		syscall_max_cnt[__NR_setrlimit      ] = 1;
-
-		syscall_max_cnt[__NR_sched_getaffinity] = -1;
-		syscall_max_cnt[__NR_sched_yield    ] = -1;
-
-		# ifdef UOJ_JUDGER_BASESYSTEM_UBUNTU1804
-		syscall_max_cnt[__NR_prlimit64      ] = -1;
-		syscall_max_cnt[__NR_getpid         ] = -1;
-		syscall_max_cnt[__NR_sysinfo        ] = -1;
-		syscall_max_cnt[__NR_clone          ] = -1;
-		syscall_max_cnt[__NR_set_robust_list] = -1;
-		syscall_max_cnt[__NR_uname          ] = -1;
-		syscall_max_cnt[__NR_clock_getres   ] = -1;
-		syscall_max_cnt[__NR_pread64        ] = -1;
-		syscall_max_cnt[__NR_prctl          ] = -1;
-		syscall_max_cnt[__NR_nanosleep      ] = -1;
-		syscall_max_cnt[__NR_clock_nanosleep] = -1;
-		# endif
-
-		syscall_should_soft_ban[__NR_socket   ] = true;
-		syscall_should_soft_ban[__NR_connect  ] = true;
-		syscall_should_soft_ban[__NR_geteuid  ] = true;
-		syscall_should_soft_ban[__NR_getuid   ] = true;
-
-		soft_ban_file_name_set.insert("/etc/nsswitch.conf");
-		soft_ban_file_name_set.insert("/etc/passwd");
-
-		add_file_permission("/usr/lib/jvm/java-11-openjdk-amd64/", 'r');
-		readable_file_name_set.insert("/sys/devices/system/cpu/");
-		readable_file_name_set.insert("/proc/");
-		# ifdef UOJ_JUDGER_BASESYSTEM_UBUNTU1804
-		readable_file_name_set.insert("/sys/fs/cgroup/cpu/");
-		readable_file_name_set.insert("/sys/fs/cgroup/cpu,cpuacct/");
-		readable_file_name_set.insert("/sys/fs/cgroup/memory/");
-		readable_file_name_set.insert("/usr/share/java/");
-		readable_file_name_set.insert("/usr/lib/locale/");
-		readable_file_name_set.insert("/etc/oracle/java/usagetracker.properties");
-		# endif
-		statable_file_name_set.insert("/usr/java/");
-		statable_file_name_set.insert("/tmp/");
-		# ifdef UOJ_JUDGER_BASESYSTEM_UBUNTU1804
-		statable_file_name_set.insert("/usr/share/");
-		# endif
 	} else if (config.type == "compiler") {
 		syscall_max_cnt[__NR_gettid         ] = -1;
 		syscall_max_cnt[__NR_set_tid_address] = -1;
@@ -535,13 +420,13 @@ void init_conf(const RunProgramConfig &config) {
 		syscall_max_cnt[__NR_chdir          ] = -1;
 		syscall_max_cnt[__NR_fchdir         ] = -1;
 
-		syscall_max_cnt[__NR_ftruncate      ] = -1; // for javac = =
+		syscall_max_cnt[__NR_ftruncate      ] = -1;
 
-		syscall_max_cnt[__NR_sched_getaffinity] = -1; // for javac = =
-		syscall_max_cnt[__NR_sched_yield      ] = -1; // for javac = =
+		syscall_max_cnt[__NR_sched_getaffinity] = -1;
+		syscall_max_cnt[__NR_sched_yield      ] = -1;
 
-		syscall_max_cnt[__NR_uname          ] = -1; // for javac = =
-		syscall_max_cnt[__NR_sysinfo        ] = -1; // for javac = =
+		syscall_max_cnt[__NR_uname          ] = -1;
+		syscall_max_cnt[__NR_sysinfo        ] = -1;
 
 		# ifdef UOJ_JUDGER_BASESYSTEM_UBUNTU1804
 		syscall_max_cnt[__NR_prlimit64      ] = -1;
@@ -553,10 +438,10 @@ void init_conf(const RunProgramConfig &config) {
 		syscall_max_cnt[__NR_socketpair     ] = -1;
 		# endif
 
-		syscall_should_soft_ban[__NR_socket   ] = true; // for javac
-		syscall_should_soft_ban[__NR_connect  ] = true; // for javac
-		syscall_should_soft_ban[__NR_geteuid  ] = true; // for javac
-		syscall_should_soft_ban[__NR_getuid  ] = true; // for javac
+		syscall_should_soft_ban[__NR_socket   ] = true;
+		syscall_should_soft_ban[__NR_connect  ] = true;
+		syscall_should_soft_ban[__NR_geteuid  ] = true;
+		syscall_should_soft_ban[__NR_getuid  ] = true;
 
 		writable_file_name_set.insert("/tmp/");
 
@@ -582,8 +467,8 @@ void init_conf(const RunProgramConfig &config) {
 
 		readable_file_name_set.insert("/sys/devices/system/cpu/");
 		readable_file_name_set.insert("/proc/");
-		soft_ban_file_name_set.insert("/etc/nsswitch.conf"); // for javac = =
-		soft_ban_file_name_set.insert("/etc/passwd"); // for javac = =
+		soft_ban_file_name_set.insert("/etc/nsswitch.conf");
+		soft_ban_file_name_set.insert("/etc/passwd");
 
 		readable_file_name_set.insert("/etc/timezone");
 		# ifdef UOJ_JUDGER_FPC_VERSION

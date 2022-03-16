@@ -50,8 +50,6 @@
 					<p>默认的测评环境是 Ubuntu Linux 20.04 LTS x64。</p>
 					<p>C的编译器是 gcc 9.4.0，编译命令：<code>gcc code.c -o code -lm -O2 -DONLINE_JUDGE</code>。</p>
 					<p>C++的编译器是 g++ 9.4.0，编译命令：<code>g++ code.cpp -o code -lm -O2 -DONLINE_JUDGE</code>。如果选择C++11会在编译命令后面添加<code>-std=c++11</code>。</p>
-					<p>Java8的JDK版本是 openjdk 1.8.0_312，编译命令：<code>javac code.java</code>。</p>
-					<p>Java11的JDK版本是 openjdk 11.0.14，编译命令：<code>javac code.java</code>。</p>
 					<p>Pascal的编译器是 fpc 3.0.4，编译命令：<code>fpc code.pas -O2</code>。</p>
 					<p>Python会先编译为优化过的字节码<samp>.pyo</samp>文件。支持的Python版本分别为Python 2.7和3.8。</p>
 				</div>

@@ -221,11 +221,8 @@ void parse_args(int argc, char **argv) {
 		}
 	}
 
-	if (run_program_config.type == "java8" || run_program_config.type == "java11") {
-		run_program_config.program_name = run_program_config.argv[0];
-	} else {
-		run_program_config.program_name = realpath(run_program_config.argv[0]);
-	}
+	run_program_config.program_name = realpath(run_program_config.argv[0]);
+
 	if (run_program_config.work_path.empty()) {
 		run_program_config.work_path = dirname(run_program_config.program_name);
 		run_program_config.program_basename = basename(run_program_config.program_name);
@@ -241,12 +238,6 @@ void parse_args(int argc, char **argv) {
 		run_program_config.argv.insert(run_program_config.argv.begin(), pre, pre + 4);
 	} else if (run_program_config.type == "python3") {
 		string pre[3] = {"/usr/bin/python3.8", "-I", "-B"};
-		run_program_config.argv.insert(run_program_config.argv.begin(), pre, pre + 3);
-	} else if (run_program_config.type == "java8") {
-		string pre[3] = {"/usr/lib/jvm/java-8-openjdk-amd64/bin/java", "-Xmx1024m", "-Xss1024m"};
-		run_program_config.argv.insert(run_program_config.argv.begin(), pre, pre + 3);
-	} else if (run_program_config.type == "java11") {
-		string pre[3] = {"/usr/lib/jvm/java-11-openjdk-amd64/bin/java", "-Xmx1024m", "-Xss1024m"};
 		run_program_config.argv.insert(run_program_config.argv.begin(), pre, pre + 3);
 	}
 }
