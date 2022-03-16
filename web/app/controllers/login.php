@@ -149,6 +149,8 @@ function submitLoginPost() {
 }
 
 $(document).ready(function() {
+	refreshCaptcha();
+
 	$('#form-login').submit(function(e) {
 		e.preventDefault();
 		submitLoginPost();
