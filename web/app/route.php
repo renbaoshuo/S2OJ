@@ -65,6 +65,11 @@ Route::group([
 		Route::any('/download.php', '/download.php');
 		
 		Route::any('/click-zan', '/click_zan.php');
+
+		Route::any('/paste', '/paste_post.php');
+		Route::any('/pastes/{rand_str_id}', '/paste_view.php');
+
+		Route::any('/map_visualizer', '/map_visualizer.php');
 	}
 );
 
