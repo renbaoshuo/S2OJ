@@ -14,7 +14,7 @@ getAptPackage(){
     export DEBIAN_FRONTEND=noninteractive
     dpkg -s gnupg 2>/dev/null || (apt-get update && apt-get install -y gnupg)
     echo "deb http://ppa.launchpad.net/stesie/libv8/ubuntu bionic main" | tee /etc/apt/sources.list.d/stesie-libv8.list && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D858A0DF
-    apt-get update && apt-get install -y vim ntp zip unzip curl wget apache2 libapache2-mod-xsendfile libapache2-mod-php php php-dev php-pear php-zip php-mysql php-mbstring php-gd php-intl php-xsl g++ cmake re2c libv8-7.5-dev libyaml-dev
+    apt-get update && apt-get install -y vim ntp zip unzip curl wget apache2 libapache2-mod-xsendfile libapache2-mod-php php php-dev php-pear php-zip php-mysql php-mbstring php-gd php-intl php-xsl g++ make re2c libv8-7.5-dev libyaml-dev
     # Install PHP extensions
     printf "/opt/libv8-7.5\n\n" | pecl install v8js yaml
 }
@@ -62,14 +62,14 @@ setWebConf(){
 file_put_contents('/var/www/uoj/app/.config.php', "<?php\nreturn ".str_replace('\'_httpHost_\'','UOJContext::httpHost()',var_export(\$config, true)).";\n");
 UOJEOF
     # Prepare local sandbox
-    cd ../judger/uoj_judger
+    cd /opt/uoj/judger/uoj_judger
     cat >include/uoj_work_path.h <<UOJEOF
 #define UOJ_WORK_PATH "/opt/uoj/judger/uoj_judger"
 #define UOJ_JUDGER_BASESYSTEM_UBUNTU1804
 #define UOJ_JUDGER_PYTHON3_VERSION "3.6"
 #define UOJ_JUDGER_FPC_VERSION "3.0.4"
 UOJEOF
-    make runner -j$(($(nproc) + 1)) && cd ../../web
+    make runner -j$(($(nproc) + 1)) && cd /opt/uoj/web
 }
 
 initProgress(){
