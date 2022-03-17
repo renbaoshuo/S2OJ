@@ -1,12 +1,12 @@
 <?php
 return [
 	'profile' => [
-		'oj-name' => 'Universal Online Judge',
-		'oj-name-short' => 'UOJ',
+		'oj-name' => '石家庄二中信息学在线评测系统',
+		'oj-name-short' => 'S2OJ',
 		'administrator' => 'root',
-		'admin-email' => 'admin@local_uoj.ac',
+		'admin-email' => 'admin@sjzezoj.com',
 		'QQ-group' => '',
-		'ICP-license' => ''
+		'ICP-license' => '冀ICP备2020028886号'
 	],
 	'database' => [
 		'database' => 'app_uoj233',
