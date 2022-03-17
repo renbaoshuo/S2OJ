@@ -166,16 +166,6 @@
 		<?= HTML::js_src('/js/jquery.hotkeys.js') ?>
 		<?php endif ?>
 
-		<?php if (isset($REQUIRE_LIB['flot'])): ?>
-		<!-- flot -->
-		<?= HTML::js_src('/js/jquery.flot.min.js') ?>
-		<?= HTML::js_src('/js/jquery.flot.time.min.js') ?>
-		<?= HTML::js_src('/js/jquery.flot.resize.min.js') ?>
-		<?php
-			$REQUIRE_LIB['colorhelpers'] = "";
-		?>
-		<?php endif ?>
-		
 		<?php if (isset($REQUIRE_LIB['colorhelpers'])): ?>
 		<!-- colorhelpers -->
 		<?= HTML::js_src('/js/jquery.colorhelpers.min.js') ?>
@@ -242,7 +232,7 @@
 				<?php if (Auth::check()): ?>
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-							<span class="uoj-username" data-rating="<?= Auth::user()['rating'] ?>" data-link="0"><?= Auth::id() ?></span> <?= $new_msg_tot_html ?>
+							<span class="uoj-username" data-link="0"><?= Auth::id() ?></span> <?= $new_msg_tot_html ?>
 						</a>
 						<ul class="dropdown-menu" role="menu">
 							<li role="presentation"><a class="dropdown-item" href="<?= HTML::url('/user/profile/' . Auth::id()) ?>"><?= UOJLocale::get('my profile') ?></a></li>

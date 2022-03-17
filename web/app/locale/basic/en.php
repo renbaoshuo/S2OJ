@@ -17,7 +17,6 @@ return [
 	'all the announcements' => 'All the Announcements……',
 	'help' => 'Help',
 	'search' => 'Search',
-	'top rated' => 'Top rated',
 	'username' => 'Username',
 	'password' => 'Password',
 	'new password' => 'New password',
@@ -26,7 +25,6 @@ return [
 	'QQ' => 'QQ',
 	'sex' => 'Sex',
 	'motto' => 'Motto',
-	'rating' => 'Rating',
 	'view all' => 'View all',
 	'appraisal' => 'Appraisal',
 	'submit' => 'Submit',
@@ -46,7 +44,6 @@ return [
 	'visit his blog' => function($name) {
 		return "Visit $name's blog";
 	},
-	'rating changes' => 'Rating changes',
 	'accepted problems' => 'Accepted problems',
 	'n problems in total' => function($n) {
 		return "$n ".($n <= 1 ? 'problem' : 'problems');

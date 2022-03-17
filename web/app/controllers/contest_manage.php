@@ -116,43 +116,6 @@
 	);
 	
 	if (isSuperUser($myUser)) {
-		$rating_k_form = new UOJForm('rating_k');
-		$rating_k_form->addInput('rating_k', 'text', 'rating 变化上限', isset($contest['extra_config']['rating_k']) ? $contest['extra_config']['rating_k'] : 400,
-			function ($x) {
-				if (!validateUInt($x) || $x < 1 || $x > 1000) {
-					return '不合法的上限';
-				}
-				return '';
-			},
-			null
-		);
-		$rating_k_form->handle = function() {
-			global $contest;
-			$contest['extra_config']['rating_k'] = $_POST['rating_k'];
-			$esc_extra_config = json_encode($contest['extra_config']);
-			$esc_extra_config = DB::escape($esc_extra_config);
-			DB::update("update contests set extra_config = '$esc_extra_config' where id = {$contest['id']}");
-		};
-		$rating_k_form->runAtServer();
-		
-		$rated_form = new UOJForm('rated');
-		$rated_form->handle = function() {
-			global $contest;
-			if (isset($contest['extra_config']['unrated'])) {
-				unset($contest['extra_config']['unrated']);
-			} else {
-				$contest['extra_config']['unrated'] = '';
-			}
-			$esc_extra_config = json_encode($contest['extra_config']);
-			$esc_extra_config = DB::escape($esc_extra_config);
-			DB::update("update contests set extra_config = '$esc_extra_config' where id = {$contest['id']}");
-		};
-		$rated_form->submit_button_config['class_str'] = 'btn btn-warning btn-block';
-		$rated_form->submit_button_config['text'] = isset($contest['extra_config']['unrated']) ? '设置比赛为rated' : '设置比赛为unrated';
-		$rated_form->submit_button_config['smart_confirm'] = '';
-	
-		$rated_form->runAtServer();
-		
 		$version_form = new UOJForm('version');
 		$version_form->addInput('standings_version', 'text', '排名版本', $contest['extra_config']['standings_version'],
 			function ($x) {
@@ -260,16 +223,6 @@
 	<?php if (isSuperUser($myUser)): ?>
 	<div class="tab-pane" id="tab-others">
 		<div class="row">
-			<div class="col-sm-12">
-				<h3>Rating控制</h3>
-				<div class="row">
-					<div class="col-sm-3">
-						<?php $rated_form->printHTML(); ?>
-					</div>
-				</div>
-				<div class="top-buffer-sm"></div>
-				<?php $rating_k_form->printHTML(); ?>
-			</div>
 			<div class="col-sm-12 top-buffer-sm">
 				<h3>版本控制</h3>
 				<?php $version_form->printHTML(); ?>

@@ -17,7 +17,6 @@ return [
 	'all the announcements' => '所有公告……',
 	'help' => '帮助',
 	'search' => '搜索',
-	'top rated' => '比赛排行榜',
 	'username' => '用户名',
 	'password' => '密码',
 	'new password' => '新密码',
@@ -26,7 +25,6 @@ return [
 	'QQ' => 'QQ',
 	'sex' => '性别',
 	'motto' => '格言',
-	'rating' => 'Rating',
 	'view all' => '查看全部',
 	'appraisal' => '评价',
 	'submit' => '提交',
@@ -46,7 +44,6 @@ return [
 	'visit his blog' => function($name) {
 		return "访问 $name 的博客";
 	},
-	'rating changes' => 'Rating 变化',
 	'accepted problems' => 'AC 过的题目',
 	'n problems in total' => function($n) {
 		return "共 $n 道题";

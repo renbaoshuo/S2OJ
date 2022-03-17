@@ -14,7 +14,7 @@
 	$register_form = new UOJForm('register');
 	$register_form->handle = function() {
 		global $myUser, $contest;
-		DB::query("insert into contests_registrants (username, user_rating, contest_id, has_participated) values ('{$myUser['username']}', {$myUser['rating']}, {$contest['id']}, 0)");
+		DB::query("insert into contests_registrants (username, contest_id, has_participated) values ('{$myUser['username']}', {$contest['id']}, 0)");
 		updateContestPlayerNum($contest);
 	};
 	$register_form->submit_button_config['class_str'] = 'btn btn-primary';
@@ -26,7 +26,7 @@
 <?php echoUOJPageHeader(HTML::stripTags($contest['name']) . ' - 报名') ?>
 <h1 class="page-header">比赛规则</h1>
 <ul>
-	<li>比赛报名后不算正式参赛，报名后进了比赛页面也不算参赛，<strong>看了题目才算正式参赛</strong>。如果未正式参赛则不算rating。</li>
+	<li>比赛报名后不算正式参赛，报名后进了比赛页面也不算参赛，<strong>看了题目才算正式参赛</strong>。</li>
 	<li>比赛中途可以提交，若同一题有多次提交按<strong>最后一次不是Compile Error的提交</strong>算成绩。（其实UOJ会自动无视你所有Compile Error的提交当作没看见）</li>
 	<li>比赛中途提交后，可以看到<strong>测样例</strong>的结果。（若为提交答案题则对于每个测试点，该测试点有分则该测试点为满分）</li>
 	<li>比赛结束后会进行最终测试，最终测试后的排名为最终排名。</li>

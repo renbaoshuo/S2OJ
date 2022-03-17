@@ -152,7 +152,6 @@ class HTML {
 		//$config->set('HTML.Doctype', 'HTML 4.01 Transitional');
 		$config->set('Cache.DefinitionImpl', null);
 		$def = $config->getHTMLDefinition(true);
-		$def->addAttribute('span', 'data-rating', 'Number');
 		
 		$def->addElement('section', 'Block', 'Flow', 'Common');
 		$def->addElement('nav',     'Block', 'Flow', 'Common');

@@ -291,7 +291,6 @@ UNLOCK TABLES;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `contests_registrants` (
   `username` varchar(20) NOT NULL,
-  `user_rating` int(11) NOT NULL,
   `contest_id` int(11) NOT NULL,
   `has_participated` tinyint(1) NOT NULL,
   `rank` int(11) NOT NULL,
@@ -622,7 +621,6 @@ CREATE TABLE `user_info` (
   `email` varchar(50) NOT NULL,
   `password` char(32) NOT NULL,
   `svn_password` char(10) NOT NULL,
-  `rating` int(11) NOT NULL DEFAULT '1500',
   `qq` bigint(20) NOT NULL,
   `sex` char(1) NOT NULL DEFAULT 'U',
   `ac_num` int(11) NOT NULL,
@@ -632,7 +630,6 @@ CREATE TABLE `user_info` (
   `remember_token` char(60) NOT NULL,
   `motto` varchar(200) NOT NULL,
   PRIMARY KEY (`username`),
-  KEY `rating` (`rating`,`username`),
   KEY `ac_num` (`ac_num`,`username`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;

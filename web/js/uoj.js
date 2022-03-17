@@ -108,18 +108,6 @@ function htmlspecialchars(str)
 	return s;
 }
 
-function getColOfRating(rating) {
-	if (rating < 1500) {
-		var H = 300 - (1500 - 850) * 300 / 1650, S = 30 + (1500 - 850) * 70 / 1650, V = 50 + (1500 - 850) * 50 / 1650;
-		if (rating < 300) rating = 300;
-		var k = (rating - 300) / 1200;
-		return ColorConverter.toStr(ColorConverter.toRGB(new HSV(H + (300 - H) * (1 - k), 30 + (S - 30) * k, 50 + (V - 50) * k)));
-	}
-	if (rating > 2500) {
-		rating = 2500;
-	}
-	return ColorConverter.toStr(ColorConverter.toRGB(new HSV(300 - (rating - 850) * 300 / 1650, 30 + (rating - 850) * 70 / 1650, 50 + (rating - 850) * 50 / 1650)));
-}
 function getColOfScore(score) {
 	if (score == 0) {
 		return ColorConverter.toStr(ColorConverter.toRGB(new HSV(0, 100, 80)));
@@ -130,80 +118,34 @@ function getColOfScore(score) {
 	}
 }
 
-function getUserLink(username, rating, addSymbol) {
+function getUserLink(username) {
 	if (!username) {
 		return '';
-	}
-	if (addSymbol == undefined) {
-		addSymbol = true;
 	}
 	var text = username;
 	if (username.charAt(0) == '@') {
 		username = username.substr(1);
 	}
-	if (addSymbol) {
-		if (rating >= 2500) {
-			text += '<sup>';
-			for (var i = 2500; i <= rating; i += 200) {
-				text += "&alefsym;"
-			}
-			text += "</sup>";
-		}
-	}
-	return '<a class="uoj-username" href="' + uojHome + '/user/profile/' + username + '" style="color:' + getColOfRating(rating) + '">' + text + '</a>';
+	return '<a class="uoj-username" href="' + uojHome + '/user/profile/' + username + '">' + text + '</a>';
 }
-function getUserSpan(username, rating, addSymbol) {
+function getUserSpan(username) {
 	if (!username) {
 		return '';
-	}
-	if (addSymbol == undefined) {
-		addSymbol = true;
 	}
 	var text = username;
 	if (username.charAt(0) == '@') {
 		username = username.substr(1);
 	}
-	if (addSymbol) {
-		if (rating >= 2500) {
-			text += '<sup>';
-			for (var i = 2500; i <= rating; i += 200) {
-				text += "&alefsym;"
-			}
-			text += "</sup>";
-		}
-	}
-	return '<span class="uoj-username" style="color:' + getColOfRating(rating) + '">' + text + '</span>';
+	return '<span class="uoj-username">' + text + '</span>';
 }
 
 function replaceWithHighlightUsername() {
 	var username = $(this).text();
-	var rating = $(this).data("rating");
-	if (isNaN(rating)) {
-		return;
-	}
 	if ($(this).data("link") != 0) {
-		$(this).replaceWith(getUserLink(username, rating));
+		$(this).replaceWith(getUserLink(username));
 	} else {
-		$(this).replaceWith(getUserSpan(username, rating));
+		$(this).replaceWith(getUserSpan(username));
 	}
-}
-
-$.fn.uoj_honor = function() {
-	return this.each(function() {
-		var honor = $(this).text();
-		var rating = $(this).data("rating");
-		if (isNaN(rating)) {
-			return;
-		}
-		if (rating >= 2500) {
-			honor += '<sup>';
-			for (var i = 2500; i <= rating; i += 200) {
-				honor += "&alefsym;"
-			}
-			honor += "</sup>";
-		}
-		$(this).css("color", getColOfRating(rating)).html(honor);
-	});
 }
 
 function showErrorHelp(name, err) {
@@ -422,7 +364,6 @@ $(document).ready(function() {
 $.fn.uoj_highlight = function() {
 	return $(this).each(function() {
 		$(this).find("span.uoj-username").each(replaceWithHighlightUsername);
-		$(this).find(".uoj-honor").uoj_honor();
 		$(this).find(".uoj-score").each(function() {
 			var score = parseInt($(this).text());
 			var maxscore = parseInt($(this).data('max'));
@@ -1069,7 +1010,7 @@ function showCommentReplies(id, replies) {
 		function(reply) {
 			return $('<tr id="' + 'comment-' + reply.id + '" />').append(
 				$('<td />').append(
-					$('<div class="comtbox6">' + getUserLink(reply.poster, reply.poster_rating) + '：' + reply.content + '</div>')
+					$('<div class="comtbox6">' + getUserLink(reply.poster) + '：' + reply.content + '</div>')
 				).append(
 					$('<ul class="text-right list-inline bot-buffer-no" />').append(
 						'<li>' + '<small class="text-muted">' + reply.post_time + '</small>' + '</li>'
@@ -1107,7 +1048,7 @@ function showStandings() {
 		function(row) {
 			var col_tr = '<tr>';
 			col_tr += '<td>' + row[3] + '</td>';
-			col_tr += '<td>' + getUserLink(row[2][0], row[2][1]) + '</td>';
+			col_tr += '<td>' + getUserLink(row[2][0]) + '</td>';
 			col_tr += '<td>' + '<div><span class="uoj-score" data-max="' + problems.length * 100 + '" style="color:' + getColOfScore(row[0] / problems.length) + '">' + row[0] + '</span></div>' + '<div>' + getPenaltyTimeStr(row[1]) + '</div></td>';
 			for (var i = 0; i < problems.length; i++) {
 				col_tr += '<td>';

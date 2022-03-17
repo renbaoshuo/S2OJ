@@ -120,35 +120,11 @@
 				global $contest;
 				$contest_data = queryContestData($contest);
 				calcStandings($contest, $contest_data, $score, $standings, true);
-				if (!isset($contest['extra_config']['unrated'])) {
-					$rating_k = isset($contest['extra_config']['rating_k']) ? $contest['extra_config']['rating_k'] : 400;
-					$ratings = calcRating($standings, $rating_k);
-				} else {
-					$ratings = array();
-					for ($i = 0; $i < count($standings); $i++) {
-						$ratings[$i] = $standings[$i][2][1];
-					}
-				}
 
 				for ($i = 0; $i < count($standings); $i++) {
 					$user = queryUser($standings[$i][2][0]);
-					$change = $ratings[$i] - $user['rating'];
 					$user_link = getUserLink($user['username']);
 
-					if ($change != 0) {
-						$tail = '<strong style="color:red">' . ($change > 0 ? '+' : '') . $change . '</strong>';
-						$content = <<<EOD
-<p>${user_link} 您好：</p>
-<p class="indent2">您在 <a href="/contest/{$contest['id']}">{$contest['name']}</a> 这场比赛后的Rating变化为${tail}，当前Rating为 <strong style="color:red">{$ratings[$i]}</strong>。</p>
-EOD;
-					} else {
-						$content = <<<EOD
-<p>${user_link} 您好：</p>
-<p class="indent2">您在 <a href="/contest/{$contest['id']}">{$contest['name']}</a> 这场比赛后Rating没有变化。当前Rating为 <strong style="color:red">{$ratings[$i]}</strong>。</p>
-EOD;
-					}
-					sendSystemMsg($user['username'], 'Rating变化通知', $content);
-					DB::query("update user_info set rating = {$ratings[$i]} where username = '{$standings[$i][2][0]}'");
 					DB::query("update contests_registrants set rank = {$standings[$i][3]} where contest_id = {$contest['id']} and username = '{$standings[$i][2][0]}'");
 				}
 				DB::query("update contests set status = 'finished' where id = {$contest['id']}");

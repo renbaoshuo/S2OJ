@@ -11,7 +11,7 @@ function uojHandleAtSign($str, $uri) {
 				return $matches[0];
 			} else {
 				$referrers[$user['username']] = '';
-				return '<span class="uoj-username" data-rating="'.$user['rating'].'">@'.$user['username'].'</span>';
+				return '<span class="uoj-username">@'.$user['username'].'</span>';
 			}
 		}
 	}, $str);
@@ -74,12 +74,9 @@ function become403Page() {
 	becomeMsgPage('<div class="text-center"><div style="font-size:233px">403</div><p>禁止入内！ T_T</p></div>', '403');
 }
 
-function getUserLink($username, $rating = null) {
+function getUserLink($username) {
 	if (validateUsername($username) && ($user = queryUser($username))) {
-		if ($rating == null) {
-			$rating = $user['rating'];
-		}
-		return '<span class="uoj-username" data-rating="'.$rating.'">'.$username.'</span>';
+		return '<span class="uoj-username">'.$username.'</span>';
 	} else {
 		$esc_username = HTML::escape($username);
 		return '<span>'.$esc_username.'</span>';
@@ -1029,45 +1026,4 @@ function echoUOJPageHeader($page_title, $extra_config = array()) {
 }
 function echoUOJPageFooter($config = array()) {
 	uojIncludeView('page-footer', $config);
-}
-
-function echoRanklist($config = array()) {
-	$header_row = '';
-	$header_row .= '<tr>';
-	$header_row .= '<th style="width: 5em;">#</th>';
-	$header_row .= '<th style="width: 14em;">'.UOJLocale::get('username').'</th>';
-	$header_row .= '<th style="width: 50em;">'.UOJLocale::get('motto').'</th>';
-	$header_row .= '<th style="width: 5em;">'.UOJLocale::get('rating').'</th>';
-	$header_row .= '</tr>';
-	
-	$users = array();
-	$print_row = function($user, $now_cnt) use (&$users) {
-		if (!$users) {
-			$rank = DB::selectCount("select count(*) from user_info where rating > {$user['rating']}") + 1;
-		} elseif ($user['rating'] == $users[count($users) - 1]['rating']) {
-			$rank = $users[count($users) - 1]['rank'];
-		} else {
-			$rank = $now_cnt;
-		}
-		
-		$user['rank'] = $rank;
-		
-		echo '<tr>';
-		echo '<td>' . $user['rank'] . '</td>';
-		echo '<td>' . getUserLink($user['username']) . '</td>';
-		echo '<td>' . HTML::escape($user['motto']) . '</td>';
-		echo '<td>' . $user['rating'] . '</td>';
-		echo '</tr>';
-		
-		$users[] = $user;
-	};
-	$col_names = array('username', 'rating', 'motto');
-	$tail = 'order by rating desc, username asc';
-	
-	if (isset($config['top10'])) {
-		$tail .= ' limit 10';
-	}
-	
-	$config['get_row_index'] = '';
-	echoLongTable($col_names, 'user_info', '1', $tail, $header_row, $print_row, $config);
 }
