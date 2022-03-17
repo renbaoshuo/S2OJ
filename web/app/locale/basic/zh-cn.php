@@ -64,5 +64,5 @@ return [
 	'male' => '男',
 	'female' => '女',
 	'server time' => '服务器时间',
-	'opensource project' => '开源项目'
+	'opensource project' => '开源项目，S2OJ 魔改版'
 ];

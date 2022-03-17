@@ -64,5 +64,5 @@ return [
 	'male' => 'Male',
 	'female' => 'Female',
 	'server time' => 'Server Time',
-	'opensource project' => 'OpenSource Project'
+	'opensource project' => 'OpenSource Project, modified by S2OJ'
 ];
