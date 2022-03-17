@@ -4,6 +4,7 @@ return [
 	'login' => 'Login',
 	'register' => 'Register',
 	'logout' => 'Logout',
+	'need login' => 'You need to login first',
 	'my profile' => 'My Profile',
 	'private message' => 'Private Message',
 	'system message' => 'System Message',

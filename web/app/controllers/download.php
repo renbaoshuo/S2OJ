@@ -1,5 +1,10 @@
 <?php
 	requirePHPLib('judger');
+
+	if (!Auth::check()) {
+		becomeMsgPage(UOJLocale::get('need login'));
+	}
+
 	switch ($_GET['type']) {
 		case 'problem':
 			if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {

@@ -1,4 +1,8 @@
 <?php
+	if (!Auth::check()) {
+		becomeMsgPage(UOJLocale::get('need login'));
+	}
+
 	$blogs_pag = new Paginator(array(
 		'col_names' => array('*'),
 		'table_name' => 'blogs',

@@ -1,4 +1,8 @@
 <?php
+	if (!Auth::check()) {
+		becomeMsgPage(UOJLocale::get('need login'));
+	}
+
 	if (!validateUInt($_GET['id']) || !($blog = queryBlog($_GET['id']))) {
 		become404Page();
 	}

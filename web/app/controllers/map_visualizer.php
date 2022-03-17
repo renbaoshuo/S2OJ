@@ -1,5 +1,9 @@
 <?php
 
+if (!Auth::check()) {
+	becomeMsgPage(UOJLocale::get('need login'));
+}
+
 $REQUIRE_LIB['shjs'] = "";
 $REQUIRE_LIB['dracula'] = "";
 $REQUIRE_LIB['base64'] = "";

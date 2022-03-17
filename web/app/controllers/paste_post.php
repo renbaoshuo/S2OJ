@@ -2,8 +2,8 @@
 requirePHPLib('form');
 requirePHPLib('judger');
 
-if ($myUser == null) {
-	becomeMsgPage("请先登录!");
+if (!Auth::check()) {
+	becomeMsgPage(UOJLocale::get('need login'));
 }
 
 

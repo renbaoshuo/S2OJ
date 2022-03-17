@@ -1,7 +1,12 @@
 <?php
 	requireLib('shjs');
 	requireLib('mathjax');
-	echoUOJPageHeader(UOJLocale::get('help')) 
+
+	if (!Auth::check()) {
+		becomeMsgPage(UOJLocale::get('need login'));
+	}
+
+	echoUOJPageHeader(UOJLocale::get('help'));
 ?>
 <article>
 	<header>

@@ -1,6 +1,10 @@
 <?php
 	requirePHPLib('form');
-	
+
+	if (!Auth::check()) {
+		becomeMsgPage(UOJLocale::get('need login'));
+	}
+
 	$upcoming_contest_name = null;
 	$upcoming_contest_href = null;
 	$rest_second = 1000000;

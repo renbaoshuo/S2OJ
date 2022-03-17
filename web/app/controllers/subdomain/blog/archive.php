@@ -1,5 +1,9 @@
 <?php
 	requirePHPLib('form');
+
+	if (!Auth::check()) {
+		becomeMsgPage(UOJLocale::get('need login'));
+	}
 	
 	$blogs_cond = "poster = '".UOJContext::userid()."' and is_draft = false";
 	if (!UOJContext::hasBlogPermission()) {

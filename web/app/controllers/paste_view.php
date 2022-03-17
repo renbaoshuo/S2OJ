@@ -1,5 +1,9 @@
 <?php
 
+if (!Auth::check()) {
+	becomeMsgPage(UOJLocale::get('need login'));
+}
+
 $paste_id = $_GET['rand_str_id'];
 
 $paste = DB::selectFirst("select * from pastes where `index` = '".DB::escape($paste_id)."'");

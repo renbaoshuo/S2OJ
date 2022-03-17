@@ -1,5 +1,9 @@
 <?php
 	requirePHPLib('form');
+
+	if (!Auth::check()) {
+		becomeMsgPage(UOJLocale::get('need login'));
+	}
 	
 	if (!UOJContext::hasBlogPermission()) {
 		become403Page();

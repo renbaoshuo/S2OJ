@@ -1,4 +1,8 @@
 <?php
+	if (!Auth::check()) {
+		becomeMsgPage(UOJLocale::get('need login'));
+	}
+
 	requirePHPLib('form');
 	
 	function echoBlogCell($blog) {

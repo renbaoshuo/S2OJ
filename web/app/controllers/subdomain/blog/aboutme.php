@@ -1,4 +1,10 @@
-<?php requirePHPLib('form') ?>
+<?php
+    requirePHPLib('form');
+
+    if (!Auth::check()) {
+        becomeMsgPage(UOJLocale::get('need login'));
+    }
+?>
 <?php echoUOJPageHeader('关于我') ?>
 
 <?php if (UOJContext::user()['username'] != 'vfleaking'): ?>

@@ -4,6 +4,7 @@ return [
 	'login' => '登录',
 	'register' => '注册',
 	'logout' => '登出',
+	'need login' => '您需要登录后才能继续',
 	'my profile' => '个人信息',
 	'private message' => '私信',
 	'system message' => '系统消息',

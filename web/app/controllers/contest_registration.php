@@ -1,11 +1,12 @@
 <?php
 	requirePHPLib('form');
+
 	if (!validateUInt($_GET['id']) || !($contest = queryContest($_GET['id']))) {
 		become404Page();
 	}
 	genMoreContestInfo($contest);
 	
-	if ($myUser == null) {
+	if (!Auth::check()) {
 		redirectToLogin();
 	} elseif (hasContestPermission($myUser, $contest) || hasRegistered($myUser, $contest) || $contest['cur_progress'] != CONTEST_NOT_STARTED) {
 		redirectTo('/contests');

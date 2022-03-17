@@ -1,5 +1,5 @@
 <?php
-	if ($myUser == null) {
+	if (!Auth::check()) {
 		redirectToLogin();
 	}
 

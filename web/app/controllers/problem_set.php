@@ -2,6 +2,10 @@
 	requirePHPLib('form');
 	requirePHPLib('judger');
 	requirePHPLib('data');
+
+	if (!Auth::check()) {
+		becomeMsgPage(UOJLocale::get('need login'));
+	}
 	
 	if (isSuperUser($myUser)) {
 		$new_problem_form = new UOJForm('new_problem');

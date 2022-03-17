@@ -1,4 +1,8 @@
 <?php
+	if (!Auth::check()) {
+		becomeMsgPage(UOJLocale::get('need login'));
+	}
+
 	$username = $_GET['username'];
 ?>
 <?php if (validateUsername($username) && ($user = queryUser($username))): ?>

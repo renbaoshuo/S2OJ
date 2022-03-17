@@ -1,7 +1,11 @@
 <?php
 	requirePHPLib('form');
-	requirePHPLib('judger');
-	
+	requirePHPLib('judger');	
+
+	if (!Auth::check()) {
+		becomeMsgPage(UOJLocale::get('need login'));
+	}
+
 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
 		become404Page();
 	}
