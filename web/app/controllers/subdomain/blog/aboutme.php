@@ -1,9 +1,9 @@
 <?php
-    requirePHPLib('form');
+	requirePHPLib('form');
 
-    if (!Auth::check()) {
-        becomeMsgPage(UOJLocale::get('need login'));
-    }
+	if (!Auth::check()) {
+		becomeMsgPage(UOJLocale::get('need login'));
+	}
 ?>
 <?php echoUOJPageHeader('关于我') ?>
 
