@@ -3,7 +3,11 @@
 	
 	function echoBlogCell($blog) {
 		echo '<tr>';
-		echo '<td>' . getBlogLink($blog['id']) . '</td>';
+		if ($blog['is_hidden']) {
+			echo '<td><span class="text-danger">[已隐藏]</span>' . getBlogLink($blog['id']) . '</td>';
+		} else {
+			echo '<td>' . getBlogLink($blog['id']) . '</td>';
+		}
 		echo '<td>' . getUserLink($blog['poster']) . '</td>';
 		echo '<td>' . $blog['post_time'] . '</td>';
 		echo '</tr>';
@@ -28,5 +32,5 @@ EOD;
 </div>
 <?php endif ?>
 <h3>博客总览</h3>
-<?php echoLongTable(array('id', 'poster', 'title', 'post_time', 'zan'), 'blogs', 'is_hidden = 0', 'order by post_time desc', $header, 'echoBlogCell', $config); ?>
+<?php echoLongTable(array('id', 'poster', 'title', 'post_time', 'zan', 'is_hidden'), 'blogs', "is_hidden = 0 or poster = '{$myUser['username']}'", 'order by post_time desc', $header, 'echoBlogCell', $config); ?>
 <?php echoUOJPageFooter() ?>
