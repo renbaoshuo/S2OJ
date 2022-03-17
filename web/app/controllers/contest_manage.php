@@ -212,7 +212,7 @@
 			</thead>
 			<tbody>
 <?php
-	$result = DB::query("select problem_id from contests_problems where contest_id = ${contest['id']} order by problem_id asc");
+	$result = DB::query("select problem_id from contests_problems where contest_id = ${contest['id']} order by dfn asc");
 	while ($row = DB::fetch($result, MYSQLI_ASSOC)) {
 		$problem = queryProblemBrief($row['problem_id']);
 		$problem_config_str = isset($contest['extra_config']["problem_{$problem['id']}"]) ? $contest['extra_config']["problem_{$problem['id']}"] : 'sample';
