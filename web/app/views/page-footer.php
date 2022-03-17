@@ -16,7 +16,7 @@
 					</div>
 				</div>
 				
-				<ul class="list-inline"><li class="list-inline-item"><?= UOJConfig::$data['profile']['oj-name'] ?></li></ul>
+				<ul class="list-inline"><li class="list-inline-item">Universal Online Judge</li></ul>
 				<?php if (UOJConfig::$data['profile']['ICP-license'] != ''): ?>
 				<p><a target="_blank" href="https://beian.miit.gov.cn" style="text-decoration:none;"><?= UOJConfig::$data['profile']['ICP-license'] ?></a></p>
 				<?php endif ?>

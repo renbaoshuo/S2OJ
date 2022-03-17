@@ -253,7 +253,7 @@
 					<a href="<?= HTML::url('/') ?>">
 						<img src="<?= HTML::url('/images/logo_small.png') ?>" alt="Logo" class="img-rounded" style="width: 39px; height: 39px; position: relative; top: -4px; margin-right: 8px;" />
 					</a>
-					<span class="u" style="position: absolute; font-size: 13px; letter-spacing: 10px; left: 48px;">S2 Online Judge</span>
+					<span class="u" style="position: absolute; font-size: 13px; left: 48px;">S2 Online Judge</span>
 					<span class="d" style="position: absolute; font-size: 26px; top: 11px;">在线评测系统</span>
 				</h1>
 				<h1 class="d-block d-sm-none"><?= $PageMainTitleOnSmall ?></h1>
