@@ -5,7 +5,35 @@
 	if ($myUser == null || !isSuperUser($myUser)) {
 		become403Page();
 	}
-	
+
+	$change_realname_form = new UOJForm('change_realname');
+	$change_realname_form->submit_button_config['align'] = 'compressed';
+	$change_realname_form->addInput('r_username', 'text', '用户名', '',
+		function ($r_username) {
+			if (!validateUsername($r_username)) {
+				return '用户名不合法';
+			}
+			if (!queryUser($r_username)) {
+				return '用户不存在';
+			}
+			return '';
+		},
+		null
+	);
+	$change_realname_form->addInput('r_realname', 'text', '真实姓名', '',
+		function ($r_realname) {
+			return '';
+		},
+		null
+	);
+	$change_realname_form->handle = function() {
+		$r_username = $_POST['r_username'];
+		$r_realname = $_POST['r_realname'];
+
+		DB::query("update user_info set realname = '$r_realname' where username = '$r_username'");
+	};
+	$change_realname_form->runAtServer();
+
 	$user_form = new UOJForm('user');
 	$user_form->addInput('username', 'text', '用户名', '',
 		function ($username) {
@@ -368,6 +396,8 @@ EOD;
 	<div class="col-sm-9">
 		<?php if ($cur_tab === 'users'): ?>
 			<?php $user_form->printHTML(); ?>
+			<h3>修改用户真实姓名</h3>
+			<?php $change_realname_form->printHTML(); ?>
 			<h3>封禁名单</h3>
 			<?php echoLongTable($banlist_cols, 'user_info', "usergroup='B'", '', $banlist_header_row, $banlist_print_row, $banlist_config) ?>
 		<?php elseif ($cur_tab === 'blogs'): ?>

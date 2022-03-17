@@ -195,7 +195,7 @@ UNLOCK TABLES;
 CREATE TABLE `contests_asks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `contest_id` int(11) NOT NULL,
-  `username` varchar(20) NOT NULL,
+  `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `question` text NOT NULL,
   `answer` text NOT NULL,
   `post_time` datetime NOT NULL,
@@ -245,7 +245,7 @@ UNLOCK TABLES;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `contests_permissions` (
-  `username` varchar(20) NOT NULL,
+  `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `contest_id` int(11) NOT NULL,
   PRIMARY KEY (`username`,`contest_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
@@ -289,7 +289,7 @@ UNLOCK TABLES;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `contests_registrants` (
-  `username` varchar(20) NOT NULL,
+  `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `contest_id` int(11) NOT NULL,
   `has_participated` tinyint(1) NOT NULL,
   `rank` int(11) NOT NULL,
@@ -500,7 +500,7 @@ UNLOCK TABLES;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `problems_permissions` (
-  `username` varchar(20) NOT NULL,
+  `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `problem_id` int(11) NOT NULL,
   PRIMARY KEY (`username`,`problem_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
@@ -616,7 +616,8 @@ UNLOCK TABLES;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user_info` (
   `usergroup` char(1) NOT NULL DEFAULT 'U',
-  `username` varchar(20) NOT NULL,
+  `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `realname` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `email` varchar(50) NOT NULL,
   `password` char(32) NOT NULL,
   `svn_password` char(10) NOT NULL,

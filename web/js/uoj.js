@@ -118,34 +118,52 @@ function getColOfScore(score) {
 	}
 }
 
-function getUserLink(username) {
+function getUserLink(username, realname) {
 	if (!username) {
 		return '';
 	}
 	var text = username;
 	if (username.charAt(0) == '@') {
 		username = username.substr(1);
+	}
+	if (realname) {
+		text = text + ' (' + realname + ')';
 	}
 	return '<a class="uoj-username" href="' + uojHome + '/user/profile/' + username + '">' + text + '</a>';
 }
-function getUserSpan(username) {
+function getUserSpan(username, realname) {
 	if (!username) {
 		return '';
 	}
 	var text = username;
 	if (username.charAt(0) == '@') {
 		username = username.substr(1);
+	}
+	if (realname) {
+		text = text + ' (' + realname + ')';
 	}
 	return '<span class="uoj-username">' + text + '</span>';
 }
 
 function replaceWithHighlightUsername() {
 	var username = $(this).text();
+	var realname = $(this).data("realname");
 	if ($(this).data("link") != 0) {
-		$(this).replaceWith(getUserLink(username));
+		$(this).replaceWith(getUserLink(username, realname));
 	} else {
-		$(this).replaceWith(getUserSpan(username));
+		$(this).replaceWith(getUserSpan(username, realname));
 	}
+}
+
+$.fn.uoj_honor = function() {
+	return this.each(function() {
+		var honor = $(this).text();
+		var realname = $(this).data("realname");
+		if (realname) {
+			honor = honor + ' (' + realname + ')';
+		}
+		$(this).css('color', '#007bff').html(honor);
+	});
 }
 
 function showErrorHelp(name, err) {
@@ -364,6 +382,7 @@ $(document).ready(function() {
 $.fn.uoj_highlight = function() {
 	return $(this).each(function() {
 		$(this).find("span.uoj-username").each(replaceWithHighlightUsername);
+		$(this).find(".uoj-honor").uoj_honor();
 		$(this).find(".uoj-score").each(function() {
 			var score = parseInt($(this).text());
 			var maxscore = parseInt($(this).data('max'));
@@ -1010,7 +1029,7 @@ function showCommentReplies(id, replies) {
 		function(reply) {
 			return $('<tr id="' + 'comment-' + reply.id + '" />').append(
 				$('<td />').append(
-					$('<div class="comtbox6">' + getUserLink(reply.poster) + '：' + reply.content + '</div>')
+					$('<div class="comtbox6">' + getUserLink(reply.poster, reply.poster_realname) + '：' + reply.content + '</div>')
 				).append(
 					$('<ul class="text-right list-inline bot-buffer-no" />').append(
 						'<li>' + '<small class="text-muted">' + reply.post_time + '</small>' + '</li>'
@@ -1048,7 +1067,7 @@ function showStandings() {
 		function(row) {
 			var col_tr = '<tr>';
 			col_tr += '<td>' + row[3] + '</td>';
-			col_tr += '<td>' + getUserLink(row[2][0]) + '</td>';
+			col_tr += '<td>' + getUserLink(row[2][0], row[2][1]) + '</td>';
 			col_tr += '<td>' + '<div><span class="uoj-score" data-max="' + problems.length * 100 + '" style="color:' + getColOfScore(row[0] / problems.length) + '">' + row[0] + '</span></div>' + '<div>' + getPenaltyTimeStr(row[1]) + '</div></td>';
 			for (var i = 0; i < problems.length; i++) {
 				col_tr += '<td>';

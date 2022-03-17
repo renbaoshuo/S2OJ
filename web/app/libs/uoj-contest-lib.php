@@ -82,7 +82,7 @@ function queryContestData($contest, $config = array()) {
 	}
 
 	$people = [];
-	$result = DB::query("select username from contests_registrants where contest_id = {$contest['id']} and has_participated = 1");
+	$result = DB::query("select a.username, b.realname from contests_registrants a inner join user_info b on a.username = b.username where a.contest_id = {$contest['id']} and a.has_participated = 1");
 	while ($row = DB::fetch($result, MYSQLI_NUM)) {
 		$people[] = $row;
 	}
@@ -108,7 +108,7 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 		$score[$submission[2]][$submission[3]] = array($submission[4], $penalty, $submission[0]);
 	}
 
-	// standings: rank => score, penalty, [username], virtual_rank
+	// standings: rank => score, penalty, [username, realname], virtual_rank
 	$standings = array();
 	foreach ($contest_data['people'] as $person) {
 		$cur = array(0, 0, $person);

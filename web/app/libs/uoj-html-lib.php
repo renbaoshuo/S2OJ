@@ -76,12 +76,33 @@ function become403Page() {
 
 function getUserLink($username) {
 	if (validateUsername($username) && ($user = queryUser($username))) {
-		return '<span class="uoj-username">'.$username.'</span>';
+		$realname = $user['realname'];
+
+		if ($realname == "") {
+			return '<span class="uoj-username">'.$username.'</span>';
+		} else {
+			return '<span class="uoj-username" data-realname="'.$realname.'">'.$username.'</span>';
+		}
 	} else {
 		$esc_username = HTML::escape($username);
 		return '<span>'.$esc_username.'</span>';
 	}
 }
+
+function getUserName($username, $realname = null) {
+	if ($realname == null) {
+		if (validateUsername($username) && ($user = queryUser($username))) {
+			$realname = $user['realname'];
+		}
+	}
+
+	if ($realname == "") {
+		return "$username";
+	} else {
+		return "$username ($realname)";
+	}
+}
+
 
 function getProblemLink($problem, $problem_title = '!title_only') {
 	if ($problem_title == '!title_only') {
