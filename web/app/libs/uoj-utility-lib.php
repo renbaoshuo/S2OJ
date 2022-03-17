@@ -129,6 +129,13 @@ function blog_name_decode($name) {
 	return $name;
 }
 
+function isProblemUploader($user) {
+	return $user != null && $user['usertype'] == 'problem_uploader';
+}
+function isProblemManager($user) {
+	return $user != null && $user['usertype'] == 'problem_manager';
+}
+
 function isSuperUser($user) {
 	return $user != null && $user['usergroup'] == 'S';
 }

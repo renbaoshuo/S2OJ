@@ -4,20 +4,23 @@ function hasProblemPermission($user, $problem) {
 	if ($user == null) {
 		return false;
 	}
-	if (isSuperUser($user)) {
+	if (isSuperUser($user) || isProblemManager($user)) {
+		return true;
+	}
+	if ($problem['uploader'] == $user['username']) {
 		return true;
 	}
 	return DB::selectFirst("select * from problems_permissions where username = '{$user['username']}' and problem_id = {$problem['id']}") != null;
 }
-function hasViewPermission($str,$user,$problem,$submission) {
-	if ($str=='ALL') {
+function hasViewPermission($str, $user, $problem, $submission) {
+	if ($str == 'ALL') {
 		return true;
 	}
-	if ($str=='ALL_AFTER_AC') {
+	if ($str == 'ALL_AFTER_AC') {
 		return hasAC($user,$problem);
 	}
-	if ($str=='SELF') {
-		return $submission['submitter']==$user['username'];
+	if ($str == 'SELF') {
+		return $submission['submitter'] == $user['username'];
 	}
 	return false;
 }

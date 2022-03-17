@@ -450,6 +450,7 @@ UNLOCK TABLES;
 CREATE TABLE `problems` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` text NOT NULL,
+  `uploader` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `is_hidden` tinyint(1) NOT NULL DEFAULT '0',
   `submission_requirement` text,
   `hackable` tinyint(1) NOT NULL DEFAULT '0',
@@ -618,6 +619,7 @@ CREATE TABLE `user_info` (
   `usergroup` char(1) NOT NULL DEFAULT 'U',
   `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `realname` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `usertype` varchar(50) NOT NULL DEFAULT 'student',
   `email` varchar(50) NOT NULL,
   `password` char(32) NOT NULL,
   `svn_password` char(10) NOT NULL,

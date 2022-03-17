@@ -122,6 +122,8 @@
 	$options = array(
 		'banneduser' => '设为封禁用户',
 		'normaluser' => '设为普通用户',
+		'problem_uploader' => '设为题目上传者',
+		'problem_manager' => '设为题目管理员',
 		'superuser' => '设为超级用户'
 	);
 	$user_form->addSelect('op_type', $options, '操作类型', '');
@@ -132,9 +134,19 @@
 		switch ($_POST['op_type']) {
 			case 'banneduser':
 				DB::update("update user_info set usergroup = 'B' where username = '{$username}'");
+				DB::update("update user_info set usertype = 'banned' where username = '{$username}'");
 				break;
 			case 'normaluser':
 				DB::update("update user_info set usergroup = 'U' where username = '{$username}'");
+				DB::update("update user_info set usertype = 'student' where username = '{$username}'");
+				break;
+			case 'problem_uploader':
+				DB::update("update user_info set usergroup = 'U' where username = '{$username}'");
+				DB::update("update user_info set usertype = 'problem_uploader' where username = '{$username}'");
+				break;
+			case 'problem_manager':
+				DB::update("update user_info set usergroup = 'U' where username = '{$username}'");
+				DB::update("update user_info set usertype = 'problem_manager' where username = '{$username}'");
 				break;
 			case 'superuser':
 				DB::update("update user_info set usergroup = 'S' where username = '{$username}'");
