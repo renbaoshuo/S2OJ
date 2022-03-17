@@ -12,8 +12,6 @@
 		if (!validateUInt($_GET['id']) || !($blog = queryBlog($_GET['id'])) || !UOJContext::isHisSlide($blog)) {
 			become404Page();
 		}
-	} else {
-		$blog = DB::selectFirst("select * from blogs where poster = '".UOJContext::user()['username']."' and type = 'S' and is_draft = true");
 	}
 	
 	$blog_editor = new UOJBlogEditor();
@@ -36,7 +34,7 @@
 			'is_hidden' => true
 		);
 	}
-	if ($blog && !$blog['is_draft']) {
+	if ($blog) {
 		$blog_editor->blog_url = HTML::blog_url(UOJContext::user()['username'], "/post/{$blog['id']}");
 	} else {
 		$blog_editor->blog_url = null;
@@ -46,28 +44,16 @@
 		DB::update("update blogs set title = '".DB::escape($data['title'])."', content = '".DB::escape($data['content'])."', content_md = '".DB::escape($data['content_md'])."', is_hidden = {$data['is_hidden']} where id = {$id}");
 	}
 	function insertSlide($data) {
-		DB::insert("insert into blogs (type, title, content, content_md, poster, is_hidden, is_draft, post_time) values ('S', '".DB::escape($data['title'])."', '".DB::escape($data['content'])."', '".DB::escape($data['content_md'])."', '".Auth::id()."', {$data['is_hidden']}, {$data['is_draft']}, now())");
+		DB::insert("insert into blogs (type, title, content, content_md, poster, is_hidden, post_time) values ('S', '".DB::escape($data['title'])."', '".DB::escape($data['content'])."', '".DB::escape($data['content_md'])."', '".Auth::id()."', {$data['is_hidden']}, now())");
 	}
 	
 	$blog_editor->save = function($data) {
 		global $blog;
 		$ret = array();
 		if ($blog) {
-			if ($blog['is_draft']) {
-				if ($data['is_hidden']) {
-					updateBlog($blog['id'], $data);
-				} else {
-					deleteBlog($blog['id']);
-					insertSlide(array_merge($data, array('is_draft' => 0)));
-					$blog = array('id' => DB::insert_id(), 'tags' => array());
-					$ret['blog_write_url'] = HTML::blog_url(UOJContext::user()['username'], "/slide/{$blog['id']}/write");
-					$ret['blog_url'] = HTML::blog_url(UOJContext::user()['username'], "/post/{$blog['id']}");
-				}
-			} else {
-				updateBlog($blog['id'], $data);
-			}
+			updateBlog($blog['id'], $data);
 		} else {
-			insertSlide(array_merge($data, array('is_draft' => $data['is_hidden'] ? 1 : 0)));
+			insertSlide($data);
 			$blog = array('id' => DB::insert_id(), 'tags' => array());
 		}
 		if ($data['tags'] !== $blog['tags']) {
