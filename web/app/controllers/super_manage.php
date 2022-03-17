@@ -1,10 +1,81 @@
 <?php
+	$REQUIRE_LIB['md5'] = '';
+	$REQUIRE_LIB['jquery.query'] = '';
+
 	requirePHPLib('form');
 	requirePHPLib('judger');
 	
 	if ($myUser == null || !isSuperUser($myUser)) {
 		become403Page();
 	}
+
+	$register_form = new UOJForm('register');
+	$register_form->submit_button_config['align'] = 'compressed';
+	$register_form->addInput('new_username', 'text', '用户名', '',
+		function ($new_username) {
+			if (!validateUsername($new_username)) {
+				return '用户名不合法';
+			}
+			if (queryUser($new_username)) {
+				return '该用户已存在';
+			}
+			return '';
+		},
+		null
+	);
+	$register_form->addInput('new_password', 'password', '密码', '',
+		function ($new_password) {
+			return '';
+		},
+		null
+	);
+	$register_form->addInput('new_realname', 'text', '真实姓名', '',
+		function ($new_realname) {
+			return '';
+		},
+		null
+	);
+	$register_form->handle = function() {
+		$new_username = $_POST['new_username'];
+		$new_password = $_POST['new_password'];
+		$new_realname = $_POST['new_realname'];
+		$new_password = hash_hmac('md5', $new_password, getPasswordClientSalt());
+		$new_password = getPasswordToStore($new_password, $new_username);
+		$svn_pw = uojRandString(10);
+
+		DB::query("insert into user_info (username, realname, password, svn_password, register_time, usergroup) values ('$new_username', '$new_realname', '$new_password', '$svn_pw', now(), 'U')");
+	};
+	$register_form->runAtServer();
+
+	$change_password_form = new UOJForm('change_password');
+	$change_password_form->submit_button_config['align'] = 'compressed';
+	$change_password_form->addInput('p_username', 'text', '用户名', '',
+		function ($p_username) {
+			if (!validateUsername($p_username)) {
+				return '用户名不合法';
+			}
+			if (!queryUser($p_username)) {
+				return '用户不存在';
+			}
+			return '';
+		},
+		null
+	);
+	$change_password_form->addInput('p_password', 'password', '密码', '',
+		function ($p_password) {
+			return '';
+		},
+		null
+	);
+	$change_password_form->handle = function() {
+		$p_username = $_POST['p_username'];
+		$p_password = $_POST['p_password'];
+		$p_password = hash_hmac('md5', $p_password, getPasswordClientSalt());
+		$p_password = getPasswordToStore($p_password, $p_username);
+
+		DB::query("update user_info set password = '$p_password' where username = '$p_username'");
+	};
+	$change_password_form->runAtServer();
 
 	$change_realname_form = new UOJForm('change_realname');
 	$change_realname_form->submit_button_config['align'] = 'compressed';
@@ -53,12 +124,12 @@
 		'normaluser' => '设为普通用户',
 		'superuser' => '设为超级用户'
 	);
-	$user_form->addSelect('op-type', $options, '操作类型', '');
+	$user_form->addSelect('op_type', $options, '操作类型', '');
 	$user_form->handle = function() {
 		global $user_form;
 		
 		$username = $_POST['username'];
-		switch ($_POST['op-type']) {
+		switch ($_POST['op_type']) {
 			case 'banneduser':
 				DB::update("update user_info set usergroup = 'B' where username = '{$username}'");
 				break;
@@ -327,27 +398,48 @@ EOD;
 EOD;
 	};
 	
-	$banlist_cols = array('username', 'usergroup');
-	$banlist_config = array();
-	$banlist_header_row = <<<EOD
+	$userlist_cols = array('username', 'usergroup', 'register_time');
+	$userlist_config = array('page_len' => 20,
+			'table_classes' => array('table', 'table-bordered', 'table-hover', 'table-striped'));
+	$userlist_header_row = <<<EOD
 	<tr>
 		<th>用户名</th>
+		<th style="width: 6em">用户类别</th>
+		<th style="width: 12em">注册时间</th>
 	</tr>
 EOD;
-	$banlist_print_row = function($row) {
+
+	$cur_tab = isset($_GET['tab']) ? $_GET['tab'] : 'users';
+
+	$user_list_cond = array();
+	if ($cur_tab === 'users') {
+		if (isset($_GET['username']) && $_GET['username'] != "") {
+			$user_list_cond[] = "username like '%" . DB::escape($_GET['username']) . "%'";
+		}
+		if (isset($_GET['usergroup']) && $_GET['usergroup'] != "") {
+			$user_list_cond[] = "usergroup = '" . DB::escape($_GET['usergroup']) . "'";
+		}
+	}
+	if ($user_list_cond) {
+		$user_list_cond = join($user_list_cond, ' and ');
+	} else {
+		$user_list_cond = '1';
+	}
+
+	$userlist_print_row = function($row) {
 		$hislink = getUserLink($row['username']);
 		echo <<<EOD
 			<tr>
 				<td>${hislink}</td>
+				<td>{$row['usergroup']}</td>
+				<td>{$row['register_time']}</td>
 			</tr>
 EOD;
 	};
-	
-	$cur_tab = isset($_GET['tab']) ? $_GET['tab'] : 'users';
-	
+
 	$tabs_info = array(
 		'users' => array(
-			'name' => '用户操作',
+			'name' => '用户管理',
 			'url' => "/super-manage/users"
 		),
 		'blogs' => array(
@@ -362,20 +454,12 @@ EOD;
 			'name' => '自定义测试',
 			'url' => '/super-manage/custom-test'
 		),
-		'click-zan' => array(
-			'name' => '点赞管理',
-			'url' => '/super-manage/click-zan'
-		),
-		'search' => array(
-			'name' => '搜索管理',
-			'url' => '/super-manage/search'
-		),
 		'judger' => array(
 			'name' => '评测机管理',
 			'url' => '/super-manage/judger'
 		),
 		'paste' => array(
-			'name' => 'Paste管理',
+			'name' => '剪贴板管理',
 			'url' => '/super-manage/paste'
 		)
 	);
@@ -396,11 +480,37 @@ EOD;
 	
 	<div class="col-sm-9">
 		<?php if ($cur_tab === 'users'): ?>
+			<h3>添加新用户</h3>
+			<?php $register_form->printHTML(); ?>
+			<h3>修改用户密码</h3>
+			<?php $change_password_form->printHTML(); ?>
+			<h3>用户类别设置</h3>
 			<?php $user_form->printHTML(); ?>
 			<h3>修改用户真实姓名</h3>
 			<?php $change_realname_form->printHTML(); ?>
-			<h3>封禁名单</h3>
-			<?php echoLongTable($banlist_cols, 'user_info', "usergroup='B'", '', $banlist_header_row, $banlist_print_row, $banlist_config) ?>
+			<h3>用户名单</h3>
+			<div id="user-query">
+				<form class="form-horizontal uoj-form-compressed" target="_self" method="GET">
+					<div class="form-group">
+						<label for="username" class="col-sm-2 control-label">用户名</label>
+						<div class="col-sm-3">
+							<input type="text" class="form-control" name="username" id="user-query-username" value="" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="usergroup" class="col-sm-2 control-label">用户类别</label>
+						<div class="col-sm-3">
+							<select class="form-control" id="user-query-usergroup" name="usergroup">
+								<option value="">*: 所有用户</option>
+								<option value="B">B: 封禁用户</option>
+								<option value="U">U: 普通用户</option>
+								<option value="S">S: 超级用户</option>
+							</select>
+						</div>
+					</div><div class="text-center"><button type="submit" id="user-query-submit" class="mt-2 btn btn-secondary">查询</button></div>
+				</form>
+			</div>
+			<?php echoLongTable($userlist_cols, 'user_info', $user_list_cond, 'order by username asc', $userlist_header_row, $userlist_print_row, $userlist_config) ?>
 		<?php elseif ($cur_tab === 'blogs'): ?>
 			<div>
 				<h4>添加到比赛链接</h4>
@@ -455,49 +565,6 @@ EOD;
 			}
 		?>
 		<?= $submissions_pag->pagination() ?>
-		<?php elseif ($cur_tab === 'click-zan'): ?>
-		没写好QAQ
-		<?php elseif ($cur_tab === 'search'): ?>
-		<h2 class="text-center">一周搜索情况</h2>
-		<div id="search-distribution-chart-week" style="height: 250px;"></div>
-		<script type="text/javascript">
-			new Morris.Line({
-				element: 'search-distribution-chart-week',
-				data: <?= json_encode(DB::selectAll("select DATE_FORMAT(created_at, '%Y-%m-%d %h:00'), count(*) from search_requests  where created_at > now() - interval 1 week group by DATE_FORMAT(created_at, '%Y-%m-%d %h:00')")) ?>,
-				xkey: "DATE_FORMAT(created_at, '%Y-%m-%d %h:00')",
-				ykeys: ["count(*)"],
-				labels: ['number'],
-				resize: true
-			});
-		</script>
-		
-		<h2 class="text-center">一月搜索情况</h2>
-		<div id="search-distribution-chart-month" style="height: 250px;"></div>
-		<script type="text/javascript">
-			new Morris.Line({
-				element: 'search-distribution-chart-month',
-				data: <?= json_encode(DB::selectAll("select DATE_FORMAT(created_at, '%Y-%m-%d'), count(*) from search_requests  where created_at > now() - interval 1 week group by DATE_FORMAT(created_at, '%Y-%m-%d')")) ?>,
-				xkey: "DATE_FORMAT(created_at, '%Y-%m-%d')",
-				ykeys: ["count(*)"],
-				labels: ['number'],
-				resize: true
-			});
-		</script>
-		
-		<?php echoLongTable(array('*'), 'search_requests', "1", 'order by id desc',
-			'<tr><th>id</th><th>created_at</th><th>remote_addr</th><th>type</th><th>q</th><tr>',
-			function($row) {
-				echo '<tr>';
-				echo '<td>', $row['id'], '</td>';
-				echo '<td>', $row['created_at'], '</td>';
-				echo '<td>', $row['remote_addr'], '</td>';
-				echo '<td>', $row['type'], '</td>';
-				echo '<td>', HTML::escape($row['q']), '</td>';
-				echo '</tr>';
-			}, array(
-				'page_len' => 1000
-			))
-		?>
 		<?php elseif ($cur_tab === 'judger'): ?>
 			<div>
 				<h4>添加评测机</h4>
