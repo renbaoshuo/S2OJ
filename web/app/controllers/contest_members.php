@@ -81,7 +81,8 @@
 		},
 		array('page_len' => 100,
 			'get_row_index' => '',
-			'print_after_table' => function() {}
+			'print_after_table' => function() {
+			}
 		)
 	);
 ?>
