@@ -66,7 +66,8 @@ class UOJContext {
 		if ($domain === null) {
 			$domain = UOJConfig::$data['web']['main']['host'];
 		}
-		$domain = array_shift(explode(':', $domain));
+		$domain = explode(':', $domain);
+		$domain = array_shift($domain);
 		if (validateIP($domain) || $domain === 'localhost') {
 			$domain = '';
 		} else {
