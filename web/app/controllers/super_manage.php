@@ -35,6 +35,7 @@
 	$change_realname_form->runAtServer();
 
 	$user_form = new UOJForm('user');
+	$user_form->submit_button_config['align'] = 'compressed';
 	$user_form->addInput('username', 'text', '用户名', '',
 		function ($username) {
 			if (!validateUsername($username)) {
