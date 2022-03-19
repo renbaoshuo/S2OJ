@@ -3,7 +3,7 @@
 getAptPackage(){
     printf "\n\n==> Getting environment packages\n"
     export DEBIAN_FRONTEND=noninteractive
-    apt-get update && apt-get install -y vim ntp zip unzip curl wget build-essential fp-compiler python2.7 python3.8 python3-requests openjdk-8-jdk openjdk-11-jdk
+    apt-get update && apt-get install -y vim ntp zip unzip curl wget build-essential fp-compiler python2.7 python3.8 python3-requests
 }
 
 setJudgeConf(){
