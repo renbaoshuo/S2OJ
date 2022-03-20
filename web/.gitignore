@@ -7,7 +7,5 @@ composer.lock
 app/.config.php
 app/storage/tmp/*
 app/storage/submission/*
-app/storage/paste/*
 !app/storage/tmp/.gitkeep
 !app/storage/submission/.gitkeep
-!app/storage/paste/.gitkeep

@@ -377,22 +377,6 @@
 	};
 	$judger_deleter->runAtServer();
 
-	$paste_deleter = new UOJForm('paste_deleter');
-	$paste_deleter->addInput('paste_deleter_name', 'text', 'Paste ID', '',
-		function ($x, &$vdata) {
-			if (DB::selectCount("select count(*) from pastes where `index`='$x'")==0) {
-				return '不合法';
-			}
-			$vdata['name'] = $x;
-			return '';
-		},
-		null
-	);
-	$paste_deleter->handle = function(&$vdata) {
-		DB::delete("delete from pastes where `index` = '${vdata['name']}'");
-	};
-	$paste_deleter->runAtServer();
-	
 	$judgerlist_cols = array('judger_name', 'password');
 	$judgerlist_config = array();
 	$judgerlist_header_row = <<<EOD
@@ -469,10 +453,6 @@ EOD;
 		'judger' => array(
 			'name' => '评测机管理',
 			'url' => '/super-manage/judger'
-		),
-		'paste' => array(
-			'name' => '剪贴板管理',
-			'url' => '/super-manage/paste'
 		)
 	);
 	
@@ -588,11 +568,6 @@ EOD;
 			</div>
 			<h3>评测机列表</h3>
 			<?php echoLongTable($judgerlist_cols, 'judger_info', "1=1", '', $judgerlist_header_row, $judgerlist_print_row, $judgerlist_config) ?>
-		<?php elseif ($cur_tab === 'paste'): ?>
-			<div>
-				<h4>Paste管理</h4>
-				<?php echoPastesList() ?>
-			</div>
 		<?php endif ?>
 	</div>
 </div>
