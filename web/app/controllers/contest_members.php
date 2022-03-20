@@ -10,6 +10,68 @@
 	}
 	genMoreContestInfo($contest);
 
+	if (isSuperUser($myUser)) {
+		$add_new_contestant_form = new UOJForm('add_new_contestant_form');
+		$add_new_contestant_form->addInput('new_username', 'text', '用户名', '', 
+			function ($x) {
+				global $contest;
+
+				if (!validateUsername($x)) return '用户名不合法';
+				$user = queryUser($x);
+				if (!$user) return '用户不存在';
+
+				if (hasRegistered($user, $contest)) {
+					return '该用户已经报名';
+				}
+				return '';
+			},
+			null
+		);
+		$add_new_contestant_form->submit_button_config['align'] = 'compressed';
+		$add_new_contestant_form->submit_button_config['text'] = '注册该用户';
+		$add_new_contestant_form->handle = function() {
+			global $contest;
+			$username = $_POST['new_username'];
+
+			$user = queryUser($username);
+			if (!$user) return;
+
+			DB::query("replace into contests_registrants (username, user_rating, contest_id, has_participated) values ('{$user['username']}', {$user['rating']}, {$contest['id']}, 0)");
+
+			updateContestPlayerNum($contest);
+		};
+		$add_new_contestant_form->runAtServer();
+
+		$add_group_to_contest_form = new UOJForm('add_group_to_contest');
+		$add_group_to_contest_form->addInput('group_id', 'text', '小组 ID', '', 
+			function ($x) {
+				global $contest;
+
+				if (!validateUInt($x)) return '小组 ID 不合法';
+				$group = queryGroup($x);
+				if (!$group) return '小组不存在';
+
+				return '';
+			},
+			null
+		);
+		$add_group_to_contest_form->submit_button_config['align'] = 'compressed';
+		$add_group_to_contest_form->submit_button_config['text'] = '注册该小组中的用户';
+		$add_group_to_contest_form->handle = function() {
+			global $contest;
+			$group_id = $_POST['group_id'];
+
+			$users = DB::selectAll("select b.username as username, b.rating as rating from groups_users a inner join user_info b on a.username = b.username where a.group_id = $group_id");
+
+			foreach ($users as $user) {
+				DB::query("replace into contests_registrants (username, user_rating, contest_id, has_participated) values ('{$user['username']}', {$user['rating']}, {$contest['id']}, 0)");
+			}
+
+			updateContestPlayerNum($contest);
+		};
+		$add_group_to_contest_form->runAtServer();
+	}
+
 	$has_contest_permission = hasContestPermission($myUser, $contest);
 	$show_ip = $has_contest_permission;
 	
@@ -86,6 +148,14 @@
 		array('page_len' => 100,
 			'get_row_index' => '',
 			'print_after_table' => function() {
+				global $add_new_contestant_form, $add_group_to_contest_form;
+
+				if (isset($add_new_contestant_form)) {
+					$add_new_contestant_form->printHTML();
+				}
+				if (isset($add_group_to_contest_form)) {
+					$add_group_to_contest_form->printHTML();
+				}
 			}
 		)
 	);

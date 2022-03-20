@@ -4,11 +4,15 @@
 	<div class="col-sm-6">
 		<?= HTML::div_vinput("{$editor->name}_title", 'text', $editor->label_text['title'], html_entity_decode($editor->cur_data['title'])) ?>
 	</div>
+	<?php if ($editor->show_tags): ?>
 	<div class="col-sm-6">
 		<?= HTML::div_vinput("{$editor->name}_tags", 'text', $editor->label_text['tags'], join(', ', $editor->cur_data['tags'])) ?>
 	</div>
+	<?php endif ?>
 </div>
+<?php if ($editor->show_editor): ?>
 <?= HTML::div_vtextarea("{$editor->name}_content_md", $editor->label_text['content'], $editor->cur_data['content_md']) ?>
+<?php endif ?>
 <div class="row mt-2">
 	<div class="col-sm-6">
 		<?php if ($editor->blog_url): ?>

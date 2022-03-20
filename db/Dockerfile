@@ -1,4 +1,4 @@
-FROM mysql:latest
+FROM mysql:5.7
 
 ADD . /opt/uoj_db
 WORKDIR /opt/uoj_db
