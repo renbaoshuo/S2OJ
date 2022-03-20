@@ -8,7 +8,7 @@ class HTML {
 		return strip_tags($str);
 	}
 	public static function avatar_addr($user, $size) {
-		return '//cn.gravatar.com/avatar/' . md5(strtolower(trim($user['email']))) . "?d=mm&amp;s=$size";
+		return '//gravatar.loli.net/avatar/' . md5(strtolower(trim($user['email']))) . "?d=mm&amp;s=$size";
 	}
 		
 	public static function tablist($tabs_info, $cur, $type = 'nav-tabs') {
