@@ -67,8 +67,6 @@ Route::group([
 		Route::any('/download.php', '/download.php');
 		
 		Route::any('/click-zan', '/click_zan.php');
-
-		Route::any('/map_visualizer', '/map_visualizer.php');
 	}
 );
 
