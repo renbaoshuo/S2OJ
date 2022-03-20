@@ -12,7 +12,8 @@ return [
 		'database' => 'app_uoj233',
 		'username' => 'root',
 		'password' => '_database_password_',
-		'host' => '127.0.0.1'
+		'host' => '127.0.0.1',
+		'port' => '3306',
 	],
 	'web' => [
 		'domain' => null,

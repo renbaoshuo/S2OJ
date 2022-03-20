@@ -3,7 +3,7 @@
 class DB {
 	public static function init() {
 		global $uojMySQL;
-		@$uojMySQL = mysqli_connect(UOJConfig::$data['database']['host'] . ':3306', UOJConfig::$data['database']['username'], UOJConfig::$data['database']['password'], UOJConfig::$data['database']['database']);
+		@$uojMySQL = mysqli_connect(UOJConfig::$data['database']['host'] . ':' . UOJConfig::$data['database']['port'], UOJConfig::$data['database']['username'], UOJConfig::$data['database']['password'], UOJConfig::$data['database']['database']);
 		if (!$uojMySQL) {
 			echo 'There is something wrong with database >_<.... ' . mysqli_connect_error();
 			die();
