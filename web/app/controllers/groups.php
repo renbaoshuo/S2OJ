@@ -4,34 +4,34 @@
     requirePHPLib('data');
 
     if (isSuperUser($myUser)) {
-		$new_group_form = new UOJForm('new_group');
-		$new_group_form->handle = function() {
-            DB::query("insert into `groups` (title, is_hidden) values ('新小组', 1)");
-		};
-		$new_group_form->submit_button_config['align'] = 'right';
-		$new_group_form->submit_button_config['class_str'] = 'btn btn-primary';
-		$new_group_form->submit_button_config['text'] = UOJLocale::get('add new group');
-		$new_group_form->submit_button_config['smart_confirm'] = '';
-		$new_group_form->runAtServer();
+    	$new_group_form = new UOJForm('new_group');
+    	$new_group_form->handle = function() {
+    		DB::query("insert into `groups` (title, is_hidden) values ('新小组', 1)");
+    	};
+    	$new_group_form->submit_button_config['align'] = 'right';
+    	$new_group_form->submit_button_config['class_str'] = 'btn btn-primary';
+    	$new_group_form->submit_button_config['text'] = UOJLocale::get('add new group');
+    	$new_group_form->submit_button_config['smart_confirm'] = '';
+    	$new_group_form->runAtServer();
     }
 
     function echoGroup($group) {
-        global $myUser;
+    	global $myUser;
 
-        echo '<tr class="text-center">';
-        echo '<td>';
-        echo '#', $group['group_id'], '</td>';
+    	echo '<tr class="text-center">';
+    	echo '<td>';
+    	echo '#', $group['group_id'], '</td>';
 
-        echo '<td class="text-left">';
-        if ($group['is_hidden']) {
-            echo ' <span class="text-danger">[隐藏]</span> ';
-        }
-        echo '<a href="/group/', $group['group_id'], '">', $group['title'], '</a>';
-        echo '</td>';
+    	echo '<td class="text-left">';
+    	if ($group['is_hidden']) {
+    		echo ' <span class="text-danger">[隐藏]</span> ';
+    	}
+    	echo '<a href="/group/', $group['group_id'], '">', $group['title'], '</a>';
+    	echo '</td>';
 
-        echo "<td>{$group['user_count']}</td>";
+    	echo "<td>{$group['user_count']}</td>";
 
-        echo '</tr>';
+    	echo '</tr>';
     }
 ?>
 
@@ -49,9 +49,9 @@
 EOD;
 
     if (isSuperUser($myUser)) {
-        $cond = "1";
+    	$cond = "1";
     } else {
-        $cond = 'is_hidden = 0';
+    	$cond = 'is_hidden = 0';
     }
 
     $from = "`groups` a left join groups_users b on a.id = b.group_id";

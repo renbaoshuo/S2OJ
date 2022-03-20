@@ -37,9 +37,13 @@
 			function ($x) {
 				global $group_id;
 
-				if (!validateUsername($x)) return '用户名不合法';
+				if (!validateUsername($x)) {
+					return '用户名不合法';
+				}
 				$user = queryUser($x);
-				if (!$user) return '用户不存在';
+				if (!$user) {
+					return '用户不存在';
+				}
 
 				if (queryUserInGroup($group_id, $x)) {
 					return '该用户已经在小组中';
@@ -64,7 +68,9 @@
 			function ($x) {
 				global $group_id;
 
-				if (!validateUsername($x)) return '用户名不合法';
+				if (!validateUsername($x)) {
+					return '用户名不合法';
+				}
 				if (!queryUserInGroup($group_id, $x)) {
 					return '该用户不在小组中';
 				}

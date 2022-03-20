@@ -16,9 +16,13 @@
 			function ($x) {
 				global $contest;
 
-				if (!validateUsername($x)) return '用户名不合法';
+				if (!validateUsername($x)) {
+					return '用户名不合法';
+				}
 				$user = queryUser($x);
-				if (!$user) return '用户不存在';
+				if (!$user) {
+					return '用户不存在';
+				}
 
 				if (hasRegistered($user, $contest)) {
 					return '该用户已经报名';
@@ -34,7 +38,9 @@
 			$username = $_POST['new_username'];
 
 			$user = queryUser($username);
-			if (!$user) return;
+			if (!$user) {
+				return;
+			}
 
 			DB::query("replace into contests_registrants (username, user_rating, contest_id, has_participated) values ('{$user['username']}', {$user['rating']}, {$contest['id']}, 0)");
 
@@ -47,9 +53,13 @@
 			function ($x) {
 				global $contest;
 
-				if (!validateUInt($x)) return '小组 ID 不合法';
+				if (!validateUInt($x)) {
+					return '小组 ID 不合法';
+				}
 				$group = queryGroup($x);
-				if (!$group) return '小组不存在';
+				if (!$group) {
+					return '小组不存在';
+				}
 
 				return '';
 			},

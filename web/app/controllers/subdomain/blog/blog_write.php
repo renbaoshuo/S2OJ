@@ -55,7 +55,7 @@
 			insertBlog($data);
 			$blog = array('id' => DB::insert_id(), 'tags' => array());
 			$ret['blog_write_url'] = HTML::blog_url(UOJContext::user()['username'], "/post/{$blog['id']}/write");
-			$ret['blog_url'] = HTML::blog_url(UOJContext::user()['username'], "/post/{$blog['id']}");			
+			$ret['blog_url'] = HTML::blog_url(UOJContext::user()['username'], "/post/{$blog['id']}");
 		}
 		if ($data['tags'] !== $blog['tags']) {
 			DB::delete("delete from blogs_tags where blog_id = {$blog['id']}");
