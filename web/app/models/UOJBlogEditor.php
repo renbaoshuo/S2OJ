@@ -7,6 +7,8 @@ class UOJBlogEditor {
 	public $save;
 	public $cur_data = array();
 	public $post_data = array();
+	public $show_editor = true;
+	public $show_tags = true;
 	
 	public $label_text = array(
 		'title' => '标题',
@@ -78,7 +80,15 @@ class UOJBlogEditor {
 	}
 	private function receivePostData() {
 		$errors = array();
-		foreach (array('title', 'content_md', 'tags') as $name) {
+
+		$keys = array('title');
+		if ($this->show_tags) {
+			$keys[] = 'tags';
+		}
+		if ($this->show_editor) {
+			$keys[] = 'content_md';
+		}
+		foreach ($keys as $name) {
 			$cur_err = $this->validate($name);
 			if ($cur_err) {
 				$errors[$name] = $cur_err;
@@ -95,34 +105,35 @@ class UOJBlogEditor {
 		
 		$this->post_data['title'] = HTML::escape($this->post_data['title']);
 		
-		if ($this->type == 'blog') {
-			$content_md = $_POST[$this->name . '_content_md'];
-			try {
-				$v8 = new V8Js('POST');
-				$v8->content_md = $this->post_data['content_md'];
-				$v8->executeString(file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/js/marked.js'), 'marked.js');
-				$this->post_data['content'] = $v8->executeString('marked(POST.content_md)');
-			} catch (V8JsException $e) {
-				die(json_encode(array('content_md' => '未知错误')));
-			}
+		if ($this->show_editor) {
+			if ($this->type == 'blog') {
+				$content_md = $_POST[$this->name . '_content_md'];
+				try {
+					$v8 = new V8Js('POST');
+					$v8->content_md = $this->post_data['content_md'];
+					$v8->executeString(file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/js/marked.js'), 'marked.js');
+					$this->post_data['content'] = $v8->executeString('marked(POST.content_md)');
+				} catch (V8JsException $e) {
+					die(json_encode(array('content_md' => '未知错误')));
+				}
 
-			if (preg_match('/^.*<!--.*readmore.*-->.*$/m', $this->post_data['content'], $matches, PREG_OFFSET_CAPTURE)) {
-				$content_less = substr($this->post_data['content'], 0, $matches[0][1]);
-				$content_more = substr($this->post_data['content'], $matches[0][1] + strlen($matches[0][0]));
-				$this->post_data['content'] = $purifier->purify($content_less).'<!-- readmore -->'.$purifier->purify($content_more);
-			} else {
-				$this->post_data['content'] = $purifier->purify($this->post_data['content']);
-			}
-		} elseif ($this->type == 'slide') {
-			$content_array = yaml_parse($this->post_data['content_md']);
-			if ($content_array === false || !is_array($content_array)) {
-				die(json_encode(array('content_md' => '不合法的 YAML 格式')));
-			}
+				if (preg_match('/^.*<!--.*readmore.*-->.*$/m', $this->post_data['content'], $matches, PREG_OFFSET_CAPTURE)) {
+					$content_less = substr($this->post_data['content'], 0, $matches[0][1]);
+					$content_more = substr($this->post_data['content'], $matches[0][1] + strlen($matches[0][0]));
+					$this->post_data['content'] = $purifier->purify($content_less).'<!-- readmore -->'.$purifier->purify($content_more);
+				} else {
+					$this->post_data['content'] = $purifier->purify($this->post_data['content']);
+				}
+			} elseif ($this->type == 'slide') {
+				$content_array = yaml_parse($this->post_data['content_md']);
+				if ($content_array === false || !is_array($content_array)) {
+					die(json_encode(array('content_md' => '不合法的 YAML 格式')));
+				}
 			
-			try {
-				$v8 = new V8Js('PHP');
-				$v8->executeString(file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/js/marked.js'), 'marked.js');
-				$v8->executeString(<<<EOD
+				try {
+					$v8 = new V8Js('PHP');
+					$v8->executeString(file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/js/marked.js'), 'marked.js');
+					$v8->executeString(<<<EOD
 marked.setOptions({
 	getLangClass: function(lang) {
 		lang = lang.toLowerCase();
@@ -146,47 +157,48 @@ marked.setOptions({
 })
 EOD
 				);
-			} catch (V8JsException $e) {
-				die(json_encode(array('content_md' => '未知错误')));
-			}
-			
-			$marked = function($md) use ($v8, $purifier) {
-				try {
-					$v8->md = $md;
-					return $purifier->purify($v8->executeString('marked(PHP.md)'));
 				} catch (V8JsException $e) {
 					die(json_encode(array('content_md' => '未知错误')));
 				}
-			};
 			
-			$config = array();
-			$this->post_data['content'] = '';
-			foreach ($content_array as $slide_name => $slide_content) {
-				if (is_array($slide_content) && is_array($slide_content['config'])) {
-					foreach (array('theme') as $config_key) {
-						if (is_string($slide_content['config'][$config_key]) && strlen($slide_content['config'][$config_key]) <= 30) {
-							$config[$config_key] = $slide_content['config'][$config_key];
+				$marked = function($md) use ($v8, $purifier) {
+					try {
+						$v8->md = $md;
+						return $purifier->purify($v8->executeString('marked(PHP.md)'));
+					} catch (V8JsException $e) {
+						die(json_encode(array('content_md' => '未知错误')));
+					}
+				};
+			
+				$config = array();
+				$this->post_data['content'] = '';
+				foreach ($content_array as $slide_name => $slide_content) {
+					if (is_array($slide_content) && is_array($slide_content['config'])) {
+						foreach (array('theme') as $config_key) {
+							if (is_string($slide_content['config'][$config_key]) && strlen($slide_content['config'][$config_key]) <= 30) {
+								$config[$config_key] = $slide_content['config'][$config_key];
+							}
+						}
+						continue;
+					}
+				
+					$this->post_data['content'] .= '<section>';
+				
+					if (is_string($slide_content)) {
+						$this->post_data['content'] .= $marked($slide_content);
+					} elseif (is_array($slide_content)) {
+						if (is_array($slide_content['children'])) {
+							foreach ($slide_content['children'] as $cslide_name => $cslide_content) {
+								$this->post_data['content'] .= '<section>';
+								$this->post_data['content'] .= $marked($cslide_content);
+								$this->post_data['content'] .= '</section>';
+							}
 						}
 					}
-					continue;
+					$this->post_data['content'] .= "</section>\n";
 				}
-				
-				$this->post_data['content'] .= '<section>';
-				
-				if (is_string($slide_content)) {
-					$this->post_data['content'] .= $marked($slide_content);
-				} elseif (is_array($slide_content)) {
-					if (is_array($slide_content['children'])) {
-						foreach ($slide_content['children'] as $cslide_name => $cslide_content) {
-							$this->post_data['content'] .= '<section>';
-							$this->post_data['content'] .= $marked($cslide_content);
-							$this->post_data['content'] .= '</section>';
-						}
-					}
-				}
-				$this->post_data['content'] .= "</section>\n";
+				$this->post_data['content'] = json_encode($config) . "\n" . $this->post_data['content'];
 			}
-			$this->post_data['content'] = json_encode($config) . "\n" . $this->post_data['content'];
 		}
 	}
 	
