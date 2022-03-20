@@ -482,7 +482,7 @@ CREATE TABLE `problems` (
   `submission_requirement` text,
   `hackable` tinyint(1) NOT NULL DEFAULT '0',
   `extra_config` varchar(500) NOT NULL DEFAULT '{"view_content_type":"ALL","view_details_type":"ALL"}',
-  `zan` int(11) NOT NULL,
+  `zan` int(11) NOT NULL DEFAULT '0',
   `ac_num` int(11) NOT NULL DEFAULT '0',
   `submit_num` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
