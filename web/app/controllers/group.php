@@ -118,6 +118,13 @@
 	</div>
 </div>
 
+<div class="row">
+	<div class="col-sm-12 mt-4">
+		<h5><?= UOJLocale::get('top solver') ?></h5>
+		<?php echoRanklist(array('echo_full' => true, 'group_id' => $group_id, 'by_accepted' => true)) ?>
+	</div>
+</div>
+
 <?php if (isSuperUser($myUser)): ?>
 <h5>编辑小组信息</h5>
 <div class="mb-4">

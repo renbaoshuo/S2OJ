@@ -3,8 +3,13 @@
 		becomeMsgPage(UOJLocale::get('need login'));
 	}
 
-	become404Page();
+	if (isset($_GET['type']) && $_GET['type'] == 'accepted') {
+		$config = array('page_len' => 100, 'by_accepted' => true);
+		$title = UOJLocale::get('top solver');
+	} else {
+		become404Page();
+	}
 ?>
-<?php echoUOJPageHeader('比赛排行榜') ?>
+<?php echoUOJPageHeader($title) ?>
 <?php echoRanklist($config) ?>
 <?php echoUOJPageFooter() ?>

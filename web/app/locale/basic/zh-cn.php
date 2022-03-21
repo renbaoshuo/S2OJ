@@ -19,6 +19,8 @@ return [
 	'blogs' => '博客',
 	'announcements' => '公告',
 	'all the announcements' => '所有公告……',
+	'solved' => 'AC 数',
+	'top solver' => 'AC 数排行榜',
 	'help' => '帮助',
 	'search' => '搜索',
 	'news' => '最新动态',

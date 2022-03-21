@@ -51,6 +51,7 @@ Route::group([
 		Route::any('/announcements', '/announcements.php');
 		
 		Route::any('/faq', '/faq.php');
+		Route::any('/solverlist', '/ranklist.php?type=accepted');
 		
 		Route::any('/captcha', '/captcha.php');
 		Route::any('/login', '/login.php');

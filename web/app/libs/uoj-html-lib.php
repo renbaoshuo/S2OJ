@@ -961,3 +961,54 @@ function echoUOJPageHeader($page_title, $extra_config = array()) {
 function echoUOJPageFooter($config = array()) {
 	uojIncludeView('page-footer', $config);
 }
+
+function echoRanklist($config = array()) {
+	$header_row = '';
+	$header_row .= '<tr>';
+	$header_row .= '<th style="width: 5em;">#</th>';
+	$header_row .= '<th style="width: 14em;">'.UOJLocale::get('username').'</th>';
+	$header_row .= '<th style="width: 50em;">'.UOJLocale::get('motto').'</th>';
+	$header_row .= '<th style="width: 5em;">'.UOJLocale::get('solved').'</th>';
+	$header_row .= '</tr>';
+
+	$users = array();
+	$print_row = function($user, $now_cnt) use (&$users, $config) {
+		if (!$users) {
+			if ($now_cnt == 1) {
+				$rank = 1;
+			} else {
+				$rank = DB::selectCount("select count(*) from (select b.username as username, count(*) as accepted from best_ac_submissions a inner join user_info b on a.submitter = b.username group by username) as derived where accepted > {$user['ac_num']}") + 1;
+			}
+		} else {
+			$rank = $now_cnt;
+		}
+
+		$user['rank'] = $rank;
+
+		echo '<tr>';
+		echo '<td>' . $user['rank'] . '</td>';
+		echo '<td>' . getUserLink($user['username']) . '</td>';
+		echo '<td>' . HTML::escape($user['motto']) . '</td>';
+		echo '<td>' . $user['ac_num'] . '</td>';
+		echo '</tr>';
+		
+		$users[] = $user;
+	};
+
+	$from = 'best_ac_submissions a inner join user_info b on a.submitter = b.username';
+	$col_names = array('b.username as username', 'count(*) as ac_num', 'b.motto as motto');
+	$cond = '1';
+	$tail = 'group by username order by ac_num desc, username asc';
+
+	if (isset($config['group_id'])) {
+		$group_id = $config['group_id'];
+		$from = "best_ac_submissions a inner join user_info b on a.submitter = b.username inner join groups_users c on (a.submitter = c.username and c.group_id = {$group_id})";
+	}
+
+	if (isset($config['top10'])) {
+		$tail .= ' limit 10';
+	}
+
+	$config['get_row_index'] = '';
+	echoLongTable($col_names, $from, $cond, $tail, $header_row, $print_row, $config);
+}

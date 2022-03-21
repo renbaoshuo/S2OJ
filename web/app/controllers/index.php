@@ -43,4 +43,17 @@
 		</div>
 	</div>
 </div>
+
+<?php if (Auth::check()): ?>
+<div class="row">
+	<div class="col-sm-12 mt-4">
+		<h3><?= UOJLocale::get('top solver') ?></h3>
+		<?php echoRanklist(array('echo_full' => true, 'top10' => true, 'by_accepted' => true)) ?>
+		<div class="text-center">
+			<a href="/solverlist"><?= UOJLocale::get('view all') ?></a>
+		</div>
+	</div>
+</div>
+<?php endif ?>
+
 <?php echoUOJPageFooter() ?>

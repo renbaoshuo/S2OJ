@@ -19,6 +19,8 @@ return [
 	'blogs' => 'Blogs',
 	'announcements' => 'Announcements',
 	'all the announcements' => 'All the Announcements……',
+	'solved' => 'Solved',
+	'top solver' => 'Top solver',
 	'help' => 'Help',
 	'search' => 'Search',
 	'news' => 'News',
