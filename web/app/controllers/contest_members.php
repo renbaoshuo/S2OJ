@@ -71,7 +71,7 @@
 			global $contest;
 			$group_id = $_POST['group_id'];
 
-			$users = DB::selectAll("select b.username as username, b.rating as rating from groups_users a inner join user_info b on a.username = b.username where a.group_id = $group_id");
+			$users = DB::selectAll("select b.username as username from groups_users a inner join user_info b on a.username = b.username where a.group_id = $group_id");
 
 			foreach ($users as $user) {
 				DB::query("replace into contests_registrants (username, contest_id, has_participated) values ('{$user['username']}', {$contest['id']}, 0)");
