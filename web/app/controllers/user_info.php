@@ -77,13 +77,13 @@
 			<div class="list-group">
 				<div class="list-group-item">
 					<?php
-						$ac_problems = DB::selectAll("select problem_id from best_ac_submissions where submitter = '{$user['username']}'");
+						$ac_problems = DB::selectAll("select a.problem_id as problem_id, b.title as title from best_ac_submissions a inner join problems b on a.problem_id = b.id where submitter = '{$user['username']}';");
 					?>
 					<h4 class="list-group-item-heading"><?= UOJLocale::get('accepted problems').'：'.UOJLocale::get('n problems in total', count($ac_problems))?> </h4>
 					<p class="list-group-item-text">
 					<?php
 						foreach ($ac_problems as $problem) {
-							echo '<a href="/problem/', $problem['problem_id'], '" style="display:inline-block; width:4em;">', $problem['problem_id'], '</a>';
+							echo '<a href="/problem/', $problem['problem_id'], '" style="display:inline-block; margin-right:0.25em;">#', $problem['problem_id'], '. ', $problem['title'], '</a>';
 						}
 						if (empty($ac_problems)) {
 							echo UOJLocale::get('none');
