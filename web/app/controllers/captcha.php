@@ -3,7 +3,7 @@
 use Gregwar\Captcha\PhraseBuilder;
 use Gregwar\Captcha\CaptchaBuilder;
 
-$builder = new CaptchaBuilder;
+$builder = new CaptchaBuilder(null, new PhraseBuilder(4, "2345678abcdefhkmnrstuxz"));
 $builder->build();
 $_SESSION['phrase'] = $builder->getPhrase();
 
