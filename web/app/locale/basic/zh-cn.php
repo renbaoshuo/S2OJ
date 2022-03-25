@@ -21,6 +21,9 @@ return [
 	'all the announcements' => '所有公告……',
 	'solved' => 'AC 数',
 	'top solver' => 'AC 数排行榜',
+	'n accepted in last year' => function($n) {
+		return "过去一年提交了 $n 份 AC 代码";
+	},
 	'help' => '帮助',
 	'search' => '搜索',
 	'news' => '最新动态',

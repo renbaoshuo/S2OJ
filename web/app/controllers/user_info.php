@@ -4,6 +4,8 @@
 	}
 
 	$username = $_GET['username'];
+
+	$REQUIRE_LIB['github_contribution_graph'] = '';
 ?>
 <?php if (validateUsername($username) && ($user = queryUser($username))): ?>
 	<?php echoUOJPageHeader($user['username'] . ' - ' . UOJLocale::get('user profile')) ?>
@@ -75,6 +77,39 @@
 			
 			<div class="top-buffer-lg"></div>
 			<div class="list-group">
+				<div class="list-group-item">
+					<?php
+						$_result = DB::query("select date(submit_time), problem_id from submissions where submitter = '{$username}' and score = 100 and date(submit_time) between date_sub(curdate(), interval 1 year) and curdate()");
+						$result = [];
+						$vis = [];
+						while ($row = DB::fetch($_result)) {
+							$id = $row['date(submit_time)'] . ':' . $row['problem_id'];
+							if (!$vis[$id]) {
+								$vis[$id] = 1;
+								$result[strtotime($row['date(submit_time)']) * 1000]++;
+							}
+						}
+					?>
+					<h4 class="list-group-item-heading"><?= UOJLocale::get('n accepted in last year', count($result)) ?></h4>
+					<div id="accepted-graph"></div>
+					<script>
+						var accepted_graph_data = [
+							<?php
+								foreach ($result as $key => $val) {
+									echo "{ timestamp: {$key}, count: {$val} }, ";
+								}
+                            ?>
+						];
+
+						$(document).ready(function () {
+							$('#accepted-graph').github_graph({
+								data: accepted_graph_data,
+								texts: ['AC', 'AC'],
+								h_days: ['Tue', 'Thu', 'Sat'],
+							});
+						});
+					</script>
+				</div>
 				<div class="list-group-item">
 					<?php
 						$ac_problems = DB::selectAll("select a.problem_id as problem_id, b.title as title from best_ac_submissions a inner join problems b on a.problem_id = b.id where submitter = '{$user['username']}';");

@@ -21,6 +21,9 @@ return [
 	'all the announcements' => 'All the Announcements……',
 	'solved' => 'Solved',
 	'top solver' => 'Top solver',
+	'n accepted in last year' => function($n) {
+		return "Submitted $n AC code" . ($n > 1 ? "s" : "") . " in last year";
+	},
 	'help' => 'Help',
 	'search' => 'Search',
 	'news' => 'News',
