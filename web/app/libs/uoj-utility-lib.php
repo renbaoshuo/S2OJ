@@ -130,10 +130,18 @@ function blog_name_decode($name) {
 }
 
 function isProblemUploader($user) {
-	return $user != null && $user['usertype'] == 'problem_uploader';
+	if ($user == null) {
+		return false;
+	}
+	$usertype = explode(',', $user['usertype']);
+	return in_array('problem_uploader', $usertype);
 }
 function isProblemManager($user) {
-	return $user != null && $user['usertype'] == 'problem_manager';
+	if ($user == null) {
+		return false;
+	}
+	$usertype = explode(',', $user['usertype']);
+	return in_array('problem_manager', $usertype);
 }
 
 function isSuperUser($user) {
