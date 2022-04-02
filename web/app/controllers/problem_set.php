@@ -4,7 +4,7 @@
 	requirePHPLib('data');
 
 	if (!Auth::check()) {
-		becomeMsgPage(UOJLocale::get('need login'));
+		become403Page(UOJLocale::get('need login'));
 	}
 	
 	if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)) {

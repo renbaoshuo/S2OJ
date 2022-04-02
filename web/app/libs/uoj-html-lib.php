@@ -65,13 +65,13 @@ function becomeMsgPage($msg, $title = '消息') {
 		die();
 	}
 }
-function become404Page() {
+function become404Page($message = '未找到页面。') {
 	header($_SERVER['SERVER_PROTOCOL'] . " 404 Not Found", true, 404);
-	becomeMsgPage('<div class="text-center"><div style="font-size:233px">404</div><p>唔……未找到该页面……你是从哪里点进来的……&gt;_&lt;……</p></div>', '404');
+	becomeMsgPage('<div class="text-center"><div style="font-size:150px">404</div><p>' . $message . '</p></div>', '404');
 }
-function become403Page() {
+function become403Page($message = '访问被拒绝，您可能需要适当的权限以访问此页面。') {
 	header($_SERVER['SERVER_PROTOCOL'] . " 403 Forbidden", true, 403); 
-	becomeMsgPage('<div class="text-center"><div style="font-size:233px">403</div><p>禁止入内！ T_T</p></div>', '403');
+	becomeMsgPage('<div class="text-center"><div style="font-size:150px">403</div><p>' . $message . '</p></div>', '403');
 }
 
 function getUserLink($username) {

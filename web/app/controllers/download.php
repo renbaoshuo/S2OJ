@@ -2,7 +2,7 @@
 	requirePHPLib('judger');
 
 	if (!Auth::check()) {
-		becomeMsgPage(UOJLocale::get('need login'));
+		become403Page(UOJLocale::get('need login'));
 	}
 
 	switch ($_GET['type']) {

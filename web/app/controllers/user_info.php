@@ -1,6 +1,6 @@
 <?php
 	if (!Auth::check()) {
-		becomeMsgPage(UOJLocale::get('need login'));
+		become403Page(UOJLocale::get('need login'));
 	}
 
 	$username = $_GET['username'];

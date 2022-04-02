@@ -3,7 +3,7 @@
 	requireLib('mathjax');
 
 	if (!Auth::check()) {
-		becomeMsgPage(UOJLocale::get('need login'));
+		become403Page(UOJLocale::get('need login'));
 	}
 
 	echoUOJPageHeader(UOJLocale::get('help'));

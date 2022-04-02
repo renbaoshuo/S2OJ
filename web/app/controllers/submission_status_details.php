@@ -1,7 +1,7 @@
 <?php
 
 if (!Auth::check()) {
-	becomeMsgPage(UOJLocale::get('need login'));
+	become403Page(UOJLocale::get('need login'));
 }
 
 if (!is_array($_GET['get'])) {

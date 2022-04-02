@@ -4,7 +4,7 @@
 	requirePHPLib('data');
 
 	if (!Auth::check()) {
-		becomeMsgPage(UOJLocale::get('need login'));
+		become403Page(UOJLocale::get('need login'));
 	}
 	
 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
