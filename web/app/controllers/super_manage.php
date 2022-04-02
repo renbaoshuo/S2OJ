@@ -406,7 +406,7 @@ EOD;
 EOD;
 	};
 	
-	$userlist_cols = array('username', 'usergroup', 'register_time');
+	$userlist_cols = array('username', 'usergroup', 'usertype', 'register_time');
 	$userlist_config = array('page_len' => 20,
 			'table_classes' => array('table', 'table-bordered', 'table-hover', 'table-striped'));
 	$userlist_header_row = <<<EOD
