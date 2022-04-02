@@ -194,3 +194,20 @@ function sendSystemMsg($username, $title, $content) {
 	$title = DB::escape($title);
 	DB::insert("insert into user_system_msg (receiver, title, content, send_time) values ('$username', '$title', '$content', now())");
 }
+
+function addUserType($user, $type) {
+	$usertype = explode(',', $user['usertype']);
+	if (!in_array($type, $usertype)) {
+		$usertype[] = $type;		
+	}
+	$user['usertype'] = implode(',', $usertype);
+	return $user;
+}
+function removeUserType($user, $type) {
+	$usertype = explode(',', $user['usertype']);
+	if (in_array($type, $usertype)) {
+		$usertype = array_diff($usertype, array($type));
+	}
+	$user['usertype'] = implode(',', $usertype);
+	return $user;
+}

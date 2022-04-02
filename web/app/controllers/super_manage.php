@@ -143,22 +143,14 @@
 			case 'problem_uploader':
 				DB::update("update user_info set usergroup = 'U' where username = '{$username}'");
 				$user = queryUser($username);
-				$usertype = explode(',', $user['usertype']);
-				if (!in_array('problem_uploader', $usertype)) {
-					$usertype[] = 'problem_uploader';
-				}
-				$usertype = implode(',', $usertype);
-				DB::update("update user_info set usertype = '{$usertype}' where username = '{$username}'");
+				$user = addUserType($user, 'problem_uploader');
+				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
 				break;
 			case 'problem_manager':
 				DB::update("update user_info set usergroup = 'U' where username = '{$username}'");
 				$user = queryUser($username);
-				$usertype = explode(',', $user['usertype']);
-				if (!in_array('problem_manager', $usertype)) {
-					$usertype[] = 'problem_manager';
-				}
-				$usertype = implode(',', $usertype);
-				DB::update("update user_info set usertype = '{$usertype}' where username = '{$username}'");
+				$user = addUserType($user, 'problem_manager');
+				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
 				break;
 			case 'superuser':
 				DB::update("update user_info set usergroup = 'S' where username = '{$username}'");
