@@ -3,6 +3,14 @@
 	requirePHPLib('judger');
 	requirePHPLib('data');
 
+	if (!Auth::check()) {
+		become403Page(UOJLocale::get('need login'));
+	}
+
+	if (!isNormalUser($myUser)) {
+		become403Page();
+	}
+
 	$group_id = $_GET['id'];
 	$group = queryGroup($group_id);
 

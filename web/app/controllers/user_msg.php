@@ -3,6 +3,10 @@
 		redirectToLogin();
 	}
 
+	if (!isNormalUser($myUser)) {
+		become403Page();
+	}
+
 	function handleMsgPost() {
 		global $myUser;
 		if (!isset($_POST['receiver'])) {

@@ -19,6 +19,10 @@
 		genMoreContestInfo($contest);
 	} else {
 		$contest = null;
+
+		if (!isNormalUser($myUser)) {
+			become403Page();
+		}
 	}
 	if (!isSubmissionVisibleToUser($submission, $problem, $myUser)) {
 		become403Page();

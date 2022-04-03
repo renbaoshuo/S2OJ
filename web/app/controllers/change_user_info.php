@@ -2,6 +2,11 @@
 	if (!Auth::check()) {
 		redirectToLogin();
 	}
+
+	if (!isNormalUser($myUser)) {
+		become403Page();
+	}
+
 	function handlePost() {
 		global $myUser;
 		if (!isset($_POST['old_password'])) {
@@ -183,4 +188,3 @@
 	});
 </script>
 <?php echoUOJPageFooter() ?>
-

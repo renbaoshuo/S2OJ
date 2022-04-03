@@ -3,6 +3,10 @@
 		become403Page(UOJLocale::get('need login'));
 	}
 
+	if (!isNormalUser($myUser)) {
+		become403Page();
+	}
+
 	$username = $_GET['username'];
 
 	$REQUIRE_LIB['github_contribution_graph'] = '';

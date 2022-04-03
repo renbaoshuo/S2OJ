@@ -3,6 +3,10 @@
 		become403Page(UOJLocale::get('need login'));
 	}
 
+	if (!isNormalUser($myUser)) {
+		become403Page();
+	}
+
 	$conds = array();
 	
 	$q_problem_id = isset($_GET['problem_id']) && validateUInt($_GET['problem_id']) ? $_GET['problem_id'] : null;

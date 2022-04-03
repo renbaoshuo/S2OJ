@@ -44,6 +44,10 @@
 		if (!isProblemVisibleToUser($problem, $myUser)) {
 			become404Page();
 		}
+
+		if (!isNormalUser($myUser)) {
+			become403Page();
+		}
 	}
 
 	$submission_requirement = json_decode($problem['submission_requirement'], true);

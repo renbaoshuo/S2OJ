@@ -6,6 +6,10 @@
 	if (!Auth::check()) {
 		become403Page(UOJLocale::get('need login'));
 	}
+
+	if (!isNormalUser($myUser)) {
+		become403Page();
+	}
 	
 	if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)) {
 		$new_problem_form = new UOJForm('new_problem');

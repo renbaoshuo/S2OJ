@@ -3,6 +3,10 @@
 		become403Page(UOJLocale::get('need login'));
 	}
 
+	if (!isNormalUser($myUser)) {
+		become403Page();
+	}
+
 	requirePHPLib('form');
 	
 	function echoBlogCell($blog) {

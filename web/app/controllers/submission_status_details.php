@@ -18,6 +18,9 @@ foreach ($_GET['get'] as $id) {
 	if ($submission['submitter'] !== Auth::id()) {
 		become403Page();
 	}
+	if ($submission['contest_id'] == null && !isNormalUser($myUser)) {
+		become403Page();
+	}
 	
 	$problem = queryProblemBrief($submission['problem_id']);
 	if (!isSubmissionVisibleToUser($submission, $problem, Auth::user())) {

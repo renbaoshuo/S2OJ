@@ -129,19 +129,41 @@ function blog_name_decode($name) {
 	return $name;
 }
 
+function addUserType($user, $type) {
+	$usertype = explode(',', $user['usertype']);
+	if (!in_array($type, $usertype)) {
+		$usertype[] = $type;
+	}
+	$user['usertype'] = implode(',', $usertype);
+	return $user;
+}
+function removeUserType($user, $type) {
+	$usertype = explode(',', $user['usertype']);
+	if (in_array($type, $usertype)) {
+		$usertype = array_diff($usertype, array($type));
+	}
+	$user['usertype'] = implode(',', $usertype);
+	return $user;
+}
+function hasUserType($user, $type) {
+	$usertype = explode(',', $user['usertype']);
+	return in_array($type, $usertype);
+}
+
+function isNormalUser($user) {
+	return $user != null && !hasUserType($user, 'contest_only');
+}
 function isProblemUploader($user) {
 	if ($user == null) {
 		return false;
 	}
-	$usertype = explode(',', $user['usertype']);
-	return in_array('problem_uploader', $usertype);
+	return hasUserType($user, 'problem_uploader');
 }
 function isProblemManager($user) {
 	if ($user == null) {
 		return false;
 	}
-	$usertype = explode(',', $user['usertype']);
-	return in_array('problem_manager', $usertype);
+	return hasUserType($user, 'problem_manager');
 }
 
 function isSuperUser($user) {
@@ -193,21 +215,4 @@ function sendSystemMsg($username, $title, $content) {
 	$content = DB::escape($content);
 	$title = DB::escape($title);
 	DB::insert("insert into user_system_msg (receiver, title, content, send_time) values ('$username', '$title', '$content', now())");
-}
-
-function addUserType($user, $type) {
-	$usertype = explode(',', $user['usertype']);
-	if (!in_array($type, $usertype)) {
-		$usertype[] = $type;		
-	}
-	$user['usertype'] = implode(',', $usertype);
-	return $user;
-}
-function removeUserType($user, $type) {
-	$usertype = explode(',', $user['usertype']);
-	if (in_array($type, $usertype)) {
-		$usertype = array_diff($usertype, array($type));
-	}
-	$user['usertype'] = implode(',', $usertype);
-	return $user;
 }

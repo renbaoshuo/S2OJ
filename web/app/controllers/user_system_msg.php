@@ -2,7 +2,11 @@
 	if (!Auth::check()) {
 		redirectToLogin();
 	}
-	
+
+	if (!isNormalUser($myUser)) {
+		become403Page();
+	}
+
 	$header_row = <<<EOD
 <tr>
 	<th>消息</th>

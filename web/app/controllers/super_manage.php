@@ -124,6 +124,7 @@
 		'normaluser' => '设为普通用户',
 		'problem_uploader' => '设为题目上传者',
 		'problem_manager' => '设为题目管理员',
+		'contest_only' => '设为仅比赛参加者',
 		'superuser' => '设为超级用户'
 	);
 	$user_form->addSelect('op_type', $options, '操作类型', '');
@@ -150,6 +151,12 @@
 				DB::update("update user_info set usergroup = 'U' where username = '{$username}'");
 				$user = queryUser($username);
 				$user = addUserType($user, 'problem_manager');
+				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
+				break;
+			case 'contest_only':
+				DB::update("update user_info set usergroup = 'U' where username = '{$username}'");
+				$user = queryUser($username);
+				$user = addUserType($user, 'contest_only');
 				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
 				break;
 			case 'superuser':

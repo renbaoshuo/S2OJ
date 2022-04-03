@@ -17,6 +17,10 @@
 		if (!isProblemVisibleToUser($problem, $myUser)) {
 			become404Page();
 		}
+
+		if (!isNormalUser($myUser)) {
+			become403Page();
+		}
 	}
 
 	function scoreDistributionData() {

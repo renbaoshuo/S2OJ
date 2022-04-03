@@ -4,6 +4,11 @@
 	if (!validateUInt($_GET['id']) || !($contest = queryContest($_GET['id']))) {
 		become404Page();
 	}
+
+	if (!isNormalUser($myUser)) {
+		become403Page();
+	}
+
 	genMoreContestInfo($contest);
 	
 	if (!Auth::check()) {

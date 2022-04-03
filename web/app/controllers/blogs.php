@@ -4,6 +4,10 @@
 	if (!Auth::check()) {
 		become403Page(UOJLocale::get('need login'));
 	}
+
+	if (!isNormalUser($myUser)) {
+		become403Page();
+	}
 	
 	function echoBlogCell($blog) {
 		echo '<tr>';
