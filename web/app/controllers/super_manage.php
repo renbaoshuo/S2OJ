@@ -298,6 +298,67 @@
 	};
 	$blog_deleter->runAtServer();
 
+	$countdown_adder = new UOJForm('new_countdown');
+	$countdown_adder->submit_button_config['align'] = 'compressed';
+	$countdown_adder->addInput('new_countdown_title', 'text', '标题', '',
+		function ($new_countdown_title) {
+			return '';
+		},
+		null
+	);
+	$countdown_adder->addInput('new_countdown_endtime', 'text', '截止日期', date("Y-m-d H:i:s"),
+        function($str, &$vdata) {
+        	try {
+        		$vdata['new_countdown_endtime'] = new DateTime($str);
+        	} catch (Exception $e) {
+        		return '无效时间格式';
+        	}
+        	return '';
+        },
+		null
+	);
+	$countdown_adder->handle = function() {
+		$new_countdown_title = $_POST['new_countdown_title'];
+		$new_countdown_endtime = $_POST['new_countdown_endtime'];
+		$new_countdown_title = DB::escape($new_countdown_title);
+
+		DB::query("insert into countdowns (title, endtime) values ('$new_countdown_title', '$new_countdown_endtime')");
+	};
+	$countdown_adder->runAtServer();
+
+    $countdown_deleter = new UOJForm('delete_countdown');
+    $countdown_deleter->submit_button_config['align'] = 'compressed';
+    $countdown_deleter->addInput('delete_countdown_id', 'text', 'ID', '',
+        function ($delete_countdown_id) {
+        	return '';
+        },
+        null
+    );
+    $countdown_deleter->handle = function() {
+    	$delete_countdown_id = $_POST['delete_countdown_id'];
+    	$delete_countdown_id = DB::escape($delete_countdown_id);
+
+    	DB::query("delete from countdowns where id = '$delete_countdown_id'");
+    };
+    $countdown_deleter->runAtServer();
+
+	$countdowns_header_row = <<<EOD
+	<tr>
+		<th>ID</th>
+		<th>标题</th>
+		<th>时间</th>
+	</tr>
+EOD;
+    $countdowns_print_row = function($row) {
+    	echo <<<EOD
+	<tr>
+		<td>{$row['id']}</td>
+		<td>{$row['title']}</td>
+		<td>{$row['endtime']}</td>
+	</tr>
+EOD;
+    };
+
 	$contest_submissions_deleter = new UOJForm('contest_submissions');
 	$contest_submissions_deleter->addInput('contest_id', 'text', '比赛ID', '',
 		function ($x) {
@@ -453,6 +514,10 @@ EOD;
 			'name' => '博客管理',
 			'url' => "/super-manage/blogs"
 		),
+		'index' => array(
+			'name' => '首页管理',
+			'url' => '/super-manage/index'
+		),
 		'submissions' => array(
 			'name' => '提交记录',
 			'url' => "/super-manage/submissions"
@@ -528,6 +593,15 @@ EOD;
 			<div>
 				<h4>删除博客</h4>
 				<?php $blog_deleter->printHTML(); ?>
+			</div>
+		<?php elseif ($cur_tab === 'index'): ?>
+			<div>
+				<h4>倒计时管理</h4>
+				<?php echoLongTable(array('id', 'title', 'endtime'), 'countdowns', '1', 'order by endtime asc', $countdowns_header_row, $countdowns_print_row, $userlist_config) ?>
+				<h5>添加倒计时</h5>
+				<?php $countdown_adder->printHTML(); ?>
+				<h5>删除倒计时</h5>
+				<?php $countdown_deleter->printHTML(); ?>
 			</div>
 		<?php elseif ($cur_tab === 'submissions'): ?>
 			<div>

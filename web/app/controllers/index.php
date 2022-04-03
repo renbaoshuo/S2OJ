@@ -1,11 +1,12 @@
 <?php
 	$blogs = DB::selectAll("select blogs.id, title, poster, post_time from important_blogs, blogs where is_hidden = 0 and important_blogs.blog_id = blogs.id order by level desc, important_blogs.blog_id desc limit 5");
+	$countdowns = DB::selectAll("select * from countdowns order by endtime asc limit 5")
 ?>
 <?php echoUOJPageHeader(UOJConfig::$data['profile']['oj-name-short']) ?>
-<div class="card card-default">
-	<div class="card-body">
-		<div class="row">
-			<div class="col-sm-12 col-md-9">
+<div class="row">
+	<div class="col-sm-12 col-md-9">
+		<div class="card card-default">
+			<div class="card-body">
 				<table class="table table-sm">
 					<thead>
 						<tr>
@@ -14,7 +15,7 @@
 							<th style="width:20%"></th>
 						</tr>
 					</thead>
-				  	<tbody>
+					<tbody>
 					<?php $now_cnt = 0; ?>
 					<?php foreach ($blogs as $blog): ?>
 						<?php
@@ -37,23 +38,44 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="col-xs-6 col-sm-4 col-md-3">
-				<img class="media-object img-thumbnail" src="/images/logo.png" alt="Logo" />
+		</div>
+		<?php if (Auth::check() && isNormalUser($myUser)): ?>
+			<div class="mt-4">
+				<h3><?= UOJLocale::get('top solver') ?></h3>
+				<?php echoRanklist(array('echo_full' => true, 'top10' => true, 'by_accepted' => true)) ?>
+				<div class="text-center">
+					<a href="/solverlist"><?= UOJLocale::get('view all') ?></a>
+				</div>
+			</div>
+		<?php endif ?>
+	</div>
+	<div class="col-xs-6 col-sm-4 col-md-3">
+		<div class="d-none d-md-block">
+			<img class="media-object img-thumbnail" src="/images/logo.png" alt="Logo" />
+		</div>
+		<div class="card card-default mt-4">
+			<div class="card-body">
+				<h3 class="card-title">倒计时</h3>
+				<div>
+					<?php foreach ($countdowns as $countdown): ?>
+						<?php
+							$enddate = strtotime($countdown['endtime']);
+							$nowdate = time();
+							$diff = floor(($enddate - $nowdate) / (24 * 60 * 60));
+						?>
+						<p class="card-text">
+							<?php if ($diff > 0): ?>
+								距离 <b><?= $countdown['title'] ?></b> 还有 <b><?= $diff ?></b> 天。
+							<?php else: ?>
+								<b><?= $countdown['title'] ?></b> 已开始。
+							<?php endif ?>
+						</p>
+					<?php endforeach ?>
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
-<?php if (Auth::check() && isNormalUser($myUser)): ?>
-<div class="row">
-	<div class="col-sm-12 mt-4">
-		<h3><?= UOJLocale::get('top solver') ?></h3>
-		<?php echoRanklist(array('echo_full' => true, 'top10' => true, 'by_accepted' => true)) ?>
-		<div class="text-center">
-			<a href="/solverlist"><?= UOJLocale::get('view all') ?></a>
-		</div>
-	</div>
-</div>
-<?php endif ?>
 
 <?php echoUOJPageFooter() ?>
