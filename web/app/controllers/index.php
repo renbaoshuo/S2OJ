@@ -55,7 +55,7 @@
 		</div>
 		<div class="card card-default mt-4">
 			<div class="card-body">
-				<h3 class="card-title">倒计时</h3>
+				<h3 class="card-title" style="font-size: 1.25rem">倒计时</h3>
 				<div>
 					<?php foreach ($countdowns as $countdown): ?>
 						<?php
@@ -72,6 +72,19 @@
 						</p>
 					<?php endforeach ?>
 				</div>
+			</div>
+		</div>
+		<div class="card card-default mt-4">
+			<div class="card-body">
+				<h3 class="card-title" style="font-size: 1.25rem">友情链接</h3>
+				<ul class="pl-4">
+					<li>
+						<a href="http://www.sjzez.com">石家庄二中</a>
+					</li>
+					<li>
+						<a href="http://www.sjzezsyxx.com">石家庄二中实验学校</a>
+					</li>
+				</ul>
 			</div>
 		</div>
 	</div>
