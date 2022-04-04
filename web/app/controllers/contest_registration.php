@@ -13,7 +13,7 @@
 	
 	if (!Auth::check()) {
 		redirectToLogin();
-	} elseif (hasContestPermission($myUser, $contest) || hasRegistered($myUser, $contest) || $contest['cur_progress'] != CONTEST_NOT_STARTED) {
+	} elseif (hasRegistered($myUser, $contest) || $contest['cur_progress'] != CONTEST_NOT_STARTED) {
 		redirectTo('/contests');
 	}
 	

@@ -39,6 +39,11 @@
 			} else {
 				$ban_in_contest = !isProblemVisibleToUser($problem, $myUser);
 			}
+		} else {
+			if ($contest['cur_progress'] == CONTEST_IN_PROGRESS) {
+				$is_in_contest = true;
+				DB::update("update contests_registrants set has_participated = 1 where username = '{$myUser['username']}' and contest_id = {$contest['id']}");
+			}
 		}
 	} else {
 		if (!isProblemVisibleToUser($problem, $myUser)) {
