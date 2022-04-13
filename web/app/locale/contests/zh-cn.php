@@ -18,6 +18,7 @@ return [
 	'contest dashboard' => '比赛主页',
 	'contest submissions' => '提交记录',
 	'contest standings' => '排行榜',
+	'after contest standings' => '赛后排行榜',
 	'contest backstage' => '大后台',
 	'contest notice' => '比赛通知',
 	'show all submissions' => '显示所有提交',

@@ -43,6 +43,10 @@
 		'standings' => array(
 			'name' => UOJLocale::get('contests::contest standings'),
 			'url' => "/contest/{$contest['id']}/standings"
+		),
+		'after_contest_standings' => array(
+			'name' => UOJLocale::get('contests::after contest standings'),
+			'url' => "/contest/{$contest['id']}/after_contest_standings"
 		)
 	);
 	
@@ -374,10 +378,10 @@ EOD;
 		}
 	}
 	
-	function echoStandings() {
+	function echoStandings($is_after_contest_query = false) {
 		global $contest;
 		
-		$contest_data = queryContestData($contest);
+		$contest_data = queryContestData($contest, array(), $is_after_contest_query);
 		calcStandings($contest, $contest_data, $score, $standings);
 		
 		uojIncludeView('contest-standings', [
@@ -450,7 +454,7 @@ EOD;
 	<?= getClickZanBlock('C', $contest['id'], $contest['zan']) ?>
 </div>
 <div class="row">
-	<?php if ($cur_tab == 'standings'): ?>
+	<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings'): ?>
 	<div class="col-sm-12">
 	<?php else: ?>
 	<div class="col-sm-9">
@@ -464,6 +468,8 @@ EOD;
 				echoMySubmissions();
 			} elseif ($cur_tab == 'standings') {
 				echoStandings();
+			} elseif ($cur_tab == 'after_contest_standings') {
+				echoStandings(true);
 			} elseif ($cur_tab == 'backstage') {
 				echoBackstage();
 			}
@@ -471,7 +477,7 @@ EOD;
 		</div>
 	</div>
 	
-	<?php if ($cur_tab == 'standings'): ?>
+	<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings'): ?>
 	<div class="col-sm-12">
 		<hr />
 	</div>
@@ -487,7 +493,7 @@ EOD;
 				echoContestFinished();
 			}
 		?>
-		<?php if ($cur_tab == 'standings'): ?>
+		<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings'): ?>
 	</div>
 	<div class="col-sm-3">
 	<?php endif ?>

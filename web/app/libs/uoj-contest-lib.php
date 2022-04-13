@@ -38,7 +38,7 @@ function updateContestPlayerNum($contest) {
 // problems: pos => id
 // data    : id, submit_time, submitter, problem_pos, score
 // people  : username
-function queryContestData($contest, $config = array()) {
+function queryContestData($contest, $config = array(), $is_after_contest_query = false) {
 	mergeConfig($config, [
 		'pre_final' => false
 	]);
@@ -69,6 +69,8 @@ function queryContestData($contest, $config = array()) {
 		if ($contest['cur_progress'] < CONTEST_FINISHED) {
 			$result = DB::query("select id, submit_time, submitter, problem_id, score from submissions"
 				." where contest_id = {$contest['id']} and score is not null order by id");
+		} elseif ($is_after_contest_query == true) {
+			$result = DB::query("select id, submit_time, submitter, problem_id, score from submissions order by score");
 		} else {
 			$result = DB::query("select submission_id, date_add('{$contest['start_time_str']}', interval penalty second),"
 				." submitter, problem_id, score from contests_submissions where contest_id = {$contest['id']}");
