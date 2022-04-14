@@ -41,6 +41,9 @@
 			if ($problem['is_hidden']) {
 				echo ' <span class="text-danger">[隐藏]</span> ';
 			}
+			if ($problem['uploader'] == $myUser['username']) {
+				echo ' <span class="text-info">[我的题目]</span> ';
+			}
 			echo '<a href="/problem/', $problem['id'], '">', $problem['title'], '</a>';
 			if (isset($_COOKIE['show_tags_mode'])) {
 				foreach (queryProblemTags($problem['id']) as $tag) {
