@@ -40,5 +40,5 @@ EOD;
 </div>
 <?php endif ?>
 <h3>博客总览</h3>
-<?php echoLongTable(array('id', 'poster', 'title', 'post_time', 'zan', 'is_hidden'), 'blogs', "is_hidden = 0 or poster = '{$myUser['username']}'", 'order by post_time desc', $header, 'echoBlogCell', $config); ?>
+<?php echoLongTable(array('id', 'poster', 'title', 'post_time', 'zan', 'is_hidden'), 'blogs', isSuperUser($myUser) ? "1" : "is_hidden = 0 or poster = '{$myUser['username']}'", 'order by post_time desc', $header, 'echoBlogCell', $config); ?>
 <?php echoUOJPageFooter() ?>
