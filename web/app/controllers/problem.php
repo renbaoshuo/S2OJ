@@ -224,10 +224,13 @@ EOD
 	$limit = getUOJConf("/var/uoj_data/{$problem['id']}/problem.conf");
 	$time_limit = $limit['time_limit'];
 	$memory_limit = $limit['memory_limit'];
+
+	$problem_uploader = $limit['poster'] ?: $problem['uploader'];
 ?>
 <div class="row d-flex justify-content-center">
 	<span class="badge badge-secondary mr-1">时间限制:<?=$time_limit!=null?"$time_limit s":"N/A"?></span>
 	<span class="badge badge-secondary mr-1">空间限制:<?=$memory_limit!=null?"$memory_limit MB":"N/A"?></span>
+	<span class="badge badge-secondary mr-1">上传者:<?= $problem_uploader ?: "root" ?></span>
 </div>
 <div class="float-right">
 	<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
