@@ -140,19 +140,15 @@
 		
 		<?php if (isset($REQUIRE_LIB['mathjax'])): ?>
 		<!-- MathJax -->
-		<script type="text/x-mathjax-config">
-			MathJax.Hub.Config({
-				showProcessingMessages: false,
-				tex2jax: {
-					inlineMath: [["$", "$"], ["\\\\(", "\\\\)"]],
-					processEscapes:true
-				},
-				menuSettings: {
-					zoom: "Hover"
-    			}
-			});
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['$', '$'], ['\\(', '\\)']],
+					processEscapes: true
+				}
+			};
 		</script>
-		<script src="//cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
+		<script id="MathJax-script" src="//cdn.staticfile.org/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
 		<?php endif ?>
 		
 		<?php if (isset($REQUIRE_LIB['jquery.form'])): ?>
