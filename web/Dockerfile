@@ -16,5 +16,5 @@ service apache2 start\n\
 exec bash\n" >/opt/up && chmod +x /opt/up
 
 ENV LANG=C.UTF-8 TZ=Asia/Shanghai
-EXPOSE 80 3690
+EXPOSE 80
 CMD /opt/up

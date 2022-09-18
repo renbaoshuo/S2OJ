@@ -51,4 +51,3 @@ services:
       - ./uoj_data/web/storage_submission:/opt/uoj/web/app/storage/submission
     ports:
       - "80:80"
-      - "3690:3690"
