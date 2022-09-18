@@ -77,8 +77,10 @@ class Paginator {
 		}
 		$html = '<ul class="pagination top-buffer-no bot-buffer-sm justify-content-center">';
 		if ($this->cur_page > 1) {
+			$html .= '<li class="page-item"><a class="page-link" href="'.$this->getPageUri(1).'"><span class="glyphicon glyphicon glyphicon-fast-backward"></span></a></li>';
 			$html .= '<li class="page-item"><a class="page-link" href="'.$this->getPageUri($this->cur_page - 1).'"><span class="glyphicon glyphicon glyphicon-backward"></span></a></li>';
 		} else {
+			$html .= '<li class="page-item disabled"><a class="page-link"><span class="glyphicon glyphicon glyphicon-fast-backward"></span></a></li>';
 			$html .= '<li class="page-item disabled"><a class="page-link"><span class="glyphicon glyphicon glyphicon-backward"></span></a></li>';
 		}
 			
@@ -91,8 +93,10 @@ class Paginator {
 		}
 		if ($this->cur_page < $this->n_pages) {
 			$html .= '<li class="page-item"><a class="page-link" href="'.$this->getPageUri($this->cur_page + 1).'"><span class="glyphicon glyphicon glyphicon-forward"></span></a></li>';
+			$html .= '<li class="page-item"><a class="page-link" href="'.$this->getPageUri($this->n_pages).'"><span class="glyphicon glyphicon glyphicon-fast-forward"></span></a></li>';
 		} else {
 			$html .= '<li class="page-item disabled"><a class="page-link"><span class="glyphicon glyphicon glyphicon-forward"></span></a></li>';
+			$html .= '<li class="page-item disabled"><a class="page-link"><span class="glyphicon glyphicon glyphicon-fast-forward"></span></a></li>';
 		}
 		$html .= '</ul>';
 		return $html;
