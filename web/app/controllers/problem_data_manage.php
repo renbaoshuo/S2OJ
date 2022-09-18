@@ -615,10 +615,10 @@ EOD
 	$rejudge_form->runAtServer();
 	$rejudgege97_form->runAtServer();
 	$info_form->runAtServer();
-?>
+	?>
 <?php
 	$REQUIRE_LIB['dialog'] = '';
-?>
+	?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - 数据 - 题目管理') ?>
 <h1 class="page-header" align="center">#<?=$problem['id']?> : <?=$problem['title']?> 管理</h1>
 <ul class="nav nav-tabs" role="tablist">

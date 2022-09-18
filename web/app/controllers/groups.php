@@ -3,13 +3,13 @@
     requirePHPLib('judger');
     requirePHPLib('data');
 
-	if (!Auth::check()) {
-		become403Page(UOJLocale::get('need login'));
-	}
+    if (!Auth::check()) {
+    	become403Page(UOJLocale::get('need login'));
+    }
 
-	if (!isNormalUser($myUser)) {
-		become403Page();
-	}
+    if (!isNormalUser($myUser)) {
+    	become403Page();
+    }
 
     if (isSuperUser($myUser)) {
     	$new_group_form = new UOJForm('new_group');
@@ -41,12 +41,12 @@
 
     	echo '</tr>';
     }
-?>
+    ?>
 
 <?php echoUOJPageHeader(UOJLocale::get('groups')) ?>
 
 <?php
-    $groups_caption = UOJLocale::get('groups');
+        $groups_caption = UOJLocale::get('groups');
     $users_caption = UOJLocale::get('users count');
     $header = <<<EOD
 <tr>
@@ -65,22 +65,22 @@ EOD;
     $from = "`groups` a left join groups_users b on a.id = b.group_id";
 
     echoLongTable(
-        array('a.id as group_id', 'a.title as title', 'a.is_hidden as is_hidden', 'count(b.username) as user_count'),
-		$from, $cond, 'group by a.id order by a.id asc',
-		$header,
-		'echoGroup',
-		array('page_len' => 100,
-			'table_classes' => array('table', 'table-bordered', 'table-hover', 'table-striped'),
-			'print_after_table' => function() {
-				global $myUser;
-				if (isSuperUser($myUser)) {
-					global $new_group_form;
-					$new_group_form->printHTML();
-				}
-			},
-			'head_pagination' => true
-		)
-	);
-?>
+    	array('a.id as group_id', 'a.title as title', 'a.is_hidden as is_hidden', 'count(b.username) as user_count'),
+    	$from, $cond, 'group by a.id order by a.id asc',
+    	$header,
+    	'echoGroup',
+    	array('page_len' => 100,
+    		'table_classes' => array('table', 'table-bordered', 'table-hover', 'table-striped'),
+    		'print_after_table' => function() {
+    			global $myUser;
+    			if (isSuperUser($myUser)) {
+    				global $new_group_form;
+    				$new_group_form->printHTML();
+    			}
+    		},
+    		'head_pagination' => true
+    	)
+    );
+    ?>
 
 <?php echoUOJPageFooter() ?>

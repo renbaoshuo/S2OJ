@@ -307,14 +307,14 @@
 		null
 	);
 	$countdown_adder->addInput('new_countdown_endtime', 'text', '截止日期', date("Y-m-d H:i:s"),
-        function($str, &$vdata) {
-        	try {
-        		$vdata['new_countdown_endtime'] = new DateTime($str);
-        	} catch (Exception $e) {
-        		return '无效时间格式';
-        	}
-        	return '';
-        },
+		function($str, &$vdata) {
+			try {
+				$vdata['new_countdown_endtime'] = new DateTime($str);
+			} catch (Exception $e) {
+				return '无效时间格式';
+			}
+			return '';
+		},
 		null
 	);
 	$countdown_adder->handle = function() {
@@ -326,21 +326,21 @@
 	};
 	$countdown_adder->runAtServer();
 
-    $countdown_deleter = new UOJForm('delete_countdown');
-    $countdown_deleter->submit_button_config['align'] = 'compressed';
-    $countdown_deleter->addInput('delete_countdown_id', 'text', 'ID', '',
-        function ($delete_countdown_id) {
-        	return '';
-        },
-        null
-    );
-    $countdown_deleter->handle = function() {
-    	$delete_countdown_id = $_POST['delete_countdown_id'];
-    	$delete_countdown_id = DB::escape($delete_countdown_id);
+	$countdown_deleter = new UOJForm('delete_countdown');
+	$countdown_deleter->submit_button_config['align'] = 'compressed';
+	$countdown_deleter->addInput('delete_countdown_id', 'text', 'ID', '',
+		function ($delete_countdown_id) {
+			return '';
+		},
+		null
+	);
+	$countdown_deleter->handle = function() {
+		$delete_countdown_id = $_POST['delete_countdown_id'];
+		$delete_countdown_id = DB::escape($delete_countdown_id);
 
-    	DB::query("delete from countdowns where id = '$delete_countdown_id'");
-    };
-    $countdown_deleter->runAtServer();
+		DB::query("delete from countdowns where id = '$delete_countdown_id'");
+	};
+	$countdown_deleter->runAtServer();
 
 	$countdowns_header_row = <<<EOD
 	<tr>
@@ -349,15 +349,15 @@
 		<th>时间</th>
 	</tr>
 EOD;
-    $countdowns_print_row = function($row) {
-    	echo <<<EOD
+	$countdowns_print_row = function($row) {
+		echo <<<EOD
 	<tr>
 		<td>{$row['id']}</td>
 		<td>{$row['title']}</td>
 		<td>{$row['endtime']}</td>
 	</tr>
 EOD;
-    };
+	};
 
 	$contest_submissions_deleter = new UOJForm('contest_submissions');
 	$contest_submissions_deleter->addInput('contest_id', 'text', '比赛ID', '',
@@ -535,11 +535,11 @@ EOD;
 	if (!isset($tabs_info[$cur_tab])) {
 		become404Page();
 	}
-?>
+	?>
 <?php
 	requireLib('shjs');
 	requireLib('morris');
-?>
+	?>
 <?php echoUOJPageHeader('系统管理') ?>
 <div class="row">
 	<div class="col-sm-3">
@@ -615,13 +615,13 @@ EOD;
 		<?php elseif ($cur_tab === 'custom-test'): ?>
 		<?php $custom_test_deleter->printHTML() ?>
 		<?php
-			$submissions_pag = new Paginator(array(
-				'col_names' => array('*'),
-				'table_name' => 'custom_test_submissions',
-				'cond' => '1',
-				'tail' => 'order by id asc',
-				'page_len' => 5
-			));
+				$submissions_pag = new Paginator(array(
+					'col_names' => array('*'),
+					'table_name' => 'custom_test_submissions',
+					'cond' => '1',
+					'tail' => 'order by id asc',
+					'page_len' => 5
+				));
 			foreach ($submissions_pag->get() as $submission) {
 				$problem = queryProblemBrief($submission['problem_id']);
 				$submission_result = json_decode($submission['result'], true);
@@ -640,7 +640,7 @@ EOD;
 				echoSubmissionContent($submission, getProblemCustomTestRequirement($problem));
 				echoCustomTestSubmissionDetails($submission_result['details'], "submission-{$submission['id']}-details");
 			}
-		?>
+			?>
 		<?= $submissions_pag->pagination() ?>
 		<?php elseif ($cur_tab === 'judger'): ?>
 			<div>

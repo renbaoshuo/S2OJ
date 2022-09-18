@@ -40,4 +40,4 @@
 	header("X-Sendfile: $file_name");
 	header("Content-type: $mimetype");
 	header("Content-Disposition: attachment; filename=$download_name");
-?>
+	?>

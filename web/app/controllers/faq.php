@@ -7,7 +7,7 @@
 	}
 
 	echoUOJPageHeader(UOJLocale::get('help'));
-?>
+	?>
 <article>
 	<header>
 		<h2 class="page-header">常见问题及其解答(FAQ)</h2>

@@ -166,7 +166,7 @@
 	$time_form->runAtServer();
 	$managers_form->runAtServer();
 	$problems_form->runAtServer();
-?>
+	?>
 <?php echoUOJPageHeader(HTML::stripTags($contest['name']) . ' - 比赛管理') ?>
 <h1 class="page-header" align="center"><?=$contest['name']?> 管理</h1>
 <ul class="nav nav-tabs mb-3" role="tablist">
@@ -193,13 +193,13 @@
 			</thead>
 			<tbody>
 <?php
-	$row_id = 0;
+		$row_id = 0;
 	$result = DB::query("select username from contests_permissions where contest_id = {$contest['id']}");
 	while ($row = DB::fetch($result, MYSQLI_ASSOC)) {
 		$row_id++;
 		echo '<tr>', '<td>', $row_id, '</td>', '<td>', getUserLink($row['username']), '</td>', '</tr>';
 	}
-?>
+	?>
 			</tbody>
 		</table>
 		<p class="text-center">命令格式：命令一行一个，+mike表示把mike加入管理者，-mike表示把mike从管理者中移除</p>
@@ -216,13 +216,13 @@
 			</thead>
 			<tbody>
 <?php
-	$result = DB::query("select problem_id from contests_problems where contest_id = ${contest['id']} order by dfn asc");
+		$result = DB::query("select problem_id from contests_problems where contest_id = ${contest['id']} order by dfn asc");
 	while ($row = DB::fetch($result, MYSQLI_ASSOC)) {
 		$problem = queryProblemBrief($row['problem_id']);
 		$problem_config_str = isset($contest['extra_config']["problem_{$problem['id']}"]) ? $contest['extra_config']["problem_{$problem['id']}"] : 'sample';
 		echo '<tr>', '<td>', $problem['id'], '</td>', '<td>', getProblemLink($problem), ' ', "[$problem_config_str]", '</td>', '</tr>';
 	}
-?>
+	?>
 			</tbody>
 		</table>
 		<p class="text-center">命令格式：命令一行一个，+233表示把题号为233的试题加入比赛，-233表示把题号为233的试题从比赛中移除</p>

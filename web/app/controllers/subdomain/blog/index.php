@@ -10,11 +10,11 @@
 		'tail' => 'order by post_time desc limit 5',
 		'echo_full' => true
 	));
-?>
+	?>
 <?php
 	$REQUIRE_LIB['mathjax'] = '';
 	$REQUIRE_LIB['shjs'] = '';
-?>
+	?>
 <?php echoUOJPageHeader(UOJContext::user()['username'] . '的博客') ?>
 
 <div class="row">

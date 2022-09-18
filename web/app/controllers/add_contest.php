@@ -52,12 +52,12 @@
 	};
 	$time_form->succ_href="/contests";
 	$time_form->runAtServer();
-?>
+	?>
 <?php echoUOJPageHeader('添加比赛') ?>
 <h1 class="page-header">添加比赛</h1>
 <div class="tab-pane active" id="tab-time">
 <?php
-	$time_form->printHTML();
-?>
+		$time_form->printHTML();
+	?>
 </div>
 <?php echoUOJPageFooter() ?>

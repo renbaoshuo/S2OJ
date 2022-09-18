@@ -49,10 +49,10 @@
 		unset($_SESSION['phrase']);
 		die();
 	}
-?>
+	?>
 <?php
 	$REQUIRE_LIB['md5'] = '';
-?>
+	?>
 <?php echoUOJPageHeader(UOJLocale::get('login')) ?>
 <h2 class="page-header"><?= UOJLocale::get('login') ?></h2>
 <form id="form-login" class="form-horizontal" method="post">

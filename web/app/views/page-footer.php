@@ -2,7 +2,7 @@
 	if (!isset($ShowPageFooter)) {
 		$ShowPageFooter = true;
 	}
-?>
+	?>
 			</div>
 			<?php if ($ShowPageFooter): ?>
 			<div class="uoj-footer">

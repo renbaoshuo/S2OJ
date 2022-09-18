@@ -1,7 +1,7 @@
 <?php
 	$blogs = DB::selectAll("select blogs.id, title, poster, post_time from important_blogs, blogs where is_hidden = 0 and important_blogs.blog_id = blogs.id order by level desc, important_blogs.blog_id desc limit 5");
 	$countdowns = DB::selectAll("select * from countdowns order by endtime asc limit 5")
-?>
+	?>
 <?php echoUOJPageHeader(UOJConfig::$data['profile']['oj-name-short']) ?>
 <div class="row">
 	<div class="col-sm-12 col-md-9">
@@ -19,11 +19,11 @@
 					<?php $now_cnt = 0; ?>
 					<?php foreach ($blogs as $blog): ?>
 						<?php
-							$now_cnt++;
-							$new_tag = '';
-							if ((time() - strtotime($blog['post_time'])) / 3600 / 24 <= 7) {
-								$new_tag = '<sup style="color:red">&nbsp;new</sup>';
-							}
+								$now_cnt++;
+						$new_tag = '';
+						if ((time() - strtotime($blog['post_time'])) / 3600 / 24 <= 7) {
+							$new_tag = '<sup style="color:red">&nbsp;new</sup>';
+						}
 						?>
 						<tr>
 							<td><a href="/blogs/<?= $blog['id'] ?>"><?= $blog['title'] ?></a><?= $new_tag ?></td>
@@ -60,8 +60,8 @@
 					<?php foreach ($countdowns as $countdown): ?>
 						<?php
 							$enddate = strtotime($countdown['endtime']);
-							$nowdate = time();
-							$diff = floor(($enddate - $nowdate) / (24 * 60 * 60));
+						$nowdate = time();
+						$diff = floor(($enddate - $nowdate) / (24 * 60 * 60));
 						?>
 						<p class="card-text">
 							<?php if ($diff > 0): ?>

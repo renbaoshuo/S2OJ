@@ -97,7 +97,7 @@
 		};
 		$delete_user_form->runAtServer();
 	}
-?>
+	?>
 
 <?php echoUOJPageHeader(UOJLocale::get('groups')) ?>
 
@@ -109,19 +109,19 @@
 		<h5><?= UOJLocale::get('news') ?></h5>
 		<ul>
 		<?php
-			$current_ac = queryGroupCurrentAC($group['id']);
-			foreach ($current_ac as $ac) {
-				echo '<li>';
-				echo getUserLink($ac['submitter']);
-				echo ' 解决了问题 ';
-				echo '<a href="/problem/', $ac['problem_id'], '">', $ac['problem_title'], '</a> ';
-				echo '<time class="time">(', $ac['submit_time'], ')</time>';
-				echo '</li>';
-			}
-			if (!$current_ac) {
-				echo '(无)';
-			}
-		?>
+				$current_ac = queryGroupCurrentAC($group['id']);
+	foreach ($current_ac as $ac) {
+		echo '<li>';
+		echo getUserLink($ac['submitter']);
+		echo ' 解决了问题 ';
+		echo '<a href="/problem/', $ac['problem_id'], '">', $ac['problem_title'], '</a> ';
+		echo '<time class="time">(', $ac['submit_time'], ')</time>';
+		echo '</li>';
+	}
+	if (!$current_ac) {
+		echo '(无)';
+	}
+	?>
 		</ul>
 	</div>
 </div>

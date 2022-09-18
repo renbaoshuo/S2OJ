@@ -64,5 +64,5 @@
 		}
 		$cnt = $row['zan'];
 	}
-?>
+	?>
 <?= getClickZanBlock($type, $id, $cnt, $cur) ?>

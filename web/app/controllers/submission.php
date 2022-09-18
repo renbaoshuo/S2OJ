@@ -132,10 +132,10 @@
 			}
 		}
 	}
-?>
+	?>
 <?php 
 	$REQUIRE_LIB['shjs'] = "";
-?>
+	?>
 <?php echoUOJPageHeader(UOJLocale::get('problems::submission').' #'.$submission['id']) ?>
 <?php echoSubmissionsListOnlyOne($submission, array(), $myUser) ?>
 

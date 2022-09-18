@@ -28,7 +28,7 @@
 	if (!isset($ShowPageHeader)) {
 		$ShowPageHeader = true;
 	}
-?>
+	?>
 <!DOCTYPE html>
 <html lang="<?= UOJLocale::locale() ?>">
 	<head>

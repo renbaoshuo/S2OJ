@@ -60,10 +60,10 @@
 			$styler->show_small_tip = false;
 		}
 	}
-?>
+	?>
 <?php
 	$REQUIRE_LIB['shjs'] = "";
-?>
+	?>
 <?php echoUOJPageHeader(UOJLocale::get('problems::hack').' #'.$hack['id']) ?>
 
 <?php echoHackListOnlyOne($hack, array(), $myUser) ?>

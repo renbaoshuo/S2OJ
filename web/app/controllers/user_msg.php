@@ -81,26 +81,26 @@
 		return json_encode($ret);
 	}
 
-/*
-function deleteMsg($msgId) {
-    return 1;
-    $str = <<<EOD
-select * from user_msg
-where id = $msgId
-and read_time is null
-EOD;
-    $result = DB::query($str);
-    if (DB::fetch($result)) {
-        $str = <<<EOD
-delete from user_msg
-where id = $msgId
-EOD;
-        DB::query($str);
-        return 1;
-    }
-    return 0;
-}
-*/
+	/*
+	function deleteMsg($msgId) {
+	    return 1;
+	    $str = <<<EOD
+	select * from user_msg
+	where id = $msgId
+	and read_time is null
+	EOD;
+	    $result = DB::query($str);
+	    if (DB::fetch($result)) {
+	        $str = <<<EOD
+	delete from user_msg
+	where id = $msgId
+	EOD;
+	        DB::query($str);
+	        return 1;
+	    }
+	    return 0;
+	}
+	*/
 
 	if (isset($_POST['user_msg'])) {
 		die(handleMsgPost());
@@ -109,7 +109,7 @@ EOD;
 	} elseif (isset($_GET['getHistory'])) {
 		die(getHistory());
 	} 
-?>
+	?>
 
 <?php echoUOJPageHeader('私信') ?>
 

@@ -67,7 +67,7 @@
 	};
 	
 	$blog_editor->runAtServer();
-?>
+	?>
 <?php echoUOJPageHeader('写博客') ?>
 <div class="text-right">
 <a href="http://uoj.ac/blog/7">这玩意儿怎么用？</a>

@@ -13,7 +13,7 @@
 	$extra_text = $blog['is_hidden'] ? '<span class="text-muted">[已隐藏]</span> ' : '';
 	
 	$blog_type = $blog['type'] == 'B' ? 'post' : 'slide';
-?>
+	?>
 <h2><?= $extra_text ?><a class="header-a" href="<?= HTML::blog_url(UOJContext::userid(), '/post/'.$blog['id']) ?>"><?= $blog['title'] ?></a></h2>
 <div><?= $blog['post_time'] ?> <strong>By</strong> <?= getUserLink($blog['poster']) ?></div>
 <?php if (!$show_title_only): ?>

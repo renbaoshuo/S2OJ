@@ -143,7 +143,7 @@ EOD;
 
 	$div_classes = array('table-responsive');
 	$table_classes = array('table', 'table-bordered', 'table-hover', 'table-striped');
-?>
+	?>
 <?php echoUOJPageHeader(UOJLocale::get('problems')) ?>
 <div class="row">
 	<div class="col-sm-4">
@@ -177,7 +177,7 @@ $('#input-show_submit_mode').click(function() {
 });
 </script>
 <?php
-	echo '<div class="', join($div_classes, ' '), '">';
+		echo '<div class="', join($div_classes, ' '), '">';
 	echo '<table class="', join($table_classes, ' '), '">';
 	echo '<thead>';
 	echo $header;
@@ -201,5 +201,5 @@ $('#input-show_submit_mode').click(function() {
 	}
 	
 	echo $pag->pagination();
-?>
+	?>
 <?php echoUOJPageFooter() ?>

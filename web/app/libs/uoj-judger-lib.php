@@ -183,4 +183,4 @@
 		
 		DB::update("update problems set ac_num = (select count(*) from submissions where problem_id = problems.id and score = 100), submit_num = (select count(*) from submissions where problem_id = problems.id) where id = $problem_id");
 	}
-?>
+	?>

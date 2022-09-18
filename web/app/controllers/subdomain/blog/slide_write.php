@@ -66,7 +66,7 @@
 	};
 	
 	$blog_editor->runAtServer();
-?>
+	?>
 <?php echoUOJPageHeader('写幻灯片') ?>
 <div class="text-right">
 <a href="http://uoj.ac/blog/75">这玩意儿怎么用？</a>

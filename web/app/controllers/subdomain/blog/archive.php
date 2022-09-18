@@ -31,7 +31,7 @@
 	
 	requireLib('mathjax');
 	requireLib('shjs');
-?>
+	?>
 <?php echoUOJPageHeader('日志') ?>
 
 <div class="row">

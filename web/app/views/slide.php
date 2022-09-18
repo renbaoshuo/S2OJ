@@ -11,7 +11,7 @@
 	if (!isset($slide_config['theme'])) {
 		$slide_config['theme'] = 'moon';
 	}
-?>
+	?>
 <!DOCTYPE html>
 <html lang="zh-cn">
 	<head>

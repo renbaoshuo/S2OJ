@@ -33,4 +33,4 @@
 		UOJLocale::setLocale($_GET['locale']);
 	}
 	UOJLocale::requireModule('basic');
-?>
+	?>

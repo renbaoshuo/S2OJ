@@ -58,11 +58,11 @@
 	if (isset($_POST['change'])) {
 		die(handlePost());
 	}
-?>
+	?>
 <?php
 	$REQUIRE_LIB['dialog'] = '';
 	$REQUIRE_LIB['md5'] = '';
-?>
+	?>
 <?php echoUOJPageHeader(UOJLocale::get('modify my profile')) ?>
 <h2 class="page-header"><?= UOJLocale::get('modify my profile') ?></h2>
 <form id="form-update" class="form-horizontal">

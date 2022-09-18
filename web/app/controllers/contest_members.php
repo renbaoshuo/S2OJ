@@ -106,7 +106,7 @@
 			$unregister_form->runAtServer();
 		}
 	}
-?>
+	?>
 <?php echoUOJPageHeader(HTML::stripTags($contest['name']) . ' - ' . UOJLocale::get('contests::contest registrants')) ?>
 
 <h1 class="text-center"><?= $contest['name'] ?></h1>
@@ -123,55 +123,55 @@
 <?php endif ?>
 
 <?php
-	if ($show_ip) {
-		$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th><th>remote_addr</th></tr>';
+		if ($show_ip) {
+			$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th><th>remote_addr</th></tr>';
 	
-		$ip_owner = array();
-		foreach (DB::selectAll("select * from contests_registrants where contest_id = {$contest['id']} order by username desc") as $reg) {
-			$user = queryUser($reg['username']);
-			$ip_owner[$user['remote_addr']] = $reg['username'];
+			$ip_owner = array();
+			foreach (DB::selectAll("select * from contests_registrants where contest_id = {$contest['id']} order by username desc") as $reg) {
+				$user = queryUser($reg['username']);
+				$ip_owner[$user['remote_addr']] = $reg['username'];
+			}
+		} else {
+			$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th></tr>';
 		}
-	} else {
-		$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th></tr>';
-	}
 	
-	echoLongTable(array('*'), 'contests_registrants', "contest_id = {$contest['id']}", 'order by username desc',
-		$header_row,
-		function($contest, $num) {
-			global $myUser;
-			global $show_ip, $ip_owner;
+		echoLongTable(array('*'), 'contests_registrants', "contest_id = {$contest['id']}", 'order by username desc',
+			$header_row,
+			function($contest, $num) {
+				global $myUser;
+				global $show_ip, $ip_owner;
 			
-			$user = queryUser($contest['username']);
-			$user_link = getUserLink($contest['username']);
-			if (!$show_ip) {
-				echo '<tr>';
-			} else {
-				if ($ip_owner[$user['remote_addr']] != $user['username']) {
-					echo '<tr class="danger">';
-				} else {
+				$user = queryUser($contest['username']);
+				$user_link = getUserLink($contest['username']);
+				if (!$show_ip) {
 					echo '<tr>';
+				} else {
+					if ($ip_owner[$user['remote_addr']] != $user['username']) {
+						echo '<tr class="danger">';
+					} else {
+						echo '<tr>';
+					}
 				}
-			}
-			echo '<td>'.$num.'</td>';
-			echo '<td>'.$user_link.'</td>';
-			if ($show_ip) {
-				echo '<td>'.$user['remote_addr'].'</td>';
-			}
-			echo '</tr>';
-		},
-		array('page_len' => 100,
-			'get_row_index' => '',
-			'print_after_table' => function() {
-				global $add_new_contestant_form, $add_group_to_contest_form;
+				echo '<td>'.$num.'</td>';
+				echo '<td>'.$user_link.'</td>';
+				if ($show_ip) {
+					echo '<td>'.$user['remote_addr'].'</td>';
+				}
+				echo '</tr>';
+			},
+			array('page_len' => 100,
+				'get_row_index' => '',
+				'print_after_table' => function() {
+					global $add_new_contestant_form, $add_group_to_contest_form;
 
-				if (isset($add_new_contestant_form)) {
-					$add_new_contestant_form->printHTML();
+					if (isset($add_new_contestant_form)) {
+						$add_new_contestant_form->printHTML();
+					}
+					if (isset($add_group_to_contest_form)) {
+						$add_group_to_contest_form->printHTML();
+					}
 				}
-				if (isset($add_group_to_contest_form)) {
-					$add_group_to_contest_form->printHTML();
-				}
-			}
-		)
-	);
-?>
+			)
+		);
+	?>
 <?php echoUOJPageFooter() ?>

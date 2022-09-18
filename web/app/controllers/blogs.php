@@ -29,7 +29,7 @@
 EOD;
 	$config = array();
 	$config['table_classes'] = array('table', 'table-hover');
-?>
+	?>
 <?php echoUOJPageHeader(UOJLocale::get('blogs')) ?>
 <?php if (Auth::check()): ?>
 <div class="float-right">

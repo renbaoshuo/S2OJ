@@ -384,7 +384,7 @@ EOD
 $('#form-group-$name').text_file_form_group('$name', '$text');
 </script>
 EOD
-		);
+			);
 			
 			$this->is_big = true;
 			$this->has_file = true;
@@ -818,4 +818,4 @@ EOD;
 		};
 		return $form;
 	}
-?>
+	?>

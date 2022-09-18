@@ -28,7 +28,7 @@
 	$register_form->succ_href = "/contests";
 	
 	$register_form->runAtServer();
-?>
+	?>
 <?php echoUOJPageHeader(HTML::stripTags($contest['name']) . ' - 报名') ?>
 <h1 class="page-header">比赛规则</h1>
 <ul>

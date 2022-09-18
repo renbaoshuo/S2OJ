@@ -37,7 +37,7 @@
 	} else {
 		$cond = '1';
 	}
-?>
+	?>
 <?php echoUOJPageHeader(UOJLocale::get('submissions')) ?>
 <div class="d-none d-sm-block">
 	<?php if ($myUser != null): ?>
@@ -86,6 +86,6 @@
 	<div class="top-buffer-sm"></div>
 </div>
 <?php
-	echoSubmissionsList($cond, 'order by id desc', array('judge_time_hidden' => ''), $myUser);
-?>
+		echoSubmissionsList($cond, 'order by id desc', array('judge_time_hidden' => ''), $myUser);
+	?>
 <?php echoUOJPageFooter() ?>

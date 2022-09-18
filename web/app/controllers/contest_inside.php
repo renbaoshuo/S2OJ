@@ -239,13 +239,13 @@
 						return '您尚未登录';
 					}
 					switch ($_POST['rtype']) {
-				    	case 'public':
-				    	case 'private':
-				    		if (strlen($content) == 0) {
-				    			return '回复不能为空';
-				    		}
+						case 'public':
+						case 'private':
+							if (strlen($content) == 0) {
+								return '回复不能为空';
+							}
 							break;
-				    }
+					}
 					return '';
 				},
 				null
@@ -447,7 +447,7 @@ EOD;
 	}
 	
 	$page_header = HTML::stripTags($contest['name']) . ' - ';
-?>
+	?>
 <?php echoUOJPageHeader(HTML::stripTags($contest['name']) . ' - ' . $tabs_info[$cur_tab]['name'] . ' - ' . UOJLocale::get('contests::contest')) ?>
 <div class="text-center">
 	<h1><?= $contest['name'] ?></h1>
@@ -462,18 +462,18 @@ EOD;
 		<?= HTML::tablist($tabs_info, $cur_tab) ?>
 		<div class="top-buffer-md">
 		<?php
-			if ($cur_tab == 'dashboard') {
-				echoDashboard();
-			} elseif ($cur_tab == 'submissions') {
-				echoMySubmissions();
-			} elseif ($cur_tab == 'standings') {
-				echoStandings();
-			} elseif ($cur_tab == 'after_contest_standings') {
-				echoStandings(true);
-			} elseif ($cur_tab == 'backstage') {
-				echoBackstage();
-			}
-		?>
+				if ($cur_tab == 'dashboard') {
+					echoDashboard();
+				} elseif ($cur_tab == 'submissions') {
+					echoMySubmissions();
+				} elseif ($cur_tab == 'standings') {
+					echoStandings();
+				} elseif ($cur_tab == 'after_contest_standings') {
+					echoStandings(true);
+				} elseif ($cur_tab == 'backstage') {
+					echoBackstage();
+				}
+	?>
 		</div>
 	</div>
 	
@@ -485,14 +485,14 @@ EOD;
 
 	<div class="col-sm-3">
 		<?php
-			if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) {
-				echoContestCountdown();
-			} elseif ($contest['cur_progress'] <= CONTEST_TESTING) {
-				echoContestJudgeProgress();
-			} else {
-				echoContestFinished();
-			}
-		?>
+		if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) {
+			echoContestCountdown();
+		} elseif ($contest['cur_progress'] <= CONTEST_TESTING) {
+			echoContestJudgeProgress();
+		} else {
+			echoContestFinished();
+		}
+	?>
 		<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings'): ?>
 	</div>
 	<div class="col-sm-3">

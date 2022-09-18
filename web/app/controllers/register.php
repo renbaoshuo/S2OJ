@@ -59,11 +59,11 @@
 		}
 		die();
 	}
-?>
+	?>
 <?php
 	$REQUIRE_LIB['md5'] = '';
 	$REQUIRE_LIB['dialog'] = '';
-?>
+	?>
 <?php echoUOJPageHeader(UOJLocale::get('register')) ?>
 <h2 class="page-header"><?= UOJLocale::get('register') ?></h2>
 <form id="form-register" class="form-horizontal">

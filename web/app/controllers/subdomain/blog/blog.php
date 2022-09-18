@@ -140,11 +140,11 @@
 		'tail' => 'order by id asc',
 		'page_len' => 20
 	));
-?>
+	?>
 <?php
 	$REQUIRE_LIB['mathjax'] = '';
 	$REQUIRE_LIB['shjs'] = '';
-?>
+	?>
 <?php echoUOJPageHeader(HTML::stripTags($blog['title']) . ' - 博客') ?>
 <?php echoBlog($blog, array('show_title_only' => isset($_GET['page']) && $_GET['page'] != 1)) ?>
 <h2>评论 <span class="glyphicon glyphicon-comment"></span></h2>
@@ -162,7 +162,7 @@
 			$replies[$idx]['poster_realname'] = queryUser($reply['poster'])['realname'];
 		}
 		$replies_json = json_encode($replies);
-	?>
+		?>
 	<div id="comment-<?= $comment['id'] ?>" class="list-group-item">
 		<div class="media">
 			<div class="media-left comtposterbox mr-3">

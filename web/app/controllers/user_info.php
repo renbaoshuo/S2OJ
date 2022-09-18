@@ -10,11 +10,11 @@
 	$username = $_GET['username'];
 
 	$REQUIRE_LIB['github_contribution_graph'] = '';
-?>
+	?>
 <?php if (validateUsername($username) && ($user = queryUser($username))): ?>
 	<?php echoUOJPageHeader($user['username'] . ' - ' . UOJLocale::get('user profile')) ?>
 	<?php
-		$esc_email = HTML::escape($user['email']);
+			$esc_email = HTML::escape($user['email']);
 		$esc_qq = HTML::escape($user['qq'] != 0 ? $user['qq'] : 'Unfilled');
 		$esc_sex = HTML::escape($user['sex']);
 		$col_sex="color:blue";
@@ -28,7 +28,7 @@
 			$esc_sex="";
 			$col_sex="color:black";
 		}
-		$esc_motto = HTML::escape($user['motto']);
+	$esc_motto = HTML::escape($user['motto']);
 	?>
 	<div class="card border-info">
 		<h5 class="card-header bg-info"><?= UOJLocale::get('user profile') ?></h5>
@@ -84,25 +84,25 @@
 				<div class="list-group-item">
 					<?php
 						$_result = DB::query("select date(submit_time), problem_id from submissions where submitter = '{$username}' and score = 100 and date(submit_time) between date_sub(curdate(), interval 1 year) and curdate()");
-						$result = [];
-						$vis = [];
-						while ($row = DB::fetch($_result)) {
-							$id = $row['date(submit_time)'] . ':' . $row['problem_id'];
-							if (!$vis[$id]) {
-								$vis[$id] = 1;
-								$result[strtotime($row['date(submit_time)']) * 1000]++;
-							}
-						}
-					?>
+	$result = [];
+	$vis = [];
+	while ($row = DB::fetch($_result)) {
+		$id = $row['date(submit_time)'] . ':' . $row['problem_id'];
+		if (!$vis[$id]) {
+			$vis[$id] = 1;
+			$result[strtotime($row['date(submit_time)']) * 1000]++;
+		}
+	}
+	?>
 					<h4 class="list-group-item-heading"><?= UOJLocale::get('n accepted in last year', count($result)) ?></h4>
 					<div id="accepted-graph"></div>
 					<script>
 						var accepted_graph_data = [
 							<?php
-								foreach ($result as $key => $val) {
-									echo "{ timestamp: {$key}, count: {$val} }, ";
-								}
-                            ?>
+				foreach ($result as $key => $val) {
+					echo "{ timestamp: {$key}, count: {$val} }, ";
+				}
+	?>
 						];
 
 						$(document).ready(function () {
@@ -117,17 +117,17 @@
 				<div class="list-group-item">
 					<?php
 						$ac_problems = DB::selectAll("select a.problem_id as problem_id, b.title as title from best_ac_submissions a inner join problems b on a.problem_id = b.id where submitter = '{$user['username']}';");
-					?>
+	?>
 					<h4 class="list-group-item-heading"><?= UOJLocale::get('accepted problems').'：'.UOJLocale::get('n problems in total', count($ac_problems))?> </h4>
 					<p class="list-group-item-text">
 					<?php
-						foreach ($ac_problems as $problem) {
-							echo '<a href="/problem/', $problem['problem_id'], '" style="display:inline-block; margin-right:0.25em;">#', $problem['problem_id'], '. ', $problem['title'], '</a>';
-						}
-						if (empty($ac_problems)) {
-							echo UOJLocale::get('none');
-						}
-					?>
+		foreach ($ac_problems as $problem) {
+			echo '<a href="/problem/', $problem['problem_id'], '" style="display:inline-block; margin-right:0.25em;">#', $problem['problem_id'], '. ', $problem['title'], '</a>';
+		}
+		if (empty($ac_problems)) {
+			echo UOJLocale::get('none');
+		}
+	?>
 					</p>
 				</div>
 			</div>

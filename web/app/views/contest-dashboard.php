@@ -11,9 +11,9 @@
 				<tr>
 					<?php
 						echo $contest_problems[$i]['submission_id'] ? '<td class="success">' : '<td>';
-						echo chr(ord('A') + $i);
-						echo '</td>';
-					?>
+				echo chr(ord('A') + $i);
+				echo '</td>';
+				?>
 					<td><?= getContestProblemLink($contest_problems[$i]['problem'], $contest['id']) ?></td>
 				</tr>
 			<?php endfor ?>

@@ -12,4 +12,4 @@
 	}
 	
 	redirectTo(HTML::blog_url($blog['poster'], '/post/'.$_GET['id']));
-?>
+	?>

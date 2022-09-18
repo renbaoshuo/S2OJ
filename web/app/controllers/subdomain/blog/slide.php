@@ -16,4 +16,4 @@
 	$page_config['PageTitle'] = HTML::stripTags($blog['title']) . ' - 幻灯片';
 	$page_config['content'] = $blog['content'];
 	uojIncludeView('slide', $page_config);
-?>
+	?>

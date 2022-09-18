@@ -4,7 +4,7 @@
 	if (!Auth::check()) {
 		become403Page(UOJLocale::get('need login'));
 	}
-?>
+	?>
 <?php echoUOJPageHeader('关于我') ?>
 
 <?php if (UOJContext::user()['username'] != 'vfleaking'): ?>

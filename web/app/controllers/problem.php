@@ -214,11 +214,11 @@ EOD
 		$custom_test_form->submit_button_config['text'] = UOJLocale::get('problems::run');
 		$custom_test_form->runAtServer();
 	}
-?>
+	?>
 <?php
 	$REQUIRE_LIB['mathjax'] = '';
 	$REQUIRE_LIB['shjs'] = '';
-?>
+	?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::problem')) ?>
 <?php
 	$limit = getUOJConf("/var/uoj_data/{$problem['id']}/problem.conf");
@@ -226,7 +226,7 @@ EOD
 	$memory_limit = $limit['memory_limit'];
 
 	$problem_uploader = $limit['poster'] ?: $problem['uploader'];
-?>
+	?>
 <div class="row d-flex justify-content-center">
 	<span class="badge badge-secondary mr-1">时间限制:<?=$time_limit!=null?"$time_limit s":"N/A"?></span>
 	<span class="badge badge-secondary mr-1">空间限制:<?=$memory_limit!=null?"$memory_limit MB":"N/A"?></span>

@@ -48,7 +48,7 @@
 		$cond = '1';
 	}
 	
-?>
+	?>
 <?php echoUOJPageHeader(UOJLocale::get('hacks')) ?>
 <div class="d-none d-sm-block">
 	<?php if ($myUser != null): ?>
@@ -104,6 +104,6 @@
 	<div class="top-buffer-sm"></div>
 </div>
 <?php
-	echoHacksList($cond, 'order by id desc', array('judge_time_hidden' => ''), $myUser);
-?>
+		echoHacksList($cond, 'order by id desc', array('judge_time_hidden' => ''), $myUser);
+	?>
 <?php echoUOJPageFooter() ?>

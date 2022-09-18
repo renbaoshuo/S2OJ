@@ -44,7 +44,7 @@ EOD;
 		'table_classes' => ['table', 'table-hover'],
 		'page_len' => 100
 	];
-?>
+	?>
 <?php echoUOJPageHeader(UOJLocale::get('announcements')) ?>
 <h3>公告</h3>
 <?php echoLongTable(array('blogs.id', 'poster', 'title', 'post_time', 'zan', 'level'), 'important_blogs, blogs', 'is_hidden = 0 and important_blogs.blog_id = blogs.id', 'order by level desc, important_blogs.blog_id desc', $header, 'echoBlogCell', $config); ?>

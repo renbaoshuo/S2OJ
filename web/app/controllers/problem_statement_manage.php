@@ -53,7 +53,7 @@
 	};
 	
 	$problem_editor->runAtServer();
-?>
+	?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - 编辑 - 题目管理') ?>
 <h1 class="page-header" align="center">#<?=$problem['id']?> : <?=$problem['title']?> 管理</h1>
 <ul class="nav nav-tabs" role="tablist">

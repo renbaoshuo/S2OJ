@@ -13,7 +13,7 @@
 	} else {
 		become404Page();
 	}
-?>
+	?>
 <?php echoUOJPageHeader($title) ?>
 <?php echoRanklist($config) ?>
 <?php echoUOJPageFooter() ?>

@@ -1,7 +1,6 @@
 <?php
 
 call_user_func(function() { // to prevent variable scope leak
-
 	Route::pattern('id', '[1-9][0-9]{0,9}');
 	Route::pattern('blog_username', '[a-zA-Z0-9_\-]{1,20}');
 

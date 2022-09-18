@@ -22,7 +22,7 @@ EOD;
 		echo '<td>'.$msg['send_time'].'</td>';
 		echo '</tr>';
 	}
-?>
+	?>
 <?php echoUOJPageHeader('系统消息') ?>
 <h2>系统消息</h2>
 <?php echoLongTable(array('*'), 'user_system_msg', "receiver='" . Auth::id() . "'", 'order by id desc', $header_row, 'echoSysMsg', array('table_classes' => array('table'))) ?>

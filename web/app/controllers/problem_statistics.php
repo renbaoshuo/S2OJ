@@ -61,10 +61,10 @@
 	}
 	
 	$submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']) ? 'time' : 'tot_size';
-?>
+	?>
 <?php
 	$REQUIRE_LIB['morris'] = "";
-?>
+	?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::statistics')) ?>
 
 <h1 class="page-header text-center"><?= $problem['title'] ?> <?= UOJLocale::get('problems::statistics') ?></h1>

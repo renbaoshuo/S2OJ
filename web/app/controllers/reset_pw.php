@@ -29,11 +29,11 @@
 	if (isset($_POST['reset'])) {
 		die(resetPassword());
 	}
-?>
+	?>
 <?php
 	$REQUIRE_LIB['dialog'] = '';
 	$REQUIRE_LIB['md5'] = '';
-?>
+	?>
 <?php echoUOJPageHeader('更改密码') ?>
 <h2 class="page-header">更改密码</h2>
 <form id="form-reset" class="form-horizontal">

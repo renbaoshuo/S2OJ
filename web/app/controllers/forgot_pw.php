@@ -51,7 +51,7 @@ EOD;
 	$forgot_form->submit_button_config['align'] = 'offset';
 	
 	$forgot_form->runAtServer();
-?>
+	?>
 <?php echoUOJPageHeader('找回密码') ?>
 <h2 class="page-header">找回密码</h2>
 <h4>请输入需要找回密码的用户名：</h4>

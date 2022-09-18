@@ -22,7 +22,7 @@
 	$delete_form->succ_href = "/archive";
 	
 	$delete_form->runAtServer();
-?>
+	?>
 <?php echoUOJPageHeader('删除博客 - ' . HTML::stripTags($blog['title'])) ?>
 <h3>您真的要删除博客 <?= $blog['title'] ?> 吗？该操作不可逆！</h3>
 <?php $delete_form->printHTML(); ?>
