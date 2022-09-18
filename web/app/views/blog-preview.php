@@ -14,13 +14,14 @@
 	
 	$blog_type = $blog['type'] == 'B' ? 'post' : 'slide';
 	?>
+<link rel="stylesheet" type="text/css" href="<?= HTML::url('/css/markdown.css') ?>">
 <h2><?= $extra_text ?><a class="header-a" href="<?= HTML::blog_url(UOJContext::userid(), '/post/'.$blog['id']) ?>"><?= $blog['title'] ?></a></h2>
 <div><?= $blog['post_time'] ?> <strong>By</strong> <?= getUserLink($blog['poster']) ?></div>
 <?php if (!$show_title_only): ?>
 <div class="card mb-4">
 	<div class="card-body">
 		<?php if ($blog_type == 'post'): ?>
-		<article><?= $content ?></article>
+		<article class="markdown-body"><?= $content ?></article>
 		<?php elseif ($blog_type == 'slide'): ?>
 		<article>
 			<div class="embed-responsive embed-responsive-16by9">

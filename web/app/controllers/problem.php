@@ -267,9 +267,10 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 	<li class="nav-item"><a class="nav-link" href="/contest/<?= $contest['id'] ?>" role="tab"><?= UOJLocale::get('contests::back to the contest') ?></a></li>
 	<?php endif ?>
 </ul>
+<link rel="stylesheet" type="text/css" href="<?= HTML::url('/css/markdown.css') ?>">
 <div class="tab-content">
 	<div class="tab-pane active" id="tab-statement">
-		<article class="top-buffer-md"><?= $problem_content['statement'] ?></article>
+		<article class="top-buffer-md markdown-body"><?= $problem_content['statement'] ?></article>
 	</div>
 	<div class="tab-pane" id="tab-submit-answer">
 		<div class="top-buffer-sm"></div>

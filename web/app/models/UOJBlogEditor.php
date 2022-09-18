@@ -214,7 +214,8 @@ EOD
 			ob_start();
 			if ($this->type == 'blog') {
 				echoUOJPageHeader('博客预览', array('ShowPageHeader' => false, 'REQUIRE_LIB' => array('mathjax' => '', 'shjs' => '')));
-				echo '<article>';
+				echo '<link rel="stylesheet" type="text/css" href="' . HTML::url('/css/markdown.css') . '">';
+				echo '<article class="markdown-body">';
 				echo $this->post_data['content'];
 				echo '</article>';
 				echoUOJPageFooter(array('ShowPageFooter' => false));

@@ -11,6 +11,10 @@ body {
 	min-height: 250px;
 }
 
+.uoj-content img {
+	max-width: 100%;
+}
+
 .uoj-footer {
 	text-align: center;
 	margin-top: 20px;
@@ -46,9 +50,6 @@ a sub {
 	text-indent: 2em;
 }
 
-article p {
-	text-indent: 2em;
-}
 .markdown-editor-out p {
 	text-indent: 2em;
 	word-break: break-all;
