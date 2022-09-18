@@ -1,8 +1,8 @@
-<p align="center"><img src="https://github.com/UniversalOJ/UOJ-System/blob/master/web/images/logo.png?raw=true"></p>
+<img src="./web/images/logo_small.png" alt="Logo" width="64" height="64" align="right" />
 
-# Universal Online Judge
+# S2OJ
 
-> #### 一款通用的在线评测系统。
+> 基于 Universal Online Judge 的在线测评系统。
 
 ## 特性
 
@@ -24,4 +24,3 @@
 - [vfleaking](https://github.com/vfleaking) 将 UOJ 代码[开源](https://github.com/vfleaking/uoj)
 - 向原项目或本项目贡献代码的人
 - 给我们启发与灵感以及提供意见和建议的人
-
