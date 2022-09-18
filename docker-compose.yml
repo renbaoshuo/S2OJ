@@ -51,3 +51,12 @@ services:
       - ./uoj_data/web/storage:/opt/uoj/web/app/storage
     ports:
       - "80:80"
+    environment:
+      - DATABASE_HOST=uoj-db
+      - DATABASE_PASSWORD=root
+      - JUDGER_SOCKET_PORT=2333
+      - JUDGER_SOCKET_PASSWORD=_judger_socket_password_
+      - SALT_0=salt_0
+      - SALT_1=salt_1
+      - SALT_2=salt_2
+      - SALT_3=salt_3

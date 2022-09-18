@@ -3,10 +3,14 @@ genRandStr(){
     cat /dev/urandom | tr -dc [:alnum:] | head -c $1
 }
 #Set some vars
-_database_host_=uoj-db
-_database_password_=root
-_judger_socket_port_=2333
-_judger_socket_password_=_judger_socket_password_
+_database_host_="${DATABASE_HOST:-uoj-db}"
+_database_password_="${DATABASE_PASSWORD:-root}"
+_judger_socket_port_="${JUDGER_SOCKET_PORT:-2333}"
+_judger_socket_password_="${JUDGER_SOCKET_PASSWORD:-_judger_socket_password_}"
+_salt0_="${SALT0:-$(genRandStr 32)}"
+_salt1_="${SALT1:-$(genRandStr 32)}"
+_salt2_="${SALT2:-$(genRandStr 16)}"
+_salt3_="${SALT3:-$(genRandStr 16)}"
 
 getAptPackage(){
     printf "\n\n==> Getting environment packages\n"
@@ -81,7 +85,7 @@ initProgress(){
     mkdir -p /var/uoj_data/upload
     chown -R www-data:www-data /var/uoj_data
     #Replace password placeholders
-    sed -i -e "s/salt0/$(genRandStr 32)/g" -e "s/salt1/$(genRandStr 16)/g" -e "s/salt2/$(genRandStr 16)/g" -e "s/salt3/$(genRandStr 16)/g" -e "s/_judger_socket_password_/$_judger_socket_password_/g" /var/www/uoj/app/.config.php
+    sed -i -e "s/salt0/$_salt0_/g" -e "s/salt1/$_salt1_/g" -e "s/salt2/$_salt2_/g" -e "s/salt3/$_salt3_/g" -e "s/_judger_socket_password_/$_judger_socket_password_/g" /var/www/uoj/app/.config.php
     #Using cli upgrade to latest
     php /var/www/uoj/app/cli.php upgrade:latest
     #Start services
