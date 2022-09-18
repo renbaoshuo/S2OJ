@@ -42,7 +42,7 @@ string dirname(const string &path) {
 	}
 }
 string getcwdp(pid_t pid) {
-	char s[20];
+	char s[50];
 	char cwd[MaxPathLen + 1];
 	if (pid != 0) {
 		sprintf(s, "/proc/%lld/cwd", (long long int)pid);
