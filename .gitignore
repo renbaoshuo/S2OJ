@@ -1,2 +1,3 @@
-/uoj_data/*
+uoj_data/
 .php-cs-fixer.cache
+docker-compose.local.yml
