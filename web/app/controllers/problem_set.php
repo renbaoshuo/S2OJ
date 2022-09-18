@@ -134,7 +134,7 @@ EOD;
 	);
 ?>*/
 
-	$pag_config = array('page_len' => 100);
+	$pag_config = array('page_len' => 40);
 	$pag_config['col_names'] = array('*');
 	$pag_config['table_name'] = "problems left join best_ac_submissions on best_ac_submissions.submitter = '{$myUser['username']}' and problems.id = best_ac_submissions.problem_id";
 	$pag_config['cond'] = $cond;

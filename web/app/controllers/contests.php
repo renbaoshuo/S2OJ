@@ -62,7 +62,7 @@ EOD;
 	$table_header .= '</tr>';
 	echoLongTable(array('*'), 'contests', "status != 'finished'", 'order by id desc', $table_header,
 		echoContest,
-		array('page_len' => 100)
+		array('page_len' => 40)
 	);
 
 	if ($rest_second <= 86400) {
@@ -87,7 +87,7 @@ EOD;
 <?php
 		echoLongTable(array('*'), 'contests', "status = 'finished'", 'order by id desc', $table_header,
 			echoContest,
-			array('page_len' => 100,
+			array('page_len' => 40,
 				'print_after_table' => function() {
 					global $myUser;
 					if (isSuperUser($myUser)) {

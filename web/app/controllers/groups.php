@@ -69,7 +69,7 @@ EOD;
     	$from, $cond, 'group by a.id order by a.id asc',
     	$header,
     	'echoGroup',
-    	array('page_len' => 100,
+    	array('page_len' => 40,
     		'table_classes' => array('table', 'table-bordered', 'table-hover', 'table-striped'),
     		'print_after_table' => function() {
     			global $myUser;

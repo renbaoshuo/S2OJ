@@ -42,7 +42,7 @@
 EOD;
 	$config = [
 		'table_classes' => ['table', 'table-hover'],
-		'page_len' => 100
+		'page_len' => 40
 	];
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('announcements')) ?>
