@@ -17,7 +17,7 @@ getAptPackage(){
     apt-get update && apt-get install -y git vim ntp zip unzip curl wget apache2 libapache2-mod-xsendfile libapache2-mod-php php php-dev php-pear php-zip php-mysql php-mbstring php-gd php-intl php-xsl g++ make re2c libv8-7.5-dev libyaml-dev
     # Install PHP extensions
     yes | pecl install yaml
-    git clone https://github.com/phpv8/v8js.git --depth=1 -b php7 /tmp/pear/download/v8js-master && cd /tmp/pear/download/v8js-master
+    git clone https://github.com/phpv8/v8js.git --depth=1 -b 4c026f3fb291797c109adcabda6aeba6491fe44f /tmp/pear/download/v8js-master && cd /tmp/pear/download/v8js-master
     phpize && ./configure --with-php-config=/usr/bin/php-config --with-v8js=/opt/libv8-7.5 && make install && cd -
 }
 
@@ -96,12 +96,12 @@ initProgress(){
 }
 
 prepProgress(){
-    getAptPackage;setLAMPConf;setWebConf
+    setLAMPConf;setWebConf
 }
 
 if [ $# -le 0 ]; then
     echo 'Installing UOJ System web...'
-    prepProgress;initProgress
+    getAptPackage;prepProgress;initProgress
 fi
 while [ $# -gt 0 ]; do
     case "$1" in
