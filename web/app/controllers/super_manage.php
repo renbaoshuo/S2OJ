@@ -38,7 +38,7 @@
 	$register_form->handle = function() {
 		$new_username = $_POST['new_username'];
 		$new_password = $_POST['new_password'];
-		$new_realname = $_POST['new_realname'];
+		$new_realname = DB::escape($_POST['new_realname']);
 		$new_password = hash_hmac('md5', $new_password, getPasswordClientSalt());
 		$new_password = getPasswordToStore($new_password, $new_username);
 		$svn_pw = uojRandString(10);
@@ -99,7 +99,7 @@
 	);
 	$change_realname_form->handle = function() {
 		$r_username = $_POST['r_username'];
-		$r_realname = $_POST['r_realname'];
+		$r_realname = DB::escape($_POST['r_realname']);
 
 		DB::query("update user_info set realname = '$r_realname' where username = '$r_username'");
 	};
