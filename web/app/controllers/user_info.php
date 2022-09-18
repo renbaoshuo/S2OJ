@@ -14,7 +14,7 @@
 <?php if (validateUsername($username) && ($user = queryUser($username))): ?>
 	<?php echoUOJPageHeader($user['username'] . ' - ' . UOJLocale::get('user profile')) ?>
 	<?php
-			$esc_email = HTML::escape($user['email']);
+		$esc_email = HTML::escape($user['email']);
 		$esc_qq = HTML::escape($user['qq'] != 0 ? $user['qq'] : 'Unfilled');
 		$esc_sex = HTML::escape($user['sex']);
 		$col_sex="color:blue";
@@ -28,7 +28,7 @@
 			$esc_sex="";
 			$col_sex="color:black";
 		}
-	$esc_motto = HTML::escape($user['motto']);
+	$motto = addslashes($user['motto']);
 	?>
 	<div class="card border-info">
 		<h5 class="card-header bg-info"><?= UOJLocale::get('user profile') ?></h5>
@@ -49,9 +49,16 @@
 							<p class="list-group-item-text"><?= $esc_qq ?></p>
 						</div>
 						<div class="list-group-item">
-							<h4 class="list-group-item-heading"><?= UOJLocale::get('motto') ?></h4>
-							<p class="list-group-item-text"><?= $esc_motto ?></p>
+							<h4 class="list-group-item-heading"><?= UOJLocale::get('motto') ?></h4><?php
+								$motto_id = uniqid("motto-{$user['username']}-");
+	$dom_sanitize_config = DOM_SANITIZE_CONFIG;
+	?>
+							<p class="list-group-item-text" id="<?= $motto_id ?>"></p>
+							<script type="text/javascript">
+								$(function() { $('#<?= $motto_id ?>').html(DOMPurify.sanitize('<?= $motto ?>', <?= $dom_sanitize_config ?>)); });
+							</script>
 						</div>
+						
 						<?php if (isSuperUser($myUser)): ?>
 						<div class="list-group-item">
 							<h4 class="list-group-item-heading">register time</h4>

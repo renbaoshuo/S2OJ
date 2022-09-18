@@ -17,7 +17,7 @@ function validateQQ($QQ) {
 }
 
 function validateMotto($motto) {
-	return is_string($motto) && ($len = mb_strlen($motto, 'UTF-8')) !== false && $len <= 50;
+	return is_string($motto) && ($len = mb_strlen($motto, 'UTF-8')) !== false && $len <= 1024;
 }
 
 function validateUInt($x) { // [0, 1000000000)

@@ -1,5 +1,7 @@
 <?php
 
+define('DOM_SANITIZE_CONFIG', "{ALLOWED_TAGS: ['a', 'b', 'i', 'u', 'em', 'strong', 'sub', 'sup', 'small', 'del'], ALLOWED_ATTR: ['href']}");
+
 function uojHandleAtSign($str, $uri) {
 	$referrers = array();
 	$res = preg_replace_callback('/@(@|[a-zA-Z0-9_]{1,20})/', function($matches) use (&$referrers) {
@@ -990,7 +992,13 @@ function echoRanklist($config = array()) {
 		echo '<tr>';
 		echo '<td>' . $user['rank'] . '</td>';
 		echo '<td>' . getUserLink($user['username']) . '</td>';
-		echo '<td>' . HTML::escape($user['motto']) . '</td>';
+		$motto_id = uniqid("motto-{$user['username']}-");
+		echo "<td id=\"$motto_id\"></td>";
+		$motto = addslashes($user['motto']);
+		$dom_sanitize_config = DOM_SANITIZE_CONFIG;
+		echo '<script type="text/javascript">';
+		echo "$(function() { $('#$motto_id').html(DOMPurify.sanitize('{$motto}', $dom_sanitize_config)); });";
+		echo '</script>';
 		echo '<td>' . $user['ac_num'] . '</td>';
 		echo '</tr>';
 		
