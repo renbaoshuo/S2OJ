@@ -430,6 +430,8 @@ function echoSubmissionContent($submission, $requirement) {
 			switch ($file_language) {
 				case 'C++':
 				case 'C++11':
+				case 'C++17':
+				case 'C++98':
 					$sh_class = 'sh_cpp';
 					break;
 				case 'Python2':

@@ -987,6 +987,14 @@ RunCompilerResult compile_cpp11(const string &name, const string &path = work_pa
 	return run_compiler(path.c_str(),
 			"/usr/bin/g++", "-o", name.c_str(), "-x", "c++", (name + ".code").c_str(), "-lm", "-O2", "-DONLINE_JUDGE", "-std=c++11", NULL);
 }
+RunCompilerResult compile_cpp17(const string &name, const string &path = work_path) {
+	return run_compiler(path.c_str(),
+			"/usr/bin/g++", "-o", name.c_str(), "-x", "c++", (name + ".code").c_str(), "-lm", "-O2", "-DONLINE_JUDGE", "-std=c++17", NULL);
+}
+RunCompilerResult compile_cpp98(const string &name, const string &path = work_path) {
+	return run_compiler(path.c_str(),
+			"/usr/bin/g++", "-o", name.c_str(), "-x", "c++", (name + ".code").c_str(), "-lm", "-O2", "-DONLINE_JUDGE", "-std=c++98", NULL);
+}
 RunCompilerResult compile_python2(const string &name, const string &path = work_path) {
 	return run_compiler(path.c_str(),
 			"/usr/bin/python2.7", "-E", "-s", "-B", "-O", "-c",
@@ -1000,7 +1008,7 @@ RunCompilerResult compile_python3(const string &name, const string &path = work_
 RunCompilerResult compile(const char *name)  {
 	string lang = conf_str(string(name) + "_language");
 
-	if ((lang == "C++" || lang == "C++11" || lang == "C") && has_illegal_keywords_in_file(work_path + "/" + name + ".code"))
+	if ((lang == "C++" || lang == "C++11" || lang == "C++17" || lang == "C++98" || lang == "C") && has_illegal_keywords_in_file(work_path + "/" + name + ".code"))
 	{
 		RunCompilerResult res;
 		res.type = RS_DGS;
@@ -1016,6 +1024,12 @@ RunCompilerResult compile(const char *name)  {
 	}
 	if (lang == "C++11") {
 		return compile_cpp11(name);
+	}
+	if (lang == "C++17") {
+		return compile_cpp17(name);
+	}
+	if (lang == "C++98") {
+		return compile_cpp98(name);
 	}
 	if (lang == "Python2") {
 		return compile_python2(name);
@@ -1046,11 +1060,19 @@ RunCompilerResult compile_pas_with_implementer(const string &name, const string 
 }
 RunCompilerResult compile_cpp_with_implementer(const string &name, const string &path = work_path) {
 	return run_compiler(path.c_str(),
-			"/usr/bin/g++", "-o", name.c_str(), "implementer.cpp", "-x", "c++", (name + ".code").c_str(), "-lm", "-O2", "-DONLINE_JUDGE", NULL);
+			"/usr/bin/g++", "-o", name.c_str(), "implementer.cpp", "-x", "c++", (name + ".code").c_str(), "-lm", "-O2", "-DONLINE_JUDGE", "-std=c++14", NULL);
+}
+RunCompilerResult compile_cpp98_with_implementer(const string &name, const string &path = work_path) {
+	return run_compiler(path.c_str(),
+			"/usr/bin/g++", "-o", name.c_str(), "implementer.cpp", "-x", "c++", (name + ".code").c_str(), "-lm", "-O2", "-DONLINE_JUDGE", "-std=c++98", NULL);
 }
 RunCompilerResult compile_cpp11_with_implementer(const string &name, const string &path = work_path) {
 	return run_compiler(path.c_str(),
 			"/usr/bin/g++", "-o", name.c_str(), "implementer.cpp", "-x", "c++", (name + ".code").c_str(), "-lm", "-O2", "-DONLINE_JUDGE", "-std=c++11", NULL);
+}
+RunCompilerResult compile_cpp17_with_implementer(const string &name, const string &path = work_path) {
+	return run_compiler(path.c_str(),
+			"/usr/bin/g++", "-o", name.c_str(), "implementer.cpp", "-x", "c++", (name + ".code").c_str(), "-lm", "-O2", "-DONLINE_JUDGE", "-std=c++17", NULL);
 }
 /*
 RunCompilerResult compile_python2(const string &name, const string &path = work_path) {
@@ -1082,6 +1104,12 @@ RunCompilerResult compile_with_implementer(const char *name)  {
 	}
 	if (lang == "C++11") {
 		return compile_cpp11_with_implementer(name);
+	}
+	if (lang == "C++17") {
+		return compile_cpp17_with_implementer(name);
+	}
+	if (lang == "C++98") {
+		return compile_cpp98_with_implementer(name);
 	}
 	if (lang == "C") {
 		return compile_c_with_implementer(name);
