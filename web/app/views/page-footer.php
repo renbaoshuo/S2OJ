@@ -20,7 +20,7 @@
 				<?php if (UOJConfig::$data['profile']['ICP-license'] != ''): ?>
 				<p><a target="_blank" href="https://beian.miit.gov.cn" style="text-decoration:none;"><?= UOJConfig::$data['profile']['ICP-license'] ?></a></p>
 				<?php endif ?>
-				<p><?= UOJLocale::get('server time') ?>: <?= UOJTime::$time_now_str ?> | <a href="https://github.com/renbaoshuo/UOJ-System" target="_blank"><?= UOJLocale::get('opensource project') ?></a></p>
+				<p><?= UOJLocale::get('server time') ?>: <?= UOJTime::$time_now_str ?> | <a href="https://github.com/renbaoshuo/S2OJ" target="_blank"><?= UOJLocale::get('opensource project') ?></a></p>
 			</div>
 			<?php endif ?>
 		</div>
