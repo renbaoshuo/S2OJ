@@ -46,7 +46,7 @@ function queryContestData($contest, $config = array(), $is_after_contest_query =
 	$problems = [];
 	$prob_pos = [];
 	$n_problems = 0;
-	$result = DB::query("select problem_id from contests_problems where contest_id = {$contest['id']} order by problem_id");
+	$result = DB::query("select problem_id from contests_problems where contest_id = {$contest['id']} order by dfn");
 	while ($row = DB::fetch($result, MYSQLI_NUM)) {
 		$prob_pos[$problems[] = (int)$row[0]] = $n_problems++;
 	}
