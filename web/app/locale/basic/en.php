@@ -11,6 +11,7 @@ return [
 	'system manage' => 'System Manage',
 	'contests' => 'Contests',
 	'problems' => 'Problems',
+	'problems lists' => 'Problems Lists',
 	'groups' => 'Groups',
 	'add new group' => 'Add new group',
 	'users count' => 'Users',

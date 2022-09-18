@@ -11,7 +11,7 @@ function blog_editor_init(name, editor_config) {
 	var input_tags = $("#input-" + name + "_tags");
 	var input_content_md = $("#input-" + name + "_content_md");
 	var input_is_hidden = $("#input-" + name + "_is_hidden");
-	var this_form = input_content_md[0].form;
+	var this_form = input_is_hidden[0].form;
 	
 	var is_saved;
 	var last_save_done = true;
@@ -23,7 +23,7 @@ function blog_editor_init(name, editor_config) {
 	var italic_btn = $('<button type="button" class="btn btn-secondary btn-sm"><span class="glyphicon glyphicon-italic"></span></button>');
 	
 	save_btn.tooltip({ container: 'body', title: '保存 (Ctrl-S)' });
-	preview_btn.tooltip({ container: 'body', title: '预览 (Ctrl-D)' 	});
+	preview_btn.tooltip({ container: 'body', title: '预览 (Ctrl-D)'	});
 	bold_btn.tooltip({ container: 'body', title: '粗体 (Ctrl-B)' });
 	italic_btn.tooltip({ container: 'body', title: '斜体 (Ctrl-I)' });
 	
@@ -78,34 +78,36 @@ function blog_editor_init(name, editor_config) {
 	set_saved(true);
 	
 	// init codemirror
-	input_content_md.wrap('<div class="blog-content-md-editor"></div>');
-	var blog_contend_md_editor = input_content_md.parent();
-	input_content_md.before($('<div class="blog-content-md-editor-toolbar"></div>')
-		.append(toolbar)
-	);
-	input_content_md.wrap('<div class="blog-content-md-editor-in"></div>');
-	
-	var codeeditor;
-	if (editor_config.type == 'blog') {
-		codeeditor = CodeMirror.fromTextArea(input_content_md[0], {
-			mode: 'gfm',
-			lineNumbers: true,
-			matchBrackets: true,
-			lineWrapping: true,
-			styleActiveLine: true,
-			theme: 'default'
-		});
-	} else if (editor_config.type == 'slide') {
-		codeeditor = CodeMirror.fromTextArea(input_content_md[0], {
-			mode: 'plain',
-			lineNumbers: true,
-			matchBrackets: true,
-			lineWrapping: true,
-			styleActiveLine: true,
-			theme: 'default'
-		});
+	if (input_content_md[0]) {
+		input_content_md.wrap('<div class="blog-content-md-editor"></div>');
+		var blog_contend_md_editor = input_content_md.parent();
+		input_content_md.before($('<div class="blog-content-md-editor-toolbar"></div>')
+			.append(toolbar)
+		);
+		input_content_md.wrap('<div class="blog-content-md-editor-in"></div>');
+
+		var codeeditor;
+		if (editor_config.type == 'blog') {
+			codeeditor = CodeMirror.fromTextArea(input_content_md[0], {
+				mode: 'gfm',
+				lineNumbers: true,
+				matchBrackets: true,
+				lineWrapping: true,
+				styleActiveLine: true,
+				theme: 'default'
+			});
+		} else if (editor_config.type == 'slide') {
+			codeeditor = CodeMirror.fromTextArea(input_content_md[0], {
+				mode: 'plain',
+				lineNumbers: true,
+				matchBrackets: true,
+				lineWrapping: true,
+				styleActiveLine: true,
+				theme: 'default'
+			});
+		}
 	}
-	
+
 	function preview(html) {
 		var iframe = $('<iframe frameborder="0"></iframe>');
 		blog_contend_md_editor.append(
@@ -219,12 +221,22 @@ function blog_editor_init(name, editor_config) {
 	}
 	
 	// event
-	codeeditor.on('change', function() {
-		codeeditor.save();
-		set_saved(false);
-	});
+	if (input_content_md[0]) {
+		codeeditor.on('change', function() {
+			codeeditor.save();
+			set_saved(false);
+		});
+	}
 	$.merge(input_title, input_tags).on('input', function() {
 		set_saved(false);
+	});
+	$('#a-' + name + '_save').click(function (e) {
+		e.preventDefault();
+		save({
+			done: function () {
+				location.reload();
+			}
+		});
 	});
 	save_btn.click(function() {
 		save();
@@ -274,20 +286,22 @@ function blog_editor_init(name, editor_config) {
 	});
 	
 	// init hot keys
-	codeeditor.setOption("extraKeys", {
-		"Ctrl-S": function(cm) {
-			save_btn.click();
-		},
-		"Ctrl-B": function(cm) {
-			bold_btn.click();
-		},
-		"Ctrl-D": function(cm) {
-			preview_btn.click();
-		},
-		"Ctrl-I": function(cm) {
-			italic_btn.click();
-		}
-	});
+	if (input_content_md[0]) {
+		codeeditor.setOption("extraKeys", {
+			"Ctrl-S": function(cm) {
+				save_btn.click();
+			},
+			"Ctrl-B": function(cm) {
+				bold_btn.click();
+			},
+			"Ctrl-D": function(cm) {
+				preview_btn.click();
+			},
+			"Ctrl-I": function(cm) {
+				italic_btn.click();
+			}
+		});
+	}
 	$(document).bind('keydown', 'ctrl+d', function() {
 		preview_btn.click();
 		return false;

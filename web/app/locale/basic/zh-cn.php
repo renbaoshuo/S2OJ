@@ -11,6 +11,7 @@ return [
 	'system manage' => '系统管理',
 	'contests' => '比赛',
 	'problems' => '题库',
+	'problems lists' => '题单',
 	'groups' => '小组',
 	'add new group' => '添加新小组',
 	'users count' => '用户数量',

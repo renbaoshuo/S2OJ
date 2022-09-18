@@ -592,6 +592,49 @@ LOCK TABLES `problems_tags` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `lists`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lists` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` text NOT NULL,
+  `is_hidden` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `lists_problems`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lists_problems` (
+  `list_id` int(11) NOT NULL,
+  `problem_id` int(11) NOT NULL,
+  PRIMARY KEY (`list_id`, `problem_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `lists_tags`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lists_tags` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `list_id` int(11) NOT NULL,
+  `tag` varchar(30) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `list_id` (`list_id`),
+  KEY `tag` (`tag`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `search_requests`
 --
 

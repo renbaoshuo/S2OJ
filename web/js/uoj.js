@@ -245,6 +245,11 @@ $.fn.uoj_problem_tag = function() {
 		$(this).attr('href', uojHome + '/problems?tag=' + encodeURIComponent($(this).text()));
 	});
 }
+$.fn.uoj_list_tag = function() {
+	return this.each(function() {
+		$(this).attr('href', uojHome + '/problem_lists?tag=' + encodeURIComponent($(this).text()));
+	});
+}
 $.fn.uoj_blog_tag = function() {
 	return this.each(function() {
 		$(this).attr('href', uojBlogUrl + '/archive?tag=' + encodeURIComponent($(this).text()));
@@ -408,6 +413,7 @@ $.fn.uoj_highlight = function() {
 			}
 		});
 		$(this).find(".uoj-problem-tag").uoj_problem_tag();
+		$(this).find(".uoj-list-tag").uoj_list_tag();
 		$(this).find(".uoj-blog-tag").uoj_blog_tag();
 		$(this).find(".uoj-click-zan-block").click_zan_block();
 		$(this).find(".countdown").countdown();

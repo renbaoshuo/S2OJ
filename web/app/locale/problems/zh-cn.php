@@ -1,9 +1,13 @@
 <?php
 return [
 	'problem' => '题目',
+	'problem list' => '题单',
 	'all problems' => '总题库',
 	'template problems' => '模板题库',
 	'add new' => '添加新题',
+	'add new list' => '添加新题单',
+	'title' => '标题',
+	'total' => '总题数',
 	'ac' => 'AC',
 	'submit' => '提交',
 	'ac ratio' => 'AC 率',
