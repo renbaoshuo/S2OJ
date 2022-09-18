@@ -270,7 +270,7 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 <link rel="stylesheet" type="text/css" href="<?= HTML::url('/css/markdown.css') ?>">
 <div class="tab-content">
 	<div class="tab-pane active" id="tab-statement">
-		<article class="top-buffer-md markdown-body"><?= $problem_content['statement'] ?></article>
+		<article class="mt-3 markdown-body"><?= $problem_content['statement'] ?></article>
 	</div>
 	<div class="tab-pane" id="tab-submit-answer">
 		<div class="top-buffer-sm"></div>
