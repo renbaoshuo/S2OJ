@@ -48,6 +48,7 @@ UOJEOF
     #Create UOJ session save dir and make PHP extensions available
     mkdir --mode=733 /var/lib/php/uoj_sessions && chmod +t /var/lib/php/uoj_sessions
     sed -i -e '912a\extension=v8js.so\nextension=yaml.so' /etc/php/7.4/apache2/php.ini
+	sed -i 's|;sys_temp_dir = "/tmp"|sys_temp_dir = "/tmp"|g' /etc/php/7.4/apache2/php.ini
 }
 
 setWebConf(){
@@ -88,6 +89,9 @@ initProgress(){
     service apache2 restart
     #Touch SetupDone flag file
     touch /var/uoj_data/.UOJSetupDone
+	mkdir -p /opt/uoj/web/app/storage/submission
+	mkdir -p /opt/uoj/web/app/storage/tmp
+	chmod -R 777 /opt/uoj/web/app/storage
     printf "\n\n***Installation complete. Enjoy!***\n"
 }
 
