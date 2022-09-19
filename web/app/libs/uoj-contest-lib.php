@@ -109,12 +109,20 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 		}
 
 		$score[$submission[2]][$submission[3]] = array($submission[4], $penalty, $submission[0]);
-		
-		if ($show_reviews) {
-			$review_result = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = {$contest_data['problems'][$submission[3]]} and poster = '{$person[0]}'");
+	}
 
-			if ($review_result['content']) {
-				$score[$submission[2]][$submission[3]][] = $review_result['content'];
+	if ($show_reviews) {
+		foreach ($contest_data['people'] as $person) {
+			foreach ($contest_data['problems'] as $key => $problem) {
+				$review_result = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = {$problem} and poster = '{$person[0]}'");
+
+				if (!isset($score[$person[0]][$key])) {
+					$score[$person[0]][$key] = array(0, 0, 0);
+				}
+
+				if ($review_result['content']) {
+					$score[$person[0]][$key][] = $review_result['content'];
+				}
 			}
 		}
 	}
@@ -135,7 +143,7 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 		}
 
 		if ($show_reviews) {
-			$review_result = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and poster = '{$person[0]}'");
+			$review_result = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = -1 and poster = '{$person[0]}'");
 
 			if ($review_result['content']) {
 				$cur[] = $review_result['content'];

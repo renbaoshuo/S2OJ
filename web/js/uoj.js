@@ -1079,25 +1079,31 @@ function showStandings() {
 			col_tr += '<td>' + getUserLink(row[2][0], row[2][1]) + '</td>';
 			col_tr += '<td>' + '<div><span class="uoj-score" data-max="' + problems.length * 100 + '" style="color:' + getColOfScore(row[0] / problems.length) + '">' + row[0] + '</span></div>' + '<div>' + getPenaltyTimeStr(row[1]) + '</div></td>';
 			for (var i = 0; i < problems.length; i++) {
-				col_tr += '<td>';
+				col_tr += '<td' + (show_self_reviews ? ' style="vertical-align: text-top"' : '') + '>';
 				col = score[row[2][0]][i];
 				if (col != undefined) {
-					col_tr += '<div><a href="/submission/' + col[2] + '" class="uoj-score" style="color:' + getColOfScore(col[0]) + '">' + col[0] + '</a></div>';
-					if (standings_version < 2) {
-						col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';
-					} else {
-						if (col[0] > 0) {
-							col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';
-						}
-					}
+					col_tr += '<div>';
+					
+					if (col[2]) col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score" style="color:' + getColOfScore(col[0]) + '">' + col[0] + '</a>';
+					else col_tr += '<span class="uoj-score" style="color:' + getColOfScore(col[0]) + '">' + col[0] + '</span>';
+
+					col_tr += '</div>';
 					if (show_self_reviews) {
 						col_tr += '<div id="review-' + row[2][0] + '-' + i + '"></div>'
 							+ '<script>'
 							+ '$(function() {'
-							+ 'var purify_result = DOMPurify.sanitize(\'' + String(col[3] || '').replace(/'/g, '\\\'').replace(new RegExp('</scr' + 'ipt>', 'gi'), '</scr\' + \'ipt>') + '\', {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del"], ALLOWED_ATTR: ["href"]});'
+							+ 'var purify_result = DOMPurify.sanitize(decodeURIComponent("' + encodeURIComponent(String(col[3] || '')) + '"), {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del", "br"], ALLOWED_ATTR: ["href"]});'
 							+ '$("#review-' + row[2][0] + '-' + i + '")'
-							+ '.html(purify_result ? \'<div class="mt-3 pt-2 border-top">\' + purify_result + \'</div>\' : \'\'); });'
+							+ '.html(purify_result ? \'<div class="mt-2 pt-2 border-top">\' + purify_result + \'</div>\' : \'\'); });'
 							+ '</scr' + 'ipt>';
+					} else {
+						if (standings_version < 2) {
+							col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';
+						} else {
+							if (col[0] > 0) {
+								col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';
+							}
+						}
 					}
 				}
 				col_tr += '</td>';
@@ -1107,7 +1113,7 @@ function showStandings() {
 				col_tr += '<td><div id="review-' + row[2][0] + '"></div>'
 					+ '<script>'
 					+ '$(function() { $("#review-' + row[2][0] + '")'
-					+ '.html(DOMPurify.sanitize(\'' + String(row[4] || '').replace(/'/g, '\\\'').replace(new RegExp('</scr' + 'ipt>', 'gi'), '</scr\' + \'ipt>') + '\', {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del"], ALLOWED_ATTR: ["href"]})); });'
+					+ '.html(DOMPurify.sanitize(decodeURIComponent("' + encodeURIComponent(String(row[4] || '')) + '"), {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del"], ALLOWED_ATTR: ["href"]})); });'
 					+ '</scr' + 'ipt></td>';
 			}
 			col_tr += '</tr>';

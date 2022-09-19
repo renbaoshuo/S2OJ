@@ -71,12 +71,18 @@
 			$this->ajax_submit_js = $js;
 		}
 		
-		public function add($name, $html, $validator_php, $validator_js) {
+		public function add($name, $html, $validator_php, $validator_js, $no_val = false) {
 			$this->main_html .= $html;
-			$this->data[] = array(
+			$data = array(
 				'name' => $name,
 				'validator_php' => $validator_php,
 				'validator_js' => $validator_js);
+
+			if ($no_val) {
+				$data['no_val'] = '';
+			}
+
+			$this->data[] = $data;
 		}
 		public function appendHTML($html) {
 			$this->main_html .= $html;
@@ -183,7 +189,7 @@ EOD;
 			);
 		}
 		
-		public function addTextArea($name, $label_text, $default_value, $validator_php, $validator_js) {
+		public function addTextArea($name, $label_text, $default_value, $validator_php, $validator_js, $no_val = false) {
 			$default_value = htmlspecialchars($default_value);
 			$this->is_big = true;
 			$html = <<<EOD
@@ -195,9 +201,9 @@ EOD;
 	</div>
 </div>
 EOD;
-			$this->add($name, $html, $validator_php, $validator_js);
+			$this->add($name, $html, $validator_php, $validator_js, $no_val);
 		}
-		public function addVTextArea($name, $label_text, $default_value, $validator_php, $validator_js) {
+		public function addVTextArea($name, $label_text, $default_value, $validator_php, $validator_js, $no_val = false) {
 			$default_value = htmlspecialchars($default_value);
 			$this->is_big = true;
 			$html = <<<EOD
@@ -207,7 +213,7 @@ EOD;
 	<span class="help-block" id="help-$name"></span>
 </div>
 EOD;
-			$this->add($name, $html, $validator_php, $validator_js);
+			$this->add($name, $html, $validator_php, $validator_js, $no_val);
 		}
 		public function addCheckBox($name, $label_text, $default_value) {
 			$default_value = htmlspecialchars($default_value);

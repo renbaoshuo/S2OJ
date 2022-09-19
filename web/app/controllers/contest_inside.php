@@ -283,6 +283,56 @@
 		} else {
 			$reply_question = null;
 		}
+	} elseif ($cur_tab == 'self_reviews') {
+		if (hasParticipated(Auth::user(), $contest)) {
+			$self_reviews_update_form = new UOJForm('self_review_update');
+			$self_reviews_update_form->ctrl_enter_submit = true;
+			
+			$contest_problems = DB::selectAll("select problem_id from contests_problems where contest_id = {$contest['id']} order by dfn, problem_id");
+			for ($i = 0; $i < count($contest_problems); $i++) {
+				$contest_problems[$i]['problem'] = queryProblemBrief($contest_problems[$i]['problem_id']);
+			}
+			
+			for ($i = 0; $i < count($contest_problems); $i++) {
+				$content = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = {$contest_problems[$i]['problem_id']} and poster = '{$myUser['username']}'")['content'];
+				$self_reviews_update_form->addVTextArea('self_review_update__problem_' . chr(ord('A') + $i), '<b>' . chr(ord('A') + $i) . '</b>: ' . $contest_problems[$i]['problem']['title'], $content,
+					function ($content) {
+						return '';
+					},
+					null,
+					true
+				);
+			}
+
+			$content = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = -1 and poster = '{$myUser['username']}'")['content'];
+			$self_reviews_update_form->addVTextArea('self_review_update__overall', '比赛总结', $content,
+				function ($content) {
+					return '';
+				},
+				null,
+				true
+			);
+
+			$self_reviews_update_form->handle = function() {
+				global $contest, $contest_problems, $myUser;
+
+				for ($i = 0; $i < count($contest_problems); $i++) {
+					if (isset($_POST['self_review_update__problem_' . chr(ord('A') + $i)])) {
+						$esc_content = DB::escape($_POST['self_review_update__problem_' . chr(ord('A') + $i)]);
+						$problem_id = $contest_problems[$i]['problem_id'];
+
+						DB::query("replace into contests_reviews (contest_id, problem_id, poster, content) values ({$contest['id']}, $problem_id, '{$myUser['username']}', '$esc_content')");
+					}
+				}
+
+				if (isset($_POST['self_review_update__overall'])){
+					$esc_content = DB::escape($_POST['self_review_update__overall']);
+					DB::query("replace into contests_reviews (contest_id, problem_id, poster, content) values ({$contest['id']}, -1, '{$myUser['username']}', '$esc_content')");
+				}
+			};
+
+			$self_reviews_update_form->runAtServer();
+		}
 	}
 	
 	function echoDashboard() {
@@ -508,7 +558,7 @@ EOD;
 	<?php endif ?>
 
 	<div class="col-sm-3">
-		<?php
+	<?php
 		if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) {
 			echoContestCountdown();
 		} elseif ($contest['cur_progress'] <= CONTEST_TESTING) {
@@ -517,21 +567,21 @@ EOD;
 			echoContestFinished();
 		}
 	?>
-		<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings'): ?>
-	</div>
-	<div class="col-sm-3">
-	<?php endif ?>
-	<?php if (!isset($contest['extra_config']['contest_type']) || $contest['extra_config']['contest_type']=='OI'):?>
-	<p>此次比赛为OI赛制。</p>
-	<p><strong>注意：比赛时只显示测样例的结果。</strong></p>
-	<?php elseif ($contest['extra_config']['contest_type']=='IOI'):?>
-	<p>此次比赛为IOI赛制。</p>
-	<p><strong>注意：比赛时显示测试所有数据的结果，但无法看到详细信息。</strong></p>
-	<?php endif?>
+		<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings' || $cur_tab == 'self_reviews'): ?>
+			</div>
+			<div class="col-sm-3">
+		<?php endif ?>
+		<?php if (!isset($contest['extra_config']['contest_type']) || $contest['extra_config']['contest_type']=='OI'):?>
+			<p>此次比赛为OI赛制。</p>
+			<p><strong>注意：比赛时只显示测样例的结果。</strong></p>
+		<?php elseif ($contest['extra_config']['contest_type'] == 'IOI'): ?>
+			<p>此次比赛为IOI赛制。</p>
+			<p><strong>注意：比赛时显示测试所有数据的结果，但无法看到详细信息。</strong></p>
+		<?php endif?>
 	
 		<a href="/contest/<?=$contest['id']?>/registrants" class="btn btn-info btn-block"><?= UOJLocale::get('contests::contest registrants') ?></a>
 		<?php if (isSuperUser($myUser)): ?>
-		<a href="/contest/<?=$contest['id']?>/manage" class="btn btn-primary btn-block">管理</a>
+			<a href="/contest/<?=$contest['id']?>/manage" class="btn btn-primary btn-block">管理</a>
 		<?php if (isset($start_test_form)): ?>
 		<div class="top-buffer-sm">
 			<?php $start_test_form->printHTML(); ?>
@@ -543,24 +593,28 @@ EOD;
 		</div>
 		<?php endif ?>
 		<?php endif ?>
-	
-		<?php if ($contest['extra_config']['links']) { ?>
+		<?php if (isset($self_reviews_update_form)) { ?>
+	</div>
+	<div class="col-sm-6">
+			<h4>修改我的赛后总结</h4>
+			<?php $self_reviews_update_form->printHTML(); ?>
+		<?php } elseif ($contest['extra_config']['links'] && $cur_tab != 'self_reviews') { ?>
 			<?php if ($cur_tab == 'standings'): ?>
 	</div>
 	<div class="col-sm-3">
 		<div class="card border-info">
-		<?php else: ?>
-		<div class="card border-info top-buffer-lg">
-		<?php endif ?>
-			<div class="card-header bg-info">
-				<h3 class="card-title">比赛资料</h3>
+			<?php else: ?>
+				<div class="card border-info top-buffer-lg">
+			<?php endif ?>
+				<div class="card-header bg-info">
+					<h3 class="card-title">比赛资料</h3>
+				</div>
+				<div class="list-group">
+				<?php foreach ($contest['extra_config']['links'] as $link) { ?>
+					<a href="/blogs/<?=$link[1]?>" class="list-group-item"><?=$link[0]?></a>
+				<?php } ?>
+				</div>
 			</div>
-			<div class="list-group">
-			<?php foreach ($contest['extra_config']['links'] as $link) { ?>
-				<a href="/blogs/<?=$link[1]?>" class="list-group-item"><?=$link[0]?></a>
-			<?php } ?>
-			</div>
-		</div>
 		<?php } ?>
 	</div>
 </div>

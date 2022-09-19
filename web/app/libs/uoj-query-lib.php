@@ -41,6 +41,11 @@ function hasRegistered($user, $contest) {
 function hasAC($user, $problem) {
 	return DB::selectFirst("select * from best_ac_submissions where submitter = '${user['username']}' and problem_id = ${problem['id']}") != null;
 }
+function hasParticipated($user, $contest) {
+	$result = DB::selectFirst("select * from contests_registrants where username = '${user['username']}' and contest_id = ${contest['id']}");
+
+	return $result != null && $result['has_participated'];
+}
 
 function queryUser($username) {
 	if (!validateUsername($username)) {
