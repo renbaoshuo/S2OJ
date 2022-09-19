@@ -26,5 +26,6 @@ return [
 	'contest pending final test' => '等待评测',
 	'contest final testing' => '正在测评',
 	'contest ended' => '比赛已结束',
-	'contest registrants' => '报名选手列表'
+	'contest registrants' => '报名选手列表',
+	'contest self reviews' => '赛后总结'
 ];

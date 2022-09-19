@@ -92,8 +92,8 @@ function queryContestData($contest, $config = array(), $is_after_contest_query =
 	return ['problems' => $problems, 'data' => $data, 'people' => $people];
 }
 
-function calcStandings($contest, $contest_data, &$score, &$standings, $update_contests_submissions = false) {
-	// score: username, problem_pos => score, penalty, id
+function calcStandings($contest, $contest_data, &$score, &$standings, $update_contests_submissions = false, $show_reviews = false) {
+	// score: username, problem_pos => score, penalty, id, ?review
 	$score = array();
 	$n_people = count($contest_data['people']);
 	$n_problems = count($contest_data['problems']);
@@ -107,10 +107,19 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 				$penalty = 0;
 			}
 		}
+
 		$score[$submission[2]][$submission[3]] = array($submission[4], $penalty, $submission[0]);
+		
+		if ($show_reviews) {
+			$review_result = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = {$contest_data['problems'][$submission[3]]} and poster = '{$person[0]}'");
+
+			if ($review_result['content']) {
+				$score[$submission[2]][$submission[3]][] = $review_result['content'];
+			}
+		}
 	}
 
-	// standings: rank => score, penalty, [username, realname], virtual_rank
+	// standings: rank => score, penalty, [username, realname], virtual_rank, ?review
 	$standings = array();
 	foreach ($contest_data['people'] as $person) {
 		$cur = array(0, 0, $person);
@@ -124,6 +133,15 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 				}
 			}
 		}
+
+		if ($show_reviews) {
+			$review_result = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and poster = '{$person[0]}'");
+
+			if ($review_result['content']) {
+				$cur[] = $review_result['content'];
+			}
+		}
+
 		$standings[] = $cur;
 	}
 
@@ -143,8 +161,10 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 
 	for ($i = 0; $i < $n_people; $i++) {
 		if ($i == 0 || !$is_same_rank($standings[$i - 1], $standings[$i])) {
-			$standings[$i][] = $i + 1;
+			$standings[$i][] = $standings[$i][3];
+			$standings[$i][3] = $i + 1;
 		} else {
+			$standings[$i][] = $standings[$i][3];
 			$standings[$i][] = $standings[$i - 1][3];
 		}
 	}

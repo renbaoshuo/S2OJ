@@ -44,11 +44,18 @@
 			'name' => UOJLocale::get('contests::contest standings'),
 			'url' => "/contest/{$contest['id']}/standings"
 		),
-		'after_contest_standings' => array(
+	);
+
+	if ($contest['cur_progress'] > CONTEST_TESTING) {
+		$tabs_info['after_contest_standings'] = array(
 			'name' => UOJLocale::get('contests::after contest standings'),
 			'url' => "/contest/{$contest['id']}/after_contest_standings"
-		)
-	);
+		);
+		$tabs_info['self_reviews'] = array(
+			'name' => UOJLocale::get('contests::contest self reviews'),
+			'url' => "/contest/{$contest['id']}/self_reviews"
+		);
+	}
 	
 	if (hasContestPermission(Auth::user(), $contest)) {
 		$tabs_info['backstage'] = array(
@@ -392,6 +399,21 @@ EOD;
 		]);
 	}
 	
+	function echoReviews() {
+		global $contest;
+		
+		$contest_data = queryContestData($contest, array());
+		calcStandings($contest, $contest_data, $score, $standings, false, true);
+		
+		uojIncludeView('contest-standings', [
+			'contest' => $contest,
+			'standings' => $standings,
+			'score' => $score,
+			'contest_data' => $contest_data,
+			'show_self_reviews' => true
+		]);
+	}
+	
 	function echoContestCountdown() {
 		global $contest;
 		$rest_second = $contest['end_time']->getTimestamp() - UOJTime::$time_now->getTimestamp();
@@ -454,7 +476,7 @@ EOD;
 	<?= getClickZanBlock('C', $contest['id'], $contest['zan']) ?>
 </div>
 <div class="row">
-	<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings'): ?>
+	<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings' || $cur_tab == 'self_reviews'): ?>
 	<div class="col-sm-12">
 	<?php else: ?>
 	<div class="col-sm-9">
@@ -472,12 +494,14 @@ EOD;
 					echoStandings(true);
 				} elseif ($cur_tab == 'backstage') {
 					echoBackstage();
+				} elseif ($cur_tab == 'self_reviews') {
+					echoReviews();
 				}
 	?>
 		</div>
 	</div>
 	
-	<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings'): ?>
+	<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings' || $cur_tab == 'self_reviews'): ?>
 	<div class="col-sm-12">
 		<hr />
 	</div>

@@ -1071,6 +1071,7 @@ function showStandings() {
 			$.map(problems, function(col, idx) {
 				return '<th style="width:8em;">' + '<a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode('A'.charCodeAt(0) + idx) + '</a>' + '</th>';
 			}).join('') +
+			(show_self_reviews ? '<th style="width:16em;">赛后总结</th>' : '') +
 		'</tr>',
 		function(row) {
 			var col_tr = '<tr>';
@@ -1089,8 +1090,25 @@ function showStandings() {
 							col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';
 						}
 					}
+					if (show_self_reviews) {
+						col_tr += '<div id="review-' + row[2][0] + '-' + i + '"></div>'
+							+ '<script>'
+							+ '$(function() {'
+							+ 'var purify_result = DOMPurify.sanitize(\'' + String(col[3] || '').replace(/'/g, '\\\'').replace(new RegExp('</scr' + 'ipt>', 'gi'), '</scr\' + \'ipt>') + '\', {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del"], ALLOWED_ATTR: ["href"]});'
+							+ '$("#review-' + row[2][0] + '-' + i + '")'
+							+ '.html(purify_result ? \'<div class="mt-3 pt-2 border-top">\' + purify_result + \'</div>\' : \'\'); });'
+							+ '</scr' + 'ipt>';
+					}
 				}
 				col_tr += '</td>';
+			}
+
+			if (show_self_reviews) {
+				col_tr += '<td><div id="review-' + row[2][0] + '"></div>'
+					+ '<script>'
+					+ '$(function() { $("#review-' + row[2][0] + '")'
+					+ '.html(DOMPurify.sanitize(\'' + String(row[4] || '').replace(/'/g, '\\\'').replace(new RegExp('</scr' + 'ipt>', 'gi'), '</scr\' + \'ipt>') + '\', {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del"], ALLOWED_ATTR: ["href"]})); });'
+					+ '</scr' + 'ipt></td>';
 			}
 			col_tr += '</tr>';
 			return col_tr;

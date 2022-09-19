@@ -334,6 +334,30 @@ LOCK TABLES `contests_submissions` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `contests_reviews`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `contests_reviews` (
+  `contest_id` int(11) NOT NULL,
+  `problem_id` int(11) NOT NULL DEFAULT 0,
+  `poster` varchar(20) NOT NULL,
+  `content` text NOT NULL,
+  PRIMARY KEY (`contest_id`,`problem_id`,`poster`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `contests_reviews`
+--
+
+LOCK TABLES `contests_reviews` WRITE;
+/*!40000 ALTER TABLE `contests_reviews` DISABLE KEYS */;
+/*!40000 ALTER TABLE `contests_reviews` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `countdowns`
 --
 
