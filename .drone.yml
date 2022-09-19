@@ -1,0 +1,85 @@
+---
+kind: pipeline
+type: docker
+name: Build Docker Image (s2oj-db)
+
+trigger:
+  event:
+    - push
+
+steps:
+  - name: docker
+    image: plugins/docker
+    settings:
+      registry: git.m.ac
+      repo: baoshuo/s2oj-db
+      use_cache: true
+      context: db
+      dockerfile: db/Dockerfile
+      username: baoshuo
+      password:
+        from_secret: GITMAC_SECRET
+    tags:
+      - latest
+      - master
+      - "${DRONE_COMMIT_SHA:0:8}"
+    when:
+      event: push
+      branch: master
+
+---
+kind: pipeline
+type: docker
+name: Build Docker Image (s2oj-judger)
+
+trigger:
+  event:
+    - push
+
+steps:
+  - name: docker
+    image: plugins/docker
+    settings:
+      registry: git.m.ac
+      repo: baoshuo/s2oj-judger
+      use_cache: true
+      context: judger
+      dockerfile: judger/Dockerfile
+      username: baoshuo
+      password:
+        from_secret: GITMAC_SECRET
+    tags:
+      - latest
+      - master
+      - "${DRONE_COMMIT_SHA:0:8}"
+    when:
+      event: push
+      branch: master
+
+---
+kind: pipeline
+type: docker
+name: Build Docker Image (s2oj-web)
+
+trigger:
+  event:
+    - push
+
+steps:
+  - name: docker
+    image: plugins/docker
+    settings:
+      registry: git.m.ac
+      repo: baoshuo/s2oj-web
+      use_cache: true
+      dockerfile: web/Dockerfile
+      username: baoshuo
+      password:
+        from_secret: GITMAC_SECRET
+    tags:
+      - latest
+      - master
+      - "${DRONE_COMMIT_SHA:0:8}"
+    when:
+      event: push
+      branch: master
