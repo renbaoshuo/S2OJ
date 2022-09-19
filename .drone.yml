@@ -12,7 +12,7 @@ steps:
     image: plugins/docker
     settings:
       registry: git.m.ac
-      repo: baoshuo/s2oj-db
+      repo: git.m.ac/baoshuo/s2oj-db
       use_cache: true
       context: db
       dockerfile: db/Dockerfile
@@ -41,7 +41,7 @@ steps:
     image: plugins/docker
     settings:
       registry: git.m.ac
-      repo: baoshuo/s2oj-judger
+      repo: git.m.ac/baoshuo/s2oj-judger
       use_cache: true
       context: judger
       dockerfile: judger/Dockerfile
@@ -70,7 +70,7 @@ steps:
     image: plugins/docker
     settings:
       registry: git.m.ac
-      repo: baoshuo/s2oj-web
+      repo: git.m.ac/baoshuo/s2oj-web
       use_cache: true
       dockerfile: web/Dockerfile
       username: baoshuo
