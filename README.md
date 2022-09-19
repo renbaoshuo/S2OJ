@@ -35,7 +35,7 @@ docker-compose up -d
 ## 开发
 
 ```bash
-docker-compose up --build -f docker-compose.development.yml
+docker-compose -f docker-compose.development.yml up --build
 ```
 
 ## 感谢
