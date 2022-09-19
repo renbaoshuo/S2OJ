@@ -36,11 +36,12 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_BASENAME }}-db
           tags: |
+            latest
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha
+            type=sha,prefix=
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3.1.1
@@ -73,11 +74,12 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_BASENAME }}-judger
           tags: |
+            latest
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha
+            type=sha,prefix=
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3.1.1
@@ -110,11 +112,12 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_BASENAME }}-web
           tags: |
+            latest
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha
+            type=sha,prefix=
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3.1.1

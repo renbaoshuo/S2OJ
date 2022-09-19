@@ -3,11 +3,12 @@ kind: pipeline
 type: docker
 name: Build Docker Image (s2oj-db)
 
-trigger:
-  event:
-    - push
-
 steps:
+  - name: tags
+    image: alpine
+    commands:
+      - echo -n "latest, $DRONE_BRANCH, ${DRONE_COMMIT_SHA:0:8}" > .tags
+
   - name: docker
     image: plugins/docker
     settings:
@@ -19,10 +20,6 @@ steps:
       username: baoshuo
       password:
         from_secret: GITMAC_SECRET
-    tags:
-      - latest
-      - master
-      - "${DRONE_COMMIT_SHA:0:8}"
     when:
       event: push
       branch: master
@@ -32,11 +29,12 @@ kind: pipeline
 type: docker
 name: Build Docker Image (s2oj-judger)
 
-trigger:
-  event:
-    - push
-
 steps:
+  - name: tags
+    image: alpine
+    commands:
+      - echo -n "latest, $DRONE_BRANCH, ${DRONE_COMMIT_SHA:0:8}" > .tags
+
   - name: docker
     image: plugins/docker
     settings:
@@ -48,10 +46,6 @@ steps:
       username: baoshuo
       password:
         from_secret: GITMAC_SECRET
-    tags:
-      - latest
-      - master
-      - "${DRONE_COMMIT_SHA:0:8}"
     when:
       event: push
       branch: master
@@ -61,11 +55,12 @@ kind: pipeline
 type: docker
 name: Build Docker Image (s2oj-web)
 
-trigger:
-  event:
-    - push
-
 steps:
+  - name: tags
+    image: alpine
+    commands:
+      - echo -n "latest, $DRONE_BRANCH, ${DRONE_COMMIT_SHA:0:8}" > .tags
+
   - name: docker
     image: plugins/docker
     settings:
@@ -76,10 +71,6 @@ steps:
       username: baoshuo
       password:
         from_secret: GITMAC_SECRET
-    tags:
-      - latest
-      - master
-      - "${DRONE_COMMIT_SHA:0:8}"
     when:
       event: push
       branch: master
