@@ -269,6 +269,7 @@ UNLOCK TABLES;
 CREATE TABLE `contests_problems` (
   `problem_id` int(11) NOT NULL,
   `contest_id` int(11) NOT NULL,
+  `dfn` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`problem_id`,`contest_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -67,6 +67,7 @@
 		},
 		function($type, $username) {
 			global $contest;
+
 			if ($type == '+') {
 				DB::query("insert into contests_permissions (contest_id, username) values (${contest['id']}, '$username')");
 			} elseif ($type == '-') {
@@ -99,7 +100,8 @@
 			$problem_id = $matches[1];
 			
 			if ($type == '+') {
-				DB::insert("insert into contests_problems (contest_id, problem_id) values ({$contest['id']}, '$problem_id')");
+				$dfn = DB::selectFirst("select max(dfn) from contests_problems where contest_id = {$contest['id']}")['max(dfn)'] + 1;
+				DB::insert("insert into contests_problems (contest_id, problem_id, dfn) values ({$contest['id']}, '$problem_id', $dfn)");
 			} elseif ($type == '-') {
 				DB::delete("delete from contests_problems where contest_id = {$contest['id']} and problem_id = '$problem_id'");
 			}
@@ -216,7 +218,7 @@
 			</thead>
 			<tbody>
 <?php
-		$result = DB::query("select problem_id from contests_problems where contest_id = ${contest['id']} order by dfn asc");
+		$result = DB::query("select problem_id from contests_problems where contest_id = ${contest['id']} order by dfn, problem_id");
 	while ($row = DB::fetch($result, MYSQLI_ASSOC)) {
 		$problem = queryProblemBrief($row['problem_id']);
 		$problem_config_str = isset($contest['extra_config']["problem_{$problem['id']}"]) ? $contest['extra_config']["problem_{$problem['id']}"] : 'sample';
