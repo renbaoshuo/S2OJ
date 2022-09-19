@@ -20,6 +20,7 @@ services:
       - SYS_PTRACE
     volumes:
       - ./uoj_data/judger/log:/opt/uoj_judger/log
+      - ./uoj_data/judger/data:/opt/uoj_judger/uoj_judger/data
     environment:
       - UOJ_PROTOCOL=http
       - UOJ_HOST=uoj-web
