@@ -60,12 +60,12 @@ UOJEOF
 }
 
 prepProgress(){
-    getAptPackage;setJudgeConf
+    setJudgeConf
 }
 
 if [ $# -le 0 ]; then
     echo 'Installing UOJ System judger...'
-    prepProgress;initProgress
+    getAptPackage;prepProgress;initProgress
 fi
 while [ $# -gt 0 ]; do
     case "$1" in

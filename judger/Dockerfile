@@ -2,6 +2,9 @@ FROM ubuntu:20.04
 
 ARG CLONE_ADDFLAG
 
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y vim ntp zip unzip curl wget build-essential fp-compiler python2.7 python3.8 python3-requests
+
 ADD . /opt/uoj_judger
 WORKDIR /opt/uoj_judger
 
