@@ -14,7 +14,6 @@ steps:
     settings:
       registry: git.m.ac
       repo: git.m.ac/baoshuo/s2oj-db
-      use_cache: true
       context: db
       dockerfile: db/Dockerfile
       username: baoshuo
@@ -40,7 +39,6 @@ steps:
     settings:
       registry: git.m.ac
       repo: git.m.ac/baoshuo/s2oj-judger
-      use_cache: true
       context: judger
       dockerfile: judger/Dockerfile
       username: baoshuo
@@ -66,7 +64,6 @@ steps:
     settings:
       registry: git.m.ac
       repo: git.m.ac/baoshuo/s2oj-web
-      use_cache: true
       dockerfile: web/Dockerfile
       username: baoshuo
       password:
