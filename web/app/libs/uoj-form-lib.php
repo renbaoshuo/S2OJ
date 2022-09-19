@@ -117,7 +117,7 @@ EOD;
 <div id="div-$name" class="form-group">
 	<label for="input-$name" class="col-sm-2 control-label">$label_text</label>
 	<div class="col-sm-3">
-		<select class="form-control" id="input-content" name="$name">
+		<select class="form-control" id="input-$name" name="$name">
 
 EOD;
 			foreach ($options as $opt_name => $opt_label) {

@@ -122,9 +122,6 @@
 	$options = array(
 		'banneduser' => '设为封禁用户',
 		'normaluser' => '设为普通用户',
-		'problem_uploader' => '设为题目上传者',
-		'problem_manager' => '设为题目管理员',
-		'contest_only' => '设为仅比赛参加者',
 		'superuser' => '设为超级用户'
 	);
 	$user_form->addSelect('op_type', $options, '操作类型', '');
@@ -141,30 +138,52 @@
 				DB::update("update user_info set usergroup = 'U' where username = '{$username}'");
 				DB::update("update user_info set usertype = 'student' where username = '{$username}'");
 				break;
-			case 'problem_uploader':
-				DB::update("update user_info set usergroup = 'U' where username = '{$username}'");
-				$user = queryUser($username);
-				$user = addUserType($user, 'problem_uploader');
-				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
-				break;
-			case 'problem_manager':
-				DB::update("update user_info set usergroup = 'U' where username = '{$username}'");
-				$user = queryUser($username);
-				$user = addUserType($user, 'problem_manager');
-				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
-				break;
-			case 'contest_only':
-				DB::update("update user_info set usergroup = 'U' where username = '{$username}'");
-				$user = queryUser($username);
-				$user = addUserType($user, 'contest_only');
-				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
-				break;
 			case 'superuser':
 				DB::update("update user_info set usergroup = 'S' where username = '{$username}'");
+				DB::update("update user_info set usertype = 'student' where username = '{$username}'");
 				break;
 		}
 	};
 	$user_form->runAtServer();
+
+	$usertype_form = new UOJForm('usertype');
+	$user_form->submit_button_config['align'] = 'compressed';
+	$usertype_form->addInput('usertype_username', 'text', '用户名', '',
+		function ($username) {
+			if (!validateUsername($username)) {
+				return '用户名不合法';
+			}
+			if (!queryUser($username)) {
+				return '用户不存在';
+			}
+			return '';
+		},
+		null
+	);
+	$usertype_options = array(
+		'problem_uploader' => '题目上传者',
+		'problem_manager' => '题目管理员',
+		'contest_only' => '仅比赛参加者',
+	);
+	$usertype_form->addSelect('usertype_type', $usertype_options, '角色', '');
+	$usertype_form->addSelect('usertype_op', array('add' => '添加', 'remove' => '移除'), '操作', '');
+	$usertype_form->handle = function() {
+		global $usertype_form;
+		
+		$username = $_POST['usertype_username'];
+		switch ($_POST['usertype_type']) {
+			case 'problem_uploader':
+			case 'problem_manager':
+			case 'contest_only':
+				$user = queryUser($username);
+				$user = $_POST['usertype_op'] === 'add'
+					? addUserType($user, $_POST['usertype_type'])
+					: removeUserType($user, $_POST['usertype_type']);
+				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
+				break;
+		}
+	};
+	$usertype_form->runAtServer();
 	
 	$blog_link_contests = new UOJForm('blog_link_contests');
 	$blog_link_contests->addInput('blog_id', 'text', '博客ID', '',
@@ -553,7 +572,10 @@ EOD;
 			<h3>修改用户密码</h3>
 			<?php $change_password_form->printHTML(); ?>
 			<h3>用户类别设置</h3>
+			<p>在此处更新用户所属类别后会自动重置用户权限。</p>
 			<?php $user_form->printHTML(); ?>
+			<h3>用户权限管理</h3>
+			<?php $usertype_form->printHTML(); ?>
 			<h3>修改用户真实姓名</h3>
 			<?php $change_realname_form->printHTML(); ?>
 			<h3>用户名单</h3>
