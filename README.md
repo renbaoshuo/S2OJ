@@ -1,4 +1,4 @@
-<img src="./web/images/logo_small.png" alt="Logo" width="64" height="64" align="right" />
+<img src="./web/images/logo_small.png" alt="Logo" width="100" height="100" align="right" />
 
 # S2OJ
 
@@ -17,10 +17,29 @@
 
 ## 文档
 
-有关安装、管理、维护，可参阅：[https://universaloj.github.io/](https://universaloj.github.io/)
+有关安装、管理、维护，可参阅：[https://universaloj.github.io/](https://universaloj.github.io/) 和 [https://vfleaking.github.io/uoj/](https://vfleaking.github.io/uoj/)。
+
+## 部署
+
+```bash
+docker-compose up -d
+```
+
+更新：
+
+```bash
+docker-compose pull
+docker-compose up -d
+```
+
+## 开发
+
+```bash
+docker-compose up --build -f docker-compose.development.yml
+```
 
 ## 感谢
 
-- [vfleaking](https://github.com/vfleaking) 将 UOJ 代码[开源](https://github.com/vfleaking/uoj)
+- [vfleaking](https://github.com/vfleaking) 将 UOJ 代码 [开源](https://github.com/vfleaking/uoj)
 - 向原项目或本项目贡献代码的人
 - 给我们启发与灵感以及提供意见和建议的人
