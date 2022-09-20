@@ -325,7 +325,7 @@
 					}
 				}
 
-				if (isset($_POST['self_review_update__overall'])){
+				if (isset($_POST['self_review_update__overall'])) {
 					$esc_content = DB::escape($_POST['self_review_update__overall']);
 					DB::query("replace into contests_reviews (contest_id, problem_id, poster, content) values ({$contest['id']}, -1, '{$myUser['username']}', '$esc_content')");
 				}

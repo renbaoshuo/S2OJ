@@ -121,6 +121,16 @@ function queryGroupmateCurrentAC($username) {
 function queryGroupCurrentAC($group_id) {
 	return DB::selectAll("select a.problem_id as problem_id, a.submitter as submitter, a.submission_id as submission_id, b.submit_time as submit_time, d.title as problem_title, b.submit_time as submit_time, e.realname as realname from best_ac_submissions a inner join submissions b on (a.submission_id = b.id) inner join groups_users c on (a.submitter = c.username and c.group_id = $group_id) inner join problems d on (a.problem_id = d.id and d.is_hidden = 0) inner join user_info e on (a.submitter = e.username) where b.submit_time > addtime(now(), '-360:00:00') order by b.submit_time desc limit 10", MYSQLI_ASSOC);
 }
+function queryGroupActiveAssignments($group_id) {
+	return DB::selectAll("select a.id as id, a.list_id as list_id, a.create_time as create_time, a.deadline as deadline, b.title from assignments a left join lists b on a.list_id = b.id where a.group_id = $group_id and a.deadline > addtime(now(), '-360:00:00') order by a.deadline asc", MYSQLI_ASSOC);
+}
+
+function queryAssignment($id) {
+	return DB::selectFirst("select * from assignments where id = $id", MYSQLI_ASSOC);
+}
+function queryAssignmentByGroupListID($group_id, $list_id) {
+	return DB::selectFirst("select * from assignments where list_id='$list_id' and group_id='$group_id'", MYSQLI_ASSOC);
+}
 
 function queryZanVal($id, $type, $user) {
 	if ($user == null) {

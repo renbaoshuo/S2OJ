@@ -447,3 +447,10 @@ form.uoj-form-compressed button {
 	position: relative;
 	top: -6px;
 }
+
+td.success {
+	background-color: #99FF99;
+}
+td.failed {
+	background-color: #FF9999;
+}

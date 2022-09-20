@@ -45,6 +45,8 @@ Route::group([
 
 		Route::any('/groups', '/groups.php');
 		Route::any('/group/{id}', '/group.php');
+
+		Route::any('/assignment/{id}', '/assignment.php');
 		
 		Route::any('/blogs', '/blogs.php');
 		if (UOJConfig::$data['switch']['blog-domain-mode'] != 3) {

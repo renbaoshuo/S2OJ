@@ -28,6 +28,7 @@ return [
 	'help' => '帮助',
 	'search' => '搜索',
 	'news' => '最新动态',
+	'assignments' => '作业',
 	'username' => '用户名',
 	'password' => '密码',
 	'new password' => '新密码',

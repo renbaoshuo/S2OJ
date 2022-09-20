@@ -28,6 +28,7 @@ return [
 	'help' => 'Help',
 	'search' => 'Search',
 	'news' => 'News',
+	'assignments' => 'Assignments',
 	'username' => 'Username',
 	'password' => 'Password',
 	'new password' => 'New password',
