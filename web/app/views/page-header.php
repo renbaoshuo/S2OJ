@@ -151,7 +151,7 @@
 				}
 			};
 		</script>
-		<script id="MathJax-script" src="//cdn.staticfile.org/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+		<script id="MathJax-script" src="<?= HTML::url('/lib/MathJax/tex-mml-chtml.js') ?>"></script>
 		<?php endif ?>
 		
 		<?php if (isset($REQUIRE_LIB['jquery.form'])): ?>
