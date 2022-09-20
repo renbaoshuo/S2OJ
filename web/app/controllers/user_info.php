@@ -127,16 +127,17 @@
 						$ac_problems = DB::selectAll("select a.problem_id as problem_id, b.title as title from best_ac_submissions a inner join problems b on a.problem_id = b.id where submitter = '{$user['username']}';");
 	?>
 					<h4 class="list-group-item-heading"><?= UOJLocale::get('accepted problems').'：'.UOJLocale::get('n problems in total', count($ac_problems))?> </h4>
-					<div class="list-group-item-text">
+					<ul class="list-group-item-text nav">
 					<?php
-		foreach ($ac_problems as $problem) {
-			echo '<a href="/problem/', $problem['problem_id'], '" role="button" class="btn btn-light mr-1">#', $problem['problem_id'], '. ', $problem['title'], '</a>';
-		}
-		if (empty($ac_problems)) {
-			echo UOJLocale::get('none');
-		}
+						foreach ($ac_problems as $problem) {
+							echo '<li><a href="/problem/', $problem['problem_id'], '" role="button" class="btn btn-light mr-1 mb-1" style="width: 12rem;">#', $problem['problem_id'], '. ', $problem['title'], '</a></li>';
+						}
+
+						if (empty($ac_problems)) {
+							echo UOJLocale::get('none');
+						}
 	?>
-					</div>
+					</ul>
 				</div>
 			</div>
 		</div>
