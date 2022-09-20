@@ -99,7 +99,8 @@ EOD;
 			'print_after_table' => function() {
 				global $myUser;
 			},
-			'head_pagination' => true
+			'head_pagination' => true,
+			'pagination_table' => 'lists'
 		)
 	);
 	?>

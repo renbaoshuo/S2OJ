@@ -78,7 +78,8 @@ EOD;
     				$new_group_form->printHTML();
     			}
     		},
-    		'head_pagination' => true
+    		'head_pagination' => true,
+			'pagination_table' => "`groups`"
     	)
     );
     ?>
