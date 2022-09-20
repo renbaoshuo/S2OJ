@@ -130,7 +130,7 @@
 					<ul class="list-group-item-text nav">
 					<?php
 						foreach ($ac_problems as $problem) {
-							echo '<li><a href="/problem/', $problem['problem_id'], '" role="button" class="btn btn-light mr-1 mb-1" style="width: 12rem;">#', $problem['problem_id'], '. ', $problem['title'], '</a></li>';
+							echo '<li><a href="/problem/', $problem['problem_id'], '" role="button" class="btn btn-light h-100 mr-1 mb-1" style="width: 12rem;">#', $problem['problem_id'], '. ', $problem['title'], '</a></li>';
 						}
 
 						if (empty($ac_problems)) {
