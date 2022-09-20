@@ -14,7 +14,7 @@
 	if (!validateUsername($username) || !($user = queryUser($username))) {
 		become404Page();
 	}
-?>
+	?>
 
 <?php echoUOJPageHeader(UOJLocale::get('contests::contest self reviews')) ?>
 
@@ -23,7 +23,7 @@
 </h2>
 
 <?php
-	$col_names = array('contest_id');
+		$col_names = array('contest_id');
 	$from = 'contests_registrants';
 	$cond = "username = '$username' and has_participated = 1";
 	$tail = '';
@@ -87,6 +87,6 @@
 	};
 
 	echoLongTable($col_names, $from, $cond, $tail, $header_row, $print_row, $config);
-?>
+	?>
 
 <?php echoUOJPageFooter() ?>
