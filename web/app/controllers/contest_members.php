@@ -84,6 +84,30 @@
 			updateContestPlayerNum($contest);
 		};
 		$add_group_to_contest_form->runAtServer();
+
+		$remove_user_from_contest_form = new UOJForm('remove_user_from_contest');
+		$remove_user_from_contest_form->addInput('remove_username', 'text', '用户名', '', 
+			function ($x) {
+				global $contest;
+				if (!validateUsername($x)) {
+					return '用户名不合法';
+				}
+				if (!queryUser($x)) {
+					return '用户不存在';
+				}
+				return '';
+			},
+			null
+		);
+		$remove_user_from_contest_form->submit_button_config['align'] = 'compressed';
+		$remove_user_from_contest_form->submit_button_config['text'] = '移除该用户';
+		$remove_user_from_contest_form->submit_button_config['class_str'] = 'mt-2 btn btn-danger';
+		$remove_user_from_contest_form->handle = function() {
+			global $contest;
+			DB::query("delete from contests_registrants where username = '{$_POST['remove_username']}' and contest_id = {$contest['id']}");
+			updateContestPlayerNum($contest);
+		};
+		$remove_user_from_contest_form->runAtServer();
 	}
 
 	$has_contest_permission = hasContestPermission($myUser, $contest);
@@ -169,6 +193,9 @@
 					}
 					if (isset($add_group_to_contest_form)) {
 						$add_group_to_contest_form->printHTML();
+					}
+					if (isset($remove_user_from_contest_form)) {
+						$remove_user_from_contest_form->printHTML();
 					}
 				}
 			)
