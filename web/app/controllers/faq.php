@@ -2,10 +2,6 @@
 	requireLib('shjs');
 	requireLib('mathjax');
 
-	if (!Auth::check()) {
-		become403Page(UOJLocale::get('need login'));
-	}
-
 	echoUOJPageHeader(UOJLocale::get('help'));
 	?>
 <article>
