@@ -87,7 +87,7 @@ dockerInitProgress() {
     chown -R www-data:www-data /var/uoj_data
     #Replace password placeholders
     sed -i -e "s/salt0/$_salt0_/g" -e "s/salt1/$_salt1_/g" -e "s/salt2/$_salt2_/g" -e "s/salt3/$_salt3_/g" -e "s/_judger_socket_password_/$_judger_socket_password_/g" /var/www/uoj/app/.config.php
-	sed -i -e "s/'protocol' => 'http'/'protocol' => '$_uoj_protocol_',/g" /var/www/uoj/app/.config.php
+	sed -i -e "s/'protocol' => 'http'/'protocol' => '$_uoj_protocol_'/g" /var/www/uoj/app/.config.php
     #Start services
     service ntp restart
     service apache2 restart
