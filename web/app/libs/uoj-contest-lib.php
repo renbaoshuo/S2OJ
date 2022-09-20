@@ -169,10 +169,17 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 
 	for ($i = 0; $i < $n_people; $i++) {
 		if ($i == 0 || !$is_same_rank($standings[$i - 1], $standings[$i])) {
-			$standings[$i][] = $standings[$i][3];
-			$standings[$i][3] = $i + 1;
+			if ($show_reviews) {
+				$standings[$i][] = $standings[$i][3];
+				$standings[$i][3] = $i + 1;
+			} else {
+				$standings[$i][] = $i + 1;
+			}
 		} else {
-			$standings[$i][] = $standings[$i][3];
+			if ($show_reviews) {
+				$standings[$i][] = $standings[$i][3];
+			}
+
 			$standings[$i][] = $standings[$i - 1][3];
 		}
 	}
