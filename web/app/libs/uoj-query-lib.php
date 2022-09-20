@@ -105,6 +105,9 @@ function queryContest($id) {
 function queryContestProblem($id) {
 	return DB::selectFirst("select * from contest_problems where contest_id = $id", MYSQLI_ASSOC);
 }
+function queryContestProblems($id) {
+	return DB::selectAll("select * from contests_problems where contest_id = $id order by dfn, problem_id", MYSQLI_ASSOC);
+}
 
 function queryGroup($id) {
 	return DB::selectFirst("select * from groups where id = $id", MYSQLI_ASSOC);

@@ -85,6 +85,7 @@
 			<?php endif ?>
 			
 			<a type="button" class="btn btn-success btn-sm" href="<?= HTML::blog_url($user['username'], '/') ?>"><span class="glyphicon glyphicon-arrow-right"></span> <?= UOJLocale::get('visit his blog', $username) ?></a>
+			<a type="button" class="btn btn-success btn-sm" href="<?= HTML::url('/user/self_reviews/' . $user['username']) ?>"><span class="glyphicon glyphicon-arrow-right"></span> 查看 <?= $username ?> 的所有赛后总结</a>
 			
 			<div class="top-buffer-lg"></div>
 			<div class="list-group">

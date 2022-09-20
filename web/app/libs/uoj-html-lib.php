@@ -1,6 +1,6 @@
 <?php
 
-define('DOM_SANITIZE_CONFIG', "{ALLOWED_TAGS: ['a', 'b', 'i', 'u', 'em', 'strong', 'sub', 'sup', 'small', 'del'], ALLOWED_ATTR: ['href']}");
+define('DOM_SANITIZE_CONFIG', "{ALLOWED_TAGS: ['a', 'b', 'i', 'u', 'em', 'strong', 'sub', 'sup', 'small', 'del', 'br'], ALLOWED_ATTR: ['href']}");
 
 function uojHandleAtSign($str, $uri) {
 	$referrers = array();

@@ -27,5 +27,7 @@ return [
 	'contest final testing' => 'Final testing',
 	'contest ended' => 'Contest Ended',
 	'contest registrants' => 'Registrants',
+	'problem self review' => 'Problem self review',
+	'contest self review' => 'Contest self review',
 	'contest self reviews' => 'Contest self reviews'
 ];

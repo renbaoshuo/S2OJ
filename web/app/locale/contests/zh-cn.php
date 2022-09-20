@@ -27,5 +27,7 @@ return [
 	'contest final testing' => '正在测评',
 	'contest ended' => '比赛已结束',
 	'contest registrants' => '报名选手列表',
+	'problem self review' => '题目总结',
+	'contest self review' => '比赛总结',
 	'contest self reviews' => '赛后总结'
 ];
