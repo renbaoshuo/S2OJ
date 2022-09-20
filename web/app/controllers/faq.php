@@ -198,8 +198,7 @@
 				<div class="card-body">
 					<p>如果你想出题、想办比赛、发现了BUG或者对网站有什么建议，可以通过下面的方式联系我们：</p>
 					<ul>
-						<li>私信联系<?= UOJConfig::$data['profile']['administrator'] ?>。</li>
-						<li>邮件联系<?= UOJConfig::$data['profile']['admin-email'] ?>。</li>
+						<li>邮件联系 <a href="/user/profile/baoshuo" class="uoj-username">baoshuo</a>（<a href="mailto:i@baoshuo.ren">i@baoshuo.ren</a>）或者 <a href="/user/profile/nekko" class="uoj-username">nekko</a>（<a href="mailto:1139855151@qq.com">1139855151@qq.com</a>）。</li>
 						<?php if (UOJConfig::$data['profile']['QQ-group']!=''): ?>
 						<li>你也可以进QQ群水水，群号是<?= UOJConfig::$data['profile']['QQ-group'] ?>。</li>
 						<?php endif ?>
