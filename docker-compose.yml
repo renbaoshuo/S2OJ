@@ -46,6 +46,7 @@ services:
     ports:
       - "80:80"
     environment:
+      - UOJ_PROTOCOL=https
       - DATABASE_HOST=uoj-db
       - DATABASE_PASSWORD=root
       - JUDGER_SOCKET_PORT=2333
