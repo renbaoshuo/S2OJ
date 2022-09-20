@@ -48,6 +48,8 @@
 			}
 			echo '<a href="/problem/', $problem['id'], '">', $problem['title'], '</a>';
 			if (isset($_COOKIE['show_tags_mode'])) {
+				echo ' <span class="text-info" style="font-size: 10px">' . $problem["uploader"] . '</span> ';
+
 				foreach (queryProblemTags($problem['id']) as $tag) {
 					echo '<a class="uoj-problem-tag">', '<span class="badge badge-pill badge-secondary">', HTML::escape($tag), '</span>', '</a>';
 				}
