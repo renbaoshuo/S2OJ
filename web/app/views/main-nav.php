@@ -1,5 +1,5 @@
 <div class="navbar navbar-light navbar-expand-md bg-light mb-4" role="navigation">
-	<a class="navbar-brand" href="<?= HTML::url('/') ?>"><?= UOJConfig::$data['profile']['oj-name-short'] ?></a>
+	<a class="navbar-brand" href="/"><?= UOJConfig::$data['profile']['oj-name-short'] ?></a>
 	<button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target=".navbar-collapse">
 		<span class="navbar-toggler-icon"></span>
 	</button>
