@@ -10,7 +10,7 @@ class HTML {
 	public static function avatar_addr($user, $size) {
 		return '//gravatar.loli.net/avatar/' . md5(strtolower(trim($user['email']))) . "?d=mm&amp;s=$size";
 	}
-		
+
 	public static function tablist($tabs_info, $cur, $type = 'nav-tabs') {
 		$html = '<ul class="nav '.$type.'" role="tablist">';
 		foreach ($tabs_info as $id => $tab) {
@@ -53,8 +53,7 @@ class HTML {
 				$url = UOJConfig::$data['web']['blog']['protocol'].'://'.UOJConfig::$data['web']['blog']['host'].$port.'/'.blog_name_encode($username);
 				break;
 			case 3:
-				$port = ((UOJConfig::$data['web']['main']['protocol'] === "http" && UOJConfig::$data['web']['main']['port'] == 80) || (UOJConfig::$data['web']['main']['protocol'] === "https" && UOJConfig::$data['web']['main']['port'] == 443)) ? '' : (':'.UOJConfig::$data['web']['main']['port']);
-				$url = '/blog/'.blog_name_encode($username);
+				$url = HTML::url('/blog/'.blog_name_encode($username));
 				break;
 		}
 		$url .= $uri;
@@ -69,19 +68,18 @@ class HTML {
 				$url = UOJConfig::$data['web']['blog']['protocol'].'://'.UOJConfig::$data['web']['blog']['host'].$port;
 				break;
 			case 3:
-				$port = ((UOJConfig::$data['web']['main']['protocol'] === "http" && UOJConfig::$data['web']['main']['port'] == 80) || (UOJConfig::$data['web']['main']['protocol'] === "https" && UOJConfig::$data['web']['main']['port'] == 443)) ? '' : (':'.UOJConfig::$data['web']['main']['port']);
-				$url = '/blogs';
+				$url = HTML::url('/blogs');
 				break;
 		}
 		return HTML::escape(rtrim($url, '/'));
 	}
-	
+
 	public static function url($uri, $config = array()) {
 		$config = array_merge(array(
 			'location' => 'main',
 			'params' => null
 		), $config);
-		
+
 		$path = strtok($uri, '?');
 		$qs = strtok('?');
 		parse_str($qs, $param);
@@ -89,18 +87,12 @@ class HTML {
 		if ($config['params'] != null) {
 			$param = array_merge($param, $config['params']);
 		}
-		
-		// $url = UOJConfig::$data['web'][$config['location']]['protocol'].'://'.UOJConfig::$data['web'][$config['location']]['host'];
-		// if ((UOJConfig::$data['web'][$config['location']]['protocol'] === "http" && UOJConfig::$data['web'][$config['location']]['port'] == 80) || (UOJConfig::$data['web'][$config['location']]['protocol'] === "https" && UOJConfig::$data['web'][$config['location']]['port'] == 443)) {
-		// } else {
-		// 	$url .= ':'.UOJConfig::$data['web'][$config['location']]['port'];
-		// }
+
+		$url = '//'.UOJConfig::$data['web'][$config['location']]['host'];
 		if ($param) {
 			$url .= $path.'?'.HTML::query_string_encode($param);
-		} elseif ($path != '/') {
-			$url .= rtrim($path, '/');
 		} else {
-			$url = $path;
+			$url .= rtrim($path, '/');
 		}
 		return HTML::escape($url);
 	}
