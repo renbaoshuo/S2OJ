@@ -354,6 +354,23 @@ $.fn.countdown = function(rest, callback) {
 	});
 };
 
+$.fn.uoj_testcase = function() {
+	return this.each(function() {
+		var id = parseInt($(this).data('test'));
+
+		if (id > 0 && problem_id) {
+			$('.uoj-testcase-download-input', this)
+				.html('<span class="glyphicon glyphicon-download-alt"></span> 下载')
+				.attr('href', '/download.php?type=testcase&id=' + problem_id + '&testcase_id=' + id + '&testcase_type=input')
+				.addClass('btn btn-secondary btn-sm float-right');
+			$('.uoj-testcase-download-output', this)
+				.html('<span class="glyphicon glyphicon-download-alt"></span> 下载')
+				.attr('href', '/download.php?type=testcase&id=' + problem_id + '&testcase_id=' + id + '&testcase_type=output')
+				.addClass('btn btn-secondary btn-sm float-right');
+		}
+	});
+}
+
 // update_judgement_status
 update_judgement_status_list = []
 function update_judgement_status_details(id) {
@@ -388,6 +405,7 @@ $.fn.uoj_highlight = function() {
 	return $(this).each(function() {
 		$(this).find("span.uoj-username").each(replaceWithHighlightUsername);
 		$(this).find(".uoj-honor").uoj_honor();
+		$(this).find(".uoj-testcase").uoj_testcase();
 		$(this).find(".uoj-score").each(function() {
 			var score = parseInt($(this).text());
 			var maxscore = parseInt($(this).data('max'));

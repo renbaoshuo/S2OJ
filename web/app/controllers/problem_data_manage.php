@@ -125,7 +125,6 @@
 
 	$info_form = new UOJForm('info');
 	$http_host = HTML::escape(UOJContext::httpHost());
-	$download_url = HTML::url("/download.php?type=problem&id={$problem['id']}");
 	$info_form->appendHTML(<<<EOD
 <div class="form-group row">
 	<!--<label class="col-sm-3 control-label">zip上传数据</label>
@@ -140,6 +139,19 @@
 </div>
 EOD
 	);
+	$attachment_url = HTML::url("/download.php?type=attachment&id={$problem['id']}");
+	$info_form->appendHTML(<<<EOD
+<div class="form-group row">
+	<label class="col-sm-3 control-label">problem_{$problem['id']}_attachment.zip</label>
+	<div class="col-sm-9">
+		<div class="form-control-static">
+			<a href="$attachment_url">$attachment_url</a>
+		</div>
+	</div>
+</div>
+EOD
+	);
+	$download_url = HTML::url("/download.php?type=problem&id={$problem['id']}");
 	$info_form->appendHTML(<<<EOD
 <div class="form-group row">
 	<label class="col-sm-3 control-label">problem_{$problem['id']}.zip</label>

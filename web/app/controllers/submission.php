@@ -136,6 +136,9 @@
 <?php 
 	$REQUIRE_LIB['shjs'] = "";
 	?>
+<script>
+	var problem_id = parseInt('<?= $submission['problem_id'] ?>');
+</script>
 <?php echoUOJPageHeader(UOJLocale::get('problems::submission').' #'.$submission['id']) ?>
 <?php echoSubmissionsListOnlyOne($submission, array(), $myUser) ?>
 

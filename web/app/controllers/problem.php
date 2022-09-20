@@ -242,7 +242,10 @@ EOD
 	<h1 class="col-md-7 text-center"><?= $problem_letter ?>. <?= $problem['title'] ?></h1>
 	<div class="col-md-2 text-right" id="contest-countdown"></div>
 </div>
-<a role="button" class="btn btn-info float-right" href="/contest/<?= $contest['id'] ?>/problem/<?= $problem['id'] ?>/statistics"><span class="glyphicon glyphicon-stats"></span> <?= UOJLocale::get('problems::statistics') ?></a>
+<div class="btn-group float-right" role="group">
+<a role="button" class="btn btn-primary" href="<?= HTML::url("/download.php?type=attachment&id={$problem['id']}") ?>"><span class="glyphicon glyphicon-download-alt"></span> 附件下载</a>
+<a role="button" class="btn btn-info" href="/contest/<?= $contest['id'] ?>/problem/<?= $problem['id'] ?>/statistics"><span class="glyphicon glyphicon-stats"></span> <?= UOJLocale::get('problems::statistics') ?></a>
+</div>
 <?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
 <script type="text/javascript">
 checkContestNotice(<?= $contest['id'] ?>, '<?= UOJTime::$time_now_str ?>');
@@ -251,7 +254,11 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 <?php endif ?>
 <?php else: ?>
 <h1 class="page-header text-center">#<?= $problem['id']?>. <?= $problem['title'] ?></h1>
-<a role="button" class="btn btn-info float-right" href="/problem/<?= $problem['id'] ?>/statistics"><span class="glyphicon glyphicon-stats"></span> <?= UOJLocale::get('problems::statistics') ?></a>
+<div class="btn-group float-right" role="group">
+<a role="button" class="btn btn-primary" href="<?= HTML::url("/download.php?type=problem&id={$problem['id']}") ?>"><span class="glyphicon glyphicon-tasks"></span> 测试数据</a>
+<a role="button" class="btn btn-primary" href="<?= HTML::url("/download.php?type=attachment&id={$problem['id']}") ?>"><span class="glyphicon glyphicon-download-alt"></span> 附件下载</a>
+<a role="button" class="btn btn-info" href="/problem/<?= $problem['id'] ?>/statistics"><span class="glyphicon glyphicon-stats"></span> <?= UOJLocale::get('problems::statistics') ?></a>
+</div>
 <?php endif ?>
 
 <ul class="nav nav-tabs" role="tablist">

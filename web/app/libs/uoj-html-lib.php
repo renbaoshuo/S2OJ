@@ -616,7 +616,7 @@ class JudgementDetailsPrinter {
 				if ($this->styler->collapse_in) {
 					$accordion_collapse_class .= ' in';
 				}
-				echo '<div id="', $accordion_collapse, '" class="', $accordion_collapse_class, '">';
+				echo '<div id="', $accordion_collapse, '" class="uoj-testcase ', $accordion_collapse_class, '" data-test=' . $test_num . '>';
 				echo '<div class="card-body">';
 
 				$this->_print_c($node);
@@ -680,11 +680,11 @@ class JudgementDetailsPrinter {
 				echo '</div>';
 			}
 		} elseif ($node->nodeName == 'in') {
-			echo "<h4>input:</h4><pre>\n";
+			echo "<h4>input: <a class=\"uoj-testcase-download-input\"></a></h4><pre>\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 		} elseif ($node->nodeName == 'out') {
-			echo "<h4>output:</h4><pre>\n";
+			echo "<h4>output: <a class=\"uoj-testcase-download-output\"></a></h4><pre>\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 		} elseif ($node->nodeName == 'res') {
