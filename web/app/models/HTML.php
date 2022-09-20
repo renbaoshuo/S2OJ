@@ -54,7 +54,7 @@ class HTML {
 				break;
 			case 3:
 				$port = ((UOJConfig::$data['web']['main']['protocol'] === "http" && UOJConfig::$data['web']['main']['port'] == 80) || (UOJConfig::$data['web']['main']['protocol'] === "https" && UOJConfig::$data['web']['main']['port'] == 443)) ? '' : (':'.UOJConfig::$data['web']['main']['port']);
-				$url = UOJConfig::$data['web']['main']['protocol'].'://'.UOJConfig::$data['web']['main']['host'].$port.'/blog/'.blog_name_encode($username);
+				$url = '/blog/'.blog_name_encode($username);
 				break;
 		}
 		$url .= $uri;
@@ -70,7 +70,7 @@ class HTML {
 				break;
 			case 3:
 				$port = ((UOJConfig::$data['web']['main']['protocol'] === "http" && UOJConfig::$data['web']['main']['port'] == 80) || (UOJConfig::$data['web']['main']['protocol'] === "https" && UOJConfig::$data['web']['main']['port'] == 443)) ? '' : (':'.UOJConfig::$data['web']['main']['port']);
-				$url = UOJConfig::$data['web']['main']['protocol'].'://'.UOJConfig::$data['web']['main']['host'].$port.'/blogs';
+				$url = '/blogs';
 				break;
 		}
 		return HTML::escape(rtrim($url, '/'));
@@ -97,7 +97,7 @@ class HTML {
 		// }
 		if ($param) {
 			$url .= $path.'?'.HTML::query_string_encode($param);
-		} else {
+		} else if ($url != '/') {
 			$url .= rtrim($path, '/');
 		}
 		return HTML::escape($url);
