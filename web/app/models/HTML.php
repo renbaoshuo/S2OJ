@@ -88,11 +88,13 @@ class HTML {
 			$param = array_merge($param, $config['params']);
 		}
 
-		$url = '//'.UOJConfig::$data['web'][$config['location']]['host'];
+		$url = ''; // '//'.UOJConfig::$data['web'][$config['location']]['host'];
 		if ($param) {
 			$url .= $path.'?'.HTML::query_string_encode($param);
-		} else {
+		} elseif ($path != '/') {
 			$url .= rtrim($path, '/');
+		} else {
+			$url .= $path;
 		}
 		return HTML::escape($url);
 	}
