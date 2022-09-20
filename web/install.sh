@@ -8,7 +8,7 @@ _database_password_="${DATABASE_PASSWORD:-root}"
 _judger_socket_port_="${JUDGER_SOCKET_PORT:-2333}"
 _judger_socket_password_="${JUDGER_SOCKET_PASSWORD:-_judger_socket_password_}"
 _salt0_="${SALT0:-$(genRandStr 32)}"
-_salt1_="${SALT1:-$(genRandStr 32)}"
+_salt1_="${SALT1:-$(genRandStr 16)}"
 _salt2_="${SALT2:-$(genRandStr 16)}"
 _salt3_="${SALT3:-$(genRandStr 16)}"
 
