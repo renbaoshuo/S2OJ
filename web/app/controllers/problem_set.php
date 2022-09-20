@@ -127,6 +127,11 @@ EOD;
 	$table_classes = array('table', 'table-bordered', 'table-hover', 'table-striped');
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('problems')) ?>
+<?php
+	if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)) {
+		$new_problem_form->printHTML();
+	}
+	?>
 <div class="row">
 	<div class="col-sm-4">
 		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
@@ -158,30 +163,22 @@ $('#input-show_submit_mode').click(function() {
 	location.reload();
 });
 </script>
+<div class="<?= join($div_classes, ' ') ?>">
+	<table class="<?= join($table_classes, ' ') ?>">
+		<thead><?= $header ?></thead>
+		<tbody>
 <?php
-		echo '<div class="', join($div_classes, ' '), '">';
-	echo '<table class="', join($table_classes, ' '), '">';
-	echo '<thead>';
-	echo $header;
-	echo '</thead>';
-	echo '<tbody>';
-	
-	foreach ($pag->get() as $idx => $row) {
-		echoProblem($row);
-		echo "\n";
-	}
-	if ($pag->isEmpty()) {
-		echo '<tr><td class="text-center" colspan="233">'.UOJLocale::get('none').'</td></tr>';
-	}
-	
-	echo '</tbody>';
-	echo '</table>';
-	echo '</div>';
-	
-	if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)) {
-		$new_problem_form->printHTML();
-	}
-	
-	echo $pag->pagination();
+
+		foreach ($pag->get() as $idx => $row) {
+			echoProblem($row);
+			echo "\n";
+		}
+		if ($pag->isEmpty()) {
+			echo '<tr><td class="text-center" colspan="233">'.UOJLocale::get('none').'</td></tr>';
+		}
 	?>
+		</tbody>
+	</table>
+</div>
+<?= $pag->pagination() ?>
 <?php echoUOJPageFooter() ?>
