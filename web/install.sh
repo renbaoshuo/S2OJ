@@ -126,6 +126,7 @@ while [ $# -gt 0 ]; do
 		-d | --docker-init)
 			echo 'Initing UOJ System web for docker...'
 			dockerInitProgress
+		;;
         -? | --*)
             echo "Illegal option $1"
         ;;
