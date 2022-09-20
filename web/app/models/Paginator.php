@@ -16,10 +16,11 @@ class Paginator {
 			$this->cur_start = 0;
 			$this->table = $config['data'];
 		} elseif (!isset($config['echo_full'])) {
-			if (!isset($config['pagination_table'])) {
-				$config['pagination_table'] = $config['table'];
+			$table = $config['table_name'];
+			if (isset($config['pagination_table'])) {
+				$table = $config['pagination_table'];
 			}
-			$this->n_rows = DB::selectCount("select count(*) from {$config['pagination_table']} where {$config['cond']}");
+			$this->n_rows = DB::selectCount("select count(*) from {$table} where {$config['cond']}");
 			
 			$this->page_len = isset($config['page_len']) ? $config['page_len'] : 10;
 			
