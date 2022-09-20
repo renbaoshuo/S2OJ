@@ -97,7 +97,7 @@ class HTML {
 		// }
 		if ($param) {
 			$url .= $path.'?'.HTML::query_string_encode($param);
-		} else if ($path != '/') {
+		} elseif ($path != '/') {
 			$url .= rtrim($path, '/');
 		} else {
 			$url = $path;
