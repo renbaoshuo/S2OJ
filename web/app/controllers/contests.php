@@ -60,7 +60,7 @@ EOD;
 	$table_header .= '<th style="width:100px;">'.UOJLocale::get('contests::the number of registrants').'</th>';
 	$table_header .= '<th style="width:180px;">'.UOJLocale::get('appraisal').'</th>';
 	$table_header .= '</tr>';
-	echoLongTable(array('*'), 'contests', "status != 'finished'", 'order by id desc', $table_header,
+	echoLongTable(array('*'), 'contests', "status != 'finished'", 'order by start_time desc, id desc', $table_header,
 		echoContest,
 		array('page_len' => 40)
 	);
@@ -85,7 +85,7 @@ EOD;
 
 <h4><?= UOJLocale::get('contests::ended contests') ?></h4>
 <?php
-		echoLongTable(array('*'), 'contests', "status = 'finished'", 'order by id desc', $table_header,
+		echoLongTable(array('*'), 'contests', "status = 'finished'", 'order by start_time desc, id desc', $table_header,
 			echoContest,
 			array('page_len' => 40,
 				'print_after_table' => function() {
