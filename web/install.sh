@@ -7,10 +7,10 @@ _database_host_="${DATABASE_HOST:-uoj-db}"
 _database_password_="${DATABASE_PASSWORD:-root}"
 _judger_socket_port_="${JUDGER_SOCKET_PORT:-2333}"
 _judger_socket_password_="${JUDGER_SOCKET_PASSWORD:-_judger_socket_password_}"
-_salt0_="${SALT0:-$(genRandStr 32)}"
-_salt1_="${SALT1:-$(genRandStr 16)}"
-_salt2_="${SALT2:-$(genRandStr 16)}"
-_salt3_="${SALT3:-$(genRandStr 16)}"
+_salt0_="${SALT0:-_salt0_}"
+_salt1_="${SALT1:-_salt1_}"
+_salt2_="${SALT2:-_salt2_}"
+_salt3_="${SALT3:-_salt3_}"
 _uoj_protocol_="${UOJ_PROTOCOL:-http}"
 
 getAptPackage(){
@@ -80,7 +80,7 @@ UOJEOF
     make runner -j$(($(nproc) + 1)) && cd /opt/uoj/web
 }
 
-initProgress(){
+dockerInitProgress() {
     printf "\n\n==> Doing initial config and start service\n"
     #Set uoj_data path
     mkdir -p /var/uoj_data/upload
@@ -88,16 +88,20 @@ initProgress(){
     #Replace password placeholders
     sed -i -e "s/salt0/$_salt0_/g" -e "s/salt1/$_salt1_/g" -e "s/salt2/$_salt2_/g" -e "s/salt3/$_salt3_/g" -e "s/_judger_socket_password_/$_judger_socket_password_/g" /var/www/uoj/app/.config.php
 	sed -i -e "s/'protocol' => 'http'/'protocol' => '$_uoj_protocol_',/g" /var/www/uoj/app/.config.php
-    #Using cli upgrade to latest
-    php /var/www/uoj/app/cli.php upgrade:latest
     #Start services
     service ntp restart
     service apache2 restart
-    #Touch SetupDone flag file
-    touch /var/uoj_data/.UOJSetupDone
 	mkdir -p /opt/uoj/web/app/storage/submission
 	mkdir -p /opt/uoj/web/app/storage/tmp
 	chmod -R 777 /opt/uoj/web/app/storage
+}
+
+initProgress(){
+	dockerInitProgress;
+	#Using cli upgrade to latest
+    php /var/www/uoj/app/cli.php upgrade:latest
+    touch /var/uoj_data/.UOJSetupDone
+    #Touch SetupDone flag file
     printf "\n\n***Installation complete. Enjoy!***\n"
 }
 
@@ -119,6 +123,9 @@ while [ $# -gt 0 ]; do
             echo 'Initing UOJ System web...'
             initProgress
         ;;
+		-d | --docker-init)
+			echo 'Initing UOJ System web for docker...'
+			dockerInitProgress
         -? | --*)
             echo "Illegal option $1"
         ;;
