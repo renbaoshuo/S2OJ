@@ -47,6 +47,12 @@
 					<a href="/solverlist"><?= UOJLocale::get('view all') ?></a>
 				</div>
 			</div>
+		<?php else: ?>
+			<div class="mt-4 card card-default">
+				<div class="card-body text-center">
+					请 <a role="button" class="btn btn-outline-primary" href="<?= HTML::url('/login') ?>">登录</a> 以查看更多内容。
+				</div>
+			</div>
 		<?php endif ?>
 	</div>
 	<div class="col-xs-6 col-sm-4 col-md-3">
