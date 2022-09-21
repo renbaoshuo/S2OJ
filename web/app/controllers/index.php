@@ -1,6 +1,6 @@
 <?php
 	$blogs = DB::selectAll("select blogs.id, title, poster, post_time from important_blogs, blogs where is_hidden = 0 and important_blogs.blog_id = blogs.id order by level desc, important_blogs.blog_id desc limit 5");
-	$countdowns = DB::selectAll("select * from countdowns order by endtime asc limit 5")
+	$countdowns = DB::selectAll("select * from countdowns order by endtime asc")
 	?>
 <?php echoUOJPageHeader(UOJConfig::$data['profile']['oj-name-short']) ?>
 <div class="row">
@@ -56,20 +56,20 @@
 		<div class="card card-default mt-4">
 			<div class="card-body">
 				<h3 class="card-title" style="font-size: 1.25rem">倒计时</h3>
-				<div>
+				<ul class="pl-4 mb-0">
 					<?php foreach ($countdowns as $countdown): ?>
 						<?php
 							$enddate = strtotime($countdown['endtime']);
 						$nowdate = time();
 						$diff = floor(($enddate - $nowdate) / (24 * 60 * 60));
 						?>
-						<p class="card-text">
+						<li>
 							<?php if ($diff > 0): ?>
 								距离 <b><?= $countdown['title'] ?></b> 还有 <b><?= $diff ?></b> 天。
 							<?php else: ?>
 								<b><?= $countdown['title'] ?></b> 已开始。
 							<?php endif ?>
-						</p>
+						</li>
 					<?php endforeach ?>
 				</div>
 			</div>
@@ -77,7 +77,7 @@
 		<div class="card card-default mt-4">
 			<div class="card-body">
 				<h3 class="card-title" style="font-size: 1.25rem">友情链接</h3>
-				<ul class="pl-4">
+				<ul class="pl-4 mb-0">
 					<li>
 						<a href="http://www.sjzez.com">石家庄二中</a>
 					</li>
