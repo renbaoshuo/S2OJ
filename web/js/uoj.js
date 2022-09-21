@@ -127,7 +127,7 @@ function getUserLink(username, realname) {
 		username = username.substr(1);
 	}
 	if (realname) {
-		text = text + ' <span class="uoj-realname inline-block">(' + realname + ')</span>';
+		text = text + ' <span class="uoj-realname d-inline-block">(' + realname + ')</span>';
 	}
 	return '<a class="uoj-username" href="' + uojHome + '/user/profile/' + username + '">' + text + '</a>';
 }
@@ -140,7 +140,7 @@ function getUserSpan(username, realname) {
 		username = username.substr(1);
 	}
 	if (realname) {
-		text = text + ' <span class="uoj-realname inline-block">(' + realname + ')</span>';
+		text = text + ' <span class="uoj-realname d-inline-block">(' + realname + ')</span>';
 	}
 	return '<span class="uoj-username">' + text + '</span>';
 }
