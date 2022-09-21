@@ -39,14 +39,10 @@
 		$add_new_contestant_form->submit_button_config['text'] = '注册该用户';
 		$add_new_contestant_form->handle = function() {
 			global $contest;
+
 			$username = $_POST['new_username'];
 
-			$user = queryUser($username);
-			if (!$user) {
-				return;
-			}
-
-			DB::query("replace into contests_registrants (username, contest_id, has_participated) values ('{$user['username']}', {$contest['id']}, 0)");
+			DB::query("replace into contests_registrants (username, contest_id, has_participated) values ('{$username}', {$contest['id']}, 0)");
 
 			updateContestPlayerNum($contest);
 		};
@@ -92,9 +88,16 @@
 				if (!validateUsername($x)) {
 					return '用户名不合法';
 				}
-				if (!queryUser($x)) {
+
+				$user = queryUser($x);
+				if (!$user) {
 					return '用户不存在';
 				}
+
+				if (!hasRegistered($user, $contest)) {
+					return '该用户未报名';
+				}
+
 				return '';
 			},
 			null
@@ -104,7 +107,9 @@
 		$remove_user_from_contest_form->submit_button_config['class_str'] = 'mt-2 btn btn-danger';
 		$remove_user_from_contest_form->handle = function() {
 			global $contest;
-			DB::query("delete from contests_registrants where username = '{$_POST['remove_username']}' and contest_id = {$contest['id']}");
+			$username = $_POST['remove_username'];
+
+			DB::query("delete from contests_registrants where username = '{$username}' and contest_id = {$contest['id']}");
 			updateContestPlayerNum($contest);
 		};
 		$remove_user_from_contest_form->runAtServer();
@@ -186,7 +191,7 @@
 			array('page_len' => 100,
 				'get_row_index' => '',
 				'print_after_table' => function() {
-					global $add_new_contestant_form, $add_group_to_contest_form;
+					global $add_new_contestant_form, $add_group_to_contest_form, $remove_user_from_contest_form;
 
 					if (isset($add_new_contestant_form)) {
 						$add_new_contestant_form->printHTML();
