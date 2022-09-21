@@ -1024,5 +1024,6 @@ function echoRanklist($config = array()) {
 	}
 
 	$config['get_row_index'] = '';
+	$config['pagination_table'] = 'user_info';
 	echoLongTable($col_names, $from, $cond, $tail, $header_row, $print_row, $config);
 }
