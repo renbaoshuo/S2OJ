@@ -113,6 +113,40 @@
 			updateContestPlayerNum($contest);
 		};
 		$remove_user_from_contest_form->runAtServer();
+
+		$force_set_user_participated_form = new UOJForm('force_set_user_participated');
+		$force_set_user_participated_form->addInput('force_set_username', 'text', '用户名', '', 
+			function ($x) {
+				global $contest;
+
+				if (!validateUsername($x)) {
+					return '用户名不合法';
+				}
+
+				$user = queryUser($x);
+				if (!$user) {
+					return '用户不存在';
+				}
+
+				if (!hasRegistered($user, $contest)) {
+					return '该用户未报名';
+				}
+
+				return '';
+			},
+			null
+		);
+		$force_set_user_participated_form->submit_button_config['align'] = 'compressed';
+		$force_set_user_participated_form->submit_button_config['text'] = '强制参赛';
+		$force_set_user_participated_form->submit_button_config['class_str'] = 'mt-2 btn btn-warning';
+		$force_set_user_participated_form->handle = function() {
+			global $contest;
+			$username = $_POST['force_set_username'];
+
+			DB::query("update contests_registrants set has_participated = 1 where username = '{$username}' and contest_id = {$contest['id']}");
+			updateContestPlayerNum($contest);
+		};
+		$force_set_user_participated_form->runAtServer();
 	}
 
 	$has_contest_permission = hasContestPermission($myUser, $contest);
@@ -153,12 +187,14 @@
 
 <?php
 		if ($show_ip) {
-			$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th><th>remote_addr</th></tr>';
+			$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th><th>remote_addr</th><th>是否参赛</th></tr>';
 	
 			$ip_owner = array();
+			$has_participated = array();
 			foreach (DB::selectAll("select * from contests_registrants where contest_id = {$contest['id']} order by username desc") as $reg) {
 				$user = queryUser($reg['username']);
 				$ip_owner[$user['remote_addr']] = $reg['username'];
+				$has_participated[$reg['username']] = $reg['has_participated'];
 			}
 		} else {
 			$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th></tr>';
@@ -168,7 +204,7 @@
 			$header_row,
 			function($contest, $num) {
 				global $myUser;
-				global $show_ip, $ip_owner;
+				global $show_ip, $ip_owner, $has_participated;
 			
 				$user = queryUser($contest['username']);
 				$user_link = getUserLink($contest['username']);
@@ -185,13 +221,17 @@
 				echo '<td>'.$user_link.'</td>';
 				if ($show_ip) {
 					echo '<td>'.$user['remote_addr'].'</td>';
+					echo '<td>'.($has_participated[$user['username']] ? 'Yes' : 'No').'</td>';
 				}
 				echo '</tr>';
 			},
 			array('page_len' => 100,
 				'get_row_index' => '',
 				'print_after_table' => function() {
-					global $add_new_contestant_form, $add_group_to_contest_form, $remove_user_from_contest_form;
+					global $add_new_contestant_form,
+					$add_group_to_contest_form,
+					$remove_user_from_contest_form,
+					$force_set_user_participated_form;
 
 					if (isset($add_new_contestant_form)) {
 						$add_new_contestant_form->printHTML();
@@ -201,6 +241,9 @@
 					}
 					if (isset($remove_user_from_contest_form)) {
 						$remove_user_from_contest_form->printHTML();
+					}
+					if (isset($force_set_user_participated_form)) {
+						$force_set_user_participated_form->printHTML();
 					}
 				}
 			)
