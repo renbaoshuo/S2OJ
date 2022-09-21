@@ -57,7 +57,12 @@ steps:
   - name: tags
     image: alpine
     commands:
-      - echo -n "latest, $DRONE_BRANCH, ${DRONE_COMMIT_SHA:0:8}" > .tags
+      - echo -n "latest, $DRONE_BRANCH, ${DRONE_COMMIT_SHA:0:7}" > .tags
+
+  - name: version
+    image: alpine
+    commands:
+      - sed -i "s/'s2oj-version' => 'dev'/'s2oj-version' => '${DRONE_COMMIT_SHA:0:7}'/g" web/app/.default-config.php
 
   - name: docker
     image: plugins/docker

@@ -99,6 +99,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Replace version
+        run: |
+          sed -i "s/'s2oj-version' => 'dev'/'s2oj-version' => '$(echo "${{ github.sha }}" | cut -c1-7)'/g" web/app/.default-config.php
+
       - name: Log in to the Container registry
         uses: docker/login-action@v2.0.0
         with:

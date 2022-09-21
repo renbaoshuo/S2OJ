@@ -15,12 +15,14 @@
 						<a class="dropdown-item" href="<?= HTML::url(UOJContext::requestURI(), array('params' => array('locale' => 'en'))) ?>">English</a>
 					</div>
 				</div>
-				
-				<ul class="list-inline"><li class="list-inline-item">Universal Online Judge</li></ul>
-				<?php if (UOJConfig::$data['profile']['ICP-license'] != ''): ?>
-				<p><a target="_blank" href="https://beian.miit.gov.cn" style="text-decoration:none;"><?= UOJConfig::$data['profile']['ICP-license'] ?></a></p>
-				<?php endif ?>
-				<p><?= UOJLocale::get('server time') ?>: <?= UOJTime::$time_now_str ?> | <a href="https://github.com/renbaoshuo/S2OJ" target="_blank"><?= UOJLocale::get('opensource project') ?></a></p>
+
+				<p><?= UOJLocale::get('server time') ?>: <?= UOJTime::$time_now_str ?></p>
+				<p>
+					<a href="https://github.com/renbaoshuo/S2OJ<?= UOJConfig::$data['profile']['s2oj-version'] == "dev" ? '' : '/tree/' . UOJConfig::$data['profile']['s2oj-version'] ?>">S2OJ (<?= UOJConfig::$data['profile']['s2oj-version'] ?>)</a>
+					<?php if (UOJConfig::$data['profile']['ICP-license'] != ''): ?>
+						| <a target="_blank" href="https://beian.miit.gov.cn" style="text-decoration:none;"><?= UOJConfig::$data['profile']['ICP-license'] ?></a>
+					<?php endif ?>
+				</p>
 			</div>
 			<?php endif ?>
 		</div>
