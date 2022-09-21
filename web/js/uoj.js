@@ -127,7 +127,7 @@ function getUserLink(username, realname) {
 		username = username.substr(1);
 	}
 	if (realname) {
-		text = text + ' (' + realname + ')';
+		text = text + ' <span class="uoj-realname inline-block">(' + realname + ')</span>';
 	}
 	return '<a class="uoj-username" href="' + uojHome + '/user/profile/' + username + '">' + text + '</a>';
 }
@@ -140,7 +140,7 @@ function getUserSpan(username, realname) {
 		username = username.substr(1);
 	}
 	if (realname) {
-		text = text + ' (' + realname + ')';
+		text = text + ' <span class="uoj-realname inline-block">(' + realname + ')</span>';
 	}
 	return '<span class="uoj-username">' + text + '</span>';
 }
@@ -1083,11 +1083,11 @@ function showStandings() {
 		standings,
 		1,
 		'<tr>' +
-			'<th style="width:5em">#</th>' +
-			'<th style="width:14em">'+uojLocale('username')+'</th>' +
+			'<th style="width:' + (show_self_reviews ? '2' : '5') + 'em">#</th>' +
+			'<th style="width:' + (show_self_reviews ? '8' : '14') + 'em">'+uojLocale('username')+'</th>' +
 			'<th style="width:5em">'+uojLocale('contests::total score')+'</th>' +
 			$.map(problems, function(col, idx) {
-				return '<th style="width:8em;">' + '<a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode('A'.charCodeAt(0) + idx) + '</a>' + '</th>';
+				return '<th style="width:' + (show_self_reviews ? '10' : '8') + 'em;">' + '<a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode('A'.charCodeAt(0) + idx) + '</a>' + '</th>';
 			}).join('') +
 			(show_self_reviews ? '<th style="width:16em;">赛后总结</th>' : '') +
 		'</tr>',
@@ -1131,7 +1131,7 @@ function showStandings() {
 				col_tr += '<td><div id="review-' + row[2][0] + '"></div>'
 					+ '<script>'
 					+ '$(function() { $("#review-' + row[2][0] + '")'
-					+ '.html(DOMPurify.sanitize(decodeURIComponent("' + encodeURIComponent(String(row[4] || '')) + '"), {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del"], ALLOWED_ATTR: ["href"]})); });'
+					+ '.html(DOMPurify.sanitize(decodeURIComponent("' + encodeURIComponent(String(row[4] || '')) + '"), {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del", "br"], ALLOWED_ATTR: ["href"]})); });'
 					+ '</scr' + 'ipt></td>';
 			}
 			col_tr += '</tr>';
