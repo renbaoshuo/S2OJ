@@ -410,6 +410,30 @@ LOCK TABLES `custom_test_submissions` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `friend_links`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `friend_links` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(40) NOT NULL,
+  `url` varchar(100) NOT NULL,
+  `level` int(10) NOT NULL DEFAULT 10,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `friend_links`
+--
+
+LOCK TABLES `friend_links` WRITE;
+/*!40000 ALTER TABLE `friend_links` DISABLE KEYS */;
+/*!40000 ALTER TABLE `friend_links` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `groups`
 --
 

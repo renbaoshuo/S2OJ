@@ -1,6 +1,7 @@
 <?php
 	$blogs = DB::selectAll("select blogs.id, title, poster, post_time from important_blogs, blogs where is_hidden = 0 and important_blogs.blog_id = blogs.id order by level desc, important_blogs.blog_id desc limit 5");
-	$countdowns = DB::selectAll("select * from countdowns order by endtime asc")
+	$countdowns = DB::selectAll("select * from countdowns order by endtime asc");
+	$friend_links = DB::selectAll("select * from friend_links order by level desc, id asc");
 	?>
 <?php echoUOJPageHeader(UOJConfig::$data['profile']['oj-name-short']) ?>
 <div class="row">
@@ -77,19 +78,18 @@
 							<?php endif ?>
 						</li>
 					<?php endforeach ?>
-				</div>
+				</ul>
 			</div>
 		</div>
 		<div class="card card-default mt-4">
 			<div class="card-body">
 				<h3 class="card-title" style="font-size: 1.25rem">友情链接</h3>
 				<ul class="pl-4 mb-0">
-					<li>
-						<a href="http://www.sjzez.com">石家庄二中</a>
-					</li>
-					<li>
-						<a href="http://www.sjzezsyxx.com">石家庄二中实验学校</a>
-					</li>
+					<?php foreach ($friend_links as $friend_link): ?>
+						<li>
+							<a href="<?= $friend_link['url'] ?>" target="_blank"><?= $friend_link['title'] ?></a>
+						</li>
+					<?php endforeach ?>
 				</ul>
 			</div>
 		</div>

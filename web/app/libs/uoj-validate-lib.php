@@ -47,3 +47,7 @@ function validateUploadedFile($name) {
 function validateIP($ip) {
 	return filter_var($ip, FILTER_VALIDATE_IP) !== false;
 }
+
+function validateURL($url) {
+	return filter_var($url, FILTER_VALIDATE_URL) !== false;
+}

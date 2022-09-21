@@ -385,6 +385,87 @@ EOD;
 EOD;
 	};
 
+	$friend_link_adder = new UOJForm('new_friend_link');
+	$friend_link_adder->submit_button_config['align'] = 'compressed';
+	$friend_link_adder->addInput('new_friend_link_title', 'text', '名称', '',
+		function ($str) {
+			return '';
+		},
+		null
+	);
+	$friend_link_adder->addInput('new_friend_link_url', 'text', '链接', '',
+		function($str) {
+			if (!validateURL($str)) {
+				return '链接不合法';
+			}
+
+			return '';
+		},
+		null
+	);
+	$friend_link_adder->addInput('new_friend_link_level', 'text', '权重', '10',
+		function($str) {
+			if (!validateUInt($str)) {
+				return '权重必须是数字';
+			}
+
+			return '';
+		},
+		null
+	);
+	$friend_link_adder->handle = function() {
+		$new_friend_link_title = $_POST['new_friend_link_title'];
+		$new_friend_link_url = $_POST['new_friend_link_url'];
+		$new_friend_link_level = $_POST['new_friend_link_level'];
+		$esc_new_friend_link_title = DB::escape($new_friend_link_title);
+		$esc_new_friend_link_url = DB::escape($new_friend_link_url);
+
+		DB::query("insert into friend_links (title, url, level) values ('$esc_new_friend_link_title', '$esc_new_friend_link_url', $new_friend_link_level)");
+	};
+	$friend_link_adder->runAtServer();
+
+	$friend_link_deleter = new UOJForm('delete_friend_link');
+	$friend_link_deleter->submit_button_config['align'] = 'compressed';
+	$friend_link_deleter->addInput('delete_friend_link_id', 'text', 'ID', '',
+		function ($id) {
+			if (!validateUInt($id)) {
+				return 'ID不合法';
+			}
+
+			if (!DB::selectFirst("select * from friend_links where id = $id")) {
+				return 'ID不存在';
+			}
+
+			return '';
+		},
+		null
+	);
+	$friend_link_deleter->handle = function() {
+		$delete_friend_link_id = $_POST['delete_friend_link_id'];
+
+		DB::query("delete from friend_links where id = $delete_friend_link_id");
+	};
+	$friend_link_deleter->runAtServer();
+
+	$friend_links_header_row = <<<EOD
+	<tr>
+		<th>ID</th>
+		<th>名称</th>
+		<th>链接</th>
+		<th>置顶等级</th>
+	</tr>
+EOD;
+	$friend_links_print_row = function($row) {
+		echo <<<EOD
+	<tr>
+		<td>{$row['id']}</td>
+		<td>{$row['title']}</td>
+		<td>{$row['url']}</td>
+		<td>{$row['level']}</td>
+	</tr>
+EOD;
+	};
+
 	$contest_submissions_deleter = new UOJForm('contest_submissions');
 	$contest_submissions_deleter->addInput('contest_id', 'text', '比赛ID', '',
 		function ($x) {
@@ -631,6 +712,13 @@ EOD;
 				<?php $countdown_adder->printHTML(); ?>
 				<h5>删除倒计时</h5>
 				<?php $countdown_deleter->printHTML(); ?>
+
+				<h4>友情链接</h4>
+				<?php echoLongTable(array('id', 'title', 'url', 'level'), 'friend_links', '1', 'order by level desc, id asc', $friend_links_header_row, $friend_links_print_row, $userlist_config) ?>
+				<h5>添加友情链接</h5>
+				<?php $friend_link_adder->printHTML(); ?>
+				<h5>删除友情链接</h5>
+				<?php $friend_link_deleter->printHTML(); ?>
 			</div>
 		<?php elseif ($cur_tab === 'submissions'): ?>
 			<div>
