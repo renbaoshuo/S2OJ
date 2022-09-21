@@ -1,6 +1,8 @@
 <?php
 	requirePHPLib('form');
 
+	$REQUIRE_LIB['mathjax'] = '';
+
 	if (!Auth::check()) {
 		become403Page(UOJLocale::get('need login'));
 	}

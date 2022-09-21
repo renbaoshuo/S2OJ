@@ -1109,10 +1109,10 @@ function showStandings() {
 					if (show_self_reviews) {
 						col_tr += '<div id="review-' + row[2][0] + '-' + i + '"></div>'
 							+ '<script>'
-							+ '$(function() {'
+							+ '(function() {'
 							+ 'var purify_result = DOMPurify.sanitize(decodeURIComponent("' + encodeURIComponent(String(col[3] || '')) + '"), {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del", "br"], ALLOWED_ATTR: ["href"]});'
 							+ '$("#review-' + row[2][0] + '-' + i + '")'
-							+ '.html(purify_result ? \'<div class="mt-2 pt-2 border-top">\' + purify_result + \'</div>\' : \'\'); });'
+							+ '.html(purify_result ? \'<div class="mt-2 pt-2 border-top">\' + purify_result + \'</div>\' : \'\'); })();'
 							+ '</scr' + 'ipt>';
 					} else {
 						if (standings_version < 2) {
@@ -1130,8 +1130,8 @@ function showStandings() {
 			if (show_self_reviews) {
 				col_tr += '<td><div id="review-' + row[2][0] + '"></div>'
 					+ '<script>'
-					+ '$(function() { $("#review-' + row[2][0] + '")'
-					+ '.html(DOMPurify.sanitize(decodeURIComponent("' + encodeURIComponent(String(row[4] || '')) + '"), {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del", "br"], ALLOWED_ATTR: ["href"]})); });'
+					+ '(function() { $("#review-' + row[2][0] + '")'
+					+ '.html(DOMPurify.sanitize(decodeURIComponent("' + encodeURIComponent(String(row[4] || '')) + '"), {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del", "br"], ALLOWED_ATTR: ["href"]})); })();'
 					+ '</scr' + 'ipt></td>';
 			}
 			col_tr += '</tr>';
@@ -1140,7 +1140,7 @@ function showStandings() {
 			table_classes: ['table', 'table-bordered', 'table-striped', 'table-text-center', 'table-vertical-middle', 'table-condensed'],
 			page_len: 100,
 			print_after_table: function() {
-				return '<div class="text-right text-muted">' + uojLocale("contests::n participants", standings.length) + '</div>';
+				return '<div class="text-right text-muted">' + uojLocale("contests::n participants", standings.length) + '</div><script>if (window.MathJax) window.MathJax.typeset();</scr' + 'ipt>';
 			}
 		}
 	);
