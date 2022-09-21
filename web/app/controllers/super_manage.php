@@ -339,25 +339,32 @@
 	$countdown_adder->handle = function() {
 		$new_countdown_title = $_POST['new_countdown_title'];
 		$new_countdown_endtime = $_POST['new_countdown_endtime'];
-		$new_countdown_title = DB::escape($new_countdown_title);
+		$esc_countdown_title = DB::escape($new_countdown_title);
 
-		DB::query("insert into countdowns (title, endtime) values ('$new_countdown_title', '$new_countdown_endtime')");
+		DB::query("insert into countdowns (title, endtime) values ('$esc_countdown_title', '$new_countdown_endtime')");
 	};
 	$countdown_adder->runAtServer();
 
 	$countdown_deleter = new UOJForm('delete_countdown');
 	$countdown_deleter->submit_button_config['align'] = 'compressed';
 	$countdown_deleter->addInput('delete_countdown_id', 'text', 'ID', '',
-		function ($delete_countdown_id) {
+		function ($x) {
+			if (!validateUInt($x)) {
+				return 'ID不合法';
+			}
+
+			if (!DB::selectFirst("select * from countdowns where id = $x")) {
+				return '倒计时不存在';
+			}
+
 			return '';
 		},
 		null
 	);
 	$countdown_deleter->handle = function() {
 		$delete_countdown_id = $_POST['delete_countdown_id'];
-		$delete_countdown_id = DB::escape($delete_countdown_id);
 
-		DB::query("delete from countdowns where id = '$delete_countdown_id'");
+		DB::query("delete from countdowns where id = $delete_countdown_id");
 	};
 	$countdown_deleter->runAtServer();
 
@@ -618,7 +625,7 @@ EOD;
 			</div>
 		<?php elseif ($cur_tab === 'index'): ?>
 			<div>
-				<h4>倒计时管理</h4>
+				<h4>倒计时</h4>
 				<?php echoLongTable(array('id', 'title', 'endtime'), 'countdowns', '1', 'order by endtime asc', $countdowns_header_row, $countdowns_print_row, $userlist_config) ?>
 				<h5>添加倒计时</h5>
 				<?php $countdown_adder->printHTML(); ?>
