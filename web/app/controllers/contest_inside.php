@@ -99,8 +99,8 @@
 		}
 	}
 	
-	if (isSuperUser($myUser)) {
-		if (CONTEST_PENDING_FINAL_TEST <= $contest['cur_progress'] && $contest['cur_progress'] <= CONTEST_TESTING) {
+	if (isSuperUser($myUser) || isContestJudger($myUser)) {
+		if (CONTEST_PENDING_FINAL_TEST <= $contest['cur_progress']) {
 			$start_test_form = new UOJForm('start_test');
 			$start_test_form->handle = function() {
 				global $contest;

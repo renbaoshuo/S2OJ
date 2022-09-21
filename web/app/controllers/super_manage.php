@@ -163,6 +163,7 @@
 	$usertype_options = array(
 		'problem_uploader' => '题目上传者',
 		'problem_manager' => '题目管理员',
+		'contest_judger' => '比赛评测员',
 		'contest_only' => '仅比赛参加者',
 	);
 	$usertype_form->addSelect('usertype_type', $usertype_options, '角色', '');
@@ -174,6 +175,7 @@
 		switch ($_POST['usertype_type']) {
 			case 'problem_uploader':
 			case 'problem_manager':
+			case 'contest_judger':
 			case 'contest_only':
 				$user = queryUser($username);
 				$user = $_POST['usertype_op'] === 'add'
