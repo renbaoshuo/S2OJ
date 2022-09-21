@@ -47,7 +47,7 @@
 		<?= HTML::css_link('/css/bootstrap-glyphicons.min.css?v=2019.5.31') ?>
 
 		<!-- Custom styles for this template -->
-		<?= HTML::css_link('/css/uoj-theme.css?v=2022.09.20') ?>
+		<?= HTML::css_link('/css/uoj-theme.css?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
 		
 		<!-- jQuery (necessary for Bootstrap\'s JavaScript plugins) -->
 		<?= HTML::js_src('/js/jquery.min.js') ?>
@@ -82,7 +82,7 @@
 		<?= HTML::js_src('/js/purify.min.js') ?>
 		
 		<!-- uoj -->
-		<?= HTML::js_src('/js/uoj.js?v=2022.09.20') ?>
+		<?= HTML::js_src('/js/uoj.js?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
 		
 		<!-- readmore -->
 		<?= HTML::js_src('/js/readmore/readmore.min.js') ?>
@@ -196,16 +196,6 @@
 		<?php if (isset($REQUIRE_LIB['ckeditor'])): ?>
 		<!-- ckeditor -->
 		<?= HTML::js_src('/js/ckeditor/ckeditor.js') ?>
-		<?php endif ?>
-
-		<?php if (isset($REQUIRE_LIB['dracula'])): ?>
-			<!-- dracula.js -->
-			<?= HTML::js_src('/js/dracula.min.js') ?>
-		<?php endif ?>
-
-		<?php if (isset($REQUIRE_LIB['base64'])): ?>
-			<!-- base64.js -->
-			<?= HTML::js_src('/js/base64.min.js') ?>
 		<?php endif ?>
 
 		<?php if (isset($REQUIRE_LIB['github_contribution_graph'])): ?>
