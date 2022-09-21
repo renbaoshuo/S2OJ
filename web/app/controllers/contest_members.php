@@ -187,13 +187,15 @@
 
 <?php
 		if ($show_ip) {
-			$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th><th>remote_addr</th><th>是否参赛</th></tr>';
+			$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th><th>remote_addr</th><th>http_x_forwarded_for</th><th>是否参赛</th></tr>';
 	
 			$ip_owner = array();
+			$forwarded_ip_owner = array();
 			$has_participated = array();
 			foreach (DB::selectAll("select * from contests_registrants where contest_id = {$contest['id']} order by username desc") as $reg) {
 				$user = queryUser($reg['username']);
 				$ip_owner[$user['remote_addr']] = $reg['username'];
+				$forwarded_ip_owner[$user['http_x_forwarded_for']] = $reg['username'];
 				$has_participated[$reg['username']] = $reg['has_participated'];
 			}
 		} else {
@@ -211,7 +213,7 @@
 				if (!$show_ip) {
 					echo '<tr>';
 				} else {
-					if ($ip_owner[$user['remote_addr']] != $user['username']) {
+					if ($ip_owner[$user['remote_addr']] != $user['username'] || $forwarded_ip_owner[$user['http_x_forwarded_for']] != $user['username']) {
 						echo '<tr class="danger">';
 					} else {
 						echo '<tr>';
@@ -221,6 +223,7 @@
 				echo '<td>'.$user_link.'</td>';
 				if ($show_ip) {
 					echo '<td>'.$user['remote_addr'].'</td>';
+					echo '<td>'.$user['http_x_forwarded_for'].'</td>';
 					echo '<td>'.($has_participated[$user['username']] ? 'Yes' : 'No').'</td>';
 				}
 				echo '</tr>';
