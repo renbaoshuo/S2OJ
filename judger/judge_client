@@ -214,7 +214,7 @@ def update_problem_data(problem_id, problem_mtime):
 			os.system('chmod 700 %s -R && rm -rf %s' % (quoted_fname, quoted_fname))
 		
 		uoj_download('/problem/%d' % problem_id, copy_zip_name)
-		execute('cd %s && unzip -q %d.zip && rm %d.zip && chmod -w %d -R' % (uoj_judger_path('/data'), problem_id, problem_id, problem_id))
+		execute('cd %s && unzip -o -q %d.zip && rm %d.zip && chmod -w %d -R' % (uoj_judger_path('/data'), problem_id, problem_id, problem_id))
 	except Exception:
 		print_judge_client_status()
 		traceback.print_exc()
@@ -233,7 +233,7 @@ def judge():
 	
 	with open(uoj_judger_path('/work/submission.conf'), 'w') as fconf:
 		uoj_download(submission['content']['file_name'], uoj_judger_path('/work/all.zip'))
-		execute("cd %s && unzip -q all.zip && rm all.zip" % pipes.quote(uoj_judger_path('/work')))
+		execute("cd %s && unzip -o -q all.zip && rm all.zip" % pipes.quote(uoj_judger_path('/work')))
 		for k, v in submission['content']['config']:
 			print(k, v, file=fconf)
 		
