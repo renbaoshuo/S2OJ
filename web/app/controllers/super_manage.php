@@ -185,74 +185,6 @@
 	};
 	$usertype_form->runAtServer();
 	
-	$blog_link_contests = new UOJForm('blog_link_contests');
-	$blog_link_contests->addInput('blog_id', 'text', '博客ID', '',
-		function ($x) {
-			if (!validateUInt($x)) {
-				return 'ID不合法';
-			}
-			if (!queryBlog($x)) {
-				return '博客不存在';
-			}
-			return '';
-		},
-		null
-	);
-	$blog_link_contests->addInput('contest_id', 'text', '比赛ID', '',
-		function ($x) {
-			if (!validateUInt($x)) {
-				return 'ID不合法';
-			}
-			if (!queryContest($x)) {
-				return '比赛不存在';
-			}
-			return '';
-		},
-		null
-	);
-	$blog_link_contests->addInput('title', 'text', '标题', '',
-		function ($x) {
-			return '';
-		},
-		null
-	);
-	$options = array(
-		'add' => '添加',
-		'del' => '删除'
-	);
-	$blog_link_contests->addSelect('op-type', $options, '操作类型', '');
-	$blog_link_contests->handle = function() {
-		$blog_id = $_POST['blog_id'];
-		$contest_id = $_POST['contest_id'];
-		$str = DB::selectFirst(("select * from contests where id='${contest_id}'"));
-		$all_config = json_decode($str['extra_config'], true);
-		$config = $all_config['links'];
-
-		$n = count($config);
-		
-		if ($_POST['op-type'] == 'add') {
-			$row = array();
-			$row[0] = $_POST['title'];
-			$row[1] = $blog_id;
-			$config[$n] = $row;
-		}
-		if ($_POST['op-type'] == 'del') {
-			for ($i = 0; $i < $n; $i++) {
-				if ($config[$i][1] == $blog_id) {
-					$config[$i] = $config[$n - 1];
-					unset($config[$n - 1]);
-					break;
-				}
-			}
-		}
-
-		$all_config['links'] = $config;
-		$str = json_encode($all_config);
-		$str = DB::escape($str);
-		DB::query("update contests set extra_config='${str}' where id='${contest_id}'");
-	};
-	$blog_link_contests->runAtServer();
-	
 	$blog_link_index = new UOJForm('blog_link_index');
 	$blog_link_index->addInput('blog_id2', 'text', '博客ID', '',
 		function ($x) {
@@ -690,11 +622,6 @@ EOD;
 			</div>
 			<?php echoLongTable($userlist_cols, 'user_info', $user_list_cond, 'order by username asc', $userlist_header_row, $userlist_print_row, $userlist_config) ?>
 		<?php elseif ($cur_tab === 'blogs'): ?>
-			<div>
-				<h4>添加到比赛链接</h4>
-				<?php $blog_link_contests->printHTML(); ?>
-			</div>
-
 			<div>
 				<h4>添加到公告</h4>
 				<?php $blog_link_index->printHTML(); ?>

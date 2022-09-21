@@ -168,6 +168,65 @@
 	$time_form->runAtServer();
 	$managers_form->runAtServer();
 	$problems_form->runAtServer();
+
+	$blog_link_contests = new UOJForm('blog_link_contests');
+	$blog_link_contests->addInput('blog_link_contests__blog_id', 'text', '博客ID', '',
+		function ($x) {
+			if (!validateUInt($x)) {
+				return 'ID不合法';
+			}
+			if (!queryBlog($x)) {
+				return '博客不存在';
+			}
+			return '';
+		},
+		null
+	);
+	$blog_link_contests->addInput('blog_link_contests__title', 'text', '标题', '',
+		function ($x) {
+			return '';
+		},
+		null
+	);
+	$options = array(
+		'add' => '添加',
+		'del' => '删除'
+	);
+	$blog_link_contests->addSelect('blog_link_contests__op-type', $options, '操作类型', '');
+	$blog_link_contests->handle = function() {
+		global $contest;
+
+		$blog_id = $_POST['blog_link_contests__blog_id'];
+		$contest_id = $contest['id'];
+		$str = DB::selectFirst("select * from contests where id='${contest_id}'");
+		$all_config = json_decode($str['extra_config'], true);
+		$config = $all_config['links'];
+
+		$n = count($config);
+		
+		if ($_POST['blog_link_contests__op-type'] == 'add') {
+			$row = array();
+			$row[0] = $_POST['blog_link_contests__title'];
+			$row[1] = $blog_id;
+			$config[$n] = $row;
+		}
+		if ($_POST['blog_link_contests__op-type'] == 'del') {
+			for ($i = 0; $i < $n; $i++) {
+				if ($config[$i][1] == $blog_id) {
+					$config[$i] = $config[$n - 1];
+					unset($config[$n - 1]);
+					break;
+				}
+			}
+		}
+
+		$all_config['links'] = $config;
+		$str = json_encode($all_config);
+		$str = DB::escape($str);
+		DB::query("update contests set extra_config='${str}' where id='${contest_id}'");
+	};
+	$blog_link_contests->runAtServer();
+	
 	?>
 <?php echoUOJPageHeader(HTML::stripTags($contest['name']) . ' - 比赛管理') ?>
 <h1 class="page-header" align="center"><?=$contest['name']?> 管理</h1>
@@ -175,6 +234,7 @@
 	<li class="nav-item"><a class="nav-link active" href="#tab-time" role="tab" data-toggle="tab">比赛时间</a></li>
 	<li class="nav-item"><a class="nav-link" href="#tab-managers" role="tab" data-toggle="tab">管理者</a></li>
 	<li class="nav-item"><a class="nav-link" href="#tab-problems" role="tab" data-toggle="tab">试题</a></li>
+	<li class="nav-item"><a class="nav-link" href="#tab-blogs" role="tab" data-toggle="tab">比赛资料</a></li>
 	<?php if (isSuperUser($myUser)): ?>
 	<li class="nav-item"><a class="nav-link" href="#tab-others" role="tab" data-toggle="tab">其它</a></li>
 	<?php endif ?>
@@ -229,6 +289,9 @@
 		</table>
 		<p class="text-center">命令格式：命令一行一个，+233表示把题号为233的试题加入比赛，-233表示把题号为233的试题从比赛中移除</p>
 		<?php $problems_form->printHTML(); ?>
+	</div>
+	<div class="tab-pane" id="tab-blogs">
+		<?php $blog_link_contests->printHTML(); ?>
 	</div>
 	<?php if (isSuperUser($myUser)): ?>
 	<div class="tab-pane" id="tab-others">
