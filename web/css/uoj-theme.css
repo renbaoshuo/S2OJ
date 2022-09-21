@@ -373,10 +373,8 @@ pre {
 	color: red;
 }
 
-.uoj-problem-tag {
-	margin-left: 5px;
-	margin-right: 5px;
-}
+.uoj-problem-tag, 
+.uoj-list-tag,
 .uoj-blog-tag {
 	margin-left: 5px;
 	margin-right: 5px;
