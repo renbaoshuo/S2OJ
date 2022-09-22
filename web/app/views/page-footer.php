@@ -18,7 +18,7 @@
 
 				<p><?= UOJLocale::get('server time') ?>: <?= UOJTime::$time_now_str ?></p>
 				<p>
-					<a href="https://github.com/renbaoshuo/S2OJ<?= UOJConfig::$data['profile']['s2oj-version'] == "dev" ? '' : '/tree/' . UOJConfig::$data['profile']['s2oj-version'] ?>">S2OJ (<?= UOJConfig::$data['profile']['s2oj-version'] ?>)</a>
+					<a href="https://github.com/renbaoshuo/S2OJ<?= UOJConfig::$data['profile']['s2oj-version'] == "dev" ? '' : '/tree/' . UOJConfig::$data['profile']['s2oj-version'] ?>">S2OJ (build: <?= UOJConfig::$data['profile']['s2oj-version'] ?>)</a>
 					<?php if (UOJConfig::$data['profile']['ICP-license'] != ''): ?>
 						| <a target="_blank" href="https://beian.miit.gov.cn" style="text-decoration:none;"><?= UOJConfig::$data['profile']['ICP-license'] ?></a>
 					<?php endif ?>
