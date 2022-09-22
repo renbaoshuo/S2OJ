@@ -11,6 +11,7 @@
 	
 	$username = UOJContext::user()['username'];
 
+	$REQUIRE_LIB['mathjax'] = '';
 	?>
 
 <?php echoUOJPageHeader(UOJLocale::get('contests::contest self reviews')) ?>
@@ -64,7 +65,7 @@
 			$result .= '<td><div id="' . $problem_review_id . '"></div></td>';
 			$esc_problem_self_review = rawurlencode($problem_self_review != null ? $problem_self_review['content'] : '');
 			$result .= '<script type="text/javascript">'
-					 . "$(function() { $('#$problem_review_id').html(DOMPurify.sanitize(decodeURIComponent(\"{$esc_problem_self_review}\"), $dom_sanitize_config)); });"
+					 . "(function() { $('#$problem_review_id').html(DOMPurify.sanitize(decodeURIComponent(\"{$esc_problem_self_review}\"), $dom_sanitize_config)); })();"
 					 . '</script>';
 
 			if ($i == 0) {
@@ -73,7 +74,7 @@
 				$esc_contest_self_review = rawurlencode($contest_self_review != null ? $contest_self_review['content'] : '');
 				$result .= '<td rowspan="' . $n_contest_problems . '"><div id="' . $contest_review_id . '"></div></td>';
 				$result .= '<script type="text/javascript">'
-						 . "$(function() { $('#$contest_review_id').html(DOMPurify.sanitize(decodeURIComponent(\"{$esc_contest_self_review}\"), $dom_sanitize_config)); });"
+						 . "(function() { $('#$contest_review_id').html(DOMPurify.sanitize(decodeURIComponent(\"{$esc_contest_self_review}\"), $dom_sanitize_config)); })();"
 						 . '</script>';
 			}
 
@@ -85,5 +86,5 @@
 
 	echoLongTable($col_names, $from, $cond, $tail, $header_row, $print_row, $config);
 	?>
-
+<script>if (window.MathJax) MathJax.typeset();</script>
 <?php echoUOJPageFooter() ?>
