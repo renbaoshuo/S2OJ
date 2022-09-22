@@ -74,9 +74,9 @@
 		echo '<td>' . getUserLink($username) . '</td>';
 		foreach ($problem_ids as $problem_id) {
 			if (!isset($finished[$username]) || !isset($finished[$username][$problem_id])) {
-				echo '<td class="failed"><i class="fa fa-times"></i></td>';
+				echo '<td class="failed"><span class="glyphicon glyphicon-ok"></span></td>';
 			} else {
-				echo '<td class="success"><i class="fa fa-check"></i></td>';
+				echo '<td class="success"><span class="glyphicon glyphicon-remove"></span></td>';
 			}
 		}
 		echo '</tr>';
