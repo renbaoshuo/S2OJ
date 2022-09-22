@@ -9,17 +9,14 @@
 
 	requirePHPLib('form');
 	
-	$username = $_GET['username'];
+	$username = UOJContext::user()['username'];
 
-	if (!validateUsername($username) || !($user = queryUser($username))) {
-		become404Page();
-	}
 	?>
 
 <?php echoUOJPageHeader(UOJLocale::get('contests::contest self reviews')) ?>
 
 <h2 style="margin-top: 24px">
-	<?= $username == $myUser['username'] ? '我' : $username . ' ' ?>的所有赛后总结
+	<?= $username ?> 的所有赛后总结
 </h2>
 
 <?php

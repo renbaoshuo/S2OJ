@@ -7,6 +7,7 @@
 	<div class="navbar-collapse collapse">
 		<ul class="nav navbar-nav">
 			<li class="nav-item"><a class="nav-link" href="<?= HTML::blog_url(UOJContext::userid(), '/archive')?>"><span class="glyphicon glyphicon-inbox"></span> 日志</a></li>
+			<li class="nav-item"><a class="nav-link" href="<?= HTML::blog_url(UOJContext::userid(), '/self_reviews')?>"><span class="glyphicon glyphicon-sunglasses"></span> 赛后总结</a></li>
 			<li class="nav-item"><a class="nav-link" href="<?= HTML::blog_url(UOJContext::userid(), '/aboutme')?>"><span class="glyphicon glyphicon-user"></span> 关于我</a></li>
 			<li class="nav-item"><a class="nav-link" href="<?= HTML::url('/') ?>"><span class="glyphicon glyphicon-link"></span> <?= UOJConfig::$data['profile']['oj-name-short'] ?></a></li>
 		</ul>

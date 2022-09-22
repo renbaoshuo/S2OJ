@@ -36,6 +36,7 @@ call_user_func(function() { // to prevent variable scope leak
 			Route::any("$prefix/", '/subdomain/blog/index.php');
 			Route::any("$prefix/archive", '/subdomain/blog/archive.php');
 			Route::any("$prefix/aboutme", '/subdomain/blog/aboutme.php');
+			Route::any("$prefix/self_reviews", '/subdomain/blog/self_reviews.php');
 			Route::any("$prefix/click-zan", '/click_zan.php');
 			Route::any("$prefix/post/{id}", '/subdomain/blog/blog.php');
 			Route::any("$prefix/slide/{id}", '/subdomain/blog/slide.php');
