@@ -755,10 +755,16 @@ EOD
     							<label for="use_builtin_checker" class="col-sm-5 control-label">比对函数</label>
     							<div class="col-sm-7">
 								<select class="form-control" id="use_builtin_checker" name="use_builtin_checker">
-  									<option value="ncmp">单行整数序列</option>
-  									<option value="wcmp">单行字符串序列</option>
-  									<option value="fcmp">多行数据（不忽略行末空格，但忽略文末回车）</option>
-									<option value="ownchk">自定义校验器</option>
+  									<option value="ncmp">ncmp: 整数序列</option>
+  									<option value="wcmp">wcmp: 字符串序列</option>
+									<option value="fcmp">fcmp: 多行数据（不忽略行末空格，但忽略文末回车）</option>
+									<option value="rcmp4">rcmp4: 浮点数序列（误差不超过 1e-4）</option>
+									<option value="rcmp6">rcmp6: 浮点数序列（误差不超过 1e-6）</option>
+									<option value="rcmp9">rcmp9: 浮点数序列（误差不超过 1e-9）</option>
+									<option value="yesno">yesno: Yes、No（不区分大小写）</option>
+									<option value="uncmp">uncmp: 整数集合</option>
+									<option value="bcmp">bcmp: 二进制文件</option>
+									<option value="ownchk">自定义校验器（chk.cpp）</option>
 								</select>
       								<!--<input type="hidden" class="form-control" id="use_builtin_checker" name="use_builtin_checker" placeholder="比对函数">-->
     							</div>
