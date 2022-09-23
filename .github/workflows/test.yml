@@ -1,43 +1,16 @@
 name: Lint & Test
 
 on:
-    - push
-    - pull_request
+  - push
+  - pull_request
 
 jobs:
-    php-cs-fixer:
-        name: PHP-CS-Fixer
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - name: PHP-CS-Fixer
-              uses: docker://oskarstark/php-cs-fixer-ga
-              with:
-                  args: --config=./web/.php-cs-fixer.php --diff --dry-run
-
-    docker-db:
-        name: Build Docker Image (uoj-db)
-        needs: php-cs-fixer
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - name: Build Docker Image (uoj-db)
-              run: docker-compose build uoj-db
-
-    docker-judger:
-        name: Build Docker Image (uoj-judger)
-        needs: php-cs-fixer
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - name: Build Docker Image
-              run: docker-compose build uoj-judger
-
-    docker-web:
-        name: Build Docker Image (uoj-web)
-        needs: php-cs-fixer
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - name: Build Docker Image (uoj-web)
-              run: docker-compose build uoj-web
+  php-cs-fixer:
+    name: PHP-CS-Fixer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: PHP-CS-Fixer
+        uses: docker://oskarstark/php-cs-fixer-ga
+        with:
+          args: --config=./web/.php-cs-fixer.php --diff --dry-run
