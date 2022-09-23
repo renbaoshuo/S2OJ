@@ -584,6 +584,7 @@ EOD;
 		<a href="/contest/<?=$contest['id']?>/registrants" class="btn btn-info btn-block"><?= UOJLocale::get('contests::contest registrants') ?></a>
 		<?php if (isSuperUser($myUser)): ?>
 			<a href="/contest/<?=$contest['id']?>/manage" class="btn btn-primary btn-block">管理</a>
+		<?php endif ?>
 		<?php if (isset($start_test_form)): ?>
 		<div class="top-buffer-sm">
 			<?php $start_test_form->printHTML(); ?>
@@ -593,7 +594,6 @@ EOD;
 		<div class="top-buffer-sm">
 			<?php $publish_result_form->printHTML(); ?>
 		</div>
-		<?php endif ?>
 		<?php endif ?>
 		<?php if (isset($self_reviews_update_form)) { ?>
 	</div>
