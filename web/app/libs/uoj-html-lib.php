@@ -168,9 +168,9 @@ function echoLongTable($col_names, $table_name, $cond, $tail, $header_row, $prin
 	$div_classes = isset($config['div_classes']) ? $config['div_classes'] : array('table-responsive');
 	$table_classes = isset($config['table_classes'])
 		? $config['table_classes']
-		: isset($REQUIRE_LIB['bootstrap5'])
+		: (isset($REQUIRE_LIB['bootstrap5'])
 			? array('table', 'table-bordered', 'table-striped', 'text-center')
-			: array('table', 'table-bordered', 'table-hover', 'table-striped', 'table-text-center');
+			: array('table', 'table-bordered', 'table-hover', 'table-striped', 'table-text-center'));
 	
 	if (isset($config['head_pagination']) && $config['head_pagination']) {
 		echo $pag->pagination();
