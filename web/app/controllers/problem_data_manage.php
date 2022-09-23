@@ -764,7 +764,7 @@ EOD
 									<option value="yesno">yesno: Yes、No（不区分大小写）</option>
 									<option value="uncmp">uncmp: 整数集合</option>
 									<option value="bcmp">bcmp: 二进制文件</option>
-									<option value="ownchk">自定义校验器（chk.cpp）</option>
+									<option value="ownchk">自定义校验器（需上传 chk.cpp）</option>
 								</select>
       								<!--<input type="hidden" class="form-control" id="use_builtin_checker" name="use_builtin_checker" placeholder="比对函数">-->
     							</div>
