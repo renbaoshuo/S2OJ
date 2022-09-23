@@ -85,7 +85,7 @@
 			</div>
 		<?php endif ?>
 	</div>
-	<div class="col-xs-6 col-sm-4 col-md-3">
+	<div class="col">
 		<div class="d-none d-md-block">
 			<img class="media-object img-thumbnail" src="/images/logo.png" alt="Logo" />
 		</div>
