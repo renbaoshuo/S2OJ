@@ -295,7 +295,7 @@
 					<?php foreach ($groups as $group): ?>
 						<?php
 							$group_detail = DB::selectFirst("select * from groups where id = {$group['id']}");
-							$group_announcement = $group_detail['announcement'];
+						$group_announcement = $group_detail['announcement'];
 						?>
 						<li class="list-group-item">
 							<a href="<?= HTML::url('/group/'.$group['id']) ?>">

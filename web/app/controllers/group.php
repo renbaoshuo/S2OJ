@@ -177,14 +177,14 @@
 		};
 		$remove_assignment_form->runAtServer();
 
-        $announcement_form = new UOJForm('announcement_form');
-        $announcement_form->addVTextArea('announcement_content', '公告', $group['announcement'], 
+		$announcement_form = new UOJForm('announcement_form');
+		$announcement_form->addVTextArea('announcement_content', '公告', $group['announcement'], 
 			function ($x) {
 				return '';
 			},
 			null
 		);
-        $announcement_form->submit_button_config['align'] = 'compressed';
+		$announcement_form->submit_button_config['align'] = 'compressed';
 		$announcement_form->submit_button_config['text'] = '更新公告';
 		$announcement_form->handle = function() {
 			global $group_id, $myUser;
