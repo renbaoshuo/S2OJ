@@ -6,7 +6,13 @@
 	}
 	?>
 
-<div class="navbar navbar-light navbar-expand-md bg-light mb-4" role="navigation">
+<div class="navbar navbar-light navbar-expand-md
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+bg-white shadow-sm
+<?php else: ?>
+bg-light
+<?php endif ?>
+mb-4" role="navigation">
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 	<div class="container">
 	<?php endif ?>

@@ -237,7 +237,7 @@
 		</script>
 	</head>
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	<body class="d-flex flex-column min-vh-100">
+	<body class="d-flex flex-column min-vh-100 bg-light">
 	<?php else: ?>
 	<body>
 	<?php endif ?>

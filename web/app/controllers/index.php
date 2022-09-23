@@ -65,18 +65,27 @@
 				<?php endif ?>
 			</div>
 		</div>
-		<?php if (Auth::check() && isNormalUser($myUser)): ?>
-			<div class="mt-4">
-				<h4><?= UOJLocale::get('top solver') ?></h4>
-				<?php echoRanklist(array('echo_full' => true, 'top10' => true, 'by_accepted' => true)) ?>
-				<div class="text-center">
-					<a href="/solverlist"
-						<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-						class="text-decoration-none"
-						<?php endif ?>
-						><?= UOJLocale::get('view all') ?></a>
+		<?php if (Auth::check()): ?>
+			<?php if (isNormalUser($myUser)): ?>
+			<div class="mt-4 card">
+				<div class="card-body">
+					<h4 class="card-title"><?= UOJLocale::get('top solver') ?></h4>
+					<?php echoRanklist(array(
+						'echo_full' => true,
+						'top10' => true,
+						'by_accepted' => true,
+						'table_classes' => array('table', 'text-center'),
+					)) ?>
+					<div class="text-center">
+						<a href="/solverlist"
+							<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+							class="text-decoration-none"
+							<?php endif ?>
+							><?= UOJLocale::get('view all') ?></a>
+					</div>
 				</div>
 			</div>
+			<?php endif ?>
 		<?php else: ?>
 			<div class="mt-4 card card-default">
 				<div class="card-body text-center">
@@ -91,7 +100,7 @@
 		</div>
 		<div class="card card-default mt-4">
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-			<div class="card-header">
+			<div class="card-header bg-white">
 				<b>倒计时</b>
 			</div>
 			<?php endif ?>
@@ -127,7 +136,7 @@
 		</div>
 		<div class="card card-default mt-4">
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-				<div class="card-header">
+				<div class="card-header bg-white">
 					<b>友情链接</b>
 				</div>
 			<?php endif ?>
