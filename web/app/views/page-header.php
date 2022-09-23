@@ -41,13 +41,24 @@
 		
 		<script type="text/javascript">uojHome = ''; // '<?= HTML::url('/') ?>'</script>
 
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+		<!-- Bootstrap 5 (CSS) -->
+		<?= HTML::css_link('/css/bootstrap5.min.css?v=5.2.1') ?>
+		<!-- Bootstrap Icons -->
+		<?= HTML::css_link('/css/bootstrap-icons.min.css?v=2022.9.23') ?>
+		<?php else: ?>
 		<!-- Bootstrap core CSS -->
 		<?= HTML::css_link('/css/bootstrap.min.css?v=2019.5.31') ?>
 		<!-- Bootstrap Glyphicons CSS-->
 		<?= HTML::css_link('/css/bootstrap-glyphicons.min.css?v=2019.5.31') ?>
+		<?php endif ?>
 
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+		<?= HTML::css_link('/css/uoj-bs5.css?v=' . UOJConfig::$data['profile']['css-version']) ?>
+		<?php else: ?>
 		<!-- Custom styles for this template -->
 		<?= HTML::css_link('/css/uoj-theme.css?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
+		<?php endif ?>
 		
 		<!-- jQuery (necessary for Bootstrap\'s JavaScript plugins) -->
 		<?= HTML::js_src('/js/jquery.min.js') ?>
@@ -71,9 +82,13 @@
 		<?= HTML::js_src('/js/jquery.tagcanvas.min.js') ?>
 		<?php endif ?>
 		
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+		<?= HTML::js_src('/js/bootstrap5.bundle.min.js?v=2022.9.23') ?>
+		<?php else: ?>
 		<!-- Include all compiled plugins (below), or include individual files as needed -->
 		<?= HTML::js_src('/js/popper.min.js?v=2019.5.31') ?>
 		<?= HTML::js_src('/js/bootstrap.min.js?v=2019.5.31') ?>
+		<?php endif ?>
 		
 		<!-- Color converter -->
 		<?= HTML::js_src('/js/color-converter.min.js') ?>
