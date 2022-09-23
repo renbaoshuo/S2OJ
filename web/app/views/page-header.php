@@ -1,24 +1,26 @@
 <?php
-	$new_user_msg_num = DB::selectCount("select count(*) from user_msg where receiver = '".Auth::id()."' and read_time is null");
-	$new_system_msg_num = DB::selectCount("select count(*) from user_system_msg where receiver = '".Auth::id()."' and read_time is null");
-	$new_msg_tot = $new_user_msg_num + $new_system_msg_num;
-		
-	if ($new_user_msg_num == 0) {
-		$new_user_msg_num_html = '';
-	} else {
-		$new_user_msg_num_html = '<span class="badge badge-pill badge-secondary">'.$new_user_msg_num.'</span>';
+	if (!isset($REQUIRE_LIB['bootstrap5'])) {
+		$new_user_msg_num = DB::selectCount("select count(*) from user_msg where receiver = '".Auth::id()."' and read_time is null");
+		$new_system_msg_num = DB::selectCount("select count(*) from user_system_msg where receiver = '".Auth::id()."' and read_time is null");
+		$new_msg_tot = $new_user_msg_num + $new_system_msg_num;
+			
+		if ($new_user_msg_num == 0) {
+			$new_user_msg_num_html = '';
+		} else {
+			$new_user_msg_num_html = '<span class="badge badge-pill badge-secondary">'.$new_user_msg_num.'</span>';
+		}
+		if ($new_system_msg_num == 0) {
+			$new_system_msg_num_html = '';
+		} else {
+			$new_system_msg_num_html = '<span class="badge badge-pill badge-secondary">'.$new_system_msg_num.'</span>';
+		}
+		if ($new_msg_tot == 0) {
+			$new_msg_tot_html = '';
+		} else {
+			$new_msg_tot_html = '<sup><span class="badge badge-pill badge-secondary">'.$new_msg_tot.'</span></sup>';
+		}
 	}
-	if ($new_system_msg_num == 0) {
-		$new_system_msg_num_html = '';
-	} else {
-		$new_system_msg_num_html = '<span class="badge badge-pill badge-secondary">'.$new_system_msg_num.'</span>';
-	}
-	if ($new_msg_tot == 0) {
-		$new_msg_tot_html = '';
-	} else {
-		$new_msg_tot_html = '<sup><span class="badge badge-pill badge-secondary">'.$new_msg_tot.'</span></sup>';
-	}
-	
+
 	if (!isset($PageMainTitle)) {
 		$PageMainTitle = UOJConfig::$data['profile']['oj-name'];
 	}
@@ -234,9 +236,16 @@
 		});
 		</script>
 	</head>
-	<body role="document">
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	<body class="d-flex flex-column min-vh-100">
+	<?php else: ?>
+	<body>
+	<?php endif ?>
+		<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 		<div class="container theme-showcase" role="main">
-			<?php if ($ShowPageHeader): ?>
+		<?php endif ?>
+			<?php if ($ShowPageHeader): ?>	
+			<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 			<div>
 				<ul class="nav nav-pills float-right" role="tablist">
 				<?php if (Auth::check()): ?>
@@ -270,8 +279,14 @@
 				</h1>
 				<h1 class="d-block d-sm-none"><?= $PageMainTitleOnSmall ?></h1>
 			</div>
-			
-			<?php uojIncludeView($PageNav) ?>
+			<?php endif ?>
+
+			<?php uojIncludeView($PageNav, array('REQUIRE_LIB' => $REQUIRE_LIB)) ?>
 			<?php endif ?>
 			
+			
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+			<div class="uoj-content container flex-fill">
+		<?php else: ?>
 			<div class="uoj-content">
+		<?php endif ?>

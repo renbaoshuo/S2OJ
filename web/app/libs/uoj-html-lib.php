@@ -156,6 +156,8 @@ function getLongTablePageUri($page) {
 }
 
 function echoLongTable($col_names, $table_name, $cond, $tail, $header_row, $print_row, $config) {
+	global $REQUIRE_LIB;
+
 	$pag_config = $config;
 	$pag_config['col_names'] = $col_names;
 	$pag_config['table_name'] = $table_name;
@@ -164,7 +166,11 @@ function echoLongTable($col_names, $table_name, $cond, $tail, $header_row, $prin
 	$pag = new Paginator($pag_config);
 
 	$div_classes = isset($config['div_classes']) ? $config['div_classes'] : array('table-responsive');
-	$table_classes = isset($config['table_classes']) ? $config['table_classes'] : array('table', 'table-bordered', 'table-hover', 'table-striped', 'table-text-center');
+	$table_classes = isset($config['table_classes'])
+		? $config['table_classes']
+		: isset($REQUIRE_LIB['bootstrap5'])
+			? array('table', 'table-bordered', 'table-striped', 'text-center')
+			: array('table', 'table-bordered', 'table-hover', 'table-striped', 'table-text-center');
 	
 	if (isset($config['head_pagination']) && $config['head_pagination']) {
 		echo $pag->pagination();
@@ -967,10 +973,15 @@ function echoUOJPageHeader($page_title, $extra_config = array()) {
 	uojIncludeView('page-header', $config);
 }
 function echoUOJPageFooter($config = array()) {
+	global $REQUIRE_LIB;
+	$config['REQUIRE_LIB'] = $REQUIRE_LIB;
+
 	uojIncludeView('page-footer', $config);
 }
 
 function echoRanklist($config = array()) {
+	global $REQUIRE_LIB;
+
 	$header_row = '';
 	$header_row .= '<tr>';
 	$header_row .= '<th style="width: 5em;">#</th>';
