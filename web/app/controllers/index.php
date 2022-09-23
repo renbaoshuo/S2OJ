@@ -99,7 +99,12 @@
 				<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 					<h4 class="card-title" style="font-size: 1.25rem">倒计时</h4>
 				<?php endif ?>
-				<ul class="list-unstyled mb-0">
+				<ul class="
+					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+						list-unstyled
+					<?php else: ?>
+						pl-4
+					<?php endif ?> mb-0">
 					<?php foreach ($countdowns as $countdown): ?>
 						<?php
 							$enddate = strtotime($countdown['endtime']);
@@ -130,10 +135,20 @@
 				<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 				<h4 class="card-title" style="font-size: 1.25rem">友情链接</h4>
 				<?php endif ?>
-				<ul class="list-unstyled mb-0">
+				<ul class="
+					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+						ps-3
+					<?php else: ?>
+						pl-4
+					<?php endif ?>
+					mb-0">
 					<?php foreach ($friend_links as $friend_link): ?>
 						<li>
-							<a href="<?= $friend_link['url'] ?>" target="_blank"><?= $friend_link['title'] ?></a>
+							<a
+							<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+							class="text-decoration-none"
+							<?php endif ?>
+							href="<?= $friend_link['url'] ?>" target="_blank"><?= $friend_link['title'] ?></a>
 						</li>
 					<?php endforeach ?>
 				</ul>
