@@ -282,6 +282,41 @@
 			<?php endif ?>
 
 			<?php uojIncludeView($PageNav, array('REQUIRE_LIB' => $REQUIRE_LIB)) ?>
+
+			<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
+			<?php if (Auth::check()): ?>
+			<?php $groups = queryGroupsOfUser(Auth::id()); ?>
+			<?php if (count($groups)): ?>
+			<div class="card card-default mb-2" id="group-user-announcements">
+				<div class="card-header">
+					小组公告
+				</div>
+				<ul class="list-group list-group-flush">
+					<?php foreach ($groups as $group): ?>
+						<?php
+							$group_detail = DB::selectFirst("select * from groups where id = {$group['id']}");
+							$group_announcement = $group_detail['announcement'];
+						?>
+						<li class="list-group-item">
+							<a href="<?= HTML::url('/group/'.$group['id']) ?>">
+								<b><?= $group['title'] ?></b>
+							</a>
+							<?php if ($group_announcement): ?>
+							<div id="announcement-content-<?= $group['id'] ?>"></div>
+							<script>(function(){
+								$('#announcement-content-<?= $group['id'] ?>')
+									.html(DOMPurify.sanitize(decodeURIComponent("<?= urlencode($group_announcement) ?>"), <?= DOM_SANITIZE_CONFIG ?>)); 
+							})();</script>
+							<?php else: ?>
+							<div>（暂无公告）</div>
+							<?php endif ?>
+						</li>
+					<?php endforeach ?>
+				</ul>
+			</div>
+			<?php endif ?>
+			<?php endif ?>
+			<?php endif ?>
 			<?php endif ?>
 			
 			

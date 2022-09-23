@@ -115,7 +115,7 @@ function queryGroup($id) {
 function queryUserInGroup($group_id, $username) {
 	return DB::selectFirst("select * from groups_users where username='$username' and group_id='$group_id'", MYSQLI_ASSOC);
 }
-function queryGroupOfUser($username) {
+function queryGroupsOfUser($username) {
 	return DB::selectAll("select b.title as title, b.id as id from groups_users a inner join groups b on a.group_id = b.id where a.username = '$username' and b.is_hidden = 0 order by id", MYSQLI_ASSOC);
 }
 function queryGroupmateCurrentAC($username) {

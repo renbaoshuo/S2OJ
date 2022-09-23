@@ -176,6 +176,24 @@
 			DB::query("delete from assignments where list_id='{$list_id}' and group_id={$group_id}");
 		};
 		$remove_assignment_form->runAtServer();
+
+        $announcement_form = new UOJForm('announcement_form');
+        $announcement_form->addVTextArea('announcement_content', '公告', $group['announcement'], 
+			function ($x) {
+				return '';
+			},
+			null
+		);
+        $announcement_form->submit_button_config['align'] = 'compressed';
+		$announcement_form->submit_button_config['text'] = '更新公告';
+		$announcement_form->handle = function() {
+			global $group_id, $myUser;
+
+			$content = $_POST['announcement_content'];
+			$esc_content = DB::escape($content);
+			DB::query("update groups set announcement = '{$esc_content}' where id = {$group_id}");
+		};
+		$announcement_form->runAtServer();
 	}
 	?>
 
@@ -256,6 +274,11 @@
 <h5>编辑小组信息</h5>
 <div class="mb-4">
     <?php $group_editor->printHTML(); ?>
+</div>
+
+<h5>编辑小组公告</h5>
+<div>
+	<?php $announcement_form->printHTML(); ?>
 </div>
 
 <h5>添加用户到小组</h5>
