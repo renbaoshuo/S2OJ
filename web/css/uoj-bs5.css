@@ -1,3 +1,7 @@
+body {
+	overflow-y: scroll;
+}
+
 .uoj-username {
 	font-weight: 800;
 	text-decoration: none;
