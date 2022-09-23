@@ -208,6 +208,15 @@ mb-4" role="navigation">
 				<?php endif ?>
 				<?php endif ?>
 			</ul>
+			<?php else: ?>
+			<form id="form-search-problem" class="form-inline my-2 my-lg-0" method="get">
+				<div class="input-group">
+					<input type="text" class="form-control" name="search" id="input-search" placeholder="<?= UOJLocale::get('search')?>" />  
+					<div class="input-group-append">
+						<button type="submit" class="btn btn-search btn-outline-primary" id="submit-search"><span class="glyphicon glyphicon-search"></span></button>
+					</div>
+				</div>
+			</form>
 			<?php endif ?>
 		</div>
 	
@@ -216,9 +225,12 @@ mb-4" role="navigation">
 	<?php endif ?>
 </div>
 
+<script>
+	var zan_link = '';
+</script>
+
 <?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 <script type="text/javascript">
-	var zan_link = '';
 	$('#form-search-problem').submit(function(e) {
 		e.preventDefault();
 		
