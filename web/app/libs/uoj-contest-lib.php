@@ -137,7 +137,7 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 				$cur[0] += $cur_row[0];
 				$cur[1] += $cur_row[1];
 				if ($update_contests_submissions) {
-					DB::insert("insert into contests_submissions (contest_id, submitter, problem_id, submission_id, score, penalty) values ({$contest['id']}, '{$person[0]}', {$contest_data['problems'][$i]}, {$cur_row[2]}, {$cur_row[0]}, {$cur_row[1]})");
+					DB::insert("replace into contests_submissions (contest_id, submitter, problem_id, submission_id, score, penalty) values ({$contest['id']}, '{$person[0]}', {$contest_data['problems'][$i]}, {$cur_row[2]}, {$cur_row[0]}, {$cur_row[1]})");
 				}
 			}
 		}
