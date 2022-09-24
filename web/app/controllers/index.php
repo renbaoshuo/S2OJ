@@ -117,12 +117,14 @@
 		<div class="card card-default mt-4">
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 			<div class="card-header bg-white">
-				<b>倒计时</b>
+				<b><?= UOJLocale::get('countdowns') ?></b>
 			</div>
 			<?php endif ?>
 			<div class="card-body">
 				<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-					<h4 class="card-title" style="font-size: 1.25rem">倒计时</h4>
+					<h4 class="card-title" style="font-size: 1.25rem">
+						<?= UOJLocale::get('view all') ?>
+					</h4>
 				<?php endif ?>
 				<ul class="
 					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
@@ -138,27 +140,31 @@
 						?>
 						<li>
 							<?php if ($diff > 0): ?>
-								距离 <b><?= $countdown['title'] ?></b> 还有 <b><?= $diff ?></b> 天。
+								<?= UOJLocale::get('x days until countdown title', $countdown['title'], $diff) ?>
 							<?php else: ?>
-								<b><?= $countdown['title'] ?></b> 已开始。
+								<?= UOJLocale::get("countdown title has begun", $countdown['title']) ?>
 							<?php endif ?>
 						</li>
 					<?php endforeach ?>
 				</ul>
 				<?php if (count($countdowns) == 0): ?>
-					<div class="text-center">（无）</div>
+					<div class="text-center">
+						<?= UOJLocale::get('none') ?>
+					</div>
 				<?php endif ?>
 			</div>
 		</div>
 		<div class="card card-default mt-4">
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 				<div class="card-header bg-white">
-					<b>友情链接</b>
+					<b><?= UOJLocale::get('friend links') ?></b>
 				</div>
 			<?php endif ?>
 			<div class="card-body">
 				<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-				<h4 class="card-title" style="font-size: 1.25rem">友情链接</h4>
+				<h4 class="card-title" style="font-size: 1.25rem">
+					<?= UOJLocale::get('friend links') ?>
+				</h4>
 				<?php endif ?>
 				<ul class="
 					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
@@ -178,7 +184,9 @@
 					<?php endforeach ?>
 				</ul>
 				<?php if (count($friend_links) == 0): ?>
-					<div class="text-center">（无）</div>
+					<div class="text-center">
+						<?= UOJLocale::get('none') ?>
+					</div>
 				<?php endif ?>
 			</div>
 		</div>

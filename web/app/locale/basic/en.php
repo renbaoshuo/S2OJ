@@ -75,6 +75,14 @@ return [
 	'refuse to answer' => 'Refuse to answer',
 	'male' => 'Male',
 	'female' => 'Female',
+	'countdowns' => 'Countdowns',
+	'countdown title has begun' => function($title) {
+		return "<b>$title</b> has begun.";
+	},
+	'x days until countdown title' => function($title, $days) {
+		return "<b>$days</b> ".($days <= 1 ? 'day' : 'days')." until <b>$title</b>.";
+	},
+	'friend links' => 'Friend Links',
 	'server time' => 'Server Time',
 	'opensource project' => 'OpenSource Project, modified by S2OJ'
 ];
