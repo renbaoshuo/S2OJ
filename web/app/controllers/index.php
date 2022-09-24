@@ -69,14 +69,26 @@
 		</div>
 		<?php if (Auth::check()): ?>
 			<?php if (isNormalUser($myUser)): ?>
-			<div class="mt-4 card">
+			
+			<div class="mt-4
+				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+				card
+				<?php endif ?>
+				">
+				
+				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 				<div class="card-body">
 					<h4 class="card-title"><?= UOJLocale::get('top solver') ?></h4>
+				<?php else: ?>
+					<h3><?= UOJLocale::get('top solver') ?></h3>
+				<?php endif ?>
 					<?php echoRanklist(array(
 						'echo_full' => true,
 						'top10' => true,
 						'by_accepted' => true,
-						'table_classes' => array('table', 'text-center'),
+						'table_classes' => isset($REQUIRE_LIB['bootstrap5'])
+							? array('table', 'text-center')
+							: array('table', 'table-bordered', 'table-hover', 'table-striped', 'table-text-center'),
 					)) ?>
 					<div class="text-center">
 						<a href="/solverlist"
@@ -85,7 +97,9 @@
 							<?php endif ?>
 							><?= UOJLocale::get('view all') ?></a>
 					</div>
+				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 				</div>
+				<?php endif ?>
 			</div>
 			<?php endif ?>
 		<?php else: ?>
