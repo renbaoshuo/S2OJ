@@ -123,7 +123,7 @@
 			<div class="card-body">
 				<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 					<h4 class="card-title" style="font-size: 1.25rem">
-						<?= UOJLocale::get('view all') ?>
+						<?= UOJLocale::get('countdowns') ?>
 					</h4>
 				<?php endif ?>
 				<ul class="
