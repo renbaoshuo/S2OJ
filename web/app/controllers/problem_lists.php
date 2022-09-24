@@ -3,6 +3,10 @@
 		become403Page(UOJLocale::get('need login'));
 	}
 
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
+
 	requirePHPLib('form');
 	requirePHPLib('judger');
 	requirePHPLib('data');
@@ -21,7 +25,7 @@
 	}
     
 	function echoList($list) {
-		global $myUser;
+		global $myUser, $REQUIRE_LIB;
 
 		echo '<tr class="text-center">';
 		if ($list['problem_count'] == $list['accepted'] && $list['problem_count'] > 0) {
@@ -31,13 +35,30 @@
 		}
 		echo '#', $list['list_id'], '</td>';
 
-		echo '<td class="text-left">';
+		if (isset($REQUIRE_LIB['bootstrap5'])) {
+			echo '<td class="text-start">';
+		} else {
+			echo '<td class="text-left">';
+		}
+
 		if ($list['is_hidden']) {
 			echo ' <span class="text-danger">[隐藏]</span> ';
 		}
-		echo '<a href="/problem_list/', $list['list_id'], '">', $list['title'], '</a>';
+		echo '<a ';
+		if (isset($REQUIRE_LIB['bootstrap5'])) {
+			echo ' class="text-decoration-none" ';
+		}
+		echo ' href="/problem_list/', $list['list_id'], '">', $list['title'], '</a>';
 		foreach (queryProblemListTags($list['list_id']) as $tag) {
-			echo '<a class="uoj-list-tag">', '<span class="badge badge-pill badge-secondary">', HTML::escape($tag), '</span>', '</a>';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo '<a class="uoj-list-tag my-1">';
+				echo '<span class="badge bg-secondary">';
+			} else {
+				echo '<a class="uoj-list-tag">';
+				echo '<span class="badge badge-pill badge-secondary">';
+			}
+
+			echo HTML::escape($tag), '</span>', '</a>';
 		}
 		echo '</td>';
 
@@ -50,13 +71,18 @@
 
 <?php echoUOJPageHeader(UOJLocale::get('problems lists')) ?>
 
-<?php
-	    if (isSuperUser($myUser)) {
-	    	global $new_list_form;
-	    	$new_list_form->printHTML();
-	    }
+<?php if (isSuperUser($myUser)): ?>
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	<div class="text-end mb-2">
+	<?php endif ?>
+		<?php $new_list_form->printHTML(); ?>
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	</div>
+	<?php endif ?>
+<?php endif ?>
 
-	    $problem_list_caption = UOJLocale::get('problems::problem list');
+<?php
+	$problem_list_caption = UOJLocale::get('problems::problem list');
 	$ac_caption = UOJLocale::get('problems::ac');
 	$total_caption = UOJLocale::get('problems::total');
 	$header = <<<EOD
@@ -89,19 +115,24 @@ EOD;
     
 	$from = "lists a left join lists_problems b on a.id = b.list_id left join best_ac_submissions c on (b.problem_id = c.problem_id and c.submitter = '{$myUser['username']}')";
 
+	$table_config = array(
+		'page_len' => 40,
+		'table_classes' => array('table', 'table-bordered', 'table-hover', 'table-striped'),
+		'head_pagination' => true,
+		'pagination_table' => 'lists'
+	);
+
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		$table_config['div_classes'] = array('card', 'mb-3');
+		$table_config['table_classes'] = array('table', 'uoj-table', 'mb-0');
+	}
+
 	echoLongTable(
 		array('a.id as list_id', 'a.title as title', 'a.is_hidden as is_hidden', 'count(b.problem_id) as problem_count', 'count(c.submitter) as accepted'),
 		$from, $cond, 'group by a.id order by a.id desc',
 		$header,
 		'echoList',
-		array('page_len' => 40,
-			'table_classes' => array('table', 'table-bordered', 'table-hover', 'table-striped'),
-			'print_after_table' => function() {
-				global $myUser;
-			},
-			'head_pagination' => true,
-			'pagination_table' => 'lists'
-		)
+		$table_config,
 	);
 	?>
 
