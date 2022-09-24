@@ -642,7 +642,7 @@ class JudgementDetailsPrinter {
 				}
 
 				echo 		'</div>';
-				echo 		'<div class="col-sm-2">';
+				echo 		'<div class="col-sm-2 uoj-status-text">';
 				
 				if (isset($REQUIRE_LIB['bootstrap5'])) {
 					echo $this->styler->getTestInfoIcon($subtask_info);
