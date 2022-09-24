@@ -210,6 +210,12 @@
 		<?= HTML::js_src('/js/sh_main.min.js') ?>
 		<script type="text/javascript">$(document).ready(function(){sh_highlightDocument()})</script>
 		<?php endif ?>
+
+		<?php if (isset($REQUIRE_LIB['hljs'])): ?>
+		<?= HTML::css_link('/css/highlightjs.github.min.css') ?>
+		<?= HTML::js_src('/js/highlightjs.min.js') ?>
+		<script>$(document).ready(function() { hljs.highlightAll();	});</script>
+		<?php endif ?>
 		
 		<?php if (isset($REQUIRE_LIB['ckeditor'])): ?>
 		<!-- ckeditor -->

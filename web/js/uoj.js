@@ -365,13 +365,17 @@ $.fn.uoj_testcase = function() {
 	return this.each(function() {
 		var id = parseInt($(this).data('test'));
 
-		if (id > 0 && problem_id) {
+		var download_html = isBootstrap5Page
+			? '<i class="bi bi-download"></i> 下载'
+			: '<span class="glyphicon glyphicon-download-alt"></span> 下载';
+
+		if (id > 0 && typeof problem_id !== 'undefined' && problem_id) {
 			$('.uoj-testcase-download-input', this)
-				.html('<span class="glyphicon glyphicon-download-alt"></span> 下载')
+				.html(download_html)
 				.attr('href', '/download.php?type=testcase&id=' + problem_id + '&testcase_id=' + id + '&testcase_type=input')
 				.addClass('btn btn-secondary btn-sm float-right');
 			$('.uoj-testcase-download-output', this)
-				.html('<span class="glyphicon glyphicon-download-alt"></span> 下载')
+				.html(download_html)
 				.attr('href', '/download.php?type=testcase&id=' + problem_id + '&testcase_id=' + id + '&testcase_type=output')
 				.addClass('btn btn-secondary btn-sm float-right');
 		}

@@ -9,6 +9,11 @@
 	if (!validateUInt($_GET['id']) || !($submission = querySubmission($_GET['id']))) {
 		become404Page();
 	}
+
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
+
 	$submission_result = json_decode($submission['result'], true);
 	
 	$problem = queryProblemBrief($submission['problem_id']);
@@ -134,12 +139,21 @@
 	}
 	?>
 <?php 
-	$REQUIRE_LIB['shjs'] = "";
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		$REQUIRE_LIB['hljs'] = '';
+	} else {
+		$REQUIRE_LIB['shjs'] = '';
+	}
 	?>
 <script>
 	var problem_id = parseInt('<?= $submission['problem_id'] ?>');
 </script>
 <?php echoUOJPageHeader(UOJLocale::get('problems::submission').' #'.$submission['id']) ?>
+
+<h1 class="h3">
+	<?= UOJLocale::get('problems::submission').' #'.$submission['id'] ?>
+</h1>
+
 <?php echoSubmissionsListOnlyOne($submission, array(), $myUser) ?>
 
 <?php if ($should_show_content): ?>
@@ -166,7 +180,11 @@
 		<div class="card-header bg-info">
 			<h4 class="card-title"><?= UOJLocale::get('details') ?></h4>
 		</div>
+		
+		<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 		<div class="card-body">
+		<?php endif ?>
+
 			<?php echoJudgementDetails($submission_result['details'], $styler, 'details') ?>
 			<?php if ($should_show_details_to_me): ?>
 				<?php if (isset($submission_result['final_result'])): ?>
@@ -178,17 +196,32 @@
 					<?php echoSubmissionDetails($submission_result['details'], 'final_details') ?>
 				<?php endif ?>
 			<?php endif ?>
+		
+		<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 		</div>
+		<?php endif ?>
 	</div>
 <?php endif ?>
 
 <?php if (isset($rejudge_form)): ?>
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	<div class="text-end">
+<?php endif ?>
 	<?php $rejudge_form->printHTML() ?>
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	</div>
+<?php endif ?>
 <?php endif ?>
 
 <?php if (isset($delete_form)): ?>
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	<div class="text-end">
+<?php endif ?>
 	<div class="top-buffer-sm">
 		<?php $delete_form->printHTML() ?>
 	</div>
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	</div>
+<?php endif ?>
 <?php endif ?>
 <?php echoUOJPageFooter() ?>

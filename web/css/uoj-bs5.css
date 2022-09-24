@@ -54,7 +54,9 @@ label {
 	font-size: 0.9em;
 }
 
-.uoj-click-zan-up, .uoj-click-zan-down, .uoj-click-zan-cnt {
+.uoj-click-zan-up,
+.uoj-click-zan-down,
+.uoj-click-zan-cnt {
 	margin-left: 5px;
 	margin-right: 5px;
 }
@@ -67,7 +69,8 @@ label {
 	color: red;
 	font-weight: 700;
 }
-.uoj-click-zan-block-cur-down .uoj-click-zan-up, .uoj-click-zan-block-cur-up .uoj-click-zan-down {
+.uoj-click-zan-block-cur-down .uoj-click-zan-up,
+.uoj-click-zan-block-cur-up .uoj-click-zan-down {
 	color: gray;
 }
 
@@ -79,4 +82,28 @@ label {
 }
 .uoj-click-zan-block-negative .uoj-click-zan-cnt {
 	color: red;
+}
+
+.uoj-submission-result-item {
+	cursor: pointer;
+}
+
+.card-uoj-accepted .card-header:hover,
+.card-uoj-accepted .uoj-status-text {
+	color: #25ad40;
+}
+
+.card-uoj-acceptable-answer .card-header:hover,
+.card-uoj-acceptable-answer .uoj-status-text {
+	color: #01bab2;
+}
+
+.card-uoj-tle .card-header:hover,
+.card-uoj-tle .uoj-status-text {
+	color: sandybrown;
+}
+
+.card-uoj-wrong .card-header:hover,
+.card-uoj-wrong .uoj-status-text {
+	color: #ff4f4f;
 }
