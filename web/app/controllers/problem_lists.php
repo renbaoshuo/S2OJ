@@ -48,7 +48,7 @@
 		if (isset($REQUIRE_LIB['bootstrap5'])) {
 			echo ' class="text-decoration-none" ';
 		}
-		echo ' href="/problem_list/', $list['list_id'], '">', $list['title'], '</a>';
+		echo ' href="/problem_list/', $list['list_id'], '">', $list['title'], '</a> ';
 		foreach (queryProblemListTags($list['list_id']) as $tag) {
 			if (isset($REQUIRE_LIB['bootstrap5'])) {
 				echo '<a class="uoj-list-tag my-1">';
