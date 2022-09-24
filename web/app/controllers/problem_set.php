@@ -10,6 +10,10 @@
 	if (!isNormalUser($myUser)) {
 		become403Page();
 	}
+
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
 	
 	if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)) {
 		$new_problem_form = new UOJForm('new_problem');
@@ -30,7 +34,8 @@
 	}
 	
 	function echoProblem($problem) {
-		global $myUser;
+		global $myUser, $REQUIRE_LIB;
+
 		if (isProblemVisibleToUser($problem, $myUser)) {
 			echo '<tr class="text-center">';
 			if ($problem['submission_id']) {
@@ -39,27 +44,47 @@
 				echo '<td>';
 			}
 			echo '#', $problem['id'], '</td>';
-			echo '<td class="text-left">';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo '<td class="text-start">';
+			} else {
+				echo '<td class="text-left">';
+			}
 			if ($problem['is_hidden']) {
 				echo ' <span class="text-danger">[隐藏]</span> ';
 			}
 			if ($problem['uploader'] == $myUser['username']) {
 				echo ' <span class="text-info">[我的题目]</span> ';
 			}
-			echo '<a href="/problem/', $problem['id'], '">', $problem['title'], '</a>';
+			echo '<a ';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' class="text-decoration-none" ';
+			}
+			echo ' href="/problem/', $problem['id'], '">', $problem['title'], '</a>';
 			if (isset($_COOKIE['show_tags_mode'])) {
 				echo ' <span class="text-info" style="font-size: 10px">' . $problem["uploader"] . '</span> ';
 
 				foreach (queryProblemTags($problem['id']) as $tag) {
-					echo '<a class="uoj-problem-tag">', '<span class="badge badge-pill badge-secondary">', HTML::escape($tag), '</span>', '</a>';
+					if (isset($REQUIRE_LIB['bootstrap5'])) {
+						echo '<a class="uoj-problem-tag my-1">';
+						echo '<span class="badge bg-secondary">';
+					} else {
+						echo '<a class="uoj-problem-tag">';
+						echo '<span class="badge badge-pill badge-secondary">';
+					}
+					echo HTML::escape($tag), '</span>';
+					echo '</a> ';
 				}
 			}
 			echo '</td>';
 			if (isset($_COOKIE['show_submit_mode'])) {
+				$a_class = '';
+				if (isset($REQUIRE_LIB['bootstrap5'])) {
+					$a_class .= ' text-decoration-none ';
+				}
 				$perc = $problem['submit_num'] > 0 ? round(100 * $problem['ac_num'] / $problem['submit_num']) : 0;
 				echo <<<EOD
-				<td><a href="/submissions?problem_id={$problem['id']}&min_score=100&max_score=100">&times;{$problem['ac_num']}</a></td>
-				<td><a href="/submissions?problem_id={$problem['id']}">&times;{$problem['submit_num']}</a></td>
+				<td><a class="{$a_class}" href="/submissions?problem_id={$problem['id']}&min_score=100&max_score=100">&times;{$problem['ac_num']}</a></td>
+				<td><a class="{$a_class}" href="/submissions?problem_id={$problem['id']}">&times;{$problem['submit_num']}</a></td>
 				<td>
 					<div class="progress bot-buffer-no">
 						<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="$perc" aria-valuemin="0" aria-valuemax="100" style="width: $perc%; min-width: 20px;">{$perc}%</div>
@@ -125,24 +150,77 @@ EOD;
 	$pag_config['tail'] = "order by id asc";
 	$pag = new Paginator($pag_config);
 
-	$div_classes = array('table-responsive');
-	$table_classes = array('table', 'table-bordered', 'table-hover', 'table-striped');
+	$div_classes = isset($REQUIRE_LIB['bootstrap5'])
+		? array('card', 'mb-3')
+		: array('table-responsive');
+	$table_classes = isset($REQUIRE_LIB['bootstrap5'])
+		? array('table', 'uoj-problem-list-table', 'mb-0')
+		: array('table', 'table-bordered', 'table-hover', 'table-striped');
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('problems')) ?>
-<?php
-	if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)) {
-		$new_problem_form->printHTML();
-	}
-	?>
+<?php if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)): ?>
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	<div class="text-end">
+	<?php endif ?>
+		<?php $new_problem_form->printHTML(); ?>
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	</div>
+	<?php endif ?>
+<?php endif ?>
 <div class="row">
 	<div class="col-sm-4">
 		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
 	</div>
-	<div class="col-sm-4 order-sm-9 checkbox text-right">
-		<label class="checkbox-inline" for="input-show_tags_mode"><input type="checkbox" id="input-show_tags_mode" <?= isset($_COOKIE['show_tags_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::show tags') ?></label>
-		<label class="checkbox-inline" for="input-show_submit_mode"><input type="checkbox" id="input-show_submit_mode" <?= isset($_COOKIE['show_submit_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::show statistics') ?></label>
+	<div class="col-sm-4 order-sm-5
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	text-end p-2
+	<?php else: ?>
+	text-right checkbox
+	<?php endif ?>
+	">
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+		<div class="form-check d-inline-block me-2">
+		<?php else: ?>
+		<label class="checkbox-inline" for="input-show_tags_mode">
+			<?php endif ?>
+		<input type="checkbox" id="input-show_tags_mode"
+			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+			class="form-check-input"
+			<?php endif ?>
+			<?= isset($_COOKIE['show_tags_mode']) ? 'checked="checked" ': ''?>
+		/>
+		
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+			<label class="form-check-label" for="input-show_tags_mode">
+		<?php endif ?>
+			<?= UOJLocale::get('problems::show tags') ?>
+
+		</label>
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+		</div>
+		<?php endif ?>
+
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+		<div class="form-check d-inline-block">
+		<?php else: ?>
+		<label class="checkbox-inline" for="input-show_submit_mode">
+		<?php endif ?>
+			<input type="checkbox" id="input-show_submit_mode" 
+				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+				class="form-check-input"
+				<?php endif ?>
+				<?= isset($_COOKIE['show_submit_mode']) ? 'checked="checked" ': ''?>
+			/>
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+			<label class="form-check-label" for="input-show_submit_mode">
+		<?php endif ?>
+			<?= UOJLocale::get('problems::show statistics') ?>
+		</label>
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+		</div>
+		<?php endif ?>
 	</div>
-	<div class="col-sm-4 order-sm-5">
+	<div class="col-sm-4 order-sm-3">
 	<?php echo $pag->pagination(); ?>
 	</div>
 </div>

@@ -91,6 +91,7 @@
 		<?= HTML::js_src('/js/popper.min.js?v=2019.5.31') ?>
 		<?= HTML::js_src('/js/bootstrap.min.js?v=2019.5.31') ?>
 		<?php endif ?>
+		<script>var isBootstrap5Page = Boolean(<?= isset($REQUIRE_LIB['bootstrap5']) ? 'true' : 'false' ?>);</script>
 		
 		<!-- Color converter -->
 		<?= HTML::js_src('/js/color-converter.min.js') ?>

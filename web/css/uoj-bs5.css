@@ -43,6 +43,40 @@ label {
 	float: right;
 }
 
+.uoj-problem-list-table > tbody > tr:last-child,
 .uoj-submissions-table > tbody > tr:last-child {
 	border-bottom-color: transparent;
+}
+
+.uoj-click-zan-block {
+	display: inline-block;
+	min-width: 140px;
+	text-align: left;
+}
+
+.uoj-click-zan-up, .uoj-click-zan-down, .uoj-click-zan-cnt {
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+.uoj-click-zan-block-cur-up .uoj-click-zan-up {
+	color: green;
+	font-weight: 700;
+}
+.uoj-click-zan-block-cur-down .uoj-click-zan-down {
+	color: red;
+	font-weight: 700;
+}
+.uoj-click-zan-block-cur-down .uoj-click-zan-up, .uoj-click-zan-block-cur-up .uoj-click-zan-down {
+	color: gray;
+}
+
+.uoj-click-zan-block-positive .uoj-click-zan-cnt {
+	color: green;
+}
+.uoj-click-zan-block-neutral .uoj-click-zan-cnt {
+	color: gray;
+}
+.uoj-click-zan-block-negative .uoj-click-zan-cnt {
+	color: red;
 }

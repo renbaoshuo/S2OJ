@@ -39,7 +39,7 @@
 	}
 
 
-	if (!isset($_COOKIE['bootstrap4'])){
+	if (!isset($_COOKIE['bootstrap4'])) {
 		$REQUIRE_LIB['bootstrap5'] = '';
 	}
 	?>

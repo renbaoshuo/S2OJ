@@ -63,7 +63,7 @@ function becomeMsgPage($msg, $title = '消息') {
 	if (UOJContext::isAjax()) {
 		die($msg);
 	} else {
-		if (!isset($_COOKIE['bootstrap4'])){
+		if (!isset($_COOKIE['bootstrap4'])) {
 			$REQUIRE_LIB['bootstrap5'] = '';
 		}
 
