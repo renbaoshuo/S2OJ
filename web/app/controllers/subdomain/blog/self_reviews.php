@@ -22,10 +22,11 @@
 
 <?php
 		$col_names = array('contest_id');
-	$from = 'contests_registrants';
+	$from = 'contests_registrants a left join contests b on a.contest_id = b.id';
 	$cond = "username = '$username' and has_participated = 1";
-	$tail = '';
+	$tail = 'order by start_time desc, id desc';
 	$config = array(
+		'pagination_table' => 'contests_registrants',
 		'page_len' => 10,
 		'table_classes' => array('table', 'table-bordered', 'table-text-center', 'table-vertical-middle'),
 	);
