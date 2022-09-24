@@ -10,8 +10,8 @@
 						<div class="container d-lg-flex justify-content-lg-between">
 							<p>
 								&copy; <?= date('Y') ?>
-								<a class="text-decoration-none" href="https://github.com/renbaoshuo/S2OJ<?= UOJConfig::$data['profile']['s2oj-version'] == "dev" ? '' : '/tree/' . UOJConfig::$data['profile']['s2oj-version'] ?>">S2OJ</a>
-								(build: <?= UOJConfig::$data['profile']['s2oj-version'] ?>)
+								<a class="text-decoration-none" href="<?= HTML::url('/') ?>">S2OJ</a>
+								(build: <a class="text-decoration-none" href="https://github.com/renbaoshuo/S2OJ<?= UOJConfig::$data['profile']['s2oj-version'] == "dev" ? '' : '/tree/' . UOJConfig::$data['profile']['s2oj-version'] ?>"><?= UOJConfig::$data['profile']['s2oj-version'] ?></a>)
 								<?= UOJLocale::get('server time') ?>: <?= UOJTime::$time_now_str ?>
 							</p>
 							<p>
