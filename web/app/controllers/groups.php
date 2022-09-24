@@ -11,6 +11,10 @@
     	become403Page();
     }
 
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
+
     if (isSuperUser($myUser)) {
     	$new_group_form = new UOJForm('new_group');
     	$new_group_form->handle = function() {
@@ -24,17 +28,25 @@
     }
 
     function echoGroup($group) {
-    	global $myUser;
+    	global $myUser, $REQUIRE_LIB;
 
     	echo '<tr class="text-center">';
     	echo '<td>';
     	echo '#', $group['group_id'], '</td>';
 
-    	echo '<td class="text-left">';
+		if (isset($REQUIRE_LIB['bootstrap5'])) {
+			echo '<td class="text-start">';
+		} else {
+			echo '<td class="text-left">';
+		}
     	if ($group['is_hidden']) {
     		echo ' <span class="text-danger">[隐藏]</span> ';
     	}
-    	echo '<a href="/group/', $group['group_id'], '">', $group['title'], '</a>';
+    	echo '<a ';
+		if (isset($REQUIRE_LIB['bootstrap5'])) {
+			echo ' class="text-decoration-none" ';
+		}
+		echo ' href="/group/', $group['group_id'], '">', $group['title'], '</a>';
     	echo '</td>';
 
     	echo "<td>{$group['user_count']}</td>";
@@ -44,6 +56,24 @@
     ?>
 
 <?php echoUOJPageHeader(UOJLocale::get('groups')) ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="d-flex justify-content-between">
+<?php endif ?>
+<h1 class="h2">
+	<?= UOJLocale::get('groups') ?>
+</h1>
+
+<?php if (isSuperUser($myUser)): ?>
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	<div class="text-end mb-2">
+	<?php endif ?>
+		<?php $new_group_form->printHTML(); ?>
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	</div>
+</div>
+<?php endif ?>
+<?php endif ?>
 
 <?php
         $groups_caption = UOJLocale::get('groups');
@@ -64,23 +94,23 @@ EOD;
 
     $from = "`groups` a left join groups_users b on a.id = b.group_id";
 
+	$table_config = array('page_len' => 40,
+		'table_classes' => array('table', 'table-bordered', 'table-hover', 'table-striped'),
+		'head_pagination' => true,
+		'pagination_table' => "`groups`"
+	);
+
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		$table_config['div_classes'] = array('card', 'mb-3');
+		$table_config['table_classes'] = array('table', 'uoj-table', 'mb-0');
+	}
+
     echoLongTable(
     	array('a.id as group_id', 'a.title as title', 'a.is_hidden as is_hidden', 'count(b.username) as user_count'),
     	$from, $cond, 'group by a.id order by a.id asc',
     	$header,
     	'echoGroup',
-    	array('page_len' => 40,
-    		'table_classes' => array('table', 'table-bordered', 'table-hover', 'table-striped'),
-    		'print_after_table' => function() {
-    			global $myUser;
-    			if (isSuperUser($myUser)) {
-    				global $new_group_form;
-    				$new_group_form->printHTML();
-    			}
-    		},
-    		'head_pagination' => true,
-			'pagination_table' => "`groups`"
-    	)
+		$table_config
     );
     ?>
 
