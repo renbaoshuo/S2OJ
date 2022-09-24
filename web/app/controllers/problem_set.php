@@ -129,7 +129,7 @@ EOD;
 		$header .= '<th class="text-center" style="width:5em;">'.UOJLocale::get('problems::submit').'</th>';
 		$header .= '<th class="text-center" style="width:150px;">'.UOJLocale::get('problems::ac ratio').'</th>';
 	}
-	$header .= '<th class="text-center" style="width:180px;">'.UOJLocale::get('appraisal').'</th>';
+	$header .= '<th class="text-center" style="width:190px;">'.UOJLocale::get('appraisal').'</th>';
 	$header .= '</tr>';
 	
 	$tabs_info = array(
