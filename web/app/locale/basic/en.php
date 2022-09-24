@@ -82,7 +82,7 @@ return [
 	'x days until countdown title' => function($title, $days) {
 		return "<b>$days</b> ".($days <= 1 ? 'day' : 'days')." until <b>$title</b>.";
 	},
-	'friend links' => 'Friend Links',
+	'friend links' => 'Frequently Used Links',
 	'server time' => 'Server Time',
 	'opensource project' => 'OpenSource Project, modified by S2OJ'
 ];

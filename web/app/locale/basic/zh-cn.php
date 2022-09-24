@@ -82,7 +82,7 @@ return [
 	'x days until countdown title' => function($title, $days) {
 		return "距离 <b>$title</b> 还有 <b>$days</b> 天。";
 	},
-	'friend links' => '友情链接',
+	'friend links' => '常用链接',
 	'server time' => '服务器时间',
 	'opensource project' => '开源项目，S2OJ 魔改版'
 ];
