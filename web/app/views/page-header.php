@@ -56,7 +56,7 @@
 		<?php endif ?>
 
 		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-		<?= HTML::css_link('/css/uoj-bs5.css?v=' . UOJConfig::$data['profile']['css-version']) ?>
+		<?= HTML::css_link('/css/uoj-bs5.css?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
 		<?php else: ?>
 		<!-- Custom styles for this template -->
 		<?= HTML::css_link('/css/uoj-theme.css?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
