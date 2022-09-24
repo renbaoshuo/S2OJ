@@ -37,6 +37,8 @@
 	} else {
 		$cond = '1';
 	}
+
+	$REQUIRE_LIB['bootstrap5'] = '';
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('submissions')) ?>
 <div class="d-none d-sm-block">
@@ -46,21 +48,37 @@
 	</div>
 	<?php endif ?>
 	<form id="form-search" class="form-inline" method="get">
-		<div id="form-group-problem_id" class="form-group">
+		<div id="form-group-problem_id" class="form-group
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+d-inline-block
+<?php endif ?>
+		">
 			<label for="input-problem_id" class="control-label"><?= UOJLocale::get('problems::problem id')?>:</label>
 			<input type="text" class="form-control input-sm" name="problem_id" id="input-problem_id" value="<?= $q_problem_id ?>" maxlength="4" style="width:4em" />
 		</div>
-		<div id="form-group-submitter" class="form-group">
+		<div id="form-group-submitter" class="form-group
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+d-inline-block
+<?php endif ?>
+		">
 			<label for="input-submitter" class="control-label"><?= UOJLocale::get('username')?>:</label>
 			<input type="text" class="form-control input-sm" name="submitter" id="input-submitter" value="<?= $q_submitter ?>" maxlength="20" style="width:10em" />
 		</div>
-		<div id="form-group-score" class="form-group">
+		<div id="form-group-score" class="form-group
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+d-inline-block
+<?php endif ?>
+		">
 			<label for="input-min_score" class="control-label"><?= UOJLocale::get('score range')?>:</label>
 			<input type="text" class="form-control input-sm" name="min_score" id="input-min_score" value="<?= $q_min_score ?>" maxlength="3" style="width:4em" placeholder="0" />
 			<label for="input-max_score" class="control-label">~</label>
 			<input type="text" class="form-control input-sm" name="max_score" id="input-max_score" value="<?= $q_max_score ?>" maxlength="3" style="width:4em" placeholder="100" />
 		</div>
-		<div id="form-group-language" class="form-group">
+		<div id="form-group-language" class="form-group
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+d-inline-block
+<?php endif ?>
+		">
 			<label for="input-language" class="control-label"><?= UOJLocale::get('problems::language')?>:</label>
 			<input type="text" class="form-control input-sm" name="language" id="input-language" value="<?= $html_esc_q_language ?>" maxlength="10" style="width:8em" />
 		</div>
@@ -85,7 +103,21 @@
 	</script>
 	<div class="top-buffer-sm"></div>
 </div>
+
 <?php
-		echoSubmissionsList($cond, 'order by id desc', array('judge_time_hidden' => ''), $myUser);
+	echoSubmissionsList($cond,
+		'order by id desc',
+		array(
+			'judge_time_hidden' => '',
+			'table_config' => (isset($REQUIRE_LIB['bootstrap5']) 
+				? array(
+					'div_classes' => array('card', 'mb-3'),
+					'table_classes' => array('table', 'mb-0', 'uoj-submissions-table', 'text-center')
+				)
+				: array()
+			),
+		),
+		$myUser);
 	?>
+
 <?php echoUOJPageFooter() ?>

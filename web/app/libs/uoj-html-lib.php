@@ -111,20 +111,36 @@ function getUserName($username, $realname = null) {
 
 
 function getProblemLink($problem, $problem_title = '!title_only') {
+	global $REQUIRE_LIB;
+
 	if ($problem_title == '!title_only') {
 		$problem_title = $problem['title'];
 	} elseif ($problem_title == '!id_and_title') {
 		$problem_title = "#${problem['id']}. ${problem['title']}";
 	}
-	return '<a href="/problem/'.$problem['id'].'">'.$problem_title.'</a>';
+	$result = '<a ';
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		$result .= ' class="text-decoration-none" ';
+	}
+	$result .= ' href="/problem/'.$problem['id'].'">'.$problem_title.'</a>';
+
+	return $result;
 }
 function getContestProblemLink($problem, $contest_id, $problem_title = '!title_only') {
+	global $REQUIRE_LIB;
+
 	if ($problem_title == '!title_only') {
 		$problem_title = $problem['title'];
 	} elseif ($problem_title == '!id_and_title') {
 		$problem_title = "#{$problem['id']}. {$problem['title']}";
 	}
-	return '<a href="/contest/'.$contest_id.'/problem/'.$problem['id'].'">'.$problem_title.'</a>';
+	$result = '<a ';
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		$result .= ' class="text-decoration-none" ';
+	}
+	$result .= ' href="/contest/'.$contest_id.'/problem/'.$problem['id'].'">'.$problem_title.'</a>';
+
+	return $result;
 }
 function getBlogLink($id) {
 	if (validateUInt($id) && $blog = queryBlog($id)) {
@@ -238,6 +254,8 @@ function getSubmissionStatusDetails($submission) {
 }
 
 function echoSubmission($submission, $config, $user) {
+	global $REQUIRE_LIB;
+
 	$problem = queryProblemBrief($submission['problem_id']);
 	$submitterLink = getUserLink($submission['submitter']);
 	
@@ -259,7 +277,11 @@ function echoSubmission($submission, $config, $user) {
 		echo '<tr class="warning">';
 	}
 	if (!isset($config['id_hidden'])) {
-		echo '<td><a href="/submission/', $submission['id'], '">#', $submission['id'], '</a></td>';
+		echo '<td><a ';
+		if (isset($REQUIRE_LIB['bootstrap5'])) {
+			echo ' class="text-decoration-none" ';
+		}
+		echo ' href="/submission/', $submission['id'], '">#', $submission['id'], '</a></td>';
 	}
 	if (!isset($config['problem_hidden'])) {
 		if ($submission['contest_id']) {
@@ -291,7 +313,11 @@ function echoSubmission($submission, $config, $user) {
 		echo '<td>', $used_memory_str, '</td>';
 	}
 
-	echo '<td>', '<a href="/submission/', $submission['id'], '">', $submission['language'], '</a>', '</td>';
+	echo '<td>', '<a ';
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		echo ' class="text-decoration-none" ';
+	}
+	echo ' href="/submission/', $submission['id'], '">', $submission['language'], '</a>', '</td>';
 
 	if ($submission['tot_size'] < 1024) {
 		$size_str = $submission['tot_size'] . 'b';
@@ -358,6 +384,8 @@ function echoSubmissionsListOnlyOne($submission, $config, $user) {
 
 
 function echoSubmissionsList($cond, $tail, $config, $user) {
+	global $REQUIRE_LIB;
+
 	$header_row = '<tr>';
 	$col_names = array();
 	$col_names[] = 'submissions.status_details';

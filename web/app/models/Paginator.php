@@ -76,16 +76,44 @@ class Paginator {
 	}
 	
 	public function pagination() {
+		global $REQUIRE_LIB;
+
 		if ($this->n_pages == 1) {
 			return '';
 		}
 		$html = '<ul class="pagination top-buffer-no bot-buffer-sm justify-content-center">';
 		if ($this->cur_page > 1) {
-			$html .= '<li class="page-item"><a class="page-link" href="'.$this->getPageUri(1).'"><span class="glyphicon glyphicon glyphicon-fast-backward"></span></a></li>';
-			$html .= '<li class="page-item"><a class="page-link" href="'.$this->getPageUri($this->cur_page - 1).'"><span class="glyphicon glyphicon glyphicon-backward"></span></a></li>';
+			$html .= '<li class="page-item">'
+				   . '<a class="page-link" href="'.$this->getPageUri(1).'">';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				$html .= '<i class="bi bi-chevron-double-left"></i>';
+			} else {
+				$html .= '<span class="glyphicon glyphicon glyphicon-fast-backward"></span>';
+			}
+			$html .= '</a></li>';
+			$html .= '<li class="page-item">'
+				   . '<a class="page-link" href="'.$this->getPageUri($this->cur_page - 1).'">';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				$html .= '<i class="bi bi-chevron-left"></i>';
+			} else {
+				$html .= '<span class="glyphicon glyphicon glyphicon-backward"></span>';
+			}
+			$html .= '</a></li>';
 		} else {
-			$html .= '<li class="page-item disabled"><a class="page-link"><span class="glyphicon glyphicon glyphicon-fast-backward"></span></a></li>';
-			$html .= '<li class="page-item disabled"><a class="page-link"><span class="glyphicon glyphicon glyphicon-backward"></span></a></li>';
+			$html .= '<li class="page-item disabled"><a class="page-link">';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				$html .= '<i class="bi bi-chevron-double-left"></i>';
+			} else {
+				$html .= '<span class="glyphicon glyphicon glyphicon-fast-backward"></span>';
+			}
+			$html .= '</a></li>';
+			$html .= '<li class="page-item disabled"><a class="page-link">';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				$html .= '<i class="bi bi-chevron-left"></i>';
+			} else {
+				$html .= '<span class="glyphicon glyphicon glyphicon-backward"></span>';
+			}
+			$html .= '</a></li>';
 		}
 			
 		for ($i = max($this->cur_page - $this->max_extend, 1); $i <= min($this->cur_page + $this->max_extend, $this->n_pages); $i++) {
@@ -96,11 +124,38 @@ class Paginator {
 			}
 		}
 		if ($this->cur_page < $this->n_pages) {
-			$html .= '<li class="page-item"><a class="page-link" href="'.$this->getPageUri($this->cur_page + 1).'"><span class="glyphicon glyphicon glyphicon-forward"></span></a></li>';
-			$html .= '<li class="page-item"><a class="page-link" href="'.$this->getPageUri($this->n_pages).'"><span class="glyphicon glyphicon glyphicon-fast-forward"></span></a></li>';
+			$html .= '<li class="page-item">'
+				   . '<a class="page-link" href="'.$this->getPageUri($this->cur_page + 1).'">';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				$html .= '<i class="bi bi-chevron-right"></i>';
+			} else {
+				$html .= '<span class="glyphicon glyphicon glyphicon-forward"></span>';
+			}
+			$html .= '</a></li>';
+
+			$html .= '<li class="page-item">'
+				   . '<a class="page-link" href="'.$this->getPageUri($this->n_pages).'">';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				$html .= '<i class="bi bi-chevron-double-right"></i>';
+			} else {
+				$html .= '<span class="glyphicon glyphicon glyphicon-fast-forward"></span>';
+			}
+			$html .= '</a></li>';
 		} else {
-			$html .= '<li class="page-item disabled"><a class="page-link"><span class="glyphicon glyphicon glyphicon-forward"></span></a></li>';
-			$html .= '<li class="page-item disabled"><a class="page-link"><span class="glyphicon glyphicon glyphicon-fast-forward"></span></a></li>';
+			$html .= '<li class="page-item disabled"><a class="page-link">';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				$html .= '<i class="bi bi-chevron-right"></i>';
+			} else {
+				$html .= '<span class="glyphicon glyphicon glyphicon-forward"></span>';
+			}
+			$html .= '</a></li>';
+			$html .= '<li class="page-item disabled"><a class="page-link">';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				$html .= '<i class="bi bi-chevron-double-right"></i>';
+			} else {
+				$html .= '<span class="glyphicon glyphicon glyphicon-fast-forward"></span>';
+			}
+			$html .= '</a></li>';
 		}
 		$html .= '</ul>';
 		return $html;
