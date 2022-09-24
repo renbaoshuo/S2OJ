@@ -38,7 +38,10 @@
 		$cond = '1';
 	}
 
-	$REQUIRE_LIB['bootstrap5'] = '';
+
+	if (!isset($_COOKIE['bootstrap4'])){
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('submissions')) ?>
 <div class="d-none d-sm-block">

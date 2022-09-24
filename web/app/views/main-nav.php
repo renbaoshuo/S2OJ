@@ -36,7 +36,7 @@ mb-4" role="navigation">
 				<li class="nav-item">
 					<a class="nav-link" href="<?= HTML::url('/contests') ?>">
 						<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-							<i class="bi bi-bar-chart-line-fill"></i>
+							<i class="bi bi-bar-chart-line"></i>
 						<?php else: ?>
 							<span class="glyphicon glyphicon-stats"></span>
 						<?php endif ?>
@@ -56,7 +56,7 @@ mb-4" role="navigation">
 				<li class="nav-item">
 					<a class="nav-link" href="<?= HTML::url('/groups') ?>">
 						<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-							<i class="bi bi-people-fill"></i>
+							<i class="bi bi-people"></i>
 						<?php else: ?>
 							<span class="glyphicon glyphicon-education"></span>
 						<?php endif ?>
@@ -76,7 +76,7 @@ mb-4" role="navigation">
 				<li class="nav-item">
 					<a class="nav-link" href="<?= HTML::url('/submissions') ?>">
 						<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-							<i class="bi bi-pie-chart-fill"></i>
+							<i class="bi bi-pie-chart"></i>
 						<?php else: ?>
 							<span class="glyphicon glyphicon-tasks"></span>
 						<?php endif ?>
@@ -86,7 +86,7 @@ mb-4" role="navigation">
 				<li class="nav-item">
 					<a class="nav-link" href="<?= HTML::url('/hacks') ?>">
 						<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-							<i class="bi bi-flag-fill"></i>
+							<i class="bi bi-flag"></i>
 						<?php else: ?>
 							<span class="glyphicon glyphicon-flag"></span>
 						<?php endif ?>
@@ -106,17 +106,43 @@ mb-4" role="navigation">
 				<li class="nav-item">
 					<a class="nav-link" href="<?= HTML::url('/faq') ?>">
 						<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-							<i class="bi bi-question-circle-fill"></i>
+							<i class="bi bi-question-circle"></i>
 						<?php else: ?>
 							<span class="glyphicon glyphicon-info-sign"></span>
 						<?php endif ?>
 						<?= UOJLocale::get('help') ?>
 					</a>
 				</li>
+				<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
+					<li class="nav-item">
+						<a class="nav-link" href="#" id="try-bs5">
+							<span class="glyphicon glyphicon-share"></span>
+							体验新版
+						</a>
+						<script>
+							$('#try-bs5').click(function() {
+								$.removeCookie('bootstrap4', { path: '/' });
+								location.reload();
+							});
+						</script>
+					</li>
+				<?php endif ?>
 			</ul>
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 			<hr class="d-lg-none text-muted">
 			<ul class="nav navbar-nav ms-md-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="#" id="back-to-bs4">
+						<i class="bi bi-sign-turn-left"></i>
+						返回旧版
+					</a>
+					<script>
+						$('#back-to-bs4').click(function() {
+							$.cookie('bootstrap4', '1', { expires: 7, path: '/' });
+							location.reload();
+						});
+					</script>
+				</li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 						<i class="bi bi-translate"></i>

@@ -3,7 +3,9 @@
 	$countdowns = DB::selectAll("select * from countdowns order by endtime asc");
 	$friend_links = DB::selectAll("select * from friend_links order by level desc, id asc");
 
-	$REQUIRE_LIB['bootstrap5'] = '';
+	if (!isset($_COOKIE['bootstrap4'])){
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
 	?>
 <?php echoUOJPageHeader(UOJConfig::$data['profile']['oj-name-short']) ?>
 <div class="row">
