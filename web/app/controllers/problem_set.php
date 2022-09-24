@@ -158,6 +158,14 @@ EOD;
 		: array('table', 'table-bordered', 'table-hover', 'table-striped');
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('problems')) ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="d-flex justify-content-between">
+<?php endif ?>
+<h1 class="h2">
+	<?= UOJLocale::get('problems') ?>
+</h1>
+
 <?php if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)): ?>
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 	<div class="text-end">
@@ -165,7 +173,8 @@ EOD;
 		<?php $new_problem_form->printHTML(); ?>
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 	</div>
-	<?php endif ?>
+</div>
+<?php endif ?>
 <?php endif ?>
 <div class="row">
 	<div class="col-sm-4">

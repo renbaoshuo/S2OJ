@@ -68,6 +68,12 @@ EOD;
 	}
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('contests')) ?>
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="d-flex justify-content-between">
+<?php endif ?>
+<h1 class="h2">
+	<?= UOJLocale::get('contests') ?>
+</h1>
 <?php
 if (isSuperUser($myUser)) {
 	if (isset($REQUIRE_LIB['bootstrap5'])) {
@@ -79,6 +85,10 @@ if (isSuperUser($myUser)) {
 	echo '</div>';
 }
 	?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
+<?php endif ?>
 <h4><?= UOJLocale::get('contests::current or upcoming contests') ?></h4>
 <?php
 			$table_header = '';

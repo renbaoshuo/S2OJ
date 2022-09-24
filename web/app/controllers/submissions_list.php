@@ -44,6 +44,11 @@
 	}
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('submissions')) ?>
+
+<h1 class="h2">
+	<?= UOJLocale::get('submissions') ?>
+</h1>
+
 <div class="d-none d-sm-block">
 	<?php if ($myUser != null): ?>
 	<div class="float-right">

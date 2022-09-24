@@ -71,6 +71,14 @@
 
 <?php echoUOJPageHeader(UOJLocale::get('problems lists')) ?>
 
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="d-flex justify-content-between">
+<?php endif ?>
+<h1 class="h2">
+	<?= UOJLocale::get('problems lists') ?>
+</h1>
+
 <?php if (isSuperUser($myUser)): ?>
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 	<div class="text-end mb-2">
@@ -78,7 +86,8 @@
 		<?php $new_list_form->printHTML(); ?>
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 	</div>
-	<?php endif ?>
+</div>
+<?php endif ?>
 <?php endif ?>
 
 <?php
