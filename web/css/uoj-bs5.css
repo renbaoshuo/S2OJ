@@ -51,6 +51,7 @@ label {
 	display: inline-block;
 	min-width: 140px;
 	text-align: left;
+	font-size: 0.9em;
 }
 
 .uoj-click-zan-up, .uoj-click-zan-down, .uoj-click-zan-cnt {

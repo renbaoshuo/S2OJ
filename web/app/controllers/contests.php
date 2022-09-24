@@ -54,7 +54,15 @@ EOD;
 		echo '<td>', $contest_name_link, '</td>';
 		echo '<td>', '<a'.$a_class.'href="'.HTML::timeanddate_url($contest['start_time'], array('duration' => $contest['last_min'])).'">'.$contest['start_time_str'].'</a>', '</td>';
 		echo '<td>', UOJLocale::get('hours', $last_hour), '</td>';
-		echo '<td>', '<a'.$a_class.'href="/contest/'.$contest['id'].'/registrants"><span class="glyphicon glyphicon-user"></span> &times;'.$contest['player_num'].'</a>', '</td>';
+		echo '<td>', '<a'.$a_class.'href="/contest/'.$contest['id'].'/registrants">';
+		
+		if (isset($REQUIRE_LIB['bootstrap5'])) {
+			echo '<i class="bi bi-person-fill"></i>';
+		} else {
+			echo '<span class="glyphicon glyphicon-user"></span>';
+		}
+
+		echo ' &times;'.$contest['player_num'].'</a>', '</td>';
 		echo '<td>', '<div class="text-left">'.$click_zan_block.'</div>', '</td>';
 		echo '</tr>';
 	}
@@ -85,7 +93,7 @@ if (isSuperUser($myUser)) {
 	$table_config = array('page_len' => 40);
 	if (isset($REQUIRE_LIB['bootstrap5'])) {
 		$table_config['div_classes'] = array('card', 'mb-3');
-		$table_config['table_classes'] = array('table', 'uoj-table', 'mb-0');
+		$table_config['table_classes'] = array('table', 'uoj-table', 'mb-0', 'text-center');
 	}
 	echoLongTable(array('*'), 'contests', "status != 'finished'", 'order by start_time desc, id desc', $table_header,
 		echoContest,
