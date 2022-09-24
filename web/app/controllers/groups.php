@@ -71,8 +71,11 @@
 		<?php $new_group_form->printHTML(); ?>
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 	</div>
-</div>
 <?php endif ?>
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
 <?php endif ?>
 
 <?php

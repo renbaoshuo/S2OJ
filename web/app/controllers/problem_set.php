@@ -173,9 +173,13 @@ EOD;
 		<?php $new_problem_form->printHTML(); ?>
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 	</div>
+<?php endif ?>
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 <?php endif ?>
-<?php endif ?>
+
 <div class="row">
 	<div class="col-sm-4">
 		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
