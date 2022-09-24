@@ -562,6 +562,9 @@ class JudgementDetailsPrinter {
 			echo "\n</pre>";
 		} elseif ($node->nodeName == 'tests') {
 			echo '<div id="', $this->name, '_details_accordion">';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				$this->_print_c($node);
+			}
 			if ($this->styler->show_small_tip) {
 				if (isset($REQUIRE_LIB['bootstrap5'])) {
 					echo '<div class="my-2 px-2 text-end text-muted">';
@@ -577,7 +580,9 @@ class JudgementDetailsPrinter {
 				}
 				echo 'IOI赛制比赛中不支持显示详细信息', '</div>';
 			}
-			$this->_print_c($node);
+			if (!isset($REQUIRE_LIB['bootstrap5'])) {
+				$this->_print_c($node);
+			}
 			echo '</div>';
 		} elseif ($node->nodeName == 'subtask') {
 			$subtask_num = $node->getAttribute('num');
@@ -586,6 +591,7 @@ class JudgementDetailsPrinter {
 			
 			echo '<div class="card ', $this->styler->getTestInfoClass($subtask_info);
 			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' border-0 rounded-0 border-bottom ';
 			} else {
 				echo ' mb-3 ';
 			}
@@ -594,22 +600,63 @@ class JudgementDetailsPrinter {
 			$accordion_parent = "{$this->name}_details_accordion";
 			$accordion_collapse =  "{$accordion_parent}_collapse_subtask_{$subtask_num}";
 			$accordion_collapse_accordion =  "{$accordion_collapse}_accordion";
-			echo 	'<div class="card-header" data-toggle="collapse" data-parent="#', $accordion_parent, '" data-target="#', $accordion_collapse, '">';
 			
+			echo '<div class="card-header ';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' uoj-submission-result-item bg-transparent rounded-0 border-0 ';
+			}
+			echo '" ';
+
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' data-bs-toggle="collapse" data-bs-parent="#', $accordion_parent, '" data-bs-target="#', $accordion_collapse, '" ';
+			} else {
+				echo ' data-toggle="collapse" data-parent="#', $accordion_parent, '" data-target="#', $accordion_collapse, '" ';
+			}
+			echo ' >';
+
 			echo 		'<div class="row">';
-			echo 			'<div class="col-sm-2">';
-			echo 				'<h3 class="card-title">', 'Subtask #', $subtask_num, ': ', '</h3>';
+			echo 			'<div class="col-sm-4">';
+
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo '<h3 class="fs-5">';
+			} else {
+				echo '<h3 class="card-title">';
+			}
+
+			echo 				'Subtask #', $subtask_num, ': ', '</h3>';
 			echo 			'</div>';
 			
 			if ($this->styler->show_score) {
 				echo 		'<div class="col-sm-2">';
-				echo 			'score: ', $subtask_score;
+
+				if (isset($REQUIRE_LIB['bootstrap5'])) {
+					echo '<i class="bi bi-clipboard-check"></i> ';
+				} else {
+					echo 'score: ';
+				}
+
+				echo $subtask_score;
+
+				if (isset($REQUIRE_LIB['bootstrap5'])) {
+					echo ' pts';
+				}
+
 				echo 		'</div>';
 				echo 		'<div class="col-sm-2">';
+				
+				if (isset($REQUIRE_LIB['bootstrap5'])) {
+					echo $this->styler->getTestInfoIcon($subtask_info);
+				}
+
 				echo 			htmlspecialchars($subtask_info);
 				echo 		'</div>';
 			} else {
 				echo 		'<div class="col-sm-4">';
+
+				if (isset($REQUIRE_LIB['bootstrap5'])) {
+					echo $this->styler->getTestInfoIcon($subtask_info);
+				}
+
 				echo 			htmlspecialchars($subtask_info);
 				echo 		'</div>';
 			}
@@ -618,9 +665,18 @@ class JudgementDetailsPrinter {
 			echo 	'</div>';
 			
 			echo 	'<div id="', $accordion_collapse, '" class="card-collapse collapse">';
-			echo 		'<div class="card-body">';
+			echo 		'<div class="card-body ';
+			
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' pt-0 ';
+			}
+			echo '">';
 
-			echo 			'<div id="', $accordion_collapse_accordion, '">';
+			echo 			'<div id="', $accordion_collapse_accordion, '" ';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' class="border rounded overflow-hidden" ';
+			}
+			echo ' >';
 			$this->subtask_num = $subtask_num;
 			$this->_print_c($node);
 			$this->subtask_num = null;
@@ -639,7 +695,7 @@ class JudgementDetailsPrinter {
 			echo '<div class="card ', $this->styler->getTestInfoClass($test_info);
 			
 			if (isset($REQUIRE_LIB['bootstrap5'])) {
-				echo ' border-0 rounded-0 border-top ';
+				echo ' border-0 rounded-0 border-bottom ';
 			} else {
 				echo ' mb-3 ';
 			}
@@ -694,17 +750,7 @@ class JudgementDetailsPrinter {
 				if (isset($REQUIRE_LIB['bootstrap5'])) {
 					echo '<div class="col-sm-2 uoj-status-text">';
 
-					if ($test_info == 'Accepted' || $test_info == 'Extra Test Passed') {
-						echo '<i class="bi bi-check-lg"></i> ';
-					} elseif ($test_info == 'Time Limit Exceeded') {
-						echo '<i class="bi bi-clock"></i> ';
-					} elseif ($test_info == 'Acceptable Answer') {
-						echo '<i class="bi bi-dash-square"></i> ';
-					} elseif ($test_info == 'Wrong Answer') {
-						echo '<i class="bi bi-x-lg"></i> ';
-					} else {
-						echo '<i class="bi bi-slash-circle"></i> ';
-					}
+					echo $this->styler->getTestInfoIcon($test_info);
 				} else {
 					echo '<div class="col-sm-2">';
 				}
@@ -892,6 +938,19 @@ class SubmissionDetailsStyler {
 			return 'card-uoj-acceptable-answer';
 		} else {
 			return 'card-uoj-wrong';
+		}
+	}
+	public function getTestInfoIcon($test_info) {
+		if ($test_info == 'Accepted' || $test_info == 'Extra Test Passed') {
+			return '<i class="bi bi-check-lg"></i> ';
+		} elseif ($test_info == 'Time Limit Exceeded') {
+			return '<i class="bi bi-clock"></i> ';
+		} elseif ($test_info == 'Acceptable Answer') {
+			return '<i class="bi bi-dash-square"></i> ';
+		} elseif ($test_info == 'Wrong Answer') {
+			return '<i class="bi bi-x-lg"></i> ';
+		} else {
+			return '<i class="bi bi-slash-circle"></i> ';
 		}
 	}
 	public function shouldFadeDetails($info) {
