@@ -154,7 +154,7 @@ EOD;
 		? array('card', 'mb-3')
 		: array('table-responsive');
 	$table_classes = isset($REQUIRE_LIB['bootstrap5'])
-		? array('table', 'uoj-problem-list-table', 'mb-0')
+		? array('table', 'uoj-table', 'mb-0')
 		: array('table', 'table-bordered', 'table-hover', 'table-striped');
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('problems')) ?>

@@ -43,8 +43,7 @@ label {
 	float: right;
 }
 
-.uoj-problem-list-table > tbody > tr:last-child,
-.uoj-submissions-table > tbody > tr:last-child {
+.uoj-table > tbody > tr:last-child {
 	border-bottom-color: transparent;
 }
 

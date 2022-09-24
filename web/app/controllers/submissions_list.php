@@ -115,7 +115,7 @@ d-inline-block
 			'table_config' => (isset($REQUIRE_LIB['bootstrap5']) 
 				? array(
 					'div_classes' => array('card', 'mb-3'),
-					'table_classes' => array('table', 'mb-0', 'uoj-submissions-table', 'text-center')
+					'table_classes' => array('table', 'mb-0', 'uoj-table', 'text-center')
 				)
 				: array()
 			),
