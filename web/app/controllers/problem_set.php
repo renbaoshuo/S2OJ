@@ -151,7 +151,7 @@ EOD;
 	$pag = new Paginator($pag_config);
 
 	$div_classes = isset($REQUIRE_LIB['bootstrap5'])
-		? array('card', 'mb-3', 'overflow-auto')
+		? array('card', 'my-3', 'overflow-auto')
 		: array('table-responsive');
 	$table_classes = isset($REQUIRE_LIB['bootstrap5'])
 		? array('table', 'uoj-table', 'mb-0')

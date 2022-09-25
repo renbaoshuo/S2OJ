@@ -106,7 +106,7 @@ EOD;
     );
 
     if (isset($REQUIRE_LIB['bootstrap5'])) {
-    	$table_config['div_classes'] = array('card', 'mb-3');
+    	$table_config['div_classes'] = array('card', 'my-3');
     	$table_config['table_classes'] = array('table', 'uoj-table', 'mb-0');
     }
 
