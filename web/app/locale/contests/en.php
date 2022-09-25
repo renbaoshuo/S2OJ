@@ -31,6 +31,6 @@ return [
 	'contest self review' => 'Contest self review',
 	'contest self reviews' => 'Contest self reviews',
 	'will start in x days' => function($x) {
-		return "Will start in $x ".($x > 1 ? "days" : "day");
+		return "will start in $x ".($x > 1 ? "days" : "day");
 	},
 ];
