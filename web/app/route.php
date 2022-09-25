@@ -21,6 +21,7 @@ Route::group([
 
 		Route::any('/problem_lists', '/problem_lists.php');
 		Route::any('/problem_list/{id}', '/problem_list.php');
+		Route::any('/problem_list/{id}/manage', '/problem_list_manage.php');
 		
 		Route::any('/contests', '/contests.php');
 		Route::any('/contest/new', '/add_contest.php');

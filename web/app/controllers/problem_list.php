@@ -12,110 +12,6 @@
 	if (!validateUInt($list_id) || !($list = queryProblemList($list_id))) {
 		become404Page();
 	}
-	
-	if (isSuperUser($myUser)) {
-		$list_tags = queryProblemListTags($list_id);
-
-		$list_editor = new UOJBlogEditor();
-		$list_editor->name = 'list';
-		$list_editor->blog_url = null;
-		$list_editor->cur_data = array(
-			'title' => $list['title'],
-			'tags' => $list_tags,
-			'is_hidden' => $list['is_hidden']
-		);
-		$list_editor->label_text = array_merge($list_editor->label_text, array(
-			'view blog' => '保存题单信息',
-			'blog visibility' => '题单可见性'
-		));
-		$list_editor->show_editor = false;
-
-		$list_editor->save = function($data) {
-			global $list_id, $list;
-			DB::update("update lists set title = '" . DB::escape($data['title']) . "' where id = {$list_id}");
-
-			if ($data['tags'] !== $list_tags) {
-				DB::delete("delete from lists_tags where list_id = {$list_id}");
-				foreach ($data['tags'] as $tag) {
-					DB::insert("insert into lists_tags (list_id, tag) values ({$list_id}, '" . DB::escape($tag) . "')");
-				}
-			}
-
-			if ($data['is_hidden'] != $list['is_hidden'] ) {
-				DB::update("update lists set is_hidden = {$data['is_hidden']} where id = {$list_id}");
-			}
-		};
-
-		$list_editor->runAtServer();
-	}
-
-	function removeFromProblemListForm($problem_id) {
-		$res_form = new UOJForm("remove_problem_{$problem_id}");
-		$input_name = "problem_id_delete_{$problem_id}";
-		$res_form->addHidden($input_name, $problem_id, function($problem_id) {
-			global $myUser;
-			if (!isSuperUser($myUser)) {
-				return '只有超级用户可以编辑题单';
-			}
-		}, null);
-		$res_form->handle = function() use ($input_name) {
-			global $list_id;
-			$problem_id = $_POST[$input_name];
-			DB::query("delete from lists_problems where problem_id={$problem_id} and list_id={$list_id}");
-		};
-		$res_form->submit_button_config['class_str'] = 'btn btn-danger';
-		$res_form->submit_button_config['text'] = '删除';
-		$res_form->submit_button_config['align'] = 'inline';
-		return $res_form;
-	}
-
-	$removeProblemForms = array();
-	if (isSuperUser($myUser)) {
-		$problem_ids = DB::query("select problem_id from lists_problems where list_id = {$list_id}");
-		while ($row = DB::fetch($problem_ids)) {
-			$problem_id = $row['problem_id'];
-			$removeForm = removeFromProblemListForm($problem_id);
-			$removeForm->runAtServer();
-			$removeProblemForms[$problem_id] = $removeForm;
-		}
-	}
-
-	if (isSuperUser($myUser)) {
-		$add_new_problem_form = new UOJForm('add_new_problem');
-		$add_new_problem_form->addInput('problem_id', 'text', '题目 ID', '', 
-			function ($x) {
-				global $myUser, $list_id;
-
-				if (!isSuperUser($myUser)) {
-					return '只有超级用户可以编辑题单';
-				}
-
-				if (!validateUInt($x)) {
-					return 'ID 不合法';
-				}
-				$problem = queryProblemBrief($x);
-				if (!$problem) {
-					return '题目不存在';
-				}
-
-				if (queryProblemInList($list_id, $x)) {
-					return '该题目已经在题单中';
-				}
-				
-				return '';
-			},
-			null
-		);
-		$add_new_problem_form->submit_button_config['align'] = 'compressed';
-		$add_new_problem_form->submit_button_config['text'] = '添加到题单';
-		$add_new_problem_form->handle = function() {
-			global $list_id, $myUser;
-			$problem_id = $_POST['problem_id'];
-
-			DB::insert("insert into lists_problems (list_id, problem_id) values ({$list_id}, {$problem_id})");
-		};
-		$add_new_problem_form->runAtServer();
-	}
 
 	function echoProblem($problem) {
 		global $myUser, $removeProblemForms;
@@ -129,10 +25,6 @@
 			}
 			echo '#', $problem['id'], '</td>';
 			echo '<td class="text-left">';
-			if (isSuperUser($myUser)) {
-				$form = $removeProblemForms[$problem['id']];
-				$form->printHTML();
-			}
 			if ($problem['is_hidden']) {
 				echo ' <span class="text-danger">[隐藏]</span> ';
 			}
@@ -161,14 +53,6 @@
 				</td>
 EOD;
 			}
-			if (isset($_COOKIE['show_difficulty'])) {
-				$extra_config = getProblemExtraConfig($problem);
-				if ($extra_config['difficulty'] == 0) {
-					echo "<td></td>";
-				} else {
-					echo "<td>{$extra_config['difficulty']}</td>";
-				}
-			}
 			echo '<td class="text-left">', getClickZanBlock('P', $problem['id'], $problem['zan']), '</td>';
 			echo '</tr>';
 		}
@@ -181,9 +65,6 @@ EOD;
 		$header .= '<th class="text-center" style="width:5em;">'.UOJLocale::get('problems::ac').'</th>';
 		$header .= '<th class="text-center" style="width:5em;">'.UOJLocale::get('problems::submit').'</th>';
 		$header .= '<th class="text-center" style="width:150px;">'.UOJLocale::get('problems::ac ratio').'</th>';
-	}
-	if (isset($_COOKIE['show_difficulty'])) {
-		$header .= '<th class="text-center" style="width:7em;">'.UOJLocale::get('problems::difficulty').'</th>';
 	}
 	$header .= '<th class="text-center" style="width:180px;">'.UOJLocale::get('appraisal').'</th>';
 	$header .= '</tr>';
@@ -201,22 +82,19 @@ EOD;
 	$table_classes = array('table', 'table-bordered', 'table-hover', 'table-striped');
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('problems lists')); ?>
-<?php
-	if (isSuperUser($myUser)) {
-		echo '<h5>编辑题单信息</h5>';
-		echo '<div class="mb-4">';
-		$list_editor->printHTML();
-		echo '</div>';
 
-		echo '<h5>添加题目到题单</h5>';
-		$add_new_problem_form->printHTML();
-	}
-	?>
+<h1 class="h2">
+	<?= $list['title'] ?>
+</h1>
+
+<?php if (isSuperUser($myUser)): ?>
+<ul class="nav nav-tabs" role="tablist">
+	<li class="nav-item"><a class="nav-link" href="/problem_list/<?= $list['id'] ?>/manage" role="tab">管理</a></li>
+</ul>
+<?php endif ?>
+
 <div class="row">
-	<div class="col-sm-4">
-		<h5>"<?= $list['title'] ?>" 中的题目: </h5>
-		<p>(题单 ID: #<?= $list['id'] ?>)</p>
-	</div>
+	<div class="col-sm-4"></div>
 	<div class="col-sm-4 order-sm-9 checkbox text-right fine-tune-down">
 		<label class="checkbox-inline" for="input-show_tags_mode"><input type="checkbox" id="input-show_tags_mode" <?= isset($_COOKIE['show_tags_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::show tags') ?></label>
 		<label class="checkbox-inline" for="input-show_submit_mode"><input type="checkbox" id="input-show_submit_mode" <?= isset($_COOKIE['show_submit_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::show statistics') ?></label>
@@ -253,27 +131,31 @@ $('#input-show_difficulty').click(function() {
 });
 </script>
 
+<div class="<?= join($div_classes, ' ') ?>">
+<table class="<?= join($table_classes, ' ') ?>">
+<thead>
+	<?= $header ?>
+</thead>
+<tbody>
 <?php
-	echo '<div class="', join($div_classes, ' '), '">';
-	echo '<table class="', join($table_classes, ' '), '">';
-	echo '<thead>';
-	echo $header;
-	echo '</thead>';
-	echo '<tbody>';
-	
 	foreach ($pag->get() as $idx => $row) {
 		echoProblem($row);
 		echo "\n";
 	}
-	if ($pag->isEmpty()) {
-		echo '<tr><td class="text-center" colspan="233">'.UOJLocale::get('none').'</td></tr>';
-	}
-	
-	echo '</tbody>';
-	echo '</table>';
-	echo '</div>';
-	
-	echo $pag->pagination();
 	?>
+
+<?php if ($pag->isEmpty()): ?>
+	<tr>
+		<td class="text-center" colspan="233">
+			<?= UOJLocale::get('none') ?>
+		</td>
+	</tr>
+<?php endif ?>
+	
+</tbody>
+</table>
+</div>
+
+<?= $pag->pagination();	?>
 
 <?php echoUOJPageFooter() ?>
