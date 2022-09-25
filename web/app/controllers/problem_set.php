@@ -285,7 +285,18 @@ $('#input-show_submit_mode').click(function() {
 </div>
 
 <aside class="col mt-3 mt-md-0">
-<?php 
+
+<form method="get">
+	<div class="input-group mb-3">
+		<input id="search-input" name="search" type="text" class="form-control" placeholder="搜索">
+		<button class="btn btn-outline-secondary" type="submit">
+			<i class="bi bi-search"></i>
+		</button>
+	</div>
+</form>
+<script>$('#search-input').val(new URLSearchParams(location.search).get('search'));</script>
+
+<?php
 	uojIncludeView('sidebar', array());
 	?>
 </aside>
