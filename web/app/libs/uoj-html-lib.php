@@ -299,12 +299,28 @@ function echoSubmission($submission, $config, $user) {
 		echo '<td>';
 		if ($status == 'Judged') {
 			if ($submission['score'] == null) {
-				echo '<a href="/submission/', $submission['id'], '" class="small">', $submission['result_error'], '</a>';
+				echo '<a ';
+		
+				if (isset($REQUIRE_LIB['bootstrap5'])) {
+					echo ' class="text-decoration-none small" ';
+				} else {
+					echo ' class="small" ';
+				}
+		
+				echo ' href="/submission/', $submission['id'], '">', $submission['result_error'], '</a>';
 			} else {
 				echo '<a href="/submission/', $submission['id'], '" class="uoj-score">', $submission['score'], '</a>';
 			}
 		} else {
-			echo '<a href="/submission/', $submission['id'], '" class="small">', $status, '</a>';
+			echo '<a ';
+		
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' class="text-decoration-none small" ';
+			} else {
+				echo ' class="small" ';
+			}
+	
+			echo ' href="/submission/', $submission['id'], '">', $status, '</a>';
 		}
 		echo '</td>';
 	}
@@ -757,7 +773,13 @@ class JudgementDetailsPrinter {
 				echo htmlspecialchars($test_info);
 				echo '</div>';
 			} else {
-				echo '<div class="col-sm-4">';
+				if (isset($REQUIRE_LIB['bootstrap5'])) {
+					echo '<div class="col-sm-4 uoj-status-text">';
+
+					echo $this->styler->getTestInfoIcon($test_info);
+				} else {
+					echo '<div class="col-sm-4">';
+				}
 				echo htmlspecialchars($test_info);
 				echo '</div>';
 			}
@@ -994,6 +1016,19 @@ class HackDetailsStyler {
 			return 'card-uoj-wrong';
 		}
 	}
+	public function getTestInfoIcon($test_info) {
+		if ($test_info == 'Accepted' || $test_info == 'Extra Test Passed') {
+			return '<i class="bi bi-check-lg"></i> ';
+		} elseif ($test_info == 'Time Limit Exceeded') {
+			return '<i class="bi bi-clock"></i> ';
+		} elseif ($test_info == 'Acceptable Answer') {
+			return '<i class="bi bi-dash-square"></i> ';
+		} elseif ($test_info == 'Wrong Answer') {
+			return '<i class="bi bi-x-lg"></i> ';
+		} else {
+			return '<i class="bi bi-slash-circle"></i> ';
+		}
+	}
 	public function shouldFadeDetails($info) {
 		return $this->fade_all_details;
 	}
@@ -1008,6 +1043,8 @@ function echoCustomTestSubmissionDetails($submission_details, $name) {
 	echoJudgementDetails($submission_details, new CustomTestSubmissionDetailsStyler(), $name);
 }
 function echoHackDetails($hack_details, $name) {
+	global $REQUIRE_LIB;
+	
 	echoJudgementDetails($hack_details, new HackDetailsStyler(), $name);
 }
 
@@ -1015,10 +1052,22 @@ function echoHack($hack, $config, $user) {
 	$problem = queryProblemBrief($hack['problem_id']);
 	echo '<tr>';
 	if (!isset($config['id_hidden'])) {
-		echo '<td><a href="/hack/', $hack['id'], '">#', $hack['id'], '</a></td>';
+		echo '<td><a ';
+		
+		if (isset($REQUIRE_LIB['bootstrap5'])) {
+			echo ' class="text-decoration-none" ';
+		}
+
+		echo ' href="/hack/', $hack['id'], '">#', $hack['id'], '</a></td>';
 	}
 	if (!isset($config['submission_hidden'])) {
-		echo '<td><a href="/submission/', $hack['submission_id'], '">#', $hack['submission_id'], '</a></td>';
+		echo '<td><a ';
+		
+		if (isset($REQUIRE_LIB['bootstrap5'])) {
+			echo ' class="text-decoration-none" ';
+		}
+
+		echo ' href="/submission/', $hack['submission_id'], '">#', $hack['submission_id'], '</a></td>';
 	}
 	if (!isset($config['problem_hidden'])) {
 		if ($hack['contest_id']) {
@@ -1035,13 +1084,37 @@ function echoHack($hack, $config, $user) {
 	}
 	if (!isset($config['result_hidden'])) {
 		if ($hack['judge_time'] == null) {
-			echo '<td><a href="/hack/', $hack['id'], '">Waiting</a></td>';
+			echo '<td><a ';
+		
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' class="text-decoration-none" ';
+			}
+	
+			echo ' href="/hack/', $hack['id'], '">Waiting</a></td>';
 		} elseif ($hack['success'] == null) {
-			echo '<td><a href="/hack/', $hack['id'], '">Judging</a></td>';
+			echo '<td><a ';
+		
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' class="text-decoration-none" ';
+			}
+	
+			echo ' href="/hack/', $hack['id'], '">Judging</a></td>';
 		} elseif ($hack['success']) {
-			echo '<td><a href="/hack/', $hack['id'], '" class="uoj-status" data-success="1"><strong>Success!</strong></a></td>';
+			echo '<td><a href="/hack/', $hack['id'], '" class="uoj-status ';
+		
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' text-decoration-none ';
+			}
+	
+			echo ' " data-success="1"><strong>Success!</strong></a></td>';
 		} else {
-			echo '<td><a href="/hack/', $hack['id'], '" class="uoj-status" data-success="0"><strong>Failed.</strong></a></td>';
+			echo '<td><a href="/hack/', $hack['id'], '" class="uoj-status ';
+		
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' text-decoration-none ';
+			}
+	
+			echo ' " data-success="0"><strong>Failed.</strong></a></td>';
 		}
 	} else {
 		echo '<td>Hidden</td>';
@@ -1055,8 +1128,15 @@ function echoHack($hack, $config, $user) {
 	echo '</tr>';
 }
 function echoHackListOnlyOne($hack, $config, $user) {
-	echo '<div class="table-responsive">';
-	echo '<table class="table table-bordered table-text-center">';
+	global $REQUIRE_LIB;
+	
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		echo '<div class="card mb-3">';
+		echo '<table class="table text-center uoj-table mb-0">';
+	} else {
+		echo '<div class="table-responsive">';
+		echo '<table class="table table-bordered table-text-center">';
+	}
 	echo '<thead>';
 	echo '<tr>';
 	if (!isset($config['id_hidden'])) {

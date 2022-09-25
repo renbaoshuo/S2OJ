@@ -12,6 +12,11 @@
 	if (!validateUInt($_GET['id']) || !($hack = queryHack($_GET['id']))) {
 		become404Page();
 	}
+
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
+
 	$submission = querySubmission($hack['submission_id']);	
 	$problem = queryProblemBrief($submission['problem_id']);
 	$problem_extra_config = getProblemExtraConfig($problem);
@@ -62,17 +67,27 @@
 	}
 	?>
 <?php
-	$REQUIRE_LIB['shjs'] = "";
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		$REQUIRE_LIB['hljs'] = '';
+	} else {
+		$REQUIRE_LIB['shjs'] = '';
+	}
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('problems::hack').' #'.$hack['id']) ?>
 
-<?php echoHackListOnlyOne($hack, array(), $myUser) ?>
+<h1 class="h3">
+	<?= UOJLocale::get('problems::hack').' #'.$hack['id'] ?>
+</h1>
+
+<?php echoHackListOnlyOne($hack, array('id_hidden' => ''), $myUser) ?>
 <?php if ($should_show_all_details): ?>
-	<div class="card border-info">
+	<div class="card border-info mb-3">
 		<div class="card-header bg-info">
 			<h4 class="card-title"><?= UOJLocale::get('details') ?></h4>
 		</div>
+		<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 		<div class="card-body">
+		<?php endif ?>
 			<?php echoJudgementDetails($hack['details'], $styler, 'details') ?>
 			<?php if ($should_show_details_to_me): ?>
 				<?php if ($styler->fade_all_details): ?>
@@ -80,9 +95,16 @@
 					<?php echoHackDetails($hack['details'], 'final_details') ?>
 				<?php endif ?>
 			<?php endif ?>
+		<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 		</div>
+		<?php endif ?>
 	</div>
 <?php endif ?>
+
+<h2 class="h3">
+	<?= UOJLocale::get('problems::submission').' #'.$submission['id'] ?>
+</h2>
+
 <?php echoSubmissionsListOnlyOne($submission, array(), $myUser) ?>
 <?php if ($should_show_content): ?>
 	<?php echoSubmissionContent($submission, getProblemSubmissionRequirement($problem)) ?>

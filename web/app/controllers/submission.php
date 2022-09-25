@@ -154,7 +154,7 @@
 	<?= UOJLocale::get('problems::submission').' #'.$submission['id'] ?>
 </h1>
 
-<?php echoSubmissionsListOnlyOne($submission, array(), $myUser) ?>
+<?php echoSubmissionsListOnlyOne($submission, array('id_hidden' => ''), $myUser) ?>
 
 <?php if ($should_show_content): ?>
 	<?php echoSubmissionContent($submission, getProblemSubmissionRequirement($problem)) ?>
