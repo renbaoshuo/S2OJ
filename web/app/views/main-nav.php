@@ -36,7 +36,7 @@ mb-4" role="navigation">
 				<li class="nav-item">
 					<a class="nav-link" href="<?= HTML::url('/contests') ?>">
 						<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-							<i class="bi bi-bar-chart-line"></i>
+							<i class="bi bi-bar-chart"></i>
 						<?php else: ?>
 							<span class="glyphicon glyphicon-stats"></span>
 						<?php endif ?>
