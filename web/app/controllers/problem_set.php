@@ -125,9 +125,9 @@ EOD;
 	$header .= '<th class="text-center" style="width:5em;">ID</th>';
 	$header .= '<th>'.UOJLocale::get('problems::problem').'</th>';
 	if (isset($_COOKIE['show_submit_mode'])) {
-		$header .= '<th class="text-center" style="width:5em;">'.UOJLocale::get('problems::ac').'</th>';
-		$header .= '<th class="text-center" style="width:5em;">'.UOJLocale::get('problems::submit').'</th>';
-		$header .= '<th class="text-center" style="width:150px;">'.UOJLocale::get('problems::ac ratio').'</th>';
+		$header .= '<th class="text-center" style="width:' . (isset($REQUIRE_LIB['bootstrap5']) ? '4' : '5') . 'em;">'.UOJLocale::get('problems::ac').'</th>';
+		$header .= '<th class="text-center" style="width:' . (isset($REQUIRE_LIB['bootstrap5']) ? '4' : '5') . 'em;">'.UOJLocale::get('problems::submit').'</th>';
+		$header .= '<th class="text-center" style="width:' . (isset($REQUIRE_LIB['bootstrap5']) ? '125' : '150') . 'px;">'.UOJLocale::get('problems::ac ratio').'</th>';
 	}
 	$header .= '<th class="text-center" style="width:190px;">'.UOJLocale::get('appraisal').'</th>';
 	$header .= '</tr>';
