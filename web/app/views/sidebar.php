@@ -9,8 +9,8 @@
 		<?php foreach ($groups as $group): ?>
 			<?php
 				$group_detail = DB::selectFirst("select * from groups where id = {$group['id']}");
-				$group_announcement = $group_detail['announcement'];
-				?>
+			$group_announcement = $group_detail['announcement'];
+			?>
 			<li class="list-group-item">
 				<a class="fw-bold text-decoration-none" href="<?= HTML::url('/group/'.$group['id']) ?>">
 					<?= $group['title'] ?>
@@ -34,7 +34,7 @@
 <?php if (!isset($upcoming_contests_hidden)): ?>
 <?php
 	$upcoming_contests = DB::selectAll("SELECT * FROM contests WHERE status = 'unfinished' ORDER BY start_time ASC, id ASC LIMIT 7");
-?>
+	?>
 <div class="card card-default mb-2" id="group-user-announcements">
 	<div class="card-header fw-bold bg-transparent">
 		近期比赛
@@ -54,8 +54,8 @@
 				<?= UOJLocale::get('contests::in progress') ?>
 				<?php else: ?>
 				<?php
-					$rest_seconds = $contest['start_time']->getTimestamp() - UOJTime::$time_now->getTimestamp();
-				?>
+						$rest_seconds = $contest['start_time']->getTimestamp() - UOJTime::$time_now->getTimestamp();
+					?>
 				<?php if ($rest_seconds > 86400): ?>
 				<?= UOJLocale::get('contests::will start in x days', floor($rest_seconds / 86400)) ?>
 				<?php else: ?>

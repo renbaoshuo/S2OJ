@@ -125,7 +125,7 @@ EOD;
 <aside class="col mt-3 mt-md-0">
 <?php 
 	uojIncludeView('sidebar', array());
-?>
+	?>
 </aside>
 
 </div>

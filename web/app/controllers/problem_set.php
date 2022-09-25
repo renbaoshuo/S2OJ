@@ -287,7 +287,7 @@ $('#input-show_submit_mode').click(function() {
 <aside class="col mt-3 mt-md-0">
 <?php 
 	uojIncludeView('sidebar', array());
-?>
+	?>
 </aside>
 
 </div>
