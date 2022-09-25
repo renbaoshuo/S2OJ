@@ -34,6 +34,36 @@
 	);
 	
 	$managers_form->runAtServer();
+
+	
+	if (isSuperUser($myUser)) {
+		$update_uploader_form = new UOJForm('update_uploader');
+		$update_uploader_form->addInput('new_uploader_username', 'text', '用户名', $problem['uploader'] ?: 'root', 
+			function ($x) {
+				if (!validateUsername($x)) {
+					return '用户名不合法';
+				}
+
+				if (!queryUser($x)) {
+					return '用户不存在';
+				}
+
+				return '';
+			},
+			null
+		);
+		$update_uploader_form->submit_button_config['align'] = 'compressed';
+		$update_uploader_form->submit_button_config['text'] = '修改上传者';
+		$update_uploader_form->submit_button_config['class_str'] = 'mt-2 btn btn-warning';
+		$update_uploader_form->handle = function() {
+			global $problem;
+
+			$username = $_POST['new_uploader_username'];
+
+			DB::query("update problems set uploader = '{$username}' where id = {$problem['id']}");
+		};
+		$update_uploader_form->runAtServer();
+	}
 	?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - 管理者 - 题目管理') ?>
 <h1 class="page-header" align="center">#<?=$problem['id']?> : <?=$problem['title']?> 管理</h1>
@@ -64,4 +94,9 @@
 </table>
 <p class="text-center">命令格式：命令一行一个，+mike表示把mike加入管理者，-mike表示把mike从管理者中移除</p>
 <?php $managers_form->printHTML(); ?>
+
+<?php if (isset($update_uploader_form)): ?>
+	<?php $update_uploader_form->printHTML(); ?>
+<?php endif ?>
+
 <?php echoUOJPageFooter() ?>
