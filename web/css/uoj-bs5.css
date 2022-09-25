@@ -4,6 +4,10 @@ body {
 	overflow-y: scroll;
 }
 
+pre {
+	tab-size: 4;
+}
+
 .uoj-username,
 .uoj-score {
 	font-weight: 800;
