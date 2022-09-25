@@ -111,3 +111,37 @@ label {
 .card-uoj-wrong .uoj-status-text {
 	color: #ff4f4f;
 }
+.markdown-body h1 {
+	font-size: 2em;
+	margin-bottom: 1rem;
+}
+
+.markdown-body h2 {
+	font-size: 1.5em;
+	margin-bottom: 1rem;
+}
+
+.markdown-body h3 {
+	font-size: 1.25em;
+}
+
+.markdown-body h4 {
+	font-size: 1em;
+}
+
+.markdown-body h5 {
+	font-size: 0.875em;
+}
+
+.markdown-body h6 {
+	font-size: 0.85em;
+}
+
+.markdown-body img {
+	max-width: 100%;
+}
+
+.markdown-body pre {
+	padding: 1em;
+	background-color: rgba(var(--bs-light-rgb));
+}

@@ -9,7 +9,7 @@
 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
 		become404Page();
 	}
-	
+
 	$problem_content = queryProblemContent($problem['id']);
 	
 	$contest = validateUInt($_GET['contest_id']) ? queryContest($_GET['contest_id']) : null;
@@ -53,6 +53,10 @@
 		if (!isNormalUser($myUser)) {
 			become403Page();
 		}
+	}
+	
+	if (!isset($_COOKIE['bootstrap4']) && !$contest) {
+		$REQUIRE_LIB['bootstrap5'] = '';
 	}
 
 	$submission_requirement = json_decode($problem['submission_requirement'], true);
@@ -227,6 +231,13 @@ EOD
 
 	$problem_uploader = $limit['poster'] ?: $problem['uploader'];
 	?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="row">
+<div class="col-sm-12 col-md-9">
+<?php endif ?>
+
+<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="row d-flex justify-content-center">
 	<span class="badge badge-secondary mr-1">时间限制:<?=$time_limit!=null?"$time_limit s":"N/A"?></span>
 	<span class="badge badge-secondary mr-1">空间限制:<?=$memory_limit!=null?"$memory_limit MB":"N/A"?></span>
@@ -235,6 +246,12 @@ EOD
 <div class="float-right">
 	<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
 </div>
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="card card-default mb-2">
+<div class="card-body">
+<?php endif ?>
 
 <?php if ($contest): ?>
 <div class="page-header row">
@@ -253,14 +270,37 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 </script>
 <?php endif ?>
 <?php else: ?>
-<h1 class="page-header text-center">#<?= $problem['id']?>. <?= $problem['title'] ?></h1>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<h1 class="h2 card-title text-center">
+<?php else: ?>
+<h1 class="page-header text-center">
+<?php endif ?>
+	#<?= $problem['id']?>. <?= $problem['title'] ?>
+</h1>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="text-center small">
+	时间限制: <?= $time_limit != null ? "$time_limit s" : "N/A" ?>
+	&emsp;
+	空间限制: <?= $memory_limit != null ? "$memory_limit MB" : "N/A" ?>
+	&emsp;
+	上传者: <?= getUserLink($problem_uploader ?: "root") ?>
+</div>
+
+<hr>
+<?php endif ?>
+
+<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="btn-group float-right" role="group">
 <a role="button" class="btn btn-primary" href="<?= HTML::url("/download.php?type=problem&id={$problem['id']}") ?>"><span class="glyphicon glyphicon-tasks"></span> 测试数据</a>
 <a role="button" class="btn btn-primary" href="<?= HTML::url("/download.php?type=attachment&id={$problem['id']}") ?>"><span class="glyphicon glyphicon-download-alt"></span> 附件下载</a>
 <a role="button" class="btn btn-info" href="/problem/<?= $problem['id'] ?>/statistics"><span class="glyphicon glyphicon-stats"></span> <?= UOJLocale::get('problems::statistics') ?></a>
 </div>
 <?php endif ?>
+<?php endif ?>
 
+<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 <ul class="nav nav-tabs" role="tablist">
 	<li class="nav-item"><a class="nav-link active" href="#tab-statement" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-book"></span> <?= UOJLocale::get('problems::statement') ?></a></li>
 	<li class="nav-item"><a class="nav-link" href="#tab-submit-answer" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-upload"></span> <?= UOJLocale::get('problems::submit') ?></a></li>
@@ -274,7 +314,12 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 	<li class="nav-item"><a class="nav-link" href="/contest/<?= $contest['id'] ?>" role="tab"><?= UOJLocale::get('contests::back to the contest') ?></a></li>
 	<?php endif ?>
 </ul>
+<?php endif ?>
+
+<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 <link rel="stylesheet" type="text/css" href="<?= HTML::url('/css/markdown.css') ?>">
+<?php endif ?>
+
 <div class="tab-content">
 	<div class="tab-pane active" id="tab-statement">
 		<article class="mt-3 markdown-body"><?= $problem_content['statement'] ?></article>
@@ -295,4 +340,85 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 	</div>
 	<?php endif ?>
 </div>
+
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
+</div>
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
+
+<aside class="col">
+<div class="card card-default mb-2">
+	<ul class="nav nav-pills nav-fill flex-column" role="tablist">
+		<li class="nav-item text-start">
+			<a href="#tab-statement" class="nav-link active" role="tab" data-bs-toggle="pill" data-bs-target="#tab-statement">
+				<i class="bi bi-journal-text"></i>
+				<?= UOJLocale::get('problems::statement') ?>
+			</a>
+		</li>
+		<li class="nav-item text-start">
+			<a href="#tab-submit-answer" class="nav-link" role="tab" data-bs-toggle="pill" data-bs-target="#tab-submit-answer">
+				<i class="bi bi-upload"></i>
+				<?= UOJLocale::get('problems::submit') ?>
+			</a>
+		</li>
+		<?php if ($custom_test_requirement): ?>
+		<li class="nav-item text-start">
+			<a class="nav-link" href="#tab-custom-test" role="tab" data-bs-toggle="pill" data-bs-target="#tab-custom-test">
+				<i class="bi bi-braces"></i>
+				<?= UOJLocale::get('problems::custom test') ?>
+			</a>
+		</li>
+		<?php endif ?>
+		<?php if (hasProblemPermission($myUser, $problem)): ?>
+		<li class="nav-item text-start">
+			<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
+				<i class="bi bi-sliders"></i>
+				<?= UOJLocale::get('problems::manage') ?>
+			</a>
+		</li>
+		<?php endif ?>
+		<?php if ($contest): ?>
+		<li class="nav-item">
+			<a class="nav-link" href="/contest/<?= $contest['id'] ?>" role="tab">
+				<i class="bi bi-arrow-90deg-left"></i>
+				<?= UOJLocale::get('contests::back to the contest') ?>
+			</a>
+		</li>
+		<?php endif ?>
+	</ul>
+</div>
+
+<div class="card card-default mb-2">
+	<ul class="nav nav-fill flex-column">
+		<li class="nav-item text-start">
+			<a class="nav-link" href="<?= HTML::url("/download.php?type=problem&id={$problem['id']}") ?>">
+				<i class="bi bi-hdd-stack"></i>
+				测试数据
+			</a>
+		</li>
+		<li class="nav-item text-start">
+			<a class="nav-link" href="<?= HTML::url("/download.php?type=attachment&id={$problem['id']}") ?>">
+				<i class="bi bi-download"></i>
+				附件下载
+			</a>
+		</li>
+		<li class="nav-item text-start">
+			<a class="nav-link" href="/problem/<?= $problem['id'] ?>/statistics">
+				<i class="bi bi-graph-up"></i>
+				<?= UOJLocale::get('problems::statistics') ?>
+			</a>
+		</li>
+	</ul>
+</div>
+
+<?php uojIncludeView('sidebar', array()); ?>
+</aside>
+
+</div>
+<?php endif ?>
+
 <?php echoUOJPageFooter() ?>

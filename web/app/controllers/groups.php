@@ -122,7 +122,7 @@ EOD;
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 
-<aside class="col">
+<aside class="col mt-3 mt-md-0">
 <?php 
 	uojIncludeView('sidebar', array());
 ?>

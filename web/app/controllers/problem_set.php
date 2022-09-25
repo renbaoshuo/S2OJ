@@ -151,7 +151,7 @@ EOD;
 	$pag = new Paginator($pag_config);
 
 	$div_classes = isset($REQUIRE_LIB['bootstrap5'])
-		? array('card', 'mb-3')
+		? array('card', 'mb-3', 'overflow-auto')
 		: array('table-responsive');
 	$table_classes = isset($REQUIRE_LIB['bootstrap5'])
 		? array('table', 'uoj-table', 'mb-0')
@@ -284,7 +284,7 @@ $('#input-show_submit_mode').click(function() {
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 
-<aside class="col">
+<aside class="col mt-3 mt-md-0">
 <?php 
 	uojIncludeView('sidebar', array());
 ?>

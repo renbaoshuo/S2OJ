@@ -829,15 +829,29 @@ class JudgementDetailsPrinter {
 			$test_time = $node->getAttribute('time');
 			$test_memory = $node->getAttribute('memory');
 
-			echo '<div class="card ', $this->styler->getTestInfoClass($test_info), ' mb-3">';
-			
+			echo '<div class="card ', $this->styler->getTestInfoClass($test_info);
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+			} else {
+			}
+			echo ' mb-3">';
+
 			$accordion_parent = "{$this->name}_details_accordion";
 			$accordion_collapse = "{$accordion_parent}_collapse_custom_test";
-			if (!$this->styler->shouldFadeDetails($test_info)) {
-				echo '<div class="card-header" data-toggle="collapse" data-parent="#', $accordion_parent, '" data-target="#', $accordion_collapse, '">';
-			} else {
-				echo '<div class="card-header">';
+			
+			echo '<div class="card-header ';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' uoj-submission-result-item bg-transparent rounded-0 border-0 ';
 			}
+			echo '" ';
+			if (!$this->styler->shouldFadeDetails($test_info)) {
+				if (isset($REQUIRE_LIB['bootstrap5'])) {
+					echo ' data-bs-toggle="collapse" data-bs-parent="#', $accordion_parent, '" data-bs-target="#', $accordion_collapse, '" ';
+				} else {
+					echo ' data-toggle="collapse" data-parent="#', $accordion_parent, '" data-target="#', $accordion_collapse, '" ';
+				}
+			}
+			echo '>';
+
 			echo '<div class="row">';
 			echo '<div class="col-sm-2">';
 			echo '<h4 class="card-title">', 'Custom Test: ', '</h4>';

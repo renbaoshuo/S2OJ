@@ -677,7 +677,7 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 		var help_file_id = 'help-' + name + '_file';
 
 		var input_language =
-			$('<select id="' + input_language_id + '" name="' + input_language_name + '" class="form-control input-sm"/>')
+			$('<select id="' + input_language_id + '" name="' + input_language_name + '" class="form-control input-sm form-select"/>')
 				.html(langs_options_html);
 		var input_upload_type_editor = $('<input type="radio" name="' + input_upload_type_name + '" value="editor" />');
 		var input_upload_type_file = $('<input type="radio" name="' + input_upload_type_name + '" value="file" />');
@@ -801,8 +801,8 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 
 		$(this)
 			.append($('<div class="row col-sm-12"/>')
-			.append($('<label class="col-sm-2 control-label"><div class="text-left">' + text + '</div></label>'))
-			.append($('<label class="col-sm-1 control-label" for="' + input_language_name + '">'+uojLocale('editor::language')+'</label>'))
+			.append($('<label class="col-sm-2 control-label"><div class="'+(isBootstrap5Page ? ' text-start ' : ' text-left ')+'">' + text + '</div></label>'))
+			.append($('<label class="col-sm-1 control-label '+ (isBootstrap5Page ? ' px-1 ' : '') +' " for="' + input_language_name + '">'+uojLocale('editor::language')+'</label>'))
 			.append($('<div class="col-sm-2"/>')
 				.append(input_language)
 			)
