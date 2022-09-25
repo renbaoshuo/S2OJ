@@ -29,5 +29,8 @@ return [
 	'contest registrants' => 'Registrants',
 	'problem self review' => 'Problem self review',
 	'contest self review' => 'Contest self review',
-	'contest self reviews' => 'Contest self reviews'
+	'contest self reviews' => 'Contest self reviews',
+	'will start in x days' => function($x) {
+		return "Will start in $x ".($x > 1 ? "days" : "day");
+	},
 ];

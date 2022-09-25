@@ -29,5 +29,8 @@ return [
 	'contest registrants' => '报名选手列表',
 	'problem self review' => '题目总结',
 	'contest self review' => '比赛总结',
-	'contest self reviews' => '赛后总结'
+	'contest self reviews' => '赛后总结',
+	'will start in x days' => function($x) {
+		return "将在 $x 天后开始";
+	},
 ];

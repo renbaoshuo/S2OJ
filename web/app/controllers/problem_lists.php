@@ -71,8 +71,9 @@
 
 <?php echoUOJPageHeader(UOJLocale::get('problems lists')) ?>
 
-
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="row">
+<div class="col-sm-12 col-md-9">
 <div class="d-flex justify-content-between">
 <?php endif ?>
 <h1 class="h2">
@@ -146,5 +147,17 @@ EOD;
 		$table_config,
 	);
 	?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
+
+<aside class="col">
+<?php 
+	uojIncludeView('sidebar', array());
+?>
+</aside>
+
+</div>
+<?php endif ?>
 
 <?php echoUOJPageFooter() ?>

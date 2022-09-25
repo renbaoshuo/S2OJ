@@ -160,6 +160,8 @@ EOD;
 <?php echoUOJPageHeader(UOJLocale::get('problems')) ?>
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="row">
+<div class="col-sm-12 col-md-9">
 <div class="d-flex justify-content-between">
 <?php endif ?>
 <h1 class="h2">
@@ -173,11 +175,15 @@ EOD;
 		<?php $new_problem_form->printHTML(); ?>
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 	</div>
-<?php endif ?>
+	<?php endif ?>
 <?php endif ?>
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
+<?php endif ?>
+
+<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="top-buffer-sm"></div>
 <?php endif ?>
 
 <div class="row">
@@ -237,7 +243,7 @@ EOD;
 	<?php echo $pag->pagination(); ?>
 	</div>
 </div>
-<div class="top-buffer-sm"></div>
+
 <script type="text/javascript">
 $('#input-show_tags_mode').click(function() {
 	if (this.checked) {
@@ -274,4 +280,17 @@ $('#input-show_submit_mode').click(function() {
 	</table>
 </div>
 <?= $pag->pagination() ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
+
+<aside class="col">
+<?php 
+	uojIncludeView('sidebar', array());
+?>
+</aside>
+
+</div>
+<?php endif ?>
+
 <?php echoUOJPageFooter() ?>

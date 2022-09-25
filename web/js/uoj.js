@@ -322,7 +322,7 @@ $.fn.click_zan_block = function() {
 }
 
 // count down
-function getCountdownStr(t) {
+function getCountdownStr(t, font_size, color = true) {
 	var x = Math.floor(t);
 	var ss = toFilledStr(x % 60, '0', 2);
 	x = Math.floor(x / 60);
@@ -330,17 +330,23 @@ function getCountdownStr(t) {
 	x = Math.floor(x / 60);
 	var hh = x.toString();
 	
-	var res = '<span style="font-size:30px">';
-	res += '<span style="color:' + getColOfScore(Math.min(t / 10800 * 100, 100)) + '">' + hh + '</span>';
+	var res = '<span style="font-size:' + font_size + '">';
+	res += '<span '
+	if (color) res += ' style="color:' + getColOfScore(Math.min(t / 10800 * 100, 100)) + '" ';
+	res += ' >' + hh + '</span>';
 	res += ':';
-	res += '<span style="color:' + getColOfScore(mm / 60 * 100) + '">' + mm + '</span>';
+	res += '<span '
+	if (color) res += ' style="color:' + getColOfScore(mm / 60 * 100) + '" ';
+	res += ' >' + mm + '</span>';
 	res += ':';
-	res += '<span style="color:' + getColOfScore(ss / 60 * 100) + '">' + ss + '</span>';
+	res += '<span ';
+	if (color) res += ' style="color:' + getColOfScore(ss / 60 * 100) + '" ';
+	res +=' >' + ss + '</span>';
 	res += '</span>'
 	return res;
 }
 
-$.fn.countdown = function(rest, callback) {
+$.fn.countdown = function(rest, callback, font_size = '30px', color = true) {
 	return this.each(function() {
 		var start = new Date().getTime();
 		var cur_rest = rest != undefined ? rest : parseInt($(this).data('rest'));
@@ -348,12 +354,12 @@ $.fn.countdown = function(rest, callback) {
 		var countdown = function() {
 			var passed = Math.floor((new Date().getTime() - start) / 1000);
 			if (passed >= cur_rest) {
-				$(cur).html(getCountdownStr(0));
+				$(cur).html(getCountdownStr(0, font_size, color));
 				if (callback != undefined) {
 					callback();
 				}
 			} else {
-				$(cur).html(getCountdownStr(cur_rest - passed));
+				$(cur).html(getCountdownStr(cur_rest - passed, font_size, color));
 				setTimeout(countdown, 1000);
 			}
 		}

@@ -81,7 +81,11 @@ class Paginator {
 		if ($this->n_pages == 1) {
 			return '';
 		}
-		$html = '<ul class="pagination top-buffer-no bot-buffer-sm justify-content-center">';
+		if (isset($REQUIRE_LIB['bootstrap5'])) {
+			$html = '<ul class="pagination my-0 justify-content-center">';
+		} else {
+			$html = '<ul class="pagination top-buffer-no bot-buffer-sm justify-content-center">';
+		}
 		if ($this->cur_page > 1) {
 			$html .= '<li class="page-item">'
 				   . '<a class="page-link" href="'.$this->getPageUri(1).'">';
