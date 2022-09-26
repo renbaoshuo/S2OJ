@@ -36,10 +36,10 @@ EOD;
 	$config = array();
 	$config['table_classes'] = array('table', 'table-hover');
 
-    if (isset($REQUIRE_LIB['bootstrap5'])) {
-    	$config['div_classes'] = array('card', 'my-3');
-    	$config['table_classes'] = array('table', 'uoj-table', 'mb-0');
-    }
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		$config['div_classes'] = array('card', 'my-3');
+		$config['table_classes'] = array('table', 'uoj-table', 'mb-0');
+	}
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('blogs')) ?>
 
