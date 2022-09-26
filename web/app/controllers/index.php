@@ -156,7 +156,9 @@
 		</div>
 
 		<?php if (Auth::check()): ?>
-		<?php uojIncludeView('sidebar') ?>
+			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+				<?php uojIncludeView('sidebar') ?>
+			<?php endif ?>
 		<?php endif ?>
 
 		<div class="card card-default mb-2">
