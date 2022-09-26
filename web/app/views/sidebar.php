@@ -57,7 +57,7 @@
 						$rest_seconds = $contest['start_time']->getTimestamp() - UOJTime::$time_now->getTimestamp();
 					?>
 				<?php if ($rest_seconds > 86400): ?>
-				<?= UOJLocale::get('contests::will start in x days', floor($rest_seconds / 86400)) ?>
+				<?= UOJLocale::get('contests::will start in x days', ceil($rest_seconds / 86400)) ?>
 				<?php else: ?>
 				<div id="contest-<?= $contest['id'] ?>-countdown"></div>
 				<script>$('#contest-<?= $contest['id'] ?>-countdown').countdown(<?= $rest_seconds ?>, function(){}, 'inherit', false);</script>
