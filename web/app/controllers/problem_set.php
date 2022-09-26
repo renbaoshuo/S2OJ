@@ -161,7 +161,7 @@ EOD;
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="row">
-<div class="col-sm-12 col-md-9">
+<div class="col-lg-9">
 <div class="d-flex justify-content-between">
 <?php endif ?>
 <h1 class="h2">
@@ -187,14 +187,20 @@ EOD;
 <?php endif ?>
 
 <div class="row">
-	<div class="col-sm-4">
+	<div class="
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	col-12 col-sm-6
+	<?php else: ?>
+	col-sm-4
+	<?php endif ?>
+	">
 		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
 	</div>
-	<div class="col-sm-4 order-sm-5
+	<div class="
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	text-end p-2
+	text-end p-2 col-12 col-sm-6
 	<?php else: ?>
-	text-right checkbox
+	text-right checkbox order-sm-5 col-sm-4
 	<?php endif ?>
 	">
 		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
@@ -239,10 +245,18 @@ EOD;
 		</div>
 		<?php endif ?>
 	</div>
+	<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 	<div class="col-sm-4 order-sm-3">
-	<?php echo $pag->pagination(); ?>
+		<?= $pag->pagination(); ?>
 	</div>
+	<?php endif ?>
 </div>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="text-center">
+	<?= $pag->pagination(); ?>
+</div>
+<?php endif ?>
 
 <script type="text/javascript">
 $('#input-show_tags_mode').click(function() {
@@ -284,7 +298,7 @@ $('#input-show_submit_mode').click(function() {
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 
-<aside class="col mt-3 mt-md-0">
+<aside class="col mt-3 mt-lg-0">
 
 <form method="get">
 	<div class="input-group mb-3">

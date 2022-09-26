@@ -9,7 +9,7 @@
 	?>
 <?php echoUOJPageHeader(UOJConfig::$data['profile']['oj-name-short']) ?>
 <div class="row">
-	<div class="col-sm-12 col-md-9">
+	<div class="col-lg-9">
 		<div class="card card-default">
 			<div class="card-body">
 				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>

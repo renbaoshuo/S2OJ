@@ -234,7 +234,7 @@ EOD
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="row">
-<div class="col-sm-12 col-md-9">
+<div class="col-lg-9">
 <?php endif ?>
 
 <?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
@@ -350,7 +350,7 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 
-<aside class="col">
+<aside class="col mt-3 mt-lg-0">
 <div class="card card-default mb-2">
 	<ul class="nav nav-pills nav-fill flex-column" role="tablist">
 		<li class="nav-item text-start">

@@ -25,7 +25,7 @@
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="row">
-<div class="col-sm-12 col-md-9">
+<div class="col-lg-9">
 <div class="d-flex justify-content-between">
 <?php endif ?>
 
@@ -180,7 +180,7 @@
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 
-<aside class="col mt-3 mt-md-0">
+<aside class="col mt-3 mt-lg-0">
 
 <?php uojIncludeView('sidebar', array()); ?>
 </aside>
