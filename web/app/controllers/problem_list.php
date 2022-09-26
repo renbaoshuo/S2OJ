@@ -49,7 +49,6 @@
 				echo ' <span class="text-info" style="font-size: 10px">' . $problem["uploader"] . '</span> ';
 
 				foreach (queryProblemTags($problem['id']) as $tag) {
-					
 					if (isset($REQUIRE_LIB['bootstrap5'])) {
 						echo '<a class="uoj-problem-tag my-1">';
 						echo '<span class="badge bg-secondary">';
@@ -256,6 +255,7 @@ $('#input-show_difficulty').click(function() {
 </div>
 
 <?= $pag->pagination();	?>
+
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 
@@ -266,4 +266,5 @@ $('#input-show_difficulty').click(function() {
 
 </div>
 <?php endif ?>
+
 <?php echoUOJPageFooter() ?>
