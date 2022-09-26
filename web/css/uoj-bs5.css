@@ -92,25 +92,26 @@ label {
 	cursor: pointer;
 }
 
-.card-uoj-accepted .card-header:hover,
-.card-uoj-accepted .uoj-status-text {
+.card-uoj-accepted > .card-header:hover,
+.card-uoj-accepted > div > .uoj-status-text {
 	color: #25ad40;
 }
 
-.card-uoj-acceptable-answer .card-header:hover,
-.card-uoj-acceptable-answer .uoj-status-text {
+.card-uoj-acceptable-answer > .card-header:hover,
+.card-uoj-acceptable-answer > div > .uoj-status-text {
 	color: #01bab2;
 }
 
-.card-uoj-tle .card-header:hover,
-.card-uoj-tle .uoj-status-text {
+.card-uoj-tle > .card-header:hover,
+.card-uoj-tle > div > .uoj-status-text {
 	color: sandybrown;
 }
 
-.card-uoj-wrong .card-header:hover,
-.card-uoj-wrong .uoj-status-text {
+.card-uoj-wrong > .card-header:hover,
+.card-uoj-wrong > div > .uoj-status-text {
 	color: #ff4f4f;
 }
+
 .markdown-body h1 {
 	font-size: 2em;
 	margin-bottom: 1rem;
