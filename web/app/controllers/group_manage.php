@@ -127,11 +127,9 @@
 		},
 		null
 	);
-
 	$default_ddl = new DateTime();
 	$default_ddl->setTime(17, 0, 0);
 	$default_ddl->add(new DateInterval("P7D"));
-
 	$add_new_assignment_form->addInput('new_assignment_deadline', 'text', '截止时间', $default_ddl->format('Y-m-d H:i'), 
 		function ($x) {
 			$ddl = DateTime::createFromFormat('Y-m-d H:i', $x);
@@ -143,8 +141,18 @@
 		},
 		null
 	);
+	$add_new_assignment_form->submit_button_config['align'] = 'compressed';
+	$add_new_assignment_form->submit_button_config['text'] = '添加作业';
+	$add_new_assignment_form->handle = function() {
+		global $group_id, $myUser;
+		$list_id = $_POST['new_assignment_list_id'];
+		$ddl = DateTime::createFromFormat('Y-m-d H:i', $_POST['new_assignment_deadline']);
+		$ddl_str = $ddl->format('Y-m-d H:i:s');
 
-	
+		DB::insert("insert into assignments (group_id, list_id, create_time, deadline) values ({$group_id}, '{$list_id}', now(), '{$ddl_str}')");
+	};
+	$add_new_assignment_form->runAtServer();
+
 	$remove_assignment_form = new UOJForm('remove_assignment');
 	$remove_assignment_form->addInput('remove_assignment_list_id', 'text', '题单 ID', '', 
 		function ($x) {
@@ -222,5 +230,48 @@
 
 <h5>删除小组的作业</h5>
 <?php $remove_assignment_form->printHTML(); ?>
+
+<h5>已被自动隐藏的作业</h5>
+<ul>
+		<?php
+	$assignments = queryGroupAssignments($group['id']);
+	foreach ($assignments as $ass) {
+		$ddl = DateTime::createFromFormat('Y-m-d H:i:s', $ass['deadline']);
+		$create_time = DateTime::createFromFormat('Y-m-d H:i:s', $ass['create_time']);
+		$now = new DateTime();
+
+		if ($now->getTimestamp() - $ddl->getTimestamp() <= 604800) {
+			continue;
+		}  // 7d
+
+		echo '<li>';
+		echo '<a ';
+		if (isset($REQUIRE_LIB['bootstrap5'])) {
+			echo ' class="text-decoration-none" ';
+		}
+		echo ' href="/problem_list/', $ass['list_id'], '">', $ass['title'], ' (题单 #', $ass['list_id'], ')</a>';
+
+		if ($ddl < $now) {
+			echo '<sup style="color:red">&nbsp;overdue</sup>';
+		} elseif ($ddl->getTimestamp() - $now->getTimestamp() < 86400) {  // 1d
+			echo '<sup style="color:red">&nbsp;soon</sup>';
+		} elseif ($now->getTimestamp() - $create_time->getTimestamp() < 86400) {  // 1d
+			echo '<sup style="color:red">&nbsp;new</sup>';
+		}
+
+		$ddl_str = $ddl->format('Y-m-d H:i');
+		echo ' (截止时间: ', $ddl_str, '，<a ';
+		if (isset($REQUIRE_LIB['bootstrap5'])) {
+			echo ' class="text-decoration-none" ';
+		}
+		echo ' href="/assignment/', $ass['id'], '">查看完成情况</a>)';
+		echo '</li>';
+	}
+
+	if (count($assignments) == 0) {
+		echo '<p>暂无作业</p>';
+	}
+	?>
+</ul>
 
 <?php echoUOJPageFooter() ?>
