@@ -1063,6 +1063,8 @@ function echoHackDetails($hack_details, $name) {
 }
 
 function echoHack($hack, $config, $user) {
+	global $REQUIRE_LIB;
+
 	$problem = queryProblemBrief($hack['problem_id']);
 	echo '<tr>';
 	if (!isset($config['id_hidden'])) {
@@ -1237,10 +1239,12 @@ function echoHacksList($cond, $tail, $config, $user) {
 		}
 	}
 
+	$table_config = isset($config['table_config']) ? $config['table_config'] : null;
+	
 	echoLongTable($col_names, 'hacks', $cond, $tail, $header_row,
 		function($hacks) use ($config, $user) {
 			echoHack($hacks, $config, $user);
-		}, null);
+		}, $table_config);
 }
 
 function echoBlog($blog, $config = array()) {

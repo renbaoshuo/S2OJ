@@ -7,6 +7,10 @@
 		become403Page();
 	}
 
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
+
 	$conds = array();
 
 	$q_problem_id = isset($_GET['problem_id']) && validateUInt($_GET['problem_id']) ? $_GET['problem_id'] : null;
@@ -50,31 +54,59 @@
 	
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('hacks')) ?>
+
+<h1 class="h2">
+<?= UOJLocale::get('hacks') ?>
+</h1>
+
 <div class="d-none d-sm-block">
-	<?php if ($myUser != null): ?>
-	<div class="float-right">
-		<a href="/hacks?hacker=<?= $myUser['username'] ?>" class="btn btn-success btn-sm"><?= UOJLocale::get('problems::hacks by me') ?></a>
-		<a href="/hacks?owner=<?= $myUser['username'] ?>" class="btn btn-danger btn-sm"><?= UOJLocale::get('problems::hacks to me') ?></a>
+	<?php if (Auth::check()): ?>
+	<div class="float-right
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+btn-group
+<?php endif ?>">
+		<a href="/hacks?hacker=<?= Auth::id() ?>" class="btn btn-success btn-sm"><?= UOJLocale::get('problems::hacks by me') ?></a>
+		<a href="/hacks?owner=<?= Auth::id() ?>" class="btn btn-danger btn-sm"><?= UOJLocale::get('problems::hacks to me') ?></a>
 	</div>
 	<?php endif ?>
 	<form id="form-search" class="form-inline" role="form">
-		<div id="form-group-submission_id" class="form-group">
+		<div id="form-group-submission_id" class="form-group
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+d-inline-block
+<?php endif ?>
+		">
 			<label for="input-submission_id" class="control-label"><?= UOJLocale::get('problems::submission id') ?>:</label>
 			<input type="text" class="form-control input-sm" name="submission_id" id="input-submission_id" value="<?= $q_submission_id ?>" maxlength="6" style="width:5em" />
 		</div>
-		<div id="form-group-problem_id" class="form-group">
+		<div id="form-group-problem_id" class="form-group
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+d-inline-block
+<?php endif ?>
+		">
 			<label for="input-problem_id" class="control-label"><?= UOJLocale::get('problems::problem id') ?>:</label>
 			<input type="text" class="form-control input-sm" name="problem_id" id="input-problem_id" value="<?= $q_problem_id ?>" maxlength="4" style="width:4em" />
 		</div>
-		<div id="form-group-hacker" class="form-group">
+		<div id="form-group-hacker" class="form-group
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+d-inline-block
+<?php endif ?>
+		">
 			<label for="input-hacker" class="control-label"><?= UOJLocale::get('problems::hacker') ?>:</label>
 			<input type="text" class="form-control input-sm" name="hacker" id="input-hacker" value="<?= $q_hacker ?>" maxlength="100" style="width:10em" />
 		</div>
-		<div id="form-group-owner" class="form-group">
+		<div id="form-group-owner" class="form-group
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+d-inline-block
+<?php endif ?>
+		">
 			<label for="input-owner" class="control-label"><?= UOJLocale::get('problems::owner') ?>:</label>
 			<input type="text" class="form-control input-sm" name="owner" id="input-owner" value="<?= $q_owner ?>" maxlength="100" style="width:10em" />
 		</div>
-		<div id="form-group-status" class="form-group">
+		<div id="form-group-status" class="form-group
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+d-inline-block
+<?php endif ?>
+		">
 			<label for="input-status" class="control-label"><?= UOJLocale::get('problems::result') ?>:</label>
 			<select class="form-control input-sm" id="input-status" name="status">
 				<option value=""<?= $selected_all?>>All</option>
@@ -101,9 +133,28 @@
 			location.href = url;
 		});
 	</script>
+	
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	<div class="mt-3"></div>
+<?php else: ?>
 	<div class="top-buffer-sm"></div>
+<?php endif ?>
+		
 </div>
-<?php
-		echoHacksList($cond, 'order by id desc', array('judge_time_hidden' => ''), $myUser);
+
+<?php echoHacksList($cond,
+	'order by id desc',
+	array(
+		'judge_time_hidden' => '',
+		'table_config' => (isset($REQUIRE_LIB['bootstrap5']) 
+			? array(
+				'div_classes' => array('card', 'mb-3', 'overflow-auto'),
+				'table_classes' => array('table', 'mb-0', 'uoj-table', 'text-center')
+			)
+			: array()
+		),
+	),
+	$myUser);
 	?>
+
 <?php echoUOJPageFooter() ?>
