@@ -46,6 +46,7 @@ Route::group([
 
 		Route::any('/groups', '/groups.php');
 		Route::any('/group/{id}', '/group.php');
+		Route::any('/group/{id}/manage', '/group_manage.php');
 
 		Route::any('/assignment/{id}', '/assignment.php');
 		
@@ -68,7 +69,6 @@ Route::group([
 		Route::any('/forgot-password', '/forgot_pw.php');
 		Route::any('/reset-password', '/reset_pw.php');
 		Route::any('/user/profile/{username}', '/user_info.php');
-		Route::any('/user/self_reviews/{username}', '/user_self_reviews.php');
 		Route::any('/user/modify-profile', '/change_user_info.php');
 		Route::any('/user/msg', '/user_msg.php');
 		Route::any('/user/system-msg', '/user_system_msg.php');
