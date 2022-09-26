@@ -93,22 +93,22 @@ label {
 }
 
 .card-uoj-accepted > .card-header:hover,
-.card-uoj-accepted > div > .uoj-status-text {
+.card-uoj-accepted > div.card-header > div > .uoj-status-text {
 	color: #25ad40;
 }
 
 .card-uoj-acceptable-answer > .card-header:hover,
-.card-uoj-acceptable-answer > div > .uoj-status-text {
+.card-uoj-acceptable-answer > div.card-header > div > .uoj-status-text {
 	color: #01bab2;
 }
 
 .card-uoj-tle > .card-header:hover,
-.card-uoj-tle > div > .uoj-status-text {
+.card-uoj-tle > div.card-header > div > .uoj-status-text {
 	color: sandybrown;
 }
 
 .card-uoj-wrong > .card-header:hover,
-.card-uoj-wrong > div > .uoj-status-text {
+.card-uoj-wrong > div.card-header > div > .uoj-status-text {
 	color: #ff4f4f;
 }
 
