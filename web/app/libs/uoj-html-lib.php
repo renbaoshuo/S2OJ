@@ -145,9 +145,18 @@ function getContestProblemLink($problem, $contest_id, $problem_title = '!title_o
 	return $result;
 }
 function getBlogLink($id) {
+	global $REQUIRE_LIB;
+
+	$result = '';
 	if (validateUInt($id) && $blog = queryBlog($id)) {
-		return '<a href="/blogs/'.$id.'">'.$blog['title'].'</a>';
+		$result = '<a ';
+		if (isset($REQUIRE_LIB['bootstrap5'])) {
+			$result .= ' class="text-decoration-none" ';
+		}
+		$result .= ' href="/blogs/'.$id.'">'.$blog['title'].'</a>';
 	}
+
+	return $result;
 }
 function getClickZanBlock($type, $id, $cnt, $val = null) {
 	if ($val == null) {

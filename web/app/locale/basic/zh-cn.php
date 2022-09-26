@@ -18,6 +18,7 @@ return [
 	'submissions' => '提交记录',
 	'hacks' => 'Hack!',
 	'blogs' => '博客',
+	'blogs overview' => '博客总览',
 	'announcements' => '公告',
 	'all the announcements' => '所有公告……',
 	'solved' => 'AC 数',

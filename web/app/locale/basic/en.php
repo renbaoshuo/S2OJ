@@ -18,6 +18,7 @@ return [
 	'submissions' => 'Submissions',
 	'hacks' => 'Hack!',
 	'blogs' => 'Blogs',
+	'blogs overview' => 'Blogs Overview',
 	'announcements' => 'Announcements',
 	'all the announcements' => 'All the Announcements……',
 	'solved' => 'Solved',
