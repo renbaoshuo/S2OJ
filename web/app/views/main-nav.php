@@ -131,18 +131,6 @@ mb-4" role="navigation">
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 			<hr class="d-lg-none text-muted">
 			<ul class="nav navbar-nav ms-md-auto">
-				<li class="nav-item">
-					<a class="nav-link" href="#" id="back-to-bs4">
-						<i class="bi bi-sign-turn-left"></i>
-						返回旧版
-					</a>
-					<script>
-						$('#back-to-bs4').click(function() {
-							$.cookie('bootstrap4', '1', { expires: 7, path: '/' });
-							location.reload();
-						});
-					</script>
-				</li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 						<i class="bi bi-translate"></i>

@@ -13,6 +13,14 @@
 								<a class="text-decoration-none" href="<?= HTML::url('/') ?>">S2OJ</a>
 								(build: <a class="text-decoration-none" href="https://github.com/renbaoshuo/S2OJ<?= UOJConfig::$data['profile']['s2oj-version'] == "dev" ? '' : '/tree/' . UOJConfig::$data['profile']['s2oj-version'] ?>"><?= UOJConfig::$data['profile']['s2oj-version'] ?></a>)
 								<?= UOJLocale::get('server time') ?>: <?= UOJTime::$time_now_str ?>
+								|
+								<a class="text-decoration-none" href="#" id="back-to-bs4">返回旧版</a>
+								<script>
+									$('#back-to-bs4').click(function() {
+										$.cookie('bootstrap4', '1', { expires: 7, path: '/' });
+										location.reload();
+									});
+								</script>
 							</p>
 							<p>
 								Based on
