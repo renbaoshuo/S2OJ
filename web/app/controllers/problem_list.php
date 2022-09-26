@@ -114,6 +114,9 @@ EOD;
 <div class="d-flex justify-content-between">
 <?php endif ?>
 <h1 class="h2">
+	<?php if ($list['is_hidden']): ?>
+	<span class="fs-5 text-danger">[隐藏]</span>
+	<?php endif ?>
 	<?= $list['title'] ?>
 	<span class="fs-5">(ID: #<?= $list['id'] ?>)</span>
 </h1>
