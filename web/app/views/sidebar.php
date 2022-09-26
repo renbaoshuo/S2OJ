@@ -1,4 +1,6 @@
-<?php if (!isset($group_announcements_hidden) && Auth::check()): ?>
+<?php if (Auth::check()): ?>
+
+<?php if (!isset($group_announcements_hidden)): ?>
 <?php $groups = queryGroupsOfUser(Auth::id()); ?>
 <?php if (count($groups)): ?>
 <div class="card card-default mb-2" id="group-user-announcements">
@@ -80,3 +82,5 @@
 	</div>
 </div>
 <?php endif ?>
+
+<?php endif // Auth::check() ?>

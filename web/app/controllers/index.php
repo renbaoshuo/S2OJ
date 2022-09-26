@@ -111,10 +111,10 @@
 		<?php endif ?>
 	</div>
 	<div class="col">
-		<div class="d-none d-md-block">
+		<div class="d-none d-md-block mb-4">
 			<img class="media-object img-thumbnail" src="/images/logo.png" alt="Logo" />
 		</div>
-		<div class="card card-default mt-4">
+		<div class="card card-default mb-2">
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 			<div class="card-header bg-white">
 				<b><?= UOJLocale::get('countdowns') ?></b>
@@ -154,7 +154,12 @@
 				<?php endif ?>
 			</div>
 		</div>
-		<div class="card card-default mt-4">
+
+		<?php if (Auth::check()): ?>
+		<?php uojIncludeView('sidebar') ?>
+		<?php endif ?>
+
+		<div class="card card-default mb-2">
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 				<div class="card-header bg-white">
 					<b><?= UOJLocale::get('friend links') ?></b>
