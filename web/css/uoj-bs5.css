@@ -118,24 +118,26 @@ label {
 }
 
 .markdown-body h2 {
-	font-size: 1.5em;
+	font-size: 1.75em;
 	margin-bottom: 1rem;
 }
 
 .markdown-body h3 {
-	font-size: 1.25em;
+	font-size: 1.5em;
 }
 
 .markdown-body h4 {
-	font-size: 1em;
+	font-size: 1.25em;
 }
 
 .markdown-body h5 {
-	font-size: 0.875em;
+	font-size: 1em;
+	font-weight: bold;
 }
 
 .markdown-body h6 {
-	font-size: 0.85em;
+	font-size: 0.9em;
+	font-weight: bold;
 }
 
 .markdown-body img {
