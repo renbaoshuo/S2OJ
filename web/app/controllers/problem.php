@@ -9,6 +9,10 @@
 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
 		become404Page();
 	}
+	
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
 
 	$problem_content = queryProblemContent($problem['id']);
 	
@@ -53,10 +57,6 @@
 		if (!isNormalUser($myUser)) {
 			become403Page();
 		}
-	}
-	
-	if (!isset($_COOKIE['bootstrap4']) && !$contest) {
-		$REQUIRE_LIB['bootstrap5'] = '';
 	}
 
 	$submission_requirement = json_decode($problem['submission_requirement'], true);
@@ -254,6 +254,12 @@ EOD
 <?php endif ?>
 
 <?php if ($contest): ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<h1 class="h2 card-title text-center">
+	<?= $problem_letter ?>. <?= $problem['title'] ?>
+</h1>
+<?php else: ?>
 <div class="page-header row">
 	<h1 class="col-md-3 text-left"><small><?= $contest['name'] ?></small></h1>
 	<h1 class="col-md-7 text-center"><?= $problem_letter ?>. <?= $problem['title'] ?></h1>
@@ -265,10 +271,11 @@ EOD
 </div>
 <?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
 <script type="text/javascript">
-checkContestNotice(<?= $contest['id'] ?>, '<?= UOJTime::$time_now_str ?>');
 $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJTime::$time_now->getTimestamp() ?>);
 </script>
 <?php endif ?>
+<?php endif ?>
+
 <?php else: ?>
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
@@ -278,6 +285,15 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 <?php endif ?>
 	#<?= $problem['id']?>. <?= $problem['title'] ?>
 </h1>
+
+<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="btn-group float-right" role="group">
+<a role="button" class="btn btn-primary" href="<?= HTML::url("/download.php?type=problem&id={$problem['id']}") ?>"><span class="glyphicon glyphicon-tasks"></span> 测试数据</a>
+<a role="button" class="btn btn-primary" href="<?= HTML::url("/download.php?type=attachment&id={$problem['id']}") ?>"><span class="glyphicon glyphicon-download-alt"></span> 附件下载</a>
+<a role="button" class="btn btn-info" href="/problem/<?= $problem['id'] ?>/statistics"><span class="glyphicon glyphicon-stats"></span> <?= UOJLocale::get('problems::statistics') ?></a>
+</div>
+<?php endif ?>
+<?php endif ?>
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="text-center small">
@@ -289,15 +305,6 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 </div>
 
 <hr>
-<?php endif ?>
-
-<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-<div class="btn-group float-right" role="group">
-<a role="button" class="btn btn-primary" href="<?= HTML::url("/download.php?type=problem&id={$problem['id']}") ?>"><span class="glyphicon glyphicon-tasks"></span> 测试数据</a>
-<a role="button" class="btn btn-primary" href="<?= HTML::url("/download.php?type=attachment&id={$problem['id']}") ?>"><span class="glyphicon glyphicon-download-alt"></span> 附件下载</a>
-<a role="button" class="btn btn-info" href="/problem/<?= $problem['id'] ?>/statistics"><span class="glyphicon glyphicon-stats"></span> <?= UOJLocale::get('problems::statistics') ?></a>
-</div>
-<?php endif ?>
 <?php endif ?>
 
 <?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
@@ -351,6 +358,34 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 </div>
 
 <aside class="col mt-3 mt-lg-0">
+
+<?php if ($contest): ?>
+<div class="card card-default mb-2">
+	<div class="card-body">
+		<h3 class="h5 card-title text-center">
+			<a class="text-decoration-none text-body" href="/contest/<?= $contest['id'] ?>">
+				<?= $contest['name'] ?>
+			</a>
+		</h3>
+		<div class="card-text text-center text-muted">
+			<?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
+				<span id="contest-countdown"></span>
+			<?php else: ?>
+				<?= UOJLocale::get('contests::contest ended') ?>
+			<?php endif ?>
+		</div>
+	</div>
+	<div class="card-footer bg-transparent">
+		比赛评价：<?= getClickZanBlock('C', $contest['id'], $contest['zan']) ?>
+	</div>
+</div>
+<?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
+<script type="text/javascript">
+$('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJTime::$time_now->getTimestamp() ?>, function(){}, '1.75rem', false);
+</script>
+<?php endif ?>
+<?php endif ?>
+
 <div class="card card-default mb-2">
 	<ul class="nav nav-pills nav-fill flex-column" role="tablist">
 		<li class="nav-item text-start">
@@ -382,7 +417,7 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 		</li>
 		<?php endif ?>
 		<?php if ($contest): ?>
-		<li class="nav-item">
+		<li class="nav-item text-start">
 			<a class="nav-link" href="/contest/<?= $contest['id'] ?>" role="tab">
 				<i class="bi bi-arrow-90deg-left"></i>
 				<?= UOJLocale::get('contests::back to the contest') ?>
@@ -415,7 +450,13 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 	</ul>
 </div>
 
-<?php uojIncludeView('sidebar', array()); ?>
+<?php
+	$sidebar_config = array();
+	if ($contest && $contest['cur_progress'] <= CONTEST_IN_PROGRESS) {
+		$sidebar_config['upcoming_contests_hidden'] = '';
+	}
+	uojIncludeView('sidebar', $sidebar_config);
+	?>
 </aside>
 
 </div>
@@ -427,6 +468,12 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 			$(this).addClass('table table-bordered table-striped');
 		});
 	});
+</script>
+<?php endif ?>
+
+<?php if ($contest && $contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
+<script type="text/javascript">
+checkContestNotice(<?= $contest['id'] ?>, '<?= UOJTime::$time_now_str ?>');
 </script>
 <?php endif ?>
 
