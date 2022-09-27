@@ -448,6 +448,9 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 			</a>
 		</li>
 	</ul>
+	<div class="card-footer bg-transparent">
+		评价：<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
+	</div>
 </div>
 
 <?php
