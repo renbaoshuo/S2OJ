@@ -148,3 +148,15 @@ label {
 	padding: 1em;
 	background-color: rgba(var(--bs-light-rgb));
 }
+
+.markdown-body table th[align='left'] {
+	text-align: left;
+}
+
+.markdown-body table th[align='center'] {
+	text-align: center;
+}
+
+.markdown-body table th[align='right'] {
+	text-align: right;
+}
