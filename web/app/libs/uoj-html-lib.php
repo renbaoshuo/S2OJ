@@ -862,23 +862,39 @@ class JudgementDetailsPrinter {
 			echo '>';
 
 			echo '<div class="row">';
-			echo '<div class="col-sm-2">';
+			echo '<div class="col-sm-4">';
 			echo '<h4 class="card-title">', 'Custom Test: ', '</h4>';
 			echo '</div>';
-				
-			echo '<div class="col-sm-4">';
+
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo '<div class="col-sm-4 uoj-status-text">';
+
+				echo $this->styler->getTestInfoIcon($test_info);
+			} else {
+				echo '<div class="col-sm-4">';
+			}
 			echo htmlspecialchars($test_info);
 			echo '</div>';
 				
-			echo '<div class="col-sm-3">';
+			echo '<div class="col-sm-2">';
 			if ($test_time >= 0) {
-				echo 'time: ', $test_time, 'ms';
+				if (isset($REQUIRE_LIB['bootstrap5'])) {
+					echo '<i class="bi bi-hourglass-split"></i> ';
+				} else {
+					echo 'time: ';
+				}
+				echo $test_time, ' ms';
 			}
 			echo '</div>';
 
-			echo '<div class="col-sm-3">';
+			echo '<div class="col-sm-2">';
 			if ($test_memory >= 0) {
-				echo 'memory: ', $test_memory, 'kb';
+				if (isset($REQUIRE_LIB['bootstrap5'])) {
+					echo '<i class="bi bi-memory"></i> ';
+				} else {
+					echo 'memory: ';
+				}
+				echo $test_memory, ' kB';
 			}
 			echo '</div>';
 
@@ -1017,6 +1033,19 @@ class CustomTestSubmissionDetailsStyler {
 			return 'card-uoj-acceptable-answer';
 		} else {
 			return 'card-uoj-wrong';
+		}
+	}
+	public function getTestInfoIcon($test_info) {
+		if ($test_info == 'Success') {
+			return '<i class="bi bi-check-lg"></i> ';
+		} elseif ($test_info == 'Time Limit Exceeded') {
+			return '<i class="bi bi-clock"></i> ';
+		} elseif ($test_info == 'Acceptable Answer') {
+			return '<i class="bi bi-dash-square"></i> ';
+		} elseif ($test_info == 'Wrong Answer') {
+			return '<i class="bi bi-x-lg"></i> ';
+		} else {
+			return '<i class="bi bi-slash-circle"></i> ';
 		}
 	}
 	public function shouldFadeDetails($info) {
