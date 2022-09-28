@@ -258,7 +258,7 @@ $.fn.uoj_blog_tag = function() {
 
 // click zan
 function click_zan(zan_id, zan_type, zan_delta, node) {
-	var loading_node = $('<div class="text-muted">loading...</div>');
+	var loading_node = $('<div class="uoj-click-zan-block text-muted">loading...</div>');
 	$(node).replaceWith(loading_node);
 	$.post(zan_link + '/click-zan', {
 		id : zan_id,
@@ -267,7 +267,7 @@ function click_zan(zan_id, zan_type, zan_delta, node) {
 	}, function(ret) {
 		$(loading_node).replaceWith($(ret).click_zan_block());
 	}).fail(function() {
-		$(loading_node).replaceWith('<div class="text-danger">failed</div>');
+		$(loading_node).replaceWith('<div class="uoj-click-zan-block text-danger">failed</div>');
 	});
 }
 
