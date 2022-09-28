@@ -757,6 +757,7 @@ EOD
 								<select class="form-control" id="use_builtin_checker" name="use_builtin_checker">
   									<option value="ncmp">ncmp: 整数序列</option>
   									<option value="wcmp">wcmp: 字符串序列</option>
+									<option value="lcmp">lcmp: 多行数据（忽略行内与行末的多余空格，同时忽略文末回车）</option>
 									<option value="fcmp">fcmp: 多行数据（不忽略行末空格，但忽略文末回车）</option>
 									<option value="rcmp4">rcmp4: 浮点数序列（误差不超过 1e-4）</option>
 									<option value="rcmp6">rcmp6: 浮点数序列（误差不超过 1e-6）</option>
