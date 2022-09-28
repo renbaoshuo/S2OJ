@@ -261,7 +261,7 @@ EOD;
 
 <?php if (isset($add_new_solution_form)): ?>
 <div class="card card-default mb-2">
-	<div class="card-header bg-transparent">
+	<div class="card-header bg-transparent fw-bold">
 		增加题解
 	</div>
 	<div class="card-body">
