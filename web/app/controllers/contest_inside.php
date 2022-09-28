@@ -341,7 +341,7 @@
 		global $contest, $post_notice, $post_question, $reply_question;
 		
 		$myname = Auth::id();
-		$contest_problems = DB::selectAll("select contests_problems.problem_id, best_ac_submissions.submission_id from contests_problems left join best_ac_submissions on contests_problems.problem_id = best_ac_submissions.problem_id and submitter = '{$myname}' where contest_id = {$contest['id']} order by contests_problems.problem_id asc");
+		$contest_problems = DB::selectAll("select contests_problems.problem_id, best_ac_submissions.submission_id from contests_problems left join best_ac_submissions on contests_problems.problem_id = best_ac_submissions.problem_id and submitter = '{$myname}' where contest_id = {$contest['id']} order by contests_problems.dfn, contests_problems.problem_id");
 		
 		for ($i = 0; $i < count($contest_problems); $i++) {
 			$contest_problems[$i]['problem'] = queryProblemBrief($contest_problems[$i]['problem_id']);
