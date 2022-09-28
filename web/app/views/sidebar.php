@@ -18,7 +18,7 @@
 					<?= $group['title'] ?>
 				</a>
 				<?php if ($group_announcement): ?>
-				<div id="announcement-content-<?= $group['id'] ?>"></div>
+				<div id="announcement-content-<?= $group['id'] ?>" class="text-break"></div>
 				<script>(function(){
 					$('#announcement-content-<?= $group['id'] ?>')
 						.html(DOMPurify.sanitize(decodeURIComponent("<?= urlencode($group_announcement) ?>"), <?= DOM_SANITIZE_CONFIG ?>)); 
