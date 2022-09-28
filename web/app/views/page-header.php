@@ -318,7 +318,7 @@
 							<div id="announcement-content-<?= $group['id'] ?>"></div>
 							<script>(function(){
 								$('#announcement-content-<?= $group['id'] ?>')
-									.html(DOMPurify.sanitize(decodeURIComponent("<?= urlencode($group_announcement) ?>"), <?= DOM_SANITIZE_CONFIG ?>)); 
+									.html(DOMPurify.sanitize(decodeURIComponent("<?= rawurlencode($group_announcement) ?>"), <?= DOM_SANITIZE_CONFIG ?>)); 
 							})();</script>
 							<?php else: ?>
 							<div>（暂无公告）</div>

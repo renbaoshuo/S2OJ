@@ -1347,10 +1347,10 @@ function echoRanklist($config = array()) {
 		echo '<td>' . getUserLink($user['username']) . '</td>';
 		$motto_id = uniqid("motto-{$user['username']}-");
 		echo "<td id=\"$motto_id\"></td>";
-		$motto = addslashes($user['motto']);
+		$motto = rawurlencode($user['motto']);
 		$dom_sanitize_config = DOM_SANITIZE_CONFIG;
 		echo '<script type="text/javascript">';
-		echo "$(function() { $('#$motto_id').html(DOMPurify.sanitize('{$motto}', $dom_sanitize_config)); });";
+		echo "$(function() { $('#$motto_id').html(DOMPurify.sanitize(decodeURIComponent(\"{$motto}\"), $dom_sanitize_config)); });";
 		echo '</script>';
 		echo '<td>' . $user['ac_num'] . '</td>';
 		echo '</tr>';

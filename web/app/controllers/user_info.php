@@ -41,7 +41,7 @@
 					<?php $motto_id = uniqid("motto-{$user['username']}-"); ?>
 					<div class="card-text" id="<?= $motto_id ?>"></div>
 					<script type="text/javascript">
-						$(function() { $('#<?= $motto_id ?>').html(DOMPurify.sanitize(decodeURIComponent("<?= urlencode($user['motto']) ?>"), <?= DOM_SANITIZE_CONFIG ?>)); });
+						$(function() { $('#<?= $motto_id ?>').html(DOMPurify.sanitize(decodeURIComponent("<?= rawurlencode($user['motto']) ?>"), <?= DOM_SANITIZE_CONFIG ?>)); });
 					</script>
 				</div>
 				<ul class="list-group list-group-flush">
@@ -199,13 +199,10 @@
 					</div>
 					<div class="list-group-item">
 						<h4 class="list-group-item-heading"><?= UOJLocale::get('motto') ?></h4>
-						<?php
-								$motto_id = uniqid("motto-{$user['username']}-");
-	$dom_sanitize_config = DOM_SANITIZE_CONFIG;
-	?>
+						<?php $motto_id = uniqid("motto-{$user['username']}-"); ?>
 						<p class="list-group-item-text" id="<?= $motto_id ?>"></p>
 						<script type="text/javascript">
-							$(function() { $('#<?= $motto_id ?>').html(DOMPurify.sanitize('<?= addslashes($user['motto']) ?>', <?= $dom_sanitize_config ?>)); });
+							$(function() { $('#<?= $motto_id ?>').html(DOMPurify.sanitize('<?= addslashes($user['motto']) ?>', <?= DOM_SANITIZE_CONFIG ?>)); });
 						</script>
 					</div>
 					
