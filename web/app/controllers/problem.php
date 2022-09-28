@@ -314,6 +314,9 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 	<?php if ($custom_test_requirement): ?>
 	<li class="nav-item"><a class="nav-link" href="#tab-custom-test" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-console"></span> <?= UOJLocale::get('problems::custom test') ?></a></li>
 	<?php endif ?>
+	<?php if (!$contest): ?>
+	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/solutions" role="tab"><?= UOJLocale::get('problems::solutions') ?></a></li>
+	<?php endif ?>
 	<?php if (hasProblemPermission($myUser, $problem)): ?>
 	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab"><?= UOJLocale::get('problems::manage') ?></a></li>
 	<?php endif ?>
@@ -405,6 +408,14 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 			<a class="nav-link" href="#tab-custom-test" role="tab" data-bs-toggle="pill" data-bs-target="#tab-custom-test">
 				<i class="bi bi-braces"></i>
 				<?= UOJLocale::get('problems::custom test') ?>
+			</a>
+		</li>
+		<?php endif ?>
+		<?php if (!$contest): ?>
+		<li class="nav-item text-start">
+			<a href="/problem/<?= $problem['id'] ?>/solutions" class="nav-link" role="tab">
+				<i class="bi bi-journal-bookmark"></i>
+				<?= UOJLocale::get('problems::solutions') ?>
 			</a>
 		</li>
 		<?php endif ?>

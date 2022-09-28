@@ -25,6 +25,19 @@ function hasViewPermission($str, $user, $problem, $submission) {
 	return false;
 }
 
+function hasViewSolutionPermission($str, $user, $problem) {
+	if (isSuperUser($user)) {
+		return true;
+	}
+	if ($str == 'ALL') {
+		return true;
+	}
+	if ($str == 'ALL_AFTER_AC') {
+		return hasAC($user, $problem);
+	}
+	return false;
+}
+
 function hasContestPermission($user, $contest) {
 	if ($user == null) {
 		return false;
@@ -85,6 +98,10 @@ function queryProblemListTags($id) {
 }
 function queryProblemInList($list_id, $problem_id) {
 	return DB::selectFirst("select * from lists_problems where list_id='$blog_id' and problem_id='$problem_id'", MYSQLI_ASSOC);
+}
+
+function querySolution($problem_id, $blog_id) {
+	return DB::selectFirst("select * from problems_solutions where blog_id='$blog_id' and problem_id='$problem_id'", MYSQLI_ASSOC);
 }
 
 function queryContestProblemRank($contest, $problem) {

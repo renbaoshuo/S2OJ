@@ -17,6 +17,7 @@ return [
 	'statement' => 'Statement',
 	'custom test' => 'Custom Test',
 	'manage' => 'Manage',
+	'solutions' => 'Solutions',
 	'statistics' => 'Statistics',
 	'run' => 'Run',
 	'source code' => 'Source code',

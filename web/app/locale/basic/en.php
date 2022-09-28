@@ -50,6 +50,7 @@ return [
 	'title' => 'Title',
 	'content' => 'Content',
 	'time' => 'Time',
+	'post time' => 'Post time',
 	'none' => 'None',
 	'user profile' => 'User profile',
 	'send private message' => 'Send private message',

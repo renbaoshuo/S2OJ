@@ -50,6 +50,7 @@ return [
 	'title' => '标题',
 	'content' => '内容',
 	'time' => '时间',
+	'post time' => '发布时间',
 	'none' => '无',
 	'user profile' => '用户信息',
 	'send private message' => '发送私信',

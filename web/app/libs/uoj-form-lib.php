@@ -430,7 +430,7 @@ EOD
 				} else {
 					echo '<div class="text-', $this->submit_button_config['align'], '">';
 				}
-				echo '<button type="submit" id="button-submit-', $this->form_name, '" name="submit-', $this->form_name, '" value="', $this->form_name, '" class="mt-2 ', $this->submit_button_config['class_str'], '">', $this->submit_button_config['text'], '</button>';
+				echo '<button type="submit" id="button-submit-', $this->form_name, '" name="submit-', $this->form_name, '" value="', $this->form_name, '" class="', (isset($this->submit_button_config['margin_class']) ? $this->submit_button_config['margin_class'] : 'mt-2'), ' ', $this->submit_button_config['class_str'], '">', $this->submit_button_config['text'], '</button>';
 				if ($this->submit_button_config['align'] == 'offset') {
 					echo '</div>';
 				}

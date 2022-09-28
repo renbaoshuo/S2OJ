@@ -18,6 +18,7 @@ return [
 	'manage' => '管理',
 	'submissions statistics' => '统计提交情况',
 	'statistics' => '统计',
+	'solutions' => '题解',
 	'run' => '运行',
 	'source code' => '源文件',
 	'text file' => '文本文件',

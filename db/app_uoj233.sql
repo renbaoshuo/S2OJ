@@ -633,6 +633,28 @@ LOCK TABLES `problems_permissions` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `problems_solutions`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `problems_solutions` (
+  `problem_id` int(11) NOT NULL,
+  `blog_id` int(11) NOT NULL,
+  PRIMARY KEY (`problem_id`, `blog_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `problems_solutions`
+--
+
+LOCK TABLES `problems_solutions` WRITE;
+/*!40000 ALTER TABLE `problems_solutions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `problems_solutions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `problems_tags`
 --
 
