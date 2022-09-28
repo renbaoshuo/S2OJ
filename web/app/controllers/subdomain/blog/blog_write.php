@@ -26,11 +26,11 @@
 		);
 	} else {
 		$blog_editor->cur_data = array(
-			'title' => '新博客',
+			'title' => $_GET['title'] ?: '新博客',
 			'content_md' => '',
 			'content' => '',
 			'tags' => array(),
-			'is_hidden' => true
+			'is_hidden' => isset($_GET['is_hidden']) ? $_GET['is_hidden'] : true,
 		);
 	}
 	if ($blog) {

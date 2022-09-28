@@ -267,6 +267,11 @@ EOD;
 	<div class="card-body">
 		<?php $add_new_solution_form->printHTML(); ?>
 	</div>
+	<div class="card-footer bg-transparent">
+		<a class="text-decoration-none" href="<?= HTML::blog_url(Auth::id(), '/post/new/write?title=' . urlencode('【题解】#' . $problem['id'] . '. ' . $problem['title']) . '&is_hidden=0') ?>">
+			快速新建文章
+		</a>
+	</div>
 </div>
 <?php endif ?>
 
