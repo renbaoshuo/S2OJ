@@ -228,6 +228,12 @@
 			<?= HTML::js_src('/js/jquery.github_contribution_graph.js') ?>
 		<?php endif ?>
 
+		<?php if (isset($REQUIRE_LIB['calendar_heatmap'])): ?>
+			<!-- jquery-calendar-heatmap -->
+			<?= HTML::css_link('/css/jquery.calendar_heatmap.min.css') ?>
+			<?= HTML::js_src('/js/jquery.calendar_heatmap.min.js') ?>
+		<?php endif ?>
+
 		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 		<!--[if lt IE 9]>
 			<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
