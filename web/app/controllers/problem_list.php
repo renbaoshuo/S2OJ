@@ -73,6 +73,14 @@
 				</td>
 EOD;
 			}
+			if (isset($_COOKIE['show_difficulty'])) {
+				$extra_config = getProblemExtraConfig($problem);
+				if ($extra_config['difficulty'] == 0) {
+					echo "<td></td>";
+				} else {
+					echo "<td>{$extra_config['difficulty']}</td>";
+				}
+			}
 			echo '<td class="text-left">', getClickZanBlock('P', $problem['id'], $problem['zan']), '</td>';
 			echo '</tr>';
 		}
@@ -86,11 +94,14 @@ EOD;
 		$header .= '<th class="text-center" style="width:' . (isset($REQUIRE_LIB['bootstrap5']) ? '4' : '5') . 'em;">'.UOJLocale::get('problems::submit').'</th>';
 		$header .= '<th class="text-center" style="width:' . (isset($REQUIRE_LIB['bootstrap5']) ? '125' : '150') . 'px;">'.UOJLocale::get('problems::ac ratio').'</th>';
 	}
-	$header .= '<th class="text-center" style="width:190px;">'.UOJLocale::get('appraisal').'</th>';
+	if (isset($_COOKIE['show_difficulty'])) {
+		$header .= '<th class="text-center" style="width:3em;">'.UOJLocale::get('problems::difficulty').'</th>';
+	}
+	$header .= '<th class="text-center" style="width:170px;">'.UOJLocale::get('appraisal').'</th>';
 	$header .= '</tr>';
 
 	$pag_config = array('page_len' => 40);
-	$pag_config['col_names'] = array('best_ac_submissions.submission_id as submission_id', 'problems.id as id', 'problems.is_hidden as is_hidden', 'problems.title as title', 'problems.submit_num as submit_num', 'problems.ac_num as ac_num', 'problems.zan as zan', 'problems.extra_config as extra_config', 'problems.uploader as uploader');
+	$pag_config['col_names'] = array('best_ac_submissions.submission_id as submission_id', 'problems.id as id', 'problems.is_hidden as is_hidden', 'problems.title as title', 'problems.submit_num as submit_num', 'problems.ac_num as ac_num', 'problems.zan as zan', 'problems.extra_config as extra_config', 'problems.uploader as uploader', 'problems.extra_config as extra_config');
 
 	$pag_config['table_name'] = "problems left join best_ac_submissions on best_ac_submissions.submitter = '{$myUser['username']}' and problems.id = best_ac_submissions.problem_id inner join lists_problems lp on lp.list_id = {$list_id} and lp.problem_id = problems.id";
 
@@ -143,12 +154,16 @@ EOD;
 <?php endif ?>
 
 <div class="row">
-	<div class="col-sm-4"></div>
-	<div class="col-sm-4 order-sm-5
+	<div class="col-sm-4
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	text-end p-2
+	col-12
+	<?php endif ?>
+	"></div>
+	<div class="
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	text-end p-2 col-12 col-sm-8
 	<?php else: ?>
-	text-right checkbox
+	text-right checkbox order-sm-5 col-sm-4
 	<?php endif ?>
 	">
 		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
@@ -192,11 +207,38 @@ EOD;
 		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 		</div>
 		<?php endif ?>
+
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+		<div class="form-check d-inline-block">
+		<?php else: ?>
+		<label class="checkbox-inline" for="input-show_difficulty">
+		<?php endif ?>
+			<input type="checkbox" id="input-show_difficulty"
+				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+				class="form-check-input"
+				<?php endif ?>
+				<?= isset($_COOKIE['show_difficulty']) ? 'checked="checked" ': ''?> />
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+			<label class="form-check-label" for="input-show_difficulty">
+		<?php endif ?>
+				<?= UOJLocale::get('problems::show difficulty') ?>
+		</label>
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+		</div>
+		<?php endif ?>
 	</div>
+	<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 	<div class="col-sm-4 order-sm-3">
-	<?php echo $pag->pagination(); ?>
+		<?= $pag->pagination(); ?>
 	</div>
+	<?php endif ?>
 </div>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="text-center">
+	<?= $pag->pagination(); ?>
+</div>
+<?php endif ?>
 
 <?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="top-buffer-sm"></div>

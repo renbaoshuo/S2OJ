@@ -593,6 +593,24 @@ EOD
 	};
 	$solution_view_type_form->submit_button_config['class_str'] = 'btn btn-warning btn-block top-buffer-sm';
 
+	$difficulty_form = new UOJForm('difficulty');
+	$difficulty_form->addVInput('difficulty', 'text', '难度系数', $problem_extra_config['difficulty'],
+		function($str) {
+			if (!is_numeric($str)) {
+				return '难度系数必须是一个数字';
+			}
+			return '';
+		},
+		null);
+	$difficulty_form->handle = function() {
+		global $problem, $problem_extra_config;
+		$config = $problem_extra_config;
+		$config['difficulty'] = $_POST['difficulty'] + 0;
+		$esc_config = DB::escape(json_encode($config));
+		DB::query("update problems set extra_config = '$esc_config' where id = '{$problem['id']}'");
+	};
+	$difficulty_form->submit_button_config['class_str'] = 'btn btn-warning btn-block top-buffer-sm';
+
 	if ($problem['hackable']) {
 		$test_std_form = new UOJForm('test_std');
 		$test_std_form->handle = function() {
@@ -649,6 +667,7 @@ EOD
 	$hackable_form->runAtServer();
 	$view_type_form->runAtServer();
 	$solution_view_type_form->runAtServer();
+	$difficulty_form->runAtServer();
 	$data_form->runAtServer();
 	$clear_data_form->runAtServer();
 	$rejudge_form->runAtServer();
@@ -724,7 +743,7 @@ EOD
 			</div>
 		</div>
 		<div class="top-buffer-md">
-			<button id="button-display_view_type" type="button" class="btn btn-primary btn-block" onclick="$('#div-solution_view_type').toggle('fast');">题解可视权限</button>
+			<button id="button-solution_view_type" type="button" class="btn btn-primary btn-block" onclick="$('#div-solution_view_type').toggle('fast');">题解可视权限</button>
 			<div class="top-buffer-sm" id="div-solution_view_type" style="display:none; padding-left:5px; padding-right:5px;">
 				<?php $solution_view_type_form->printHTML(); ?>
 			</div>
@@ -747,6 +766,13 @@ EOD
 		</div>
 		<div class="top-buffer-md">
 			<button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#ProblemSettingsFileModal">试题配置</button>
+		</div>
+
+		<div class="top-buffer-md">
+			<button id="button-difficulty" type="button" class="btn btn-block btn-primary" onclick="$('#div-difficulty').toggle('fast');">难度系数</button>
+			<div class="top-buffer-sm" id="div-difficulty" style="display:none; padding-left:5px; padding-right:5px;">
+				<?php $difficulty_form->printHTML(); ?>
+			</div>
 		</div>
 	</div>
 
