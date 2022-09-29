@@ -282,4 +282,12 @@ EOD;
 
 </div>
 
+<script>
+	$(document).ready(function() {
+		$('.markdown-body table').each(function() {
+			$(this).addClass('table table-bordered table-striped');
+		});
+	});
+</script>
+
 <?php echoUOJPageFooter() ?>
