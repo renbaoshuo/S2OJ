@@ -110,8 +110,8 @@
 			</div>
 		<?php endif ?>
 	</div>
-	<div class="col">
-		<div class="d-none d-md-block mb-4">
+	<div class="col mt-4 mt-lg-0">
+		<div class="d-none d-lg-block mb-4">
 			<img class="media-object img-thumbnail" src="/images/logo.png" alt="Logo" />
 		</div>
 		<div class="card card-default mb-2">
