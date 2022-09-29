@@ -535,7 +535,7 @@ function echoSubmissionContent($submission, $requirement) {
 			echo '<div class="card-body">';
 			echo '<pre><code class="'.$sh_class;
 			if (isset($REQUIRE_LIB['bootstrap5'])) {
-				echo ' bg-light rounded ';
+				echo ' bg-light rounded p-3 ';
 			}
 			echo '">'.$file_content."\n".'</code></pre>';
 			echo '</div>';
@@ -551,7 +551,11 @@ function echoSubmissionContent($submission, $requirement) {
 			echo '<h4 class="card-title">'.$req['file_name'].'</h4>';
 			echo '</div>';
 			echo '<div class="card-body">';
-			echo '<pre>'."\n".$file_content."\n".'</pre>';
+			echo '<pre class=" ';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' bg-light rounded p-3 ';
+			}
+			echo " \">\n".$file_content."\n".'</pre>';
 			echo '</div>';
 			echo '<div class="card-footer">'.$footer_text.'</div>';
 			echo '</div>';
@@ -582,7 +586,11 @@ class JudgementDetailsPrinter {
 		global $REQUIRE_LIB;
 
 		if ($node->nodeName == 'error') {
-			echo "<pre>\n";
+			echo '<pre class=" ';
+			if (isset($REQUIRE_LIB['bootstrap5'])) {
+				echo ' bg-light rounded p-3 ';
+			}
+			echo " \">\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 		} elseif ($node->nodeName == 'tests') {
