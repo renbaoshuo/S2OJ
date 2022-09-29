@@ -213,3 +213,23 @@ form.uoj-form-compressed button {
 	top: -6px;
 }
 
+@media (max-width: 767px) {
+	.uoj-ac-problems-list li {
+		width: 100%;
+	}
+}
+
+@media (min-width: 768px) {
+	.uoj-ac-problems-list li {
+		width: 18em;
+	}
+}
+
+.uoj-ac-problems-list {
+	padding-top: 10px;
+	padding-bottom: 5px;
+}
+
+.uoj-ac-problems-list a {
+	min-height: 60px;
+}

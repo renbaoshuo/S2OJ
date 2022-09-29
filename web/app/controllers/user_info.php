@@ -128,7 +128,7 @@
 				<h4 class="card-title h5">
 					<?= UOJLocale::get('accepted problems').': '.UOJLocale::get('n problems in total', count($ac_problems))?>
 				</h4>
-				<ul class="nav">
+				<ul class="nav uoj-ac-problems-list">
 					<?php foreach ($ac_problems as $problem): ?>
 						<li class="nav-item">
 							<a class="nav-link" href="/problem/<?= $problem['problem_id'] ?>" role="button">
