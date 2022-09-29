@@ -233,3 +233,8 @@ form.uoj-form-compressed button {
 .uoj-ac-problems-list a {
 	min-height: 60px;
 }
+
+.uoj-ac-problems-list-item:hover {
+	color: var(--bs-nav-link-color) !important;
+	background-color: #eeeeee70;
+}

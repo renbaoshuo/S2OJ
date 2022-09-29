@@ -131,7 +131,7 @@
 				<ul class="nav uoj-ac-problems-list">
 					<?php foreach ($ac_problems as $problem): ?>
 						<li class="nav-item">
-							<a class="nav-link" href="/problem/<?= $problem['problem_id'] ?>" role="button">
+							<a class="nav-link rounded uoj-ac-problems-list-item" href="/problem/<?= $problem['problem_id'] ?>" role="button">
 								#<?= $problem['problem_id'] ?>. <?= $problem['title'] ?>
 							</a>
 						</li>
