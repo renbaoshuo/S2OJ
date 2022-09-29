@@ -140,7 +140,7 @@ EOD;
 	if (isset($_COOKIE['show_difficulty'])) {
 		$header .= '<th class="text-center" style="width:3em;">'.UOJLocale::get('problems::difficulty').'</th>';
 	}
-	$header .= '<th class="text-center" style="width:170px;">'.UOJLocale::get('appraisal').'</th>';
+	$header .= '<th class="text-center" style="width:180px;">'.UOJLocale::get('appraisal').'</th>';
 	$header .= '</tr>';
 	
 	$tabs_info = array(
