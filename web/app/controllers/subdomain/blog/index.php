@@ -6,14 +6,21 @@
 	$blogs_pag = new Paginator(array(
 		'col_names' => array('*'),
 		'table_name' => 'blogs',
-		'cond' => "poster = '".UOJContext::user()['username']."' and is_hidden = 0",
+		'cond' => "poster = '".UOJContext::userid()."' and is_hidden = 0",
 		'tail' => 'order by post_time desc limit 5',
 		'echo_full' => true
 	));
-	?>
-<?php
+
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
+	
 	$REQUIRE_LIB['mathjax'] = '';
-	$REQUIRE_LIB['shjs'] = '';
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		$REQUIRE_LIB['hljs'] = '';
+	} else {
+		$REQUIRE_LIB['shjs'] = '';
+	}
 	?>
 <?php echoUOJPageHeader(UOJContext::user()['username'] . '的博客') ?>
 
