@@ -129,7 +129,7 @@ mb-4" role="navigation">
 				<?php endif ?>
 			</ul>
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-			<hr class="d-lg-none text-muted">
+			<hr class="d-md-none text-muted">
 			<ul class="nav navbar-nav ms-md-auto">
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
