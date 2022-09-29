@@ -531,7 +531,6 @@ EOD
 	$view_type_form = new UOJForm('view_type');
 	$view_type_form->addVSelect('view_content_type',
 		array('NONE' => '禁止',
-				'SELF' => '仅自己',
 				'ALL_AFTER_AC' => 'AC后',
 				'ALL' => '所有人'
 		),
@@ -567,6 +566,33 @@ EOD
 	};
 	$view_type_form->submit_button_config['class_str'] = 'btn btn-warning btn-block top-buffer-sm';
 	
+	$solution_view_type_form = new UOJForm('solution_view_type');
+	$solution_view_type_form->addVSelect('view_solution_type',
+		array('NONE' => '禁止',
+				'ALL_AFTER_AC' => 'AC后',
+				'ALL' => '所有人'
+		),
+		'查看题解:',
+		$problem_extra_config['view_solution_type']
+	);
+	$solution_view_type_form->addVSelect('submit_solution_type',
+		array('NONE' => '禁止',
+				'ALL_AFTER_AC' => 'AC后',
+				'ALL' => '所有人'
+		),
+		'提交题解:',
+		$problem_extra_config['submit_solution_type']
+	);
+	$solution_view_type_form->handle = function() {
+		global $problem, $problem_extra_config;
+		$config = $problem_extra_config;
+		$config['view_solution_type'] = $_POST['view_solution_type'];
+		$config['submit_solution_type'] = $_POST['submit_solution_type'];
+		$esc_config = DB::escape(json_encode($config));
+		DB::query("update problems set extra_config = '$esc_config' where id = '{$problem['id']}'");
+	};
+	$solution_view_type_form->submit_button_config['class_str'] = 'btn btn-warning btn-block top-buffer-sm';
+
 	if ($problem['hackable']) {
 		$test_std_form = new UOJForm('test_std');
 		$test_std_form->handle = function() {
@@ -622,6 +648,7 @@ EOD
 	
 	$hackable_form->runAtServer();
 	$view_type_form->runAtServer();
+	$solution_view_type_form->runAtServer();
 	$data_form->runAtServer();
 	$clear_data_form->runAtServer();
 	$rejudge_form->runAtServer();
@@ -694,6 +721,12 @@ EOD
 			<button id="button-display_view_type" type="button" class="btn btn-primary btn-block" onclick="$('#div-view_type').toggle('fast');">提交记录可视权限</button>
 			<div class="top-buffer-sm" id="div-view_type" style="display:none; padding-left:5px; padding-right:5px;">
 				<?php $view_type_form->printHTML(); ?>
+			</div>
+		</div>
+		<div class="top-buffer-md">
+			<button id="button-display_view_type" type="button" class="btn btn-primary btn-block" onclick="$('#div-solution_view_type').toggle('fast');">题解可视权限</button>
+			<div class="top-buffer-sm" id="div-solution_view_type" style="display:none; padding-left:5px; padding-right:5px;">
+				<?php $solution_view_type_form->printHTML(); ?>
 			</div>
 		</div>
 		<div class="top-buffer-md">
