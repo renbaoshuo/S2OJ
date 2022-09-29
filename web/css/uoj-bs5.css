@@ -92,6 +92,10 @@ label {
 	cursor: pointer;
 }
 
+.uoj-status-text {
+	font-weight: bold;
+}
+
 .card-uoj-accepted > .card-header:hover,
 .card-uoj-accepted > div.card-header > div > .uoj-status-text {
 	color: #25ad40;
