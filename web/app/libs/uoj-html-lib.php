@@ -1294,6 +1294,8 @@ function echoHacksList($cond, $tail, $config, $user) {
 }
 
 function echoBlog($blog, $config = array()) {
+	global $REQUIRE_LIB;
+
 	$default_config = array(
 		'blog' => $blog,
 		'show_title_only' => false,
@@ -1304,6 +1306,9 @@ function echoBlog($blog, $config = array()) {
 			$config[$key] = $val;
 		}
 	}
+
+	$config['REQUIRE_LIB'] = $REQUIRE_LIB;
+
 	uojIncludeView('blog-preview', $config);
 }
 function echoBlogTag($tag) {

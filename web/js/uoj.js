@@ -1074,11 +1074,11 @@ function showCommentReplies(id, replies) {
 				$('<td />').append(
 					$('<div class="comtbox6">' + getUserLink(reply.poster, reply.poster_realname) + '：' + reply.content + '</div>')
 				).append(
-					$('<ul class="text-right list-inline bot-buffer-no" />').append(
+					$('<ul class="' + (isBootstrap5Page ? 'text-end mb-0' : 'text-right bot-buffer-no') + ' list-inline" />').append(
 						'<li>' + '<small class="text-muted">' + reply.post_time + '</small>' + '</li>'
 					).append(
 						$('<li />').append(
-							$('<a href="#">回复</a>').click(function (e) {
+							$('<a class=" ' + (isBootstrap5Page ? ' text-decoration-none ' : '') + ' " href="#">回复</a>').click(function (e) {
 								e.preventDefault();
 								toggleFormReply(reply.id, '回复 @' + reply.poster + '：');
 							})

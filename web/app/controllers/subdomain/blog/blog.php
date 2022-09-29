@@ -11,6 +11,10 @@
 	if ($blog['is_hidden'] && !UOJContext::hasBlogPermission()) {
 		become403Page();
 	}
+
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
 	
 	$comment_form = new UOJForm('comment');
 	$comment_form->addVTextArea('comment', '内容', '',
@@ -57,7 +61,6 @@
 		$comment_form->succ_href = getLongTablePageRawUri($page);
 	};
 	$comment_form->ctrl_enter_submit = true;
-	
 	$comment_form->runAtServer();
 	
 	$reply_form = new UOJForm('reply');
@@ -143,11 +146,22 @@
 	?>
 <?php
 	$REQUIRE_LIB['mathjax'] = '';
-	$REQUIRE_LIB['shjs'] = '';
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		$REQUIRE_LIB['hljs'] = '';
+	} else {
+		$REQUIRE_LIB['shjs'] = '';
+	}
 	?>
 <?php echoUOJPageHeader(HTML::stripTags($blog['title']) . ' - 博客') ?>
 <?php echoBlog($blog, array('show_title_only' => isset($_GET['page']) && $_GET['page'] != 1)) ?>
-<h2>评论 <span class="glyphicon glyphicon-comment"></span></h2>
+<h2>
+	评论
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	<i class="bi bi-chat-fill"></i>
+	<?php else: ?>
+	<span class="glyphicon glyphicon-comment"></span>
+	<?php endif ?>
+</h2>
 <div class="list-group">
 <?php if ($comments_pag->isEmpty()): ?>
 	<div class="list-group-item text-muted">暂无评论</div>
@@ -164,19 +178,63 @@
 		$replies_json = json_encode($replies);
 		?>
 	<div id="comment-<?= $comment['id'] ?>" class="list-group-item">
-		<div class="media">
-			<div class="media-left comtposterbox mr-3">
-				<a href="<?= HTML::url('/user/profile/'.$poster['username']) ?>" class="d-none d-sm-block">
+		<div class="
+		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+		d-flex
+		<?php else: ?>
+		media
+		<?php endif ?>
+		">
+			<div class="comtposterbox mr-3
+				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+				flex-shrink-0
+				<?php else: ?>
+				media-left
+				<?php endif ?>">
+				<a href="<?= HTML::url('/user/profile/'.$poster['username']) ?>" class="d-none d-sm-block
+					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+					text-decoration-none
+					<?php endif ?>">
 					<img class="media-object img-rounded" src="<?= $asrc ?>" alt="avatar" />
 				</a>
 			</div>
-			<div id="comment-body-<?= $comment['id'] ?>" class="media-body comtbox">
+			<div id="comment-body-<?= $comment['id'] ?>" class="comtbox
+				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+				flex-grow-1 ms-3
+				<?php else: ?>
+				media-body
+				<?php endif ?>">
 				<div class="row">
 					<div class="col-sm-6"><?= getUserLink($poster['username']) ?></div>
-					<div class="col-sm-6 text-right"><?= getClickZanBlock('BC', $comment['id'], $comment['zan']) ?></div>
+					<div class="col-sm-6 
+				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+				text-end
+				<?php else: ?>
+				text-right
+				<?php endif ?>"><?= getClickZanBlock('BC', $comment['id'], $comment['zan']) ?></div>
 				</div>
 				<div class="comtbox1"><?= $comment['content'] ?></div>
-				<ul class="text-right list-inline bot-buffer-no"><li><small class="text-muted"><?= $comment['post_time'] ?></small></li><li><a id="reply-to-<?= $comment['id'] ?>" href="#">回复</a></li></ul>
+				<ul class="list-inline bot-buffer-no
+					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+					text-end
+					<?php else: ?>
+					text-right
+					<?php endif ?>">
+					<li>
+						<small class="text-muted">
+							<?= $comment['post_time'] ?>
+						</small>
+					</li>
+					<li>
+						<a class="
+							<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+							text-decoration-none
+							<?php endif ?>"
+							id="reply-to-<?= $comment['id'] ?>" href="#">
+							回复
+						</a>
+					</li>
+				</ul>
 				<?php if ($replies): ?>
 				<div id="replies-<?= $comment['id'] ?>" class="comtbox5"></div>
 				<?php endif ?>
@@ -190,7 +248,7 @@
 <?= $comments_pag->pagination() ?>
 
 <h3 class="mt-4">发表评论</h3>
-<p>可以用@mike来提到mike这个用户，mike会被高亮显示。如果你真的想打“@”这个字符，请用“@@”。</p>
+<p>可以用 @mike 来提到 mike 这个用户，mike 会被高亮显示。如果你真的想打“@”这个字符，请用“@@”。</p>
 <?php $comment_form->printHTML() ?>
 
 <div id="div-form-reply" style="display:none">
