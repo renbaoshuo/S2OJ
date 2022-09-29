@@ -108,7 +108,8 @@ function queryContestProblemRank($contest, $problem) {
 	if (!DB::selectFirst("select * from contests_problems where contest_id = {$contest['id']} and problem_id = {$problem['id']}")) {
 		return null;
 	}
-	return DB::selectCount("select count(*) from contests_problems where contest_id = {$contest['id']} and problem_id <= {$problem['id']}");
+	$contest_problems = DB::selectAll("select problem_id from contests_problems where contest_id = {$contest['id']} order by dfn, problem_id");
+	return array_search(array('problem_id' => $problem['id']), $contest_problems) + 1;
 }
 function querySubmission($id) {
 	return DB::selectFirst("select * from submissions where id = $id", MYSQLI_ASSOC);
