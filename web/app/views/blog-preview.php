@@ -53,11 +53,29 @@ text-decoration-none text-body
 
 		<?php elseif ($blog_type == 'slide'): ?>
 		<article>
-			<div class="embed-responsive embed-responsive-16by9">
+			<div class="
+			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+			ratio ratio-16x9
+			<?php else: ?>
+			embed-responsive embed-responsive-16by9
+			<?php endif ?>
+			">
 				<iframe class="embed-responsive-item" src="<?= HTML::blog_url(UOJContext::userid(), '/slide/'.$blog['id']) ?>"></iframe>
 			</div>
-			<div class="text-right top-buffer-sm">
-				<a class="btn btn-secondary btn-md" href="<?= HTML::blog_url(UOJContext::userid(), '/slide/'.$blog['id']) ?>"><span class="glyphicon glyphicon-fullscreen"></span> 全屏</a>
+			<div class="
+			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+			text-end mt-2
+			<?php else: ?>
+			text-right top-buffer-sm
+			<?php endif ?>">
+				<a class="btn btn-secondary btn-md" href="<?= HTML::blog_url(UOJContext::userid(), '/slide/'.$blog['id']) ?>">
+					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+					<i class="bi bi-arrows-fullscreen"></i>
+					<?php else: ?>
+					<span class="glyphicon glyphicon-fullscreen"></span>
+					<?php endif ?>
+					全屏
+				</a>
 			</div>
 		</article>
 		<?php endif ?>
