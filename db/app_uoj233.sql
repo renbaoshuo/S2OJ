@@ -800,6 +800,7 @@ CREATE TABLE `user_info` (
   `usergroup` char(1) NOT NULL DEFAULT 'U',
   `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `realname` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `school` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `usertype` varchar(250) NOT NULL DEFAULT 'student',
   `email` varchar(50) NOT NULL,
   `password` char(32) NOT NULL,

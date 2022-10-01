@@ -56,6 +56,12 @@
 						<?= $user['realname'] ?>
 					</li>
 					<?php endif ?>
+					<?php if ($user['school']): ?>
+					<li class="list-group-item">
+						<i class="bi bi-person-badge-fill me-1"></i>
+						<?= $user['school'] ?>
+					</li>
+					<?php endif ?>
 					<?php if ($user['usertype']): ?>
 					<li class="list-group-item">
 						<i class="bi bi-key-fill me-1"></i>

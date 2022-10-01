@@ -35,15 +35,22 @@
 		},
 		null
 	);
+	$register_form->addInput('new_school', 'text', '学校名称', '',
+		function ($new_school) {
+			return '';
+		},
+		null
+	);
 	$register_form->handle = function() {
 		$new_username = $_POST['new_username'];
 		$new_password = $_POST['new_password'];
 		$new_realname = DB::escape($_POST['new_realname']);
+		$new_school = DB::escape($_POST['new_school']);
 		$new_password = hash_hmac('md5', $new_password, getPasswordClientSalt());
 		$new_password = getPasswordToStore($new_password, $new_username);
 		$svn_pw = uojRandString(10);
 
-		DB::query("insert into user_info (username, realname, password, svn_password, register_time, usergroup) values ('$new_username', '$new_realname', '$new_password', '$svn_pw', now(), 'U')");
+		DB::query("insert into user_info (username, realname, school, password, svn_password, register_time, usergroup) values ('$new_username', '$new_realname', '$new_school', '$new_password', '$svn_pw', now(), 'U')");
 	};
 	$register_form->runAtServer();
 
@@ -104,6 +111,34 @@
 		DB::query("update user_info set realname = '$r_realname' where username = '$r_username'");
 	};
 	$change_realname_form->runAtServer();
+
+	$change_school_form = new UOJForm('change_school');
+	$change_school_form->submit_button_config['align'] = 'compressed';
+	$change_school_form->addInput('s_username', 'text', '用户名', '',
+		function ($s_username) {
+			if (!validateUsername($s_username)) {
+				return '用户名不合法';
+			}
+			if (!queryUser($s_username)) {
+				return '用户不存在';
+			}
+			return '';
+		},
+		null
+	);
+	$change_school_form->addInput('s_school', 'text', '学校名称', '',
+		function ($s_school) {
+			return '';
+		},
+		null
+	);
+	$change_school_form->handle = function() {
+		$s_username = $_POST['s_username'];
+		$s_school = DB::escape($_POST['s_school']);
+
+		DB::query("update user_info set school = '$s_school' where username = '$s_username'");
+	};
+	$change_school_form->runAtServer();
 
 	$user_form = new UOJForm('user');
 	$user_form->submit_button_config['align'] = 'compressed';
@@ -507,12 +542,13 @@ EOD;
 EOD;
 	};
 	
-	$userlist_cols = array('username', 'usergroup', 'usertype', 'register_time');
+	$userlist_cols = array('username', 'school', 'usergroup', 'usertype', 'register_time');
 	$userlist_config = array('page_len' => 20,
 			'table_classes' => array('table', 'table-bordered', 'table-hover', 'table-striped'));
 	$userlist_header_row = <<<EOD
 	<tr>
 		<th>用户名</th>
+		<th>学校</th>
 		<th style="width: 6em">用户类别</th>
 		<th style="width: 12em">注册时间</th>
 	</tr>
@@ -540,6 +576,7 @@ EOD;
 		echo <<<EOD
 			<tr>
 				<td>${hislink}</td>
+				<td>{$row['school']}</td>
 				<td>{$row['usergroup']}, {$row['usertype']}</td>
 				<td>{$row['register_time']}</td>
 			</tr>
@@ -600,6 +637,8 @@ EOD;
 			<?php $usertype_form->printHTML(); ?>
 			<h3>修改用户真实姓名</h3>
 			<?php $change_realname_form->printHTML(); ?>
+			<h3>修改用户学校名称</h3>
+			<?php $change_school_form->printHTML(); ?>
 			<h3>用户名单</h3>
 			<div id="user-query">
 				<form class="form-horizontal uoj-form-compressed" target="_self" method="GET">
