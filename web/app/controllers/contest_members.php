@@ -12,6 +12,11 @@
 	if (!validateUInt($_GET['id']) || !($contest = queryContest($_GET['id']))) {
 		become404Page();
 	}
+
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
+
 	genMoreContestInfo($contest);
 
 	if (isSuperUser($myUser)) {
@@ -186,70 +191,82 @@
 <?php endif ?>
 
 <?php
-		if ($show_ip) {
-			$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th><th>remote_addr</th><th>http_x_forwarded_for</th><th>是否参赛</th></tr>';
+		$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th>';
+	if ($show_ip) {
+		$header_row .= '<th>remote_addr</th><th>http_x_forwarded_for</th>';
 	
-			$ip_owner = array();
-			$forwarded_ip_owner = array();
-			$has_participated = array();
-			foreach (DB::selectAll("select * from contests_registrants where contest_id = {$contest['id']} order by username desc") as $reg) {
-				$user = queryUser($reg['username']);
-				$ip_owner[$user['remote_addr']] = $reg['username'];
-				$forwarded_ip_owner[$user['http_x_forwarded_for']] = $reg['username'];
-				$has_participated[$reg['username']] = $reg['has_participated'];
-			}
-		} else {
-			$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th></tr>';
+		$ip_owner = array();
+		$forwarded_ip_owner = array();
+		$has_participated = array();
+		foreach (DB::selectAll("select * from contests_registrants where contest_id = {$contest['id']} order by username desc") as $reg) {
+			$user = queryUser($reg['username']);
+			$ip_owner[$user['remote_addr']] = $reg['username'];
+			$forwarded_ip_owner[$user['http_x_forwarded_for']] = $reg['username'];
+			$has_participated[$reg['username']] = $reg['has_participated'];
 		}
-	
-		echoLongTable(array('*'), 'contests_registrants', "contest_id = {$contest['id']}", 'order by username desc',
-			$header_row,
-			function($contest, $num) {
-				global $myUser;
-				global $show_ip, $ip_owner, $has_participated;
-			
-				$user = queryUser($contest['username']);
-				$user_link = getUserLink($contest['username']);
-				if (!$show_ip) {
-					echo '<tr>';
-				} else {
-					if ($ip_owner[$user['remote_addr']] != $user['username'] || $forwarded_ip_owner[$user['http_x_forwarded_for']] != $user['username']) {
-						echo '<tr class="danger">';
-					} else {
-						echo '<tr>';
-					}
-				}
-				echo '<td>'.$num.'</td>';
-				echo '<td>'.$user_link.'</td>';
-				if ($show_ip) {
-					echo '<td>'.$user['remote_addr'].'</td>';
-					echo '<td>'.$user['http_x_forwarded_for'].'</td>';
-					echo '<td>'.($has_participated[$user['username']] ? 'Yes' : 'No').'</td>';
-				}
-				echo '</tr>';
-			},
-			array('page_len' => 100,
-				'get_row_index' => '',
-				'print_after_table' => function() {
-					global $add_new_contestant_form,
-					$add_group_to_contest_form,
-					$remove_user_from_contest_form,
-					$force_set_user_participated_form;
+	}
+	if ($has_contest_permission) {
+		$header_row .= '<th>是否参赛</th>';
+	}
+	$header_row .= '</tr>';
 
-					if (isset($add_new_contestant_form)) {
-						$add_new_contestant_form->printHTML();
-					}
-					if (isset($add_group_to_contest_form)) {
-						$add_group_to_contest_form->printHTML();
-					}
-					if (isset($remove_user_from_contest_form)) {
-						$remove_user_from_contest_form->printHTML();
-					}
-					if (isset($force_set_user_participated_form)) {
-						$force_set_user_participated_form->printHTML();
-					}
+	$config = array('page_len' => 100,
+		'get_row_index' => '',
+		'print_after_table' => function() {
+			global $add_new_contestant_form,
+			$add_group_to_contest_form,
+			$remove_user_from_contest_form,
+			$force_set_user_participated_form;
+
+			if (isset($add_new_contestant_form)) {
+				$add_new_contestant_form->printHTML();
+			}
+			if (isset($add_group_to_contest_form)) {
+				$add_group_to_contest_form->printHTML();
+			}
+			if (isset($remove_user_from_contest_form)) {
+				$remove_user_from_contest_form->printHTML();
+			}
+			if (isset($force_set_user_participated_form)) {
+				$force_set_user_participated_form->printHTML();
+			}
+		}
+	);
+
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		$config['div_classes'] = array('card', 'mb-3');
+		$config['table_classes'] = array('table', 'uoj-table', 'mb-0', 'text-center');
+	}
+	
+	echoLongTable(array('*'), 'contests_registrants', "contest_id = {$contest['id']}", 'order by username desc',
+		$header_row,
+		function($contest, $num) {
+			global $myUser;
+			global $has_contest_permission, $show_ip, $ip_owner, $has_participated;
+			
+			$user = queryUser($contest['username']);
+			$user_link = getUserLink($contest['username']);
+			if (!$show_ip) {
+				echo '<tr>';
+			} else {
+				if ($ip_owner[$user['remote_addr']] != $user['username'] || $forwarded_ip_owner[$user['http_x_forwarded_for']] != $user['username']) {
+					echo '<tr class="danger">';
+				} else {
+					echo '<tr>';
 				}
-			)
-		);
+			}
+			echo '<td>'.$num.'</td>';
+			echo '<td>'.$user_link.'</td>';
+			if ($show_ip) {
+				echo '<td>'.$user['remote_addr'].'</td>';
+				echo '<td>'.$user['http_x_forwarded_for'].'</td>';
+			}
+			if ($has_contest_permission) {
+				echo '<td>'.($has_participated[$user['username']] ? 'Yes' : 'No').'</td>';
+			}
+			echo '</tr>';
+		},
+		$config
+	);
 	?>
 <?php echoUOJPageFooter() ?>
