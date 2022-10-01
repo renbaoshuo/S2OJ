@@ -229,7 +229,7 @@ EOD
 	$time_limit = $limit['time_limit'];
 	$memory_limit = $limit['memory_limit'];
 
-	$problem_uploader = $limit['poster'] ?: $problem['uploader'];
+	$problem_uploader = $problem['uploader'];
 	?>
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
