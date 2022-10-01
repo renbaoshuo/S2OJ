@@ -83,7 +83,7 @@ function become403Page($message = '访问被拒绝，您可能需要适当的权
 }
 
 function getUserLink($username) {
-	if (validateUsername($username) && ($user = queryUser($username))) {
+	if (validateUsername($username) && ($user = queryUser($username)) && $user['usergroup'] != 'B') {
 		$realname = $user['realname'];
 
 		if ($realname == "") {
