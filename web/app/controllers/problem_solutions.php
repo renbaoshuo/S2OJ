@@ -55,7 +55,7 @@
 				$admin_user_link = getUserLink($myUser['username']);
 				$content = <<<EOD
 <p>{$poster_user_link} 您好：</p>
-<p>您为问题 <a href="/problem/{$problem['id']}">#{$problem['id']} ({$problem['title']})</a> 提交的题解 {$blog_link} 已经被管理员 {$admin_user_link} 移除。 </p>
+<p>您为问题 <a href="/problem/{$problem['id']}">#{$problem['id']} ({$problem['title']})</a> 提交的题解 {$blog_link} 已经被 {$admin_user_link} 移除。 </p>
 EOD;
 				sendSystemMsg($blog['poster'], '题解移除通知', $content);
 			}
