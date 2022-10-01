@@ -58,7 +58,7 @@
 				echo '<span class="badge badge-pill badge-secondary">';
 			}
 
-			echo HTML::escape($tag), '</span>', '</a>';
+			echo HTML::escape($tag), '</span>', '</a> ';
 		}
 		echo '</td>';
 
