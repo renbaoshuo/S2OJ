@@ -211,12 +211,6 @@
 		$username = $_POST['usertype_username'];
 		$user = queryUser($username);
 		switch ($_POST['usertype_type']) {
-			case 'student':
-				$user = $_POST['usertype_op'] === 'add'
-					? addUserType($user, 'student')
-					: removeUserType($user, 'student');
-				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
-				break;
 			case 'teacher':
 				if ($_POST['usertype_op'] === 'add') {
 					$user = addUserType($user, 'teacher');
@@ -225,18 +219,26 @@
 					$user = removeUserType($user, 'teacher');
 					$user = addUserType($user, 'student');
 				}
-				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
 				break;
-			case 'problem_uploader':
 			case 'problem_manager':
+				if ($_POST['usertype_op'] === 'add') {
+					$user = addUserType($user, 'problem_manager');
+					$user = removeUserType($user, 'problem_uploader');
+				} else {
+					$user = removeUserType($user, 'problem_manager');
+				}
+				break;
+			case 'student':
+			case 'problem_uploader':
 			case 'contest_judger':
 			case 'contest_only':
 				$user = $_POST['usertype_op'] === 'add'
 					? addUserType($user, $_POST['usertype_type'])
 					: removeUserType($user, $_POST['usertype_type']);
-				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
 				break;
 		}
+
+		DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
 	};
 	$usertype_form->runAtServer();
 	
