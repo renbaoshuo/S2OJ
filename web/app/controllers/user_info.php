@@ -28,6 +28,11 @@
 			<div class="card">
 				<img class="card-img-top" alt="Avatar of <?= $user['username'] ?>" src="<?= HTML::avatar_addr($user, 512) ?>" />
 				<div class="card-body">
+					<?php if ($user['usergroup'] == 'S'): ?>
+					<span class="badge bg-secondary">
+						<?= UOJLocale::get('admin') ?>
+					</span>
+					<?php endif ?>
 					<h3>
 						<?= $user['username'] ?>
 						<span class="fs-6 align-middle"
@@ -49,6 +54,29 @@
 					<li class="list-group-item">
 						<i class="bi bi-person-fill me-1"></i>
 						<?= $user['realname'] ?>
+					</li>
+					<?php endif ?>
+					<?php if ($user['usertype']): ?>
+					<li class="list-group-item">
+						<i class="bi bi-key-fill me-1"></i>
+						<?php foreach (explode(',', $user['usertype']) as $idx => $type): ?>
+							<?php if ($idx): ?>, <?php endif ?>
+							<?php if ($type == 'teacher'): ?>
+								<?= UOJLocale::get('teacher') ?>
+							<?php elseif ($type == 'student'): ?>
+								<?= UOJLocale::get('student') ?>
+							<?php elseif ($type == 'problem_uploader'): ?>
+								<?= UOJLocale::get('problem uploader') ?>
+							<?php elseif ($type == 'problem_manager'): ?>
+								<?= UOJLocale::get('problem manager') ?>
+							<?php elseif ($type == 'contest_judger'): ?>
+								<?= UOJLocale::get('contest judger') ?>
+							<?php elseif ($type == 'contest_only'): ?>
+								<?= UOJLocale::get('contest only') ?>
+							<?php else: ?>
+								<?= HTML::escape($type) ?>
+							<?php endif ?>
+						<?php endforeach ?>
 					</li>
 					<?php endif ?>
 					<li class="list-group-item">

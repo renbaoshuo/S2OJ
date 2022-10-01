@@ -86,5 +86,12 @@ return [
 	},
 	'friend links' => 'Frequently Used Links',
 	'server time' => 'Server Time',
-	'opensource project' => 'OpenSource Project, modified by S2OJ'
+	'opensource project' => 'OpenSource Project, modified by S2OJ',
+	'admin' => 'Admin',
+	'student' => 'Student',
+	'teacher' => 'Teacher',
+	'problem uploader' => 'Problem Uploader',
+	'problem manager' => 'Problem Manager',
+	'contest judger' => 'Contest Judger',
+	'contest only' => 'Contest Only',
 ];

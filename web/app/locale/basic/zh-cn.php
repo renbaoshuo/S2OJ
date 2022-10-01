@@ -86,5 +86,12 @@ return [
 	},
 	'friend links' => '常用链接',
 	'server time' => '服务器时间',
-	'opensource project' => '开源项目，S2OJ 魔改版'
+	'opensource project' => '开源项目，S2OJ 魔改版',
+	'admin' => '管理员',
+	'student' => '学生',
+	'teacher' => '老师',
+	'problem uploader' => '题目上传者',
+	'problem manager' => '题目管理者',
+	'contest judger' => '比赛评测员',
+	'contest only' => '仅比赛用户',
 ];
