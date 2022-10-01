@@ -1312,7 +1312,16 @@ function echoBlog($blog, $config = array()) {
 	uojIncludeView('blog-preview', $config);
 }
 function echoBlogTag($tag) {
-	echo '<a class="uoj-blog-tag"><span class="badge badge-pill badge-secondary">', HTML::escape($tag), '</span></a>';
+	global $REQUIRE_LIB;
+
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		echo '<a class="uoj-problem-tag my-1">';
+		echo '<span class="badge bg-secondary">';
+	} else {
+		echo '<a class="uoj-problem-tag">';
+		echo '<span class="badge badge-pill badge-secondary">';
+	}
+	echo HTML::escape($tag), '</span></a>';
 }
 
 function echoUOJPageHeader($page_title, $extra_config = array()) {
