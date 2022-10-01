@@ -196,6 +196,8 @@
 		null
 	);
 	$usertype_options = array(
+		'student' => '学生',
+		'teacher' => '老师',
 		'problem_uploader' => '题目上传者',
 		'problem_manager' => '题目管理员',
 		'contest_judger' => '比赛评测员',
@@ -205,14 +207,30 @@
 	$usertype_form->addSelect('usertype_op', array('add' => '添加', 'remove' => '移除'), '操作', '');
 	$usertype_form->handle = function() {
 		global $usertype_form;
-		
+
 		$username = $_POST['usertype_username'];
+		$user = queryUser($username);
 		switch ($_POST['usertype_type']) {
+			case 'student':
+				$user = $_POST['usertype_op'] === 'add'
+					? addUserType($user, 'student')
+					: removeUserType($user, 'student');
+				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
+				break;
+			case 'teacher':
+				if ($_POST['usertype_op'] === 'add') {
+					$user = addUserType($user, 'teacher');
+					$user = removeUserType($user, 'student');
+				} else {
+					$user = removeUserType($user, 'teacher');
+					$user = addUserType($user, 'student');
+				}
+				DB::update("update user_info set usertype = '{$user['usertype']}' where username = '{$username}'");
+				break;
 			case 'problem_uploader':
 			case 'problem_manager':
 			case 'contest_judger':
 			case 'contest_only':
-				$user = queryUser($username);
 				$user = $_POST['usertype_op'] === 'add'
 					? addUserType($user, $_POST['usertype_type'])
 					: removeUserType($user, $_POST['usertype_type']);
