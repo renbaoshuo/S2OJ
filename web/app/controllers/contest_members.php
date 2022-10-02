@@ -167,6 +167,7 @@
 				DB::query("delete from contests_registrants where username = '{$myUser['username']}' and contest_id = {$contest['id']}");
 				updateContestPlayerNum($contest);
 			};
+			$unregister_form->submit_button_config['align'] = 'right';
 			$unregister_form->submit_button_config['class_str'] = 'btn btn-danger btn-xs';
 			$unregister_form->submit_button_config['text'] = '取消报名';
 			$unregister_form->succ_href = "/contests";
@@ -180,10 +181,19 @@
 <h1 class="text-center"><?= $contest['name'] ?></h1>
 <?php if ($contest['cur_progress'] == CONTEST_NOT_STARTED): ?>
 	<?php if ($iHasRegistered): ?>
-		<div class="float-right">
-			<?php $unregister_form->printHTML(); ?>
+		<div class="row">
+			<div class="col-6">
+				<a style="color:green">已报名</a>
+			</div>
+			<div class="col-6
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+		text-end
+	<?php else: ?>
+		text-right
+	<?php endif ?>">
+				<?php $unregister_form->printHTML(); ?>
+			</div>
 		</div>
-		<div><a style="color:green">已报名</a></div>
 	<?php else: ?>
 		<div>当前尚未报名，您可以<a style="color:red" href="/contest/<?= $contest['id'] ?>/register">报名</a>。</div>
 	<?php endif ?>
