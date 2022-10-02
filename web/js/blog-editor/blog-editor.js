@@ -18,20 +18,27 @@ function blog_editor_init(name, editor_config) {
 	
 	// init buttons
 	var save_btn = $('<button type="button" class="btn btn-sm"></button>');
-	var preview_btn = $('<button type="button" class="btn btn-secondary btn-sm"><span class="glyphicon glyphicon-eye-open"></span></button>');
-	var bold_btn = $('<button type="button" class="btn btn-secondary btn-sm ml-2"><span class="glyphicon glyphicon-bold"></span></button>');
-	var italic_btn = $('<button type="button" class="btn btn-secondary btn-sm"><span class="glyphicon glyphicon-italic"></span></button>');
+	var preview_btn = $('<button type="button" class="btn btn-secondary btn-sm">' + (isBootstrap5Page ? '<i class="bi bi-eye"></i>' : '<span class="glyphicon glyphicon-eye-open"></span>') + '</button>');
+	var bold_btn = $('<button type="button" class="btn btn-secondary btn-sm ml-2">' + (isBootstrap5Page ? '<i class="bi bi-type-bold"></i>' : '<span class="glyphicon glyphicon-bold"></span>') + '</button>');
+	var italic_btn = $('<button type="button" class="btn btn-secondary btn-sm">' + (isBootstrap5Page ? '<i class="bi bi-type-italic"></i>' : '<span class="glyphicon glyphicon-italic"></span>') + '</button>');
 	
-	save_btn.tooltip({ container: 'body', title: '保存 (Ctrl-S)' });
-	preview_btn.tooltip({ container: 'body', title: '预览 (Ctrl-D)'	});
-	bold_btn.tooltip({ container: 'body', title: '粗体 (Ctrl-B)' });
-	italic_btn.tooltip({ container: 'body', title: '斜体 (Ctrl-I)' });
-	
+	if (typeof isBootstrap5Page !== 'undefined' && isBootstrap5Page) {
+		save_btn.get().map(el => new bootstrap.Tooltip(el, { container: 'body', title: '保存 (Ctrl-S)' }));
+		preview_btn.get().map(el => new bootstrap.Tooltip(el, { container: 'body', title: '预览 (Ctrl-D)' }));
+		bold_btn.get().map(el => new bootstrap.Tooltip(el, { container: 'body', title: '粗体 (Ctrl-B)' }));
+		italic_btn.get().map(el => new bootstrap.Tooltip(el, { container: 'body', title: '斜体 (Ctrl-I)' }));
+	} else {
+		save_btn.tooltip({ container: 'body', title: '保存 (Ctrl-S)' });
+		preview_btn.tooltip({ container: 'body', title: '预览 (Ctrl-D)'	});
+		bold_btn.tooltip({ container: 'body', title: '粗体 (Ctrl-B)' });
+		italic_btn.tooltip({ container: 'body', title: '斜体 (Ctrl-I)' });
+	}
+
 	var all_btn = [save_btn, preview_btn, bold_btn, italic_btn];
 	
 	// init toolbar
 	var toolbar = $('<div class="btn-toolbar"></div>');
-	toolbar.append($('<div class="btn-group"></div>')
+	toolbar.append($('<div class="btn-group me-2"></div>')
 		.append(save_btn)
 		.append(preview_btn)
 	);
@@ -45,12 +52,12 @@ function blog_editor_init(name, editor_config) {
 		if (val) {
 			save_btn.removeClass('btn-warning');
 			save_btn.addClass('btn-success');
-			save_btn.html('<span class="glyphicon glyphicon-saved"></span>');
+			save_btn.html(isBootstrap5Page ? '<i class="bi bi-save-fill"></i>' : '<span class="glyphicon glyphicon-saved"></span>');
 			before_window_unload_message = null;
 		} else {
 			save_btn.removeClass('btn-success');
 			save_btn.addClass('btn-warning');
-			save_btn.html('<span class="glyphicon glyphicon-save"></span>');
+			save_btn.html(isBootstrap5Page ? '<i class="bi bi-save"></i>' : '<span class="glyphicon glyphicon-save"></span>');
 			before_window_unload_message = '您所编辑的内容尚未保存';
 		}
 	}

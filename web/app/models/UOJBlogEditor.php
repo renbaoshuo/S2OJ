@@ -241,6 +241,8 @@ EOD
 		}
 	}
 	public function printHTML() {
-		uojIncludeView('blog-editor', array('editor' => $this));
+		global $REQUIRE_LIB;
+		
+		uojIncludeView('blog-editor', array('editor' => $this, 'REQUIRE_LIB' => $REQUIRE_LIB));
 	}
 }

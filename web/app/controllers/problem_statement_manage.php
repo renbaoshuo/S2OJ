@@ -15,6 +15,10 @@
 	if (!hasProblemPermission($myUser, $problem)) {
 		become403Page();
 	}
+
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
 	
 	$problem_content = queryProblemContent($problem['id']);
 	$problem_tags = queryProblemTags($problem['id']);
@@ -55,12 +59,33 @@
 	$problem_editor->runAtServer();
 	?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - 编辑 - 题目管理') ?>
-<h1 class="page-header" align="center">#<?=$problem['id']?> : <?=$problem['title']?> 管理</h1>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="row">
+<div class="col-lg-9">
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="card card-default mb-2">
+<div class="card-body">
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<h1 class="h2 card-title text-center">
+<?php else: ?>
+<h1 class="page-header text-center">
+<?php endif ?>
+	#<?=$problem['id']?>. <?=$problem['title']?> 管理
+</h1>
+
 <ul class="nav nav-tabs" role="tablist">
 	<li class="nav-item"><a class="nav-link active" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">编辑</a></li>
 	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/managers" role="tab">管理者</a></li>
 	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/data" role="tab">数据</a></li>
+
+<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 	<li class="nav-item"><a class="nav-link" href="/problem/<?=$problem['id']?>" role="tab">返回</a></li>
+<?php endif ?>
 </ul>
 
 <div class="mt-3 mb-2">
@@ -71,5 +96,89 @@
 <li>图片上传推荐使用 <a href="https://smms.app" target="_blank">SM.MS</a> 图床，以免后续产生外链图片大量失效的情况。</li>
 </ol>
 </div>
+
+<hr>
+
 <?php $problem_editor->printHTML() ?>
+
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
+</div>
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
+
+<aside class="col mt-3 mt-lg-0">
+
+<div class="card card-default mb-2">
+	<ul class="nav nav-pills nav-fill flex-column" role="tablist">
+		<li class="nav-item text-start">
+			<a href="/problem/<?= $problem['id'] ?>" class="nav-link" role="tab">
+				<i class="bi bi-journal-text"></i>
+				<?= UOJLocale::get('problems::statement') ?>
+			</a>
+		</li>
+		<li class="nav-item text-start">
+			<a href="/problem/<?= $problem['id'] ?>/solutions" class="nav-link" role="tab">
+				<i class="bi bi-journal-bookmark"></i>
+				<?= UOJLocale::get('problems::solutions') ?>
+			</a>
+		</li>
+		<li class="nav-item text-start">
+			<a class="nav-link active" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
+				<i class="bi bi-sliders"></i>
+				<?= UOJLocale::get('problems::manage') ?>
+			</a>
+		</li>
+	</ul>
+</div>
+
+<div class="card card-default mb-2">
+	<ul class="nav nav-fill flex-column">
+		<li class="nav-item text-start">
+			<a class="nav-link" href="<?= HTML::url("/download.php?type=problem&id={$problem['id']}") ?>">
+				<i class="bi bi-hdd-stack"></i>
+				测试数据
+			</a>
+		</li>
+		<li class="nav-item text-start">
+			<a class="nav-link" href="<?= HTML::url("/download.php?type=attachment&id={$problem['id']}") ?>">
+				<i class="bi bi-download"></i>
+				附件下载
+			</a>
+		</li>
+		<li class="nav-item text-start">
+			<a class="nav-link" href="/problem/<?= $problem['id'] ?>/statistics">
+				<i class="bi bi-graph-up"></i>
+				<?= UOJLocale::get('problems::statistics') ?>
+			</a>
+		</li>
+	</ul>
+	<div class="card-footer bg-transparent">
+		评价：<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
+	</div>
+</div>
+
+<?php
+	$sidebar_config = array();
+	if ($contest && $contest['cur_progress'] <= CONTEST_IN_PROGRESS) {
+		$sidebar_config['upcoming_contests_hidden'] = '';
+	}
+	uojIncludeView('sidebar', $sidebar_config);
+	?>
+</aside>
+
+</div>
+
+<script>
+	$(document).ready(function() {
+		$('.markdown-body table').each(function() {
+			$(this).addClass('table table-bordered table-striped');
+		});
+	});
+</script>
+<?php endif ?>
+
 <?php echoUOJPageFooter() ?>

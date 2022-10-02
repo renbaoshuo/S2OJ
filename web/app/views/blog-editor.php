@@ -21,7 +21,13 @@
 		<a id="a-<?= $editor->name ?>_view_blog" class="btn btn-info" style="display: none;"><?= $editor->label_text['view blog'] ?></a>
 		<?php endif ?>
 	</div>
-	<div class="col-sm-6 text-right">
+	<div class="col-sm-6
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+		text-end
+	<?php else: ?>
+		text-right
+	<?php endif ?>
+	">
 		<?= HTML::checkbox("{$editor->name}_is_hidden", $editor->cur_data['is_hidden']) ?>
 	</div>
 </div>

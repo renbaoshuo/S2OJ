@@ -118,7 +118,7 @@
 		<?= HTML::css_link('/js/codemirror/lib/codemirror.css') ?>
 		<?= HTML::css_link('/css/blog-editor.css') ?>
 		<?= HTML::js_src('/js/marked.js?v=2016.10.19') ?>
-		<?= HTML::js_src('/js/blog-editor/blog-editor.js?v=2015.7.9') ?>
+		<?= HTML::js_src('/js/blog-editor/blog-editor.js?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
 		<?= HTML::js_src('/js/codemirror/lib/codemirror.js') ?>
 		<?= HTML::js_src('/js/codemirror/addon/mode/overlay.js') ?>
 		<?= HTML::js_src('/js/codemirror/addon/selection/active-line.js') ?>
