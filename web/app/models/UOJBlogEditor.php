@@ -203,6 +203,8 @@ EOD
 	}
 	
 	public function handleSave() {
+		global $REQUIRE_LIB;
+
 		$save = $this->save;
 		$this->receivePostData();
 		$ret = $save($this->post_data);
@@ -213,8 +215,19 @@ EOD
 		if (isset($_POST['need_preview'])) {
 			ob_start();
 			if ($this->type == 'blog') {
-				echoUOJPageHeader('博客预览', array('ShowPageHeader' => false, 'REQUIRE_LIB' => array('mathjax' => '', 'shjs' => '')));
-				echo '<link rel="stylesheet" type="text/css" href="' . HTML::url('/css/markdown.css') . '">';
+				$req_lib = array('mathjax' => '');
+
+				if (isset($REQUIRE_LIB['bootstrap5'])) {
+					$req_lib['bootstrap5'] = '';
+					$req_lib['hljs'] = '';
+				} else {
+					$req_lib['shjs'] = '';
+				}
+
+				echoUOJPageHeader('博客预览', array('ShowPageHeader' => false, 'REQUIRE_LIB' => $req_lib));
+				if (!isset($REQUIRE_LIB['bootstrap5'])) {
+					echo '<link rel="stylesheet" type="text/css" href="' . HTML::url('/css/markdown.css') . '">';
+				}
 				echo '<article class="markdown-body">';
 				echo $this->post_data['content'];
 				echo '</article>';

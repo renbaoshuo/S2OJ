@@ -1315,10 +1315,10 @@ function echoBlogTag($tag) {
 	global $REQUIRE_LIB;
 
 	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		echo '<a class="uoj-problem-tag my-1">';
+		echo '<a class="uoj-blog-tag my-1">';
 		echo '<span class="badge bg-secondary">';
 	} else {
-		echo '<a class="uoj-problem-tag">';
+		echo '<a class="uoj-blog-tag">';
 		echo '<span class="badge badge-pill badge-secondary">';
 	}
 	echo HTML::escape($tag), '</span></a>';

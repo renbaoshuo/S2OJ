@@ -34,7 +34,7 @@ mb-4" role="navigation">
 					<?php else: ?>
 						<span class="glyphicon glyphicon-inbox"></span>
 					<?php endif ?>
-					日志
+					归档
 				</a>
 			</li>
 			<li class="nav-item">
