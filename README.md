@@ -48,3 +48,15 @@ docker-compose -f docker-compose.development.yml up --build
 - [vfleaking](https://github.com/vfleaking) 将 UOJ 代码 [开源](https://github.com/vfleaking/uoj)
 - 向原项目或本项目贡献代码的人
 - 给我们启发与灵感以及提供意见和建议的人
+
+## 许可
+
+```text
+Universal Online Judge
+Copyright (c) 2016-2022 vfleaking
+
+S2OJ
+Copyright (c) 2022-present Baoshuo
+```
+
+本项目采用 [AGPL-3.0](./LICENSE) 许可协议开源，在使用本项目的源代码时请遵守许可协议。
