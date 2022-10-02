@@ -131,16 +131,14 @@
 	$_result = DB::query("select date_format(submit_time, '%Y-%m-%d'), problem_id from submissions where submitter = '{$username}' and score = 100 and date(submit_time) between date_sub(curdate(), interval 1 year) and curdate()");
 	$result = [];
 	$vis = [];
+	$cnt = 0;
 	while ($row = DB::fetch($_result)) {
-		$id = $row["date_format(submit_time, '%Y-%m-%d')"] . ':' . $row['problem_id'];
-		if (!$vis[$id]) {
-			$vis[$id] = 1;
-			$result[$row["date_format(submit_time, '%Y-%m-%d')"]]++;
-		}
+		$cnt++;
+		$result[$row["date_format(submit_time, '%Y-%m-%d')"]]++;
 	}
 	?>
 					<h4 class="card-title h5">
-						<?= UOJLocale::get('n accepted in last year', count($result)) ?>
+						<?= UOJLocale::get('n accepted in last year', $cnt) ?>
 					</h4>
 					<div id="accepted-graph" style="font-size: 14px"></div>
 					<script>
