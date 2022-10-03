@@ -411,7 +411,7 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 			</a>
 		</li>
 		<?php endif ?>
-		<?php if (!$contest): ?>
+		<?php if (!$contest || $contest['cur_progress'] >= CONTEST_FINISHED): ?>
 		<li class="nav-item text-start">
 			<a href="/problem/<?= $problem['id'] ?>/solutions" class="nav-link" role="tab">
 				<i class="bi bi-journal-bookmark"></i>
