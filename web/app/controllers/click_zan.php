@@ -24,6 +24,7 @@
 	$id = $_POST['id'];
 	$delta = $_POST['delta'];
 	$type = $_POST['type'];
+	$show_text = isset($_POST['show-text']) && $_POST['show-text'] != 'false';
 	
 	switch ($type) {
 		case 'B':
@@ -65,4 +66,4 @@
 		$cnt = $row['zan'];
 	}
 	?>
-<?= getClickZanBlock($type, $id, $cnt, $cur) ?>
+<?= getClickZanBlock($type, $id, $cnt, $cur, $show_text) ?>
