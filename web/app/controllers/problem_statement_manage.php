@@ -66,29 +66,53 @@
 <?php endif ?>
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-<div class="card card-default mb-2">
-<div class="card-body">
-<?php endif ?>
-
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-<h1 class="h2 card-title text-center">
+<h1 class="h2">
 <?php else: ?>
 <h1 class="page-header text-center">
 <?php endif ?>
 	#<?=$problem['id']?>. <?=$problem['title']?> 管理
 </h1>
 
-<ul class="nav nav-tabs" role="tablist">
-	<li class="nav-item"><a class="nav-link active" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">编辑</a></li>
-	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/managers" role="tab">管理者</a></li>
-	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/data" role="tab">数据</a></li>
+<ul class="nav
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	nav-pills my-3
+	<?php else: ?>
+	nav-tabs
+	<?php endif ?>" role="tablist">
+	<li class="nav-item">
+		<a class="nav-link active" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
+			题面
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/managers" role="tab">
+			管理者
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/data" role="tab">
+			数据
+		</a>
+	</li>
 
 <?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-	<li class="nav-item"><a class="nav-link" href="/problem/<?=$problem['id']?>" role="tab">返回</a></li>
+	<li class="nav-item">
+		<a class="nav-link" href="/problem/<?=$problem['id']?>" role="tab">
+			返回
+		</a>
+	</li>
 <?php endif ?>
 </ul>
 
-<div class="mt-3 mb-2">
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="card card-default">
+<div class="card-body">
+<?php endif ?>
+
+<div class="mb-2
+	<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
+	mt-3
+	<?php endif ?>">
 <p>提示：</p>
 <ol>
 <li>请勿引用不稳定的外部资源（如来自个人服务器的图片或文档等），以便备份及后期维护；</li>
@@ -127,7 +151,7 @@
 			</a>
 		</li>
 		<li class="nav-item text-start">
-			<a class="nav-link active" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
+			<a class="nav-link active" href="#" role="tab">
 				<i class="bi bi-sliders"></i>
 				<?= UOJLocale::get('problems::manage') ?>
 			</a>
