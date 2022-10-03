@@ -100,7 +100,7 @@ EOD;
 					echo "<td>{$extra_config['difficulty']}</td>";
 				}
 			}
-			echo '<td class="text-left">', getClickZanBlock('P', $problem['id'], $problem['zan']), '</td>';
+			echo '<td class="text-center">', getClickZanBlock('P', $problem['id'], $problem['zan'], null, false), '</td>';
 			echo '</tr>';
 		}
 	}
@@ -140,7 +140,7 @@ EOD;
 	if (isset($_COOKIE['show_difficulty'])) {
 		$header .= '<th class="text-center" style="width:3em;">'.UOJLocale::get('problems::difficulty').'</th>';
 	}
-	$header .= '<th class="text-center" style="width:180px;">'.UOJLocale::get('appraisal').'</th>';
+	$header .= '<th class="text-center" style="width:100px;">'.UOJLocale::get('appraisal').'</th>';
 	$header .= '</tr>';
 	
 	$tabs_info = array(

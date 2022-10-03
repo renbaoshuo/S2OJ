@@ -158,11 +158,11 @@ function getBlogLink($id) {
 
 	return $result;
 }
-function getClickZanBlock($type, $id, $cnt, $val = null) {
+function getClickZanBlock($type, $id, $cnt, $val = null, $show_text = true) {
 	if ($val == null) {
 		$val = queryZanVal($id, $type, Auth::user());
 	}
-	return '<div class="uoj-click-zan-block" data-id="'.$id.'" data-type="'.$type.'" data-val="'.$val.'" data-cnt="'.$cnt.'"></div>';
+	return '<div class="uoj-click-zan-block" data-id="'.$id.'" data-type="'.$type.'" data-val="'.$val.'" data-cnt="'.$cnt.'" '.($show_text ? ' data-show-text="1" ' : '') . '></div>';
 }
 
 

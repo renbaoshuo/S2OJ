@@ -49,7 +49,7 @@
 							<tr>
 								<th>标题</th>
 								<th style="width: 20%">发表时间</th>
-								<th class="text-center" style="width: 180px">评价</th>
+								<th class="text-center" style="width: 100px">评价</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -67,7 +67,7 @@
 									<?php endforeach ?>
 								</td>
 								<td><?= $blog['post_time'] ?></td>
-								<td><?= getClickZanBlock('B', $blog['id'], $blog['zan']) ?></td>
+								<td><?= getClickZanBlock('B', $blog['id'], $blog['zan'], null, false) ?></td>
 							</tr>
 						<?php endforeach ?>
 						</tbody>

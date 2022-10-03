@@ -342,6 +342,12 @@ pre {
 
 .uoj-click-zan-block {
 	display: inline-block;
+	min-width: 100px;
+	text-align: center;
+	font-size: 0.9em;
+}
+
+.uoj-click-zan-block[data-show-text] {
 	min-width: 140px;
 	text-align: left;
 }
