@@ -10,11 +10,15 @@
 		become404Page();
 	}
 
+	if (!isProblemVisibleToUser($problem, $myUser)) {
+		become404Page();
+	}
+
 	$problem_extra_config = getProblemExtraConfig($problem);
 	$solution_viewable = hasViewSolutionPermission($problem_extra_config['view_solution_type'], $myUser, $problem);
 	$solution_submittable = hasViewSolutionPermission($problem_extra_config['submit_solution_type'], $myUser, $problem);
 
-	if (!$solution_viewable) {
+	if (!$solution_viewable || isRegisteredRunningContestProblem($myUser, $problem)) {
 		become403Page();
 	}
 

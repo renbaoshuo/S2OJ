@@ -29,7 +29,8 @@
 			become403Page();
 		}
 	}
-	if (!isSubmissionVisibleToUser($submission, $problem, $myUser)) {
+
+	if (!isSubmissionVisibleToUser($submission, $problem, $myUser) || isRegisteredRunningContestProblem($myUser, $problem)) {
 		become403Page();
 	}
 	

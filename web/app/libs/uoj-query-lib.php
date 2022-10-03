@@ -245,6 +245,22 @@ function isHackFullVisibleToUser($hack, $contest, $problem, $user) {
 	}
 }
 
+function isRegisteredRunningContestProblem($user, $problem) {
+	$result = DB::query("select contest_id from contests_problems where problem_id = {$problem['id']}");
+	while (list($contest_id) = DB::fetch($result, MYSQLI_NUM)) {
+		$contest = queryContest($contest_id);
+		genMoreContestInfo($contest);
+		if (CONTEST_NOT_STARTED < $contest['cur_progress'] && $contest['cur_progress'] <= CONTEST_IN_PROGRESS
+			&& hasRegistered($user, $contest)
+			&& !hasContestPermission($user, $contest)
+			&& queryContestProblemRank($contest, $problem)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 function deleteBlog($id) {
 	if (!validateUInt($id)) {
 		return;
