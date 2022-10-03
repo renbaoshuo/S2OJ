@@ -633,7 +633,7 @@ EOD;
 	
 	function newAddDelCmdForm($form_name, $validate, $handle, $final = null) {
 		$form = new UOJForm($form_name);
-		$form->addTextArea(
+		$form->addVTextArea(
 			$form_name . '_cmds', '命令', '',
 			function($str, &$vdata) use ($validate) {
 				$cmds = array();

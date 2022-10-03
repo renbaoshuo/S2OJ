@@ -15,7 +15,11 @@
 	if (!hasProblemPermission($myUser, $problem)) {
 		become403Page();
 	}
-	
+
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
+
 	$managers_form = newAddDelCmdForm('managers',
 		function($username) {
 			if (!validateUsername($username) || !queryUser($username)) {
@@ -66,15 +70,60 @@
 	}
 	?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - 管理者 - 题目管理') ?>
-<h1 class="page-header" align="center">#<?=$problem['id']?> : <?=$problem['title']?> 管理</h1>
-<ul class="nav nav-tabs" role="tablist">
-	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">编辑</a></li>
-	<li class="nav-item"><a class="nav-link active" href="/problem/<?= $problem['id'] ?>/manage/managers" role="tab">管理者</a></li>
-	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/data" role="tab">数据</a></li>
-	<li class="nav-item"><a class="nav-link" href="/problem/<?=$problem['id']?>" role="tab">返回</a></li>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="row">
+<div class="col-lg-9">
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<h1 class="h2">
+<?php else: ?>
+<h1 class="page-header text-center">
+<?php endif ?>
+	#<?=$problem['id']?>. <?=$problem['title']?> 管理
+</h1>
+
+<ul class="nav
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	nav-pills my-3
+	<?php else: ?>
+	nav-tabs
+	<?php endif ?>" role="tablist">
+	<li class="nav-item">
+		<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
+			题面
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link active" href="/problem/<?= $problem['id'] ?>/manage/managers" role="tab">
+			管理者
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/data" role="tab">
+			数据
+		</a>
+	</li>
+
+<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
+	<li class="nav-item">
+		<a class="nav-link" href="/problem/<?=$problem['id']?>" role="tab">
+			返回
+		</a>
+	</li>
+<?php endif ?>
 </ul>
 
-<table class="table table-hover">
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="card card-default">
+<div class="card-body">
+<?php endif ?>
+
+<table class="table
+<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
+table-hover
+<?php endif ?>">
 	<thead>
 		<tr>
 			<th>#</th>
@@ -96,7 +145,56 @@
 <?php $managers_form->printHTML(); ?>
 
 <?php if (isset($update_uploader_form)): ?>
-	<?php $update_uploader_form->printHTML(); ?>
+<hr>
+
+<?php $update_uploader_form->printHTML(); ?>
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
+</div>
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
+
+<aside class="col mt-3 mt-lg-0">
+
+<div class="card card-default mb-2">
+	<ul class="nav nav-pills nav-fill flex-column" role="tablist">
+		<li class="nav-item text-start">
+			<a href="/problem/<?= $problem['id'] ?>" class="nav-link" role="tab">
+				<i class="bi bi-journal-text"></i>
+				<?= UOJLocale::get('problems::statement') ?>
+			</a>
+		</li>
+		<li class="nav-item text-start">
+			<a href="/problem/<?= $problem['id'] ?>/solutions" class="nav-link" role="tab">
+				<i class="bi bi-journal-bookmark"></i>
+				<?= UOJLocale::get('problems::solutions') ?>
+			</a>
+		</li>
+		<li class="nav-item text-start">
+			<a class="nav-link active" href="#" role="tab">
+				<i class="bi bi-sliders"></i>
+				<?= UOJLocale::get('problems::manage') ?>
+			</a>
+		</li>
+	</ul>
+</div>
+
+<?php uojIncludeView('sidebar', array()) ?>
+</aside>
+
+</div>
+
+<script>
+	$(document).ready(function() {
+		$('.markdown-body table').each(function() {
+			$(this).addClass('table table-bordered table-striped');
+		});
+	});
+</script>
 <?php endif ?>
 
 <?php echoUOJPageFooter() ?>
