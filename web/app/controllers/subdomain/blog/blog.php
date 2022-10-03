@@ -12,6 +12,17 @@
 		become403Page();
 	}
 
+	$solutions = DB::selectAll("select * from problems_solutions where blog_id = {$blog['id']}");
+	if ($solutions) {
+		foreach ($solutions as $solution) {
+			$problem = queryProblemBrief($solution['problem_id']);
+
+			if (!hasProblemPermission($myUser, $problem) && isRegisteredRunningContestProblem($myUser, $problem)) {
+				become403Page();
+			}
+		}
+	}
+
 	if (!isset($_COOKIE['bootstrap4'])) {
 		$REQUIRE_LIB['bootstrap5'] = '';
 	}
