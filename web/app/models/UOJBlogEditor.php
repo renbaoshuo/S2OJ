@@ -231,6 +231,18 @@ EOD
 				echo '<article class="markdown-body">';
 				echo $this->post_data['content'];
 				echo '</article>';
+
+				if (isset($REQUIRE_LIB['bootstrap5'])) {
+					echo <<<EOD
+<script>
+$(document).ready(function() {
+	$('.markdown-body table').each(function() {
+		$(this).addClass('table table-bordered table-striped');
+	});
+});
+</script>
+EOD;
+				}
 				echoUOJPageFooter(array('ShowPageFooter' => false));
 			} elseif ($this->type == 'slide') {
 				uojIncludeView('slide', array_merge(
