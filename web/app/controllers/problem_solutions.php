@@ -60,7 +60,7 @@
 			if ($blog['poster'] != $myUser['username']) {
 				$blog_link = getBlogLink($blog['id']);
 				$poster_user_link = getUserLink($blog['poster']);
-				$admin_user_link = getUserLink($myUser['username']);
+				$admin_user_link = isSuperUser($myUser) ? '管理员' : getUserLink($myUser['username']);
 				$content = <<<EOD
 <p>{$poster_user_link} 您好：</p>
 <p>您为问题 <a href="/problem/{$problem['id']}">#{$problem['id']} ({$problem['title']})</a> 提交的题解 {$blog_link} 已经被 {$admin_user_link} 移除。 </p>
