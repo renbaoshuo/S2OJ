@@ -21,10 +21,6 @@
 		if (!isNormalUser($myUser)) {
 			become403Page();
 		}
-
-		if (isRegisteredRunningContestProblem($myUser, $problem)) {
-			become403Page();
-		}
 	}
 
 	function scoreDistributionData() {

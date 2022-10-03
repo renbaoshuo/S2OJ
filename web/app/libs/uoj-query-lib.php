@@ -221,11 +221,13 @@ function isHackVisibleToUser($hack, $problem, $user) {
 function isSubmissionFullVisibleToUser($submission, $contest, $problem, $user) {
 	if (isSuperUser($user)) {
 		return true;
+	} elseif ($submission['submitter'] == $user['username']) {
+		return true;
+	} elseif (isRegisteredRunningContestProblem($user, $problem)) {
+		return false;
 	} elseif (!$contest) {
 		return true;
 	} elseif ($contest['cur_progress'] > CONTEST_IN_PROGRESS) {
-		return true;
-	} elseif ($submission['submitter'] == $user['username']) {
 		return true;
 	} else {
 		return hasProblemPermission($user, $problem);
@@ -250,7 +252,7 @@ function isRegisteredRunningContestProblem($user, $problem) {
 	while (list($contest_id) = DB::fetch($result, MYSQLI_NUM)) {
 		$contest = queryContest($contest_id);
 		genMoreContestInfo($contest);
-		if (CONTEST_NOT_STARTED < $contest['cur_progress'] && $contest['cur_progress'] <= CONTEST_IN_PROGRESS
+		if ($contest['cur_progress'] == CONTEST_IN_PROGRESS
 			&& hasRegistered($user, $contest)
 			&& !hasContestPermission($user, $contest)
 			&& queryContestProblemRank($contest, $problem)) {

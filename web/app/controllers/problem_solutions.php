@@ -1,6 +1,8 @@
 <?php
 	requirePHPLib('form');
-	requirePHPLib('judger');	
+	requirePHPLib('judger');
+
+	$REQUIRE_LIB['bootstrap5'] = '';
 
 	if (!Auth::check()) {
 		become403Page(UOJLocale::get('need login'));
@@ -18,11 +20,13 @@
 	$solution_viewable = hasViewSolutionPermission($problem_extra_config['view_solution_type'], $myUser, $problem);
 	$solution_submittable = hasViewSolutionPermission($problem_extra_config['submit_solution_type'], $myUser, $problem);
 
-	if (!$solution_viewable || isRegisteredRunningContestProblem($myUser, $problem)) {
+	if (!$solution_viewable) {
 		become403Page();
 	}
 
-	$REQUIRE_LIB['bootstrap5'] = '';
+	if (!hasProblemPermission($myUser, $problem) && isRegisteredRunningContestProblem($myUser, $problem)) {
+		become403Page();
+	}
 
 	function removeSolutionForm($blog_id) {
 		$res_form = new UOJForm("remove_solution_{$blog_id}");

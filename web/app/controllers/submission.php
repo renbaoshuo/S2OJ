@@ -30,10 +30,10 @@
 		}
 	}
 
-	if (!isSubmissionVisibleToUser($submission, $problem, $myUser) || isRegisteredRunningContestProblem($myUser, $problem)) {
+	if (!isSubmissionVisibleToUser($submission, $problem, $myUser)) {
 		become403Page();
 	}
-	
+
 	$out_status = explode(', ', $submission['status'])[0];
 	
 	if ($_GET['get'] == 'status-details' && Auth::check() && $submission['submitter'] === Auth::id()) {
