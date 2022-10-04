@@ -139,18 +139,21 @@ function fTime($time, $gran = -1) {
 			<div class="card-footer bg-transparent">
 				<?php $last_visited = strtotime($user['last_visited']) ?>
 				<?php if (time() - $last_visited < 60 * 15): // 15 mins ?>
-					<span class="text-success fw-bold">
+					<span class="text-success">
+						<i class="bi bi-circle-fill"></i>
 						<?= UOJLocale::get('online') ?>
 					</span>
-				<?php elseif ($last_visited > 0): ?>
-					<span class="text-muted">
-						<?= UOJLocale::get('last active at') ?>
-						<?= fTime($last_visited, 0) ?>
-					</span>
 				<?php else: ?>
-					<span class="text-muted">
+					<span class="text-danger">
+						<i class="bi bi-circle-fill"></i>
 						<?= UOJLocale::get('offline') ?>
 					</span>
+					<?php if ($last_visited > 0): ?>
+						<span class="text-muted">
+							, <?= UOJLocale::get('last active at') ?>
+							<?= fTime($last_visited, 0) ?>
+						</span>
+					<?php endif ?>
 				<?php endif ?>
 			</div>
 		</div>
