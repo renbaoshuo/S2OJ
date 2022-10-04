@@ -18,8 +18,10 @@ getAptPackage(){
     # Update apt sources and install
     export DEBIAN_FRONTEND=noninteractive
     dpkg -s gnupg 2>/dev/null || (apt-get update && apt-get install -y gnupg)
-    echo "deb http://ppa.launchpad.net/stesie/libv8/ubuntu bionic main" | tee /etc/apt/sources.list.d/stesie-libv8.list && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D858A0DF
-    apt-get update && apt-get install -y git vim ntp zip unzip curl wget apache2 libapache2-mod-xsendfile libapache2-mod-php php php-dev php-pear php-zip php-mysql php-mbstring php-gd php-intl php-xsl g++ make re2c libv8-7.5-dev libyaml-dev
+	echo "deb http://ppa.launchpad.net/stesie/libv8/ubuntu bionic main" | tee /etc/apt/sources.list.d/stesie-libv8.list && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1A10946ED858A0DF
+	echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu jammy main" | tee /etc/apt/sources.list.d/ondrej-php.list && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C
+    apt-get update --allow-unauthenticated
+    apt-get install -y --allow-unauthenticated -o Dpkg::Options::="--force-overwrite" libv8 php7.4 php7.4-yaml php7.4-xml php7.4-dev php7.4-zip php7.4-mysql php7.4-mbstring php7.4-gd libseccomp-dev git vim ntp zip unzip curl wget libapache2-mod-xsendfile mysql-server php-pear cmake fp-compiler re2c libv8-7.5-dev libyaml-dev python2.7 python3.10 python3-requests openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk
     # Install PHP extensions
     yes | pecl install yaml
     git clone https://github.com/phpv8/v8js.git --depth=1 -b 4c026f3fb291797c109adcabda6aeba6491fe44f /tmp/pear/download/v8js-master && cd /tmp/pear/download/v8js-master
@@ -77,7 +79,7 @@ UOJEOF
 #define UOJ_JUDGER_PYTHON3_VERSION "3.6"
 #define UOJ_JUDGER_FPC_VERSION "3.0.4"
 UOJEOF
-    make runner -j$(($(nproc) + 1)) && cd /opt/uoj/web
+    make all -j$(($(nproc) + 1)) && cd /opt/uoj/web
 }
 
 dockerInitProgress() {

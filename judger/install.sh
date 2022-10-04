@@ -3,7 +3,8 @@
 getAptPackage(){
     printf "\n\n==> Getting environment packages\n"
     export DEBIAN_FRONTEND=noninteractive
-    apt-get update && apt-get install -y vim ntp zip unzip curl wget build-essential fp-compiler python2.7 python3.8 python3-requests
+    apt-get update
+	apt-get install -y vim ntp zip unzip curl wget build-essential fp-compiler python2.7 python3.10 python3-requests libseccomp-dev openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk
 }
 
 setJudgeConf(){
@@ -21,12 +22,6 @@ UOJEOF
     su judger <<EOD
 ln -s /var/uoj_data_copy /opt/uoj_judger/uoj_judger/data
 cd /opt/uoj_judger && chmod +x judge_client
-cat >uoj_judger/include/uoj_work_path.h <<UOJEOF
-#define UOJ_WORK_PATH "/opt/uoj_judger/uoj_judger"
-#define UOJ_JUDGER_BASESYSTEM_UBUNTU1804
-#define UOJ_JUDGER_PYTHON3_VERSION "3.8"
-#define UOJ_JUDGER_FPC_VERSION "3.0.4"
-UOJEOF
 cd uoj_judger && make -j$(($(nproc) + 1))
 EOD
 }
