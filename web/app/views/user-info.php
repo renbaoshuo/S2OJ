@@ -1,3 +1,66 @@
+<?php
+function fTime($time, $gran = -1) {
+	$d[0] = array(1, "seconds");
+	$d[1] = array(60, "minutes");
+	$d[2] = array(3600, "hours");
+	$d[3] = array(86400, "days");
+	$d[4] = array(604800, "weeks");
+	$d[5] = array(2592000, "months");
+	$d[6] = array(31104000, "years");
+
+	$w = array();
+
+	$return = "";
+	$now = time();
+	$diff = $now - $time;
+	$secondsLeft = $diff;
+	$stopat = 0;
+	for ($i = 6; $i > $gran; $i--) {
+		$w[$i] = intval($secondsLeft / $d[$i][0]);
+		$secondsLeft -= ($w[$i] * $d[$i][0]);
+		if ($w[$i] != 0) {
+			$return .= UOJLocale::get('time::x ' . $d[$i][1], abs($w[$i])) . " ";
+			switch ($i) {
+				case 6: // shows years and months
+					if ($stopat == 0) {
+						$stopat = 5;
+					}
+					break;
+				case 5: // shows months and weeks
+					if ($stopat == 0) {
+						$stopat = 4;
+					}
+					break;
+				case 4: // shows weeks and days
+					if ($stopat == 0) {
+						$stopat = 3;
+					}
+					break;
+				case 3: // shows days and hours
+					if ($stopat == 0) {
+						$stopat = 2;
+					}
+					break;
+				case 2: // shows hours and minutes
+					if ($stopat == 0) {
+						$stopat = 1;
+					}
+					break;
+				case 1: // shows minutes and seconds if granularity is not set higher
+					break;
+			}
+			if ($i === $stopat) {
+				break;
+			}
+		}
+	}
+
+	$return .= ($diff > 0) ? UOJLocale::get('time::ago') : UOJLocale::get('time::left');
+
+	return $return;
+}
+?>
+
 <div class="row">
 	<div class="col-md-3">
 		<div class="card">
@@ -73,6 +136,23 @@
 				</li>
 				<?php endif ?>
 			</ul>
+			<div class="card-footer bg-transparent">
+				<?php $last_visited = strtotime($user['last_visited']) ?>
+				<?php if (time() - $last_visited < 60 * 15): // 15 mins ?>
+					<span class="text-success fw-bold">
+						<?= UOJLocale::get('online') ?>
+					</span>
+				<?php elseif ($last_visited > 0): ?>
+					<span class="text-muted">
+						<?= UOJLocale::get('last active at') ?>
+						<?= fTime($last_visited, 0) ?>
+					</span>
+				<?php else: ?>
+					<span class="text-muted">
+						<?= UOJLocale::get('offline') ?>
+					</span>
+				<?php endif ?>
+			</div>
 		</div>
 	</div>
 	<div class="col-md-9 mt-2 mt-md-0">
@@ -107,14 +187,14 @@
 			<div class="card-body">
 <?php
 $_result = DB::query("select date_format(submit_time, '%Y-%m-%d'), problem_id from submissions where submitter = '{$user['username']}' and score = 100 and date(submit_time) between date_sub(curdate(), interval 1 year) and curdate()");
-			$result = [];
-			$vis = [];
-			$cnt = 0;
-			while ($row = DB::fetch($_result)) {
-				$cnt++;
-				$result[$row["date_format(submit_time, '%Y-%m-%d')"]]++;
-			}
-			?>
+$result = [];
+$vis = [];
+$cnt = 0;
+while ($row = DB::fetch($_result)) {
+	$cnt++;
+	$result[$row["date_format(submit_time, '%Y-%m-%d')"]]++;
+}
+?>
 				<h4 class="card-title h5">
 					<?= UOJLocale::get('n accepted in last year', $cnt) ?>
 				</h4>
@@ -168,6 +248,14 @@ $_result = DB::query("select date_format(submit_time, '%Y-%m-%d'), problem_id fr
 					<li class="list-group-item">
 						<h5 class="list-group-item-heading">http_x_forwarded_for</h5>
 						<p class="list-group-item-text"><?= $user['http_x_forwarded_for'] ?></p>
+					</li>
+					<li class="list-group-item">
+						<h5 class="list-group-item-heading">last_login</h5>
+						<p class="list-group-item-text"><?= $user['last_login'] ?></p>
+					</li>
+					<li class="list-group-item">
+						<h5 class="list-group-item-heading">last_visited</h5>
+						<p class="list-group-item-text"><?= $user['last_visited'] ?></p>
 					</li>
 				</ul>
 			</div>

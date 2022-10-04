@@ -94,4 +94,7 @@ return [
 	'problem manager' => 'Problem Manager',
 	'contest judger' => 'Contest Judger',
 	'contest only' => 'Contest Only',
+	'last active at' => 'Last active at',
+	'online' => 'Online',
+	'offline' => 'Offline',
 ];
