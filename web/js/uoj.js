@@ -618,6 +618,10 @@ function get_codemirror_mode(lang) {
 			return 'text/x-python';
 		case 'Pascal':
 			return 'text/x-pascal';
+		case 'Java8':
+		case 'Java11':
+		case 'Java17':
+			return 'text/x-java';
 		case 'text':
 			return 'text/plain';
 		default:

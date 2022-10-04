@@ -212,8 +212,8 @@
 		<?php endif ?>
 
 		<?php if (isset($REQUIRE_LIB['hljs'])): ?>
-		<?= HTML::css_link('/css/highlightjs.github.min.css') ?>
-		<?= HTML::js_src('/js/highlightjs.min.js') ?>
+		<?= HTML::css_link('/css/highlightjs.github.min.css?v=11.6.0-20221005') ?>
+		<?= HTML::js_src('/js/highlightjs.min.js?v=11.6.0-20221005') ?>
 		<script>$(document).ready(function() { hljs.highlightAll();	});</script>
 		<?php endif ?>
 		
