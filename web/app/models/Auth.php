@@ -81,7 +81,7 @@ class Auth {
 
 		if ($myUser) {
 			if (!isset($_SESSION['last_login'])) {
-				$_SESSION['last_login'] = $myUser['last_login'];
+				$_SESSION['last_login'] = strtotime($myUser['last_login']);
 			}
 			if ((time() - $_SESSION['last_login']) > 60 * 60 * 24 * 7) {  // 1 week
 				Auth::logout();
