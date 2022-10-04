@@ -1,4 +1,4 @@
-<div id="standings"></div>
+<div class="card card-default" id="standings"></div>
 
 <div class="table-responsive">
 	<table id="standings-table" class="table table-bordered table-striped table-text-center table-vertical-middle"></table>

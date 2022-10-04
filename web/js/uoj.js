@@ -1157,10 +1157,10 @@ function showStandings() {
 			col_tr += '</tr>';
 			return col_tr;
 		}, {
-			table_classes: ['table', 'table-bordered', 'table-striped', 'table-text-center', 'table-vertical-middle', 'table-condensed'],
+			table_classes: ['table', 'table-bordered', 'overflow-auto', 'text-center', 'uoj-table', 'uoj-standings-table', 'mb-0'],
 			page_len: 100,
 			print_after_table: function() {
-				return '<div class="text-right text-muted">' + uojLocale("contests::n participants", standings.length) + '</div><script>if (window.MathJax) window.MathJax.typeset();</scr' + 'ipt>';
+				return '<div class="card-footer bg-transparent text-end text-muted">' + uojLocale("contests::n participants", standings.length) + '</div><script>if (window.MathJax) window.MathJax.typeset();</scr' + 'ipt>';
 			}
 		}
 	);

@@ -36,6 +36,7 @@ function uojFilePreview($file_name, $output_limit, $file_type = 'text') {
 }
 
 function uojIncludeView($name, $view_params = array()) {
+	global $REQUIRE_LIB;
 	extract($view_params);
 	include $_SERVER['DOCUMENT_ROOT'].'/app/views/'.$name.'.php';
 }
