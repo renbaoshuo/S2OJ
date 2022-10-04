@@ -452,12 +452,14 @@ int compile(const compile_config &conf) {
 
     std::string lang = upgraded_lang(conf.lang);
 
-    if (lang == "C++" || lang == "C++03") {
+    if (lang == "C++" || lang == "C++14") {
+        return compile_cpp(conf, "c++14");
+    } else if (lang == "C++98") {
+        return compile_cpp(conf, "c++98");
+    } else if (lang == "C++03") {
         return compile_cpp(conf, "c++03");
     } else if (lang == "C++11") {
         return compile_cpp(conf, "c++11");
-    } else if (lang == "C++14") {
-        return compile_cpp(conf, "c++14");
     } else if (lang == "C++17") {
         return compile_cpp(conf, "c++17");
     } else if (lang == "C++20") {

@@ -512,10 +512,13 @@ function echoSubmissionContent($submission, $requirement) {
 				case 'C++':
 				case 'C++11':
 				case 'C++17':
+				case 'C++20':
 				case 'C++98':
+				case 'C++03':
 					$sh_class = 'sh_cpp';
 					break;
 				case 'Python2':
+				case 'Python2.7':
 				case 'Python3':
 					$sh_class = 'sh_python';
 					break;
