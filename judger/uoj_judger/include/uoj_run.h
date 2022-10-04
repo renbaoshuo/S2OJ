@@ -119,8 +119,9 @@ bool put_class_name_to_file(const std::string &fname, const std::string &class_n
 }
 
 std::map<std::string, std::string> lang_upgrade_map = {
-    {"Java7" , "Java8"    },
-    {"Java14", "Java17"   },
+    {"Java7" , "Java8"      },
+    {"Java14", "Java17"     },
+    {"Python2", "Python2.7" },
 };
 
 std::string upgraded_lang(const std::string &lang) {
