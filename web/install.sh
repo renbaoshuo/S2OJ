@@ -23,7 +23,6 @@ getAptPackage(){
     apt-get update --allow-unauthenticated
     apt-get install -y --allow-unauthenticated -o Dpkg::Options::="--force-overwrite" libv8 php7.4 php7.4-yaml php7.4-xml php7.4-dev php7.4-zip php7.4-mysql php7.4-mbstring php7.4-gd libseccomp-dev git vim ntp zip unzip curl wget libapache2-mod-xsendfile mysql-server php-pear cmake fp-compiler re2c libv8-7.5-dev libyaml-dev python2.7 python3.10 python3-requests openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk
     # Install PHP extensions
-    yes | pecl install yaml
     git clone https://github.com/phpv8/v8js.git --depth=1 -b 4c026f3fb291797c109adcabda6aeba6491fe44f /tmp/pear/download/v8js-master && cd /tmp/pear/download/v8js-master
     phpize && ./configure --with-php-config=/usr/bin/php-config --with-v8js=/opt/libv8-7.5 && make install && cd -
 }
