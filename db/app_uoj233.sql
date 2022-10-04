@@ -813,6 +813,7 @@ CREATE TABLE `user_info` (
   `http_x_forwarded_for` varchar(50) NOT NULL,
   `remember_token` char(60) NOT NULL,
   `motto` varchar(200) NOT NULL,
+  `last_login` datetime NOT NULL,
   PRIMARY KEY (`username`),
   KEY `ac_num` (`ac_num`,`username`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

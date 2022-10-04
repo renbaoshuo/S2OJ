@@ -22,16 +22,18 @@ class Auth {
 			$remember_token = DB::selectFirst("select remember_token from user_info where username = '$username'")['remember_token'];
 			if ($remember_token == '') {
 				$remember_token = uojRandString(60);
-				DB::update("update user_info set remember_token = '$remember_token' where username = '$username'");
+				DB::update("update user_info set remember_token = '$remember_token', last_login = now() where username = '$username'");
 			}
 
-			$expire = time() + 60 * 60 * 24 * 365 * 10;
+			$_SESSION['last_login'] = time();
+			$expire = time() + 60 * 60 * 24 * 7;
 			Cookie::safeSet('uoj_username', $username, $expire, '/', array('httponly' => true));
 			Cookie::safeSet('uoj_remember_token', $remember_token, $expire, '/', array('httponly' => true));
 		}
 	}
 	public static function logout() {
 		unset($_SESSION['username']);
+		unset($_SESSION['last_login']);
 		unset($_SESSION['last_visited']);
 		Cookie::safeUnset('uoj_username', '/');
 		Cookie::safeUnset('uoj_remember_token', '/');
@@ -70,14 +72,21 @@ class Auth {
 		global $myUser;
 		
 		Auth::initMyUser();
+
 		if ($myUser) {
 			if ($myUser['usergroup'] == 'B') {
 				$myUser = null;
 			}
 		}
+
 		if ($myUser) {
-			DB::update("update user_info set remote_addr = '".DB::escape($_SERVER['REMOTE_ADDR'])."', http_x_forwarded_for = '".DB::escape($_SERVER['HTTP_X_FORWARDED_FOR'])."' where username = '".DB::escape($myUser['username'])."'");
-			$_SESSION['last_visited'] = time();
+			if (!isset($_SESSION['last_login']) || (time() - $_SESSION['last_login']) > 60 * 60 * 24 * 7) {  // 1 week
+				Auth::logout();
+				$myUser = null;
+			}
+			
+			$_SESSION["last_visited"] = time();
+			DB::update("update user_info set remote_addr = '".DB::escape($_SERVER['REMOTE_ADDR'])."', http_x_forwarded_for = '".DB::escape($_SERVER['HTTP_X_FORWARDED_FOR'])."', last_visited = now() where username = '".DB::escape($myUser['username'])."'");
 		}
 	}
 }
