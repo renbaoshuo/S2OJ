@@ -233,6 +233,8 @@ std::map<std::string, std::vector<std::pair<int, syscall_info>>> allowed_syscall
 		{__NR_getgid           , syscall_info::unlimited()},
 		{__NR_getegid          , syscall_info::unlimited()},
 		{__NR_getppid          , syscall_info::unlimited()},
+		{__NR_setresuid        , syscall_info::unlimited()},
+		{__NR_setresgid        , syscall_info::unlimited()},
 
 		{__NR_setrlimit        , syscall_info::unlimited()},
 		{__NR_prlimit64        , syscall_info::unlimited()},
@@ -407,6 +409,7 @@ std::map<std::string, std::vector<std::string>> readable_file_name_list = {
 
 	{"compiler", {
 		"system_root",
+		"/dev/",
 		"/usr/",
 		"/lib/",
 		"/lib64/",
