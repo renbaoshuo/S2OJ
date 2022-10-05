@@ -23,7 +23,7 @@
 	?>
 <?php echoUOJPageHeader($user['username'] . ' - ' . UOJLocale::get('user profile')) ?>
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	<?php uojIncludeView('user-info', array('user' => $user)) ?>
+	<?php uojIncludeView('user-info', array('user' => $user, 'myUser' => $myUser)) ?>
 <?php else: ?>
 <?php
 		$esc_sex = HTML::escape($user['sex']);
