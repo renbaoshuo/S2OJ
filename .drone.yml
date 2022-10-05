@@ -3,6 +3,10 @@ kind: pipeline
 type: docker
 name: Build Docker Image (s2oj-db)
 
+trigger:
+  branch:
+  - master
+
 steps:
   - name: tags
     image: alpine
@@ -19,6 +23,7 @@ steps:
       username: baoshuo
       password:
         from_secret: GITMAC_SECRET
+      cache_from: git.m.ac/baoshuo/s2oj-db:latest
     when:
       event: push
       branch: master
@@ -27,6 +32,10 @@ steps:
 kind: pipeline
 type: docker
 name: Build Docker Image (s2oj-judger)
+
+trigger:
+  branch:
+  - master
 
 steps:
   - name: tags
@@ -44,6 +53,7 @@ steps:
       username: baoshuo
       password:
         from_secret: GITMAC_SECRET
+      cache_from: git.m.ac/baoshuo/s2oj-judger:latest
     when:
       event: push
       branch: master
@@ -52,6 +62,10 @@ steps:
 kind: pipeline
 type: docker
 name: Build Docker Image (s2oj-web)
+
+trigger:
+  branch:
+  - master
 
 steps:
   - name: tags
@@ -73,6 +87,7 @@ steps:
       username: baoshuo
       password:
         from_secret: GITMAC_SECRET
+      cache_from: git.m.ac/baoshuo/s2oj-web:latest
     when:
       event: push
       branch: master
