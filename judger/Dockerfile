@@ -1,9 +1,9 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ARG CLONE_ADDFLAG
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y vim ntp zip unzip curl wget build-essential fp-compiler python2.7 python3.8 python3-requests
+RUN apt-get update && apt-get install -y vim ntp zip unzip curl wget build-essential fp-compiler python2.7 python3.10 python3-requests libseccomp-dev openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk
 
 ADD . /opt/uoj_judger
 WORKDIR /opt/uoj_judger

@@ -512,18 +512,26 @@ function echoSubmissionContent($submission, $requirement) {
 				case 'C++':
 				case 'C++11':
 				case 'C++17':
+				case 'C++20':
 				case 'C++98':
-					$sh_class = 'sh_cpp';
+				case 'C++03':
+					$sh_class = 'sh_cpp language-cpp';
 					break;
 				case 'Python2':
+				case 'Python2.7':
 				case 'Python3':
-					$sh_class = 'sh_python';
+					$sh_class = 'sh_python language-python';
+					break;
+				case 'Java8':
+				case 'Java11':
+				case 'Java17':
+					$sh_class = 'sh_java language-java';
 					break;
 				case 'C':
-					$sh_class = 'sh_c';
+					$sh_class = 'sh_c language-c';
 					break;
 				case 'Pascal':
-					$sh_class = 'sh_pascal';
+					$sh_class = 'sh_pascal language-pascal';
 					break;
 				default:
 					$sh_class = '';

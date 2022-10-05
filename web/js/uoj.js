@@ -606,15 +606,22 @@ function get_codemirror_mode(lang) {
 		case 'C++':
 		case 'C++11':
 		case 'C++17':
+		case 'C++20':
 		case 'C++98':
+		case 'C++03':
 			return 'text/x-c++src';
 		case 'C':
 			return 'text/x-csrc';
 		case 'Python2':
+		case 'Python2.7':
 		case 'Python3':
 			return 'text/x-python';
 		case 'Pascal':
 			return 'text/x-pascal';
+		case 'Java8':
+		case 'Java11':
+		case 'Java17':
+			return 'text/x-java';
 		case 'text':
 			return 'text/plain';
 		default:
