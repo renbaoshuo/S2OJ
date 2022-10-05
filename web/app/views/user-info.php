@@ -149,7 +149,7 @@ function fTime($time, $gran = -1) {
 						<?= UOJLocale::get('offline') ?>
 					</span>
 					<?php if ($last_visited > 0): ?>
-						<span class="text-muted">
+						<span class="text-muted small">
 							, <?= UOJLocale::get('last active at') ?>
 							<?= fTime($last_visited, 0) ?>
 						</span>
