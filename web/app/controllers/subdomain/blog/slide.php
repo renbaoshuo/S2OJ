@@ -2,7 +2,7 @@
 	requirePHPLib('form');
 
 	if (!Auth::check()) {
-		become403Page(UOJLocale::get('need login'));
+		redirectToLogin();
 	}
 	
 	if (!isset($_GET['id']) || !validateUInt($_GET['id']) || !($blog = queryBlog($_GET['id'])) || !UOJContext::isHisSlide($blog)) {

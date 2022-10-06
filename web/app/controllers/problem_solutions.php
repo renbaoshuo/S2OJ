@@ -5,7 +5,7 @@
 	$REQUIRE_LIB['bootstrap5'] = '';
 
 	if (!Auth::check()) {
-		become403Page(UOJLocale::get('need login'));
+		redirectToLogin();
 	}
 
 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {

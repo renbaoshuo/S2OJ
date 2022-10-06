@@ -1,6 +1,6 @@
 <?php
 	if (!Auth::check()) {
-		become403Page(UOJLocale::get('need login'));
+		redirectToLogin();
 	}
 
 	requirePHPLib('form');

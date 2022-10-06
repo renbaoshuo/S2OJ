@@ -2,7 +2,7 @@
 	requirePHPLib('form');
 
 	if (!Auth::check()) {
-		become403Page(UOJLocale::get('need login'));
+		redirectToLogin();
 	}
 	
 	if (!UOJContext::hasBlogPermission()) {

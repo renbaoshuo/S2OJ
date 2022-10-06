@@ -2,7 +2,7 @@
 	requirePHPLib('judger');
 
 	if (!Auth::check()) {
-		become403Page(UOJLocale::get('need login'));
+		redirectToLogin();
 	}
 
 	if (!isNormalUser($myUser) && $_GET['type'] != 'attachment') {

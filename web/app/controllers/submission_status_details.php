@@ -1,7 +1,7 @@
 <?php
 
 if (!Auth::check()) {
-	become403Page(UOJLocale::get('need login'));
+	redirectToLogin();
 }
 
 if (!is_array($_GET['get'])) {
