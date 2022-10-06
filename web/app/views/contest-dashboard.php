@@ -15,7 +15,7 @@
 			<?php for ($i = 0; $i < count($contest_problems); $i++): ?>
 				<tr>
 					<?php
-						echo $contest_problems[$i]['submission_id'] ? '<td class="success">' : '<td>';
+						echo $contest_problems[$i]['submission_id'] ? '<td class="table-success">' : '<td>';
 				echo chr(ord('A') + $i);
 				echo '</td>';
 				?>
