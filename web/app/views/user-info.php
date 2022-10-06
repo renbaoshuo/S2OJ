@@ -140,12 +140,12 @@ function fTime($time, $gran = -1) {
 				<?php $last_visited = strtotime($user['last_visited']) ?>
 				<?php if (time() - $last_visited < 60 * 15): // 15 mins ?>
 					<span class="text-success">
-						<i class="bi bi-circle-fill"></i>
+						<i class="bi bi-circle-fill me-1"></i>
 						<?= UOJLocale::get('online') ?>
 					</span>
 				<?php else: ?>
 					<span class="text-danger">
-						<i class="bi bi-circle-fill"></i>
+						<i class="bi bi-circle-fill me-1"></i>
 						<?= UOJLocale::get('offline') ?>
 					</span>
 					<?php if ($last_visited > 0): ?>
