@@ -75,12 +75,12 @@
 <h3>提问</h3>
 <?php if ($my_questions_pag != null): ?>
 	<div>
-		<?php if ($post_question): ?>
-			<div class="float-right">
+		<div class="d-flex justify-content-between align-items-center mb-2">
+			<h4 class="mb-0">我的提问</h4>
+			<?php if ($post_question): ?>
 				<button id="button-display-post-question" type="button" class="btn btn-primary btn-xs">提问题</button>
-			</div>
-		<?php endif ?>
-		<h4>我的提问</h4>
+			<?php endif ?>
+		</div>
 		<?php if ($post_question): ?>
 			<div id="div-form-post-question" style="display:none" class="bot-buffer-md">
 				<?php $post_question->printHTML() ?>
