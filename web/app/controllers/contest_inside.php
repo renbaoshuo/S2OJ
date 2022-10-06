@@ -597,20 +597,19 @@ EOD;
 			<?php $publish_result_form->printHTML(); ?>
 		</div>
 		<?php endif ?>
-	</div>
 		<?php if ($contest['extra_config']['links']): ?>
-			<div class="card border-info top-buffer-lg">
+			<div class="card card-default border-info mt-3">
 				<div class="card-header bg-info">
-					<h3 class="card-title">比赛资料</h3>
+					<h3 class="h4 card-title">比赛资料</h3>
 				</div>
-				<div class="list-group">
+				<div class="list-group list-group-flush">
 				<?php foreach ($contest['extra_config']['links'] as $link): ?>
 					<a href="/blogs/<?=$link[1]?>" class="list-group-item"><?=$link[0]?></a>
 				<?php endforeach ?>
 				</div>
 			</div>
-		</div>
 		<?php endif ?>
+	</div>
 	<?php endif ?>
 </div>
 
