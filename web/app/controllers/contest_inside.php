@@ -579,7 +579,7 @@ EOD;
 			<p><strong>注意：比赛时显示测试所有数据的结果，但无法看到详细信息。</strong></p>
 		<?php endif ?>
 	
-		<a href="/contest/<?= $contest['id'] ?>/registrants" class="btn btn-info d-block mt-2">
+		<a href="/contest/<?= $contest['id'] ?>/registrants" class="btn btn-secondary d-block mt-2">
 			<?= UOJLocale::get('contests::contest registrants') ?>
 		</a>
 		<?php if (isSuperUser($myUser)): ?>
