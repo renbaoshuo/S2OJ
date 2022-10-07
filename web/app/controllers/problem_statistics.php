@@ -7,6 +7,10 @@
 		become404Page();
 	}
 	
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
+	
 	$contest = validateUInt($_GET['contest_id']) ? queryContest($_GET['contest_id']) : null;
 	if ($contest != null) {
 		genMoreContestInfo($contest);
@@ -67,16 +71,56 @@
 	?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::statistics')) ?>
 
-<h1 class="page-header text-center"><?= $problem['title'] ?> <?= UOJLocale::get('problems::statistics') ?></h1>
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="row">
+<div class="col-lg-9">
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="card card-default mb-2">
+<div class="card-body">
+<?php endif ?>
+
+<h1 class="page-header text-center
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	h2
+<?php endif ?>
+">
+	<?php if ($contest): ?>
+		<?= $problem_letter ?>.
+	<?php else: ?>
+		#<?= $problem['id'] ?>.
+	<?php endif ?>
+	<?= $problem['title'] ?>
+<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
+	<?= UOJLocale::get('problems::statistics') ?>
+<?php endif ?>
+</h1>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	<hr />
+<?php endif ?>
 
 <?php if ($contest && !hasContestPermission($myUser, $contest) && $contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
 <h2 class="text-center text-muted">比赛尚未结束</h2>
 <?php else: ?>
-<h2 class="text-center"><?= UOJLocale::get('problems::accepted submissions') ?></h2>
-<div class="text-right bot-buffer-sm">
+<h2 class="text-center
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	h3
+<?php endif ?>"><?= UOJLocale::get('problems::accepted submissions') ?></h2>
+<div class="
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	text-end mb-2
+<?php else: ?>
+	text-right bot-buffer-sm
+<?php endif ?>">
 	<div class="btn-group btn-group-sm">
-		<a href="<?=$SERVER['REQUEST_URI']?>" class="<?=$submissions_sort_by_choice == 'time' ? 'btn btn-info btn-xs active' : 'btn btn-info btn-xs'?>" id="submissions-sort-by-run-time"><?= UOJLocale::get('problems::fastest') ?></a>
-		<a href="<?=$SERVER['REQUEST_URI']?>" class="<?=$submissions_sort_by_choice == 'tot_size' ? 'btn btn-info btn-xs active' : 'btn btn-info btn-xs'?>" id="submissions-sort-by-code-length"><?= UOJLocale::get('problems::shortest') ?></a>
+		<a href="<?= UOJContext::requestURI() ?>" class="btn btn-secondary btn-xs <?= $submissions_sort_by_choice == 'time' ? 'active' : '' ?>" id="submissions-sort-by-run-time">
+			<?= UOJLocale::get('problems::fastest') ?>
+		</a>
+		<a href="<?= UOJContext::requestURI() ?>" class="btn btn-secondary btn-xs <?= $submissions_sort_by_choice == 'tot_size' ? 'active' : '' ?>" id="submissions-sort-by-code-length">
+			<?= UOJLocale::get('problems::shortest') ?>
+		</a>
 	</div>
 </div>
 
@@ -91,13 +135,24 @@
 	});
 </script>
 
+<?php
+$table_config = [];
+if (isset($REQUIRE_LIB['bootstrap5'])) {
+	$table_config['div_classes'] = ['mb-3'];
+	$table_config['table_classes'] = ['table', 'mb-0', 'text-center'];
+}
+?>
+
 <?php if ($submissions_sort_by_choice == 'time'): ?>
-	<?php echoSubmissionsList("best_ac_submissions.submission_id = submissions.id and best_ac_submissions.problem_id = {$problem['id']}", 'order by best_ac_submissions.used_time, best_ac_submissions.used_memory, best_ac_submissions.tot_size', array('judge_time_hidden' => '', 'table_name' => 'best_ac_submissions, submissions'), $myUser); ?>
+	<?php echoSubmissionsList("best_ac_submissions.submission_id = submissions.id and best_ac_submissions.problem_id = {$problem['id']}", 'order by best_ac_submissions.used_time, best_ac_submissions.used_memory, best_ac_submissions.tot_size', array('problem_hidden' => '', 'judge_time_hidden' => '', 'table_name' => 'best_ac_submissions, submissions', 'table_config' => $table_config), $myUser); ?>
 <?php else: ?>
-	<?php echoSubmissionsList("best_ac_submissions.shortest_id = submissions.id and best_ac_submissions.problem_id = {$problem['id']}", 'order by best_ac_submissions.shortest_tot_size, best_ac_submissions.shortest_used_time, best_ac_submissions.shortest_used_memory', array('judge_time_hidden' => '', 'table_name' => 'best_ac_submissions, submissions'), $myUser); ?>
+	<?php echoSubmissionsList("best_ac_submissions.shortest_id = submissions.id and best_ac_submissions.problem_id = {$problem['id']}", 'order by best_ac_submissions.shortest_tot_size, best_ac_submissions.shortest_used_time, best_ac_submissions.shortest_used_memory', array('problem_hidden' => '', 'judge_time_hidden' => '', 'table_name' => 'best_ac_submissions, submissions', 'table_config' => $table_config), $myUser); ?>
 <?php endif ?>
 
-<h2 class="text-center"><?= UOJLocale::get('problems::score distribution') ?></h2>
+<h2 class="text-center
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	h3
+<?php endif ?>"><?= UOJLocale::get('problems::score distribution') ?></h2>
 <div id="score-distribution-chart" style="height: 250px;"></div>
 <script type="text/javascript">
 new Morris.Bar({
@@ -118,7 +173,10 @@ new Morris.Bar({
 });
 </script>
 
-<h2 class="text-center"><?= UOJLocale::get('problems::prefix sum of score distribution') ?></h2>
+<h2 class="text-center
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	h3
+<?php endif ?>"><?= UOJLocale::get('problems::prefix sum of score distribution') ?></h2>
 <div id="score-distribution-chart-pre" style="height: 250px;"></div>
 <script type="text/javascript">
 new Morris.Line({
@@ -145,7 +203,10 @@ new Morris.Line({
 });
 </script>
 
-<h2 class="text-center"><?= UOJLocale::get('problems::suffix sum of score distribution') ?></h2>
+<h2 class="text-center
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	h3
+<?php endif ?>"><?= UOJLocale::get('problems::suffix sum of score distribution') ?></h2>
 <div id="score-distribution-chart-suf" style="height: 250px;"></div>
 <script type="text/javascript">
 new Morris.Line({
@@ -172,6 +233,117 @@ new Morris.Line({
 });
 </script>
 
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
+</div>
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
+
+<!-- Right col -->
+<aside class="col mt-3 mt-lg-0">
+
+<?php if ($contest): ?>
+<!-- Contest card -->
+<div class="card card-default mb-2">
+	<div class="card-body">
+		<h3 class="h5 card-title text-center">
+			<a class="text-decoration-none text-body" href="/contest/<?= $contest['id'] ?>">
+				<?= $contest['name'] ?>
+			</a>
+		</h3>
+		<div class="card-text text-center text-muted">
+			<?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
+				<span id="contest-countdown"></span>
+			<?php else: ?>
+				<?= UOJLocale::get('contests::contest ended') ?>
+			<?php endif ?>
+		</div>
+	</div>
+	<ul class="nav nav-pills nav-fill flex-column" role="tablist">
+		<li class="nav-item text-start">
+			<a class="nav-link" href="/contest/<?= $contest['id'] ?>" role="tab">
+				<i class="bi bi-arrow-90deg-left"></i>
+				<?= UOJLocale::get('contests::back to the contest') ?>
+			</a>
+		</li>
+	</ul>
+	<div class="card-footer bg-transparent">
+		比赛评价：<?= getClickZanBlock('C', $contest['id'], $contest['zan']) ?>
+	</div>
+</div>
+<?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
+<script type="text/javascript">
+$('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJTime::$time_now->getTimestamp() ?>, function(){}, '1.75rem', false);
+</script>
+<?php endif ?>
+<?php endif ?>
+
+<div class="card card-default mb-2">
+	<ul class="nav nav-pills nav-fill flex-column" role="tablist">
+		<li class="nav-item text-start">
+			<a class="nav-link" role="tab"
+			<?php if ($contest): ?>
+				href="/contest/<?= $contest['id'] ?>/problem/<?= $problem['id'] ?>"
+			<?php else: ?>
+				href="/problem/<?= $problem['id'] ?>"
+			<?php endif ?>>
+				<i class="bi bi-journal-text"></i>
+				<?= UOJLocale::get('problems::statement') ?>
+			</a>
+		</li>
+		<?php if (!$contest || $contest['cur_progress'] >= CONTEST_FINISHED): ?>
+		<li class="nav-item text-start">
+			<a href="/problem/<?= $problem['id'] ?>/solutions" class="nav-link" role="tab">
+				<i class="bi bi-journal-bookmark"></i>
+				<?= UOJLocale::get('problems::solutions') ?>
+			</a>
+		</li>
+		<?php endif ?>
+		<li class="nav-item text-start">
+			<a class="nav-link active" href="#">
+				<i class="bi bi-graph-up"></i>
+				<?= UOJLocale::get('problems::statistics') ?>
+			</a>
+		</li>
+		<?php if (hasProblemPermission($myUser, $problem)): ?>
+		<li class="nav-item text-start">
+			<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
+				<i class="bi bi-sliders"></i>
+				<?= UOJLocale::get('problems::manage') ?>
+			</a>
+		</li>
+		<?php endif ?>
+	</ul>
+	<div class="card-footer bg-transparent">
+		评价：<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
+	</div>
+</div>
+
+<?php uojIncludeView('sidebar', array()); ?>
+
+<!-- End right col -->
+</aside>
+
+</div>
+
+
+<script>
+	$(document).ready(function() {
+		$('.markdown-body table').each(function() {
+			$(this).addClass('table table-bordered table-striped');
+		});
+	});
+</script>
+<?php endif ?>
+
+<?php if ($contest && $contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
+<script type="text/javascript">
+checkContestNotice(<?= $contest['id'] ?>, '<?= UOJTime::$time_now_str ?>');
+</script>
 <?php endif ?>
 
 <?php echoUOJPageFooter() ?>
