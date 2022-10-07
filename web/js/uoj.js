@@ -168,11 +168,13 @@ $.fn.uoj_honor = function() {
 
 function showErrorHelp(name, err) {
 	if (err) {
-		$('#div-' + name).addClass('has-error');
+		$('#div-' + name).addClass(isBootstrap5Page ? 'has-validation' : 'has-error');
+		if (isBootstrap5Page) $('#div-' + name + ' .form-floating, #input-' + name).addClass('is-invalid');
 		$('#help-' + name).text(err);
 		return false;
 	} else {
-		$('#div-' + name).removeClass('has-error');
+		$('#div-' + name).removeClass(isBootstrap5Page ? 'has-validation' : 'has-error');
+		if (isBootstrap5Page) $('#div-' + name+ ' .form-floating, #input-' + name).removeClass('is-invalid');
 		$('#help-' + name).text('');
 		return true;
 	}
