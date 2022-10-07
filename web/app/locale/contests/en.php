@@ -10,6 +10,7 @@ return [
 	'the number of registrants' => 'Registrants',
 	'register' => 'register',
 	'registered' => 'registered',
+	'not started' => 'not started',
 	'in progress' => 'in progress',
 	'pending final test' => 'pending final test',
 	'final testing' => 'final testing',

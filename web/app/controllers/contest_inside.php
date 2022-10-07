@@ -486,8 +486,21 @@ EOD;
 	?>
 <?php echoUOJPageHeader(HTML::stripTags($contest['name']) . ' - ' . $tabs_info[$cur_tab]['name'] . ' - ' . UOJLocale::get('contests::contest')) ?>
 
-<div class="text-center d-md-none">
+<div class="text-center d-md-none mb-3">
 	<h1 class="h2"><?= $contest['name'] ?></h1>
+	<div class="small text-muted">
+		<?php if ($contest['cur_progress'] <= CONTEST_NOT_STARTED): ?>
+			<?= UOJLocale::get('contests::not started') ?>
+		<?php elseif ($contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
+			<?= UOJLocale::get('contests::in progress') ?>
+		<?php elseif ($contest['cur_progress'] <= CONTEST_PENDING_FINAL_TEST): ?>
+			<?= UOJLocale::get('contests::pending final test') ?>
+		<?php elseif ($contest['cur_progress'] <= CONTEST_TESTING): ?>
+			<?= UOJLocale::get('contests::final testing') ?>
+		<?php else: ?>
+			<?= UOJLocale::get('contests::finished') ?>
+		<?php endif ?>
+	</div>
 </div>
 
 
@@ -499,7 +512,22 @@ EOD;
 	<?php endif ?>
 		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
 		<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings' || $cur_tab == 'self_reviews'): ?>
-		<h1 class="h2 text-center d-none d-md-block mt-2"><?= $contest['name'] ?></h1>
+		<div class="d-none d-md-block text-center">
+			<h1 class="h2 mt-2 mb-3"><?= $contest['name'] ?></h1>
+			<div class="small text-muted">
+				<?php if ($contest['cur_progress'] <= CONTEST_NOT_STARTED): ?>
+					<?= UOJLocale::get('contests::not started') ?>
+				<?php elseif ($contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
+					<?= UOJLocale::get('contests::in progress') ?>
+				<?php elseif ($contest['cur_progress'] <= CONTEST_PENDING_FINAL_TEST): ?>
+					<?= UOJLocale::get('contests::pending final test') ?>
+				<?php elseif ($contest['cur_progress'] <= CONTEST_TESTING): ?>
+					<?= UOJLocale::get('contests::final testing') ?>
+				<?php else: ?>
+					<?= UOJLocale::get('contests::finished') ?>
+				<?php endif ?>
+			</div>
+		</div>
 		<?php endif ?>
 		<div class="mt-3">
 		<?php

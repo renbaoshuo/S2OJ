@@ -10,6 +10,7 @@ return [
 	'the number of registrants' => '报名人数',
 	'register' => '报名',
 	'registered' => '已报名',
+	'not started' => '未开始',
 	'in progress' => '正在进行',
 	'pending final test' => '等待评测',
 	'final testing' => '正在评测',
