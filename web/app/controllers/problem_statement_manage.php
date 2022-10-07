@@ -151,12 +151,21 @@
 			</a>
 		</li>
 		<li class="nav-item text-start">
+			<a class="nav-link" href="/problem/<?= $problem['id'] ?>/statistics">
+				<i class="bi bi-graph-up"></i>
+				<?= UOJLocale::get('problems::statistics') ?>
+			</a>
+		</li>
+		<li class="nav-item text-start">
 			<a class="nav-link active" href="#" role="tab">
 				<i class="bi bi-sliders"></i>
 				<?= UOJLocale::get('problems::manage') ?>
 			</a>
 		</li>
 	</ul>
+	<div class="card-footer bg-transparent">
+		评价：<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
+	</div>
 </div>
 
 <?php uojIncludeView('sidebar', array()) ?>

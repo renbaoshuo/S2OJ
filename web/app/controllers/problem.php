@@ -378,6 +378,14 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 			<?php endif ?>
 		</div>
 	</div>
+	<ul class="nav nav-pills nav-fill flex-column" role="tablist">
+		<li class="nav-item text-start">
+			<a class="nav-link" href="/contest/<?= $contest['id'] ?>" role="tab">
+				<i class="bi bi-arrow-90deg-left"></i>
+				<?= UOJLocale::get('contests::back to the contest') ?>
+			</a>
+		</li>
+	</ul>
 	<div class="card-footer bg-transparent">
 		比赛评价：<?= getClickZanBlock('C', $contest['id'], $contest['zan']) ?>
 	</div>
@@ -419,6 +427,18 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 			</a>
 		</li>
 		<?php endif ?>
+		<li class="nav-item text-start">
+			<a class="nav-link"
+			<?php if ($contest): ?>
+				href="/contest/<?= $contest['id'] ?>/problem/<?= $problem['id'] ?>/statistics"
+			<?php else: ?>
+				href="/problem/<?= $problem['id'] ?>/statistics"
+			<?php endif ?>
+			>
+				<i class="bi bi-graph-up"></i>
+				<?= UOJLocale::get('problems::statistics') ?>
+			</a>
+		</li>
 		<?php if (hasProblemPermission($myUser, $problem)): ?>
 		<li class="nav-item text-start">
 			<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
@@ -427,15 +447,10 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 			</a>
 		</li>
 		<?php endif ?>
-		<?php if ($contest): ?>
-		<li class="nav-item text-start">
-			<a class="nav-link" href="/contest/<?= $contest['id'] ?>" role="tab">
-				<i class="bi bi-arrow-90deg-left"></i>
-				<?= UOJLocale::get('contests::back to the contest') ?>
-			</a>
-		</li>
-		<?php endif ?>
 	</ul>
+	<div class="card-footer bg-transparent">
+		评价：<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
+	</div>
 </div>
 
 <div class="card card-default mb-2">
@@ -452,16 +467,7 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 				附件下载
 			</a>
 		</li>
-		<li class="nav-item text-start">
-			<a class="nav-link" href="/problem/<?= $problem['id'] ?>/statistics">
-				<i class="bi bi-graph-up"></i>
-				<?= UOJLocale::get('problems::statistics') ?>
-			</a>
-		</li>
 	</ul>
-	<div class="card-footer bg-transparent">
-		评价：<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
-	</div>
 </div>
 
 <?php

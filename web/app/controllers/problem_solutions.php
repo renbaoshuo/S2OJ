@@ -230,6 +230,12 @@ EOD;
 				<?= UOJLocale::get('problems::solutions') ?>
 			</a>
 		</li>
+		<li class="nav-item text-start">
+			<a class="nav-link" href="/problem/<?= $problem['id'] ?>/statistics">
+				<i class="bi bi-graph-up"></i>
+				<?= UOJLocale::get('problems::statistics') ?>
+			</a>
+		</li>
 		<?php if (hasProblemPermission($myUser, $problem)): ?>
 		<li class="nav-item text-start">
 			<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
@@ -238,29 +244,6 @@ EOD;
 			</a>
 		</li>
 		<?php endif ?>
-	</ul>
-</div>
-
-<div class="card card-default mb-2">
-	<ul class="nav nav-fill flex-column">
-		<li class="nav-item text-start">
-			<a class="nav-link" href="<?= HTML::url("/download.php?type=problem&id={$problem['id']}") ?>">
-				<i class="bi bi-hdd-stack"></i>
-				测试数据
-			</a>
-		</li>
-		<li class="nav-item text-start">
-			<a class="nav-link" href="<?= HTML::url("/download.php?type=attachment&id={$problem['id']}") ?>">
-				<i class="bi bi-download"></i>
-				附件下载
-			</a>
-		</li>
-		<li class="nav-item text-start">
-			<a class="nav-link" href="/problem/<?= $problem['id'] ?>/statistics">
-				<i class="bi bi-graph-up"></i>
-				<?= UOJLocale::get('problems::statistics') ?>
-			</a>
-		</li>
 	</ul>
 	<div class="card-footer bg-transparent">
 		评价：<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
