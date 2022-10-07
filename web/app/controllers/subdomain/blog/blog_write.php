@@ -13,6 +13,10 @@
 			become404Page();
 		}
 	}
+
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
 	
 	$blog_editor = new UOJBlogEditor();
 	$blog_editor->name = 'blog';
@@ -69,8 +73,16 @@
 	$blog_editor->runAtServer();
 	?>
 <?php echoUOJPageHeader('写博客') ?>
-<div class="text-right">
-<a href="http://uoj.ac/blog/7">这玩意儿怎么用？</a>
+<div class="
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	text-end
+	<?php else: ?>
+	text-right
+	<?php endif ?>">
+<a class="
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	text-decoration-none
+	<?php endif ?>" href="http://uoj.ac/blog/7">这玩意儿怎么用？</a>
 </div>
 <?php $blog_editor->printHTML() ?>
 <?php echoUOJPageFooter() ?>
