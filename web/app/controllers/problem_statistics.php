@@ -199,7 +199,7 @@ $table_config = [];
 
 <h2 class="text-center
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	h3
+	h3 mt-4
 <?php endif ?>"><?= UOJLocale::get('problems::score distribution') ?></h2>
 <div id="score-distribution-chart" style="height: 250px;"></div>
 <script type="text/javascript">
@@ -223,7 +223,7 @@ new Morris.Bar({
 
 <h2 class="text-center
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	h3
+	h3 mt-4
 <?php endif ?>"><?= UOJLocale::get('problems::prefix sum of score distribution') ?></h2>
 <div id="score-distribution-chart-pre" style="height: 250px;"></div>
 <script type="text/javascript">
@@ -253,7 +253,7 @@ new Morris.Line({
 
 <h2 class="text-center
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	h3
+	h3 mt-4
 <?php endif ?>"><?= UOJLocale::get('problems::suffix sum of score distribution') ?></h2>
 <div id="score-distribution-chart-suf" style="height: 250px;"></div>
 <script type="text/javascript">
