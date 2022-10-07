@@ -3,9 +3,9 @@
 		redirectToLogin();
 	}
 
-    if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-    	become403Page();
-    }
+	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
+		become403Page();
+	}
 
 	if (!isset($_COOKIE['bootstrap4'])) {
 		$REQUIRE_LIB['bootstrap5'] = '';
