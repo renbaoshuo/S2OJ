@@ -7,6 +7,10 @@
 		become403Page();
 	}
 
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
+
 	requirePHPLib('form');
 	
 	function echoBlogCell($blog) {
@@ -44,8 +48,37 @@ EOD;
 		'table_classes' => ['table', 'table-hover'],
 		'page_len' => 40
 	];
+
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		$config['div_classes'] = ['card', 'my-3'];
+		$config['table_classes'] = ['table', 'uoj-table', 'mb-0'];
+	}
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('announcements')) ?>
-<h3>公告</h3>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<div class="row">
+<!-- left col -->
+<div class="col-lg-9">
+<?php endif ?>
+
+<h1 class="h2">
+	<?= UOJLocale::get('announcements') ?>
+</h1>
+
 <?php echoLongTable(array('blogs.id', 'poster', 'title', 'post_time', 'zan', 'level'), 'important_blogs, blogs', 'is_hidden = 0 and important_blogs.blog_id = blogs.id', 'order by level desc, important_blogs.blog_id desc', $header, 'echoBlogCell', $config); ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+</div>
+<!-- end left col -->
+
+<!-- right col -->
+<aside class="col mt-3 mt-lg-0">
+<?php uojIncludeView('sidebar', array()) ?>
+</aside>
+<!-- end right col -->
+
+</div>
+<?php endif ?>
+
 <?php echoUOJPageFooter() ?>
