@@ -1,5 +1,4 @@
 <?php if (Auth::check()): ?>
-
 <?php if (!isset($group_announcements_hidden)): ?>
 <?php $groups = queryGroupsOfUser(Auth::id()); ?>
 <?php if (count($groups)): ?>
@@ -30,9 +29,11 @@
 		<?php endforeach ?>
 	</ul>
 </div>
-<?php endif ?>
-<?php endif ?>
+<?php endif // count($groups) ?>
+<?php endif // !isset($group_announcements_hidden) ?>
+<?php endif // Auth::check() ?>
 
+<?php if (!UOJConfig::$data['switch']['force-login'] || Auth::check()): ?>
 <?php if (!isset($upcoming_contests_hidden)): ?>
 <?php
 	$upcoming_contests = DB::selectAll("SELECT * FROM contests WHERE status = 'unfinished' ORDER BY start_time ASC, id ASC LIMIT 7");
@@ -81,6 +82,5 @@
 		</a>
 	</div>
 </div>
-<?php endif ?>
-
-<?php endif // Auth::check() ?>
+<?php endif // !isset($upcoming_contests_hidden) ?>
+<?php endif // !UOJConfig::$data['switch']['force-login'] || Auth::check() ?>

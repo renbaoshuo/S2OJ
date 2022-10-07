@@ -53,6 +53,8 @@ return [
 		]
 	],
 	'switch' => [
-		'blog-domain-mode' => 3
+		'blog-domain-mode' => 3,
+		'force-login' => true,
+		'open-register' => false
 	]
 ];

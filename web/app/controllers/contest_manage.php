@@ -1,13 +1,9 @@
 <?php
-	requirePHPLib('form');
-
 	if (!Auth::check()) {
 		redirectToLogin();
 	}
-
-	if (!isNormalUser($myUser)) {
-		become403Page();
-	}
+	
+	requirePHPLib('form');
 
 	if (!validateUInt($_GET['id']) || !($contest = queryContest($_GET['id']))) {
 		become404Page();

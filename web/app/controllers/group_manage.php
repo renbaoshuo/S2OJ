@@ -1,15 +1,11 @@
 <?php
-	requirePHPLib('form');
-	requirePHPLib('judger');
-	requirePHPLib('data');
-
 	if (!Auth::check()) {
 		redirectToLogin();
 	}
-
-	if (!isNormalUser($myUser)) {
-		become403Page();
-	}
+	
+	requirePHPLib('form');
+	requirePHPLib('judger');
+	requirePHPLib('data');
 
 	$group_id = $_GET['id'];
 	if (!validateUInt($group_id) || !($group = queryGroup($group_id))) {

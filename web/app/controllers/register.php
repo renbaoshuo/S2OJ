@@ -13,7 +13,7 @@
 			return "无效表单";
 		}
 
-		if (DB::selectCount("SELECT COUNT(*) FROM user_info")) {
+		if (!UOJConfig::$data['switch']['open-register'] && DB::selectCount("SELECT COUNT(*) FROM user_info")) {
 			return "只有首位用户可以注册。";
 		}
 

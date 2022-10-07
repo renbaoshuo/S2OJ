@@ -1,7 +1,11 @@
 <?php
-	if (!Auth::check()) {
+	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
 	}
+
+    if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
+    	become403Page();
+    }
 
 	if (!isset($_COOKIE['bootstrap4'])) {
 		$REQUIRE_LIB['bootstrap5'] = '';

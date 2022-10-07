@@ -67,8 +67,8 @@
 				<?php endif ?>
 			</div>
 		</div>
-		<?php if (Auth::check()): ?>
-			<?php if (isNormalUser($myUser)): ?>
+		<?php if (!UOJConfig::$data['switch']['force-login'] || Auth::check()): ?>
+			<?php if (!UOJConfig::$data['switch']['force-login'] || isNormalUser($myUser)): ?>
 			
 			<div class="mt-4
 				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>

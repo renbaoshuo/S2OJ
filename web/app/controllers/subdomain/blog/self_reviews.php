@@ -3,7 +3,7 @@
 		redirectToLogin();
 	}
 
-	if (!isNormalUser($myUser)) {
+	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
 		become403Page();
 	}
 

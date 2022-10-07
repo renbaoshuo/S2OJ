@@ -1,6 +1,6 @@
 <?php
 
-if (!Auth::check()) {
+if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 	redirectToLogin();
 }
 
@@ -18,7 +18,7 @@ foreach ($_GET['get'] as $id) {
 	if ($submission['submitter'] !== Auth::id()) {
 		become403Page();
 	}
-	if ($submission['contest_id'] == null && !isNormalUser($myUser)) {
+	if ($submission['contest_id'] == null && !(isNormalUser($myUser) && UOJConfig::$data['switch']['force-login'])) {
 		become403Page();
 	}
 	

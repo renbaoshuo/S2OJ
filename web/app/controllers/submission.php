@@ -2,7 +2,7 @@
 	requirePHPLib('form');
 	requirePHPLib('judger');
 
-	if (!Auth::check()) {
+	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
 	}
 	
@@ -25,7 +25,7 @@
 	} else {
 		$contest = null;
 
-		if (!isNormalUser($myUser)) {
+		if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
 			become403Page();
 		}
 	}

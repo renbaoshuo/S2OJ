@@ -1,11 +1,11 @@
 <?php
 	requirePHPLib('judger');
 
-	if (!Auth::check()) {
+	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
 	}
 
-	if (!isNormalUser($myUser) && $_GET['type'] != 'attachment') {
+	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login'] && $_GET['type'] != 'attachment') {
 		become403Page();
 	}
 

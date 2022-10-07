@@ -167,7 +167,7 @@ mb-4" role="navigation">
 						<?= UOJLocale::get('login') ?>
 					</a>
 				</li>
-				<?php if (!DB::selectCount("SELECT COUNT(*) FROM user_info")): ?>
+				<?php if (UOJConfig::$data['switch']['open-register'] || !DB::selectCount("SELECT COUNT(*) FROM user_info")): ?>
 				<li class="nav-item">
 					<a class="nav-link" href="<?= HTML::url('/register') ?>">
 						<i class="bi bi-person-plus-fill"></i>

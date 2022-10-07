@@ -5,14 +5,13 @@
 		become404Page();
 	}
 
-	if (!isNormalUser($myUser)) {
-		become403Page();
-	}
 
 	genMoreContestInfo($contest);
 	
 	if (!Auth::check()) {
 		redirectToLogin();
+	} elseif (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
+		become403Page();
 	} elseif (hasRegistered($myUser, $contest) || $contest['cur_progress'] != CONTEST_NOT_STARTED) {
 		redirectTo('/contests');
 	}

@@ -4,8 +4,12 @@
 
 	$REQUIRE_LIB['bootstrap5'] = '';
 
-	if (!Auth::check()) {
+	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
+	}
+
+	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
+		become403Page();
 	}
 
 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {

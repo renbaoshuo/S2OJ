@@ -1,5 +1,5 @@
 <?php
-	if (!Auth::check()) {
+	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
 	}
 
@@ -29,7 +29,7 @@
 			become404Page();
 		}
 
-		if (!isNormalUser($myUser)) {
+		if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
 			become403Page();
 		}
 	}
