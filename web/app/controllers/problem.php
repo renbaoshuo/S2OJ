@@ -219,10 +219,12 @@ EOD
 		$custom_test_form->runAtServer();
 	}
 	?>
+
 <?php
 	$REQUIRE_LIB['mathjax'] = '';
 	$REQUIRE_LIB['shjs'] = '';
 	?>
+
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::problem')) ?>
 <?php
 	$limit = getUOJConf("/var/uoj_data/{$problem['id']}/problem.conf");
@@ -234,7 +236,50 @@ EOD
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="row">
+
+<!-- Left col -->
 <div class="col-lg-9">
+<?php endif ?>
+
+<?php if (isset($REQUIRE_LIB['bootstrap5']) && $contest): ?>
+<!-- 比赛导航 -->
+<?php
+	$tabs_info = array(
+		'dashboard' => array(
+			'name' => UOJLocale::get('contests::contest dashboard'),
+			'url' => "/contest/{$contest['id']}"
+		),
+		'submissions' => array(
+			'name' => UOJLocale::get('contests::contest submissions'),
+			'url' => "/contest/{$contest['id']}/submissions"
+		),
+		'standings' => array(
+			'name' => UOJLocale::get('contests::contest standings'),
+			'url' => "/contest/{$contest['id']}/standings"
+		),
+	);
+
+	if ($contest['cur_progress'] > CONTEST_TESTING) {
+		$tabs_info['after_contest_standings'] = array(
+			'name' => UOJLocale::get('contests::after contest standings'),
+			'url' => "/contest/{$contest['id']}/after_contest_standings"
+		);
+		$tabs_info['self_reviews'] = array(
+			'name' => UOJLocale::get('contests::contest self reviews'),
+			'url' => "/contest/{$contest['id']}/self_reviews"
+		);
+	}
+
+	if (hasContestPermission(Auth::user(), $contest)) {
+		$tabs_info['backstage'] = array(
+			'name' => UOJLocale::get('contests::contest backstage'),
+			'url' => "/contest/{$contest['id']}/backstage"
+		);
+	}
+	?>
+	<div class="mb-2">
+		<?= HTML::tablist($tabs_info, '', 'nav-pills') ?>
+	</div>
 <?php endif ?>
 
 <?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
@@ -359,10 +404,13 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
+<!-- End left col -->
 
 <aside class="col mt-3 mt-lg-0">
+<!-- Right col -->
 
 <?php if ($contest): ?>
+<!-- Contest card -->
 <div class="card card-default mb-2">
 	<div class="card-body">
 		<h3 class="h5 card-title text-center">
@@ -378,14 +426,6 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 			<?php endif ?>
 		</div>
 	</div>
-	<ul class="nav nav-pills nav-fill flex-column" role="tablist">
-		<li class="nav-item text-start">
-			<a class="nav-link" href="/contest/<?= $contest['id'] ?>" role="tab">
-				<i class="bi bi-arrow-90deg-left"></i>
-				<?= UOJLocale::get('contests::back to the contest') ?>
-			</a>
-		</li>
-	</ul>
 	<div class="card-footer bg-transparent">
 		比赛评价：<?= getClickZanBlock('C', $contest['id'], $contest['zan']) ?>
 	</div>
@@ -397,6 +437,7 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 <?php endif ?>
 <?php endif ?>
 
+<!-- 题目导航卡片 -->
 <div class="card card-default mb-2">
 	<ul class="nav nav-pills nav-fill flex-column" role="tablist">
 		<li class="nav-item text-start">
@@ -453,6 +494,7 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 	</div>
 </div>
 
+<!-- 附件 -->
 <div class="card card-default mb-2">
 	<ul class="nav nav-fill flex-column">
 		<li class="nav-item text-start">
@@ -481,7 +523,7 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 
 </div>
 
-
+<!-- 表格处理 -->
 <script>
 	$(document).ready(function() {
 		$('.markdown-body table').each(function() {
