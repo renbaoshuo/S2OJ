@@ -59,7 +59,7 @@
 							<tr>
 								<td>
 									<?php if ($blog['is_hidden']): ?>
-									<span class="text-danger">[已隐藏]</span>
+									<span class="text-danger">[隐藏]</span>
 									<?php endif ?>
 									<?= getBlogLink($blog['id']) ?>
 									<?php foreach (queryBlogTags($blog['id']) as $tag): ?>
@@ -101,6 +101,9 @@
 				<?php foreach ($blogs_pag->get() as $blog): ?>
 					<tr>
 						<td>
+							<?php if ($blog['is_hidden']): ?>
+							<span class="text-danger">[隐藏]</span>
+							<?php endif ?>
 							<?= getBlogLink($blog['id']) ?>
 							<?php foreach (queryBlogTags($blog['id']) as $tag): ?>
 								<?php echoBlogTag($tag) ?>
