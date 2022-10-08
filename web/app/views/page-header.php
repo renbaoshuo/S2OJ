@@ -315,11 +315,7 @@
 								<b><?= $group['title'] ?></b>
 							</a>
 							<?php if ($group_announcement): ?>
-							<div id="announcement-content-<?= $group['id'] ?>"></div>
-							<script>(function(){
-								$('#announcement-content-<?= $group['id'] ?>')
-									.html(DOMPurify.sanitize(decodeURIComponent("<?= rawurlencode($group_announcement) ?>"), <?= DOM_SANITIZE_CONFIG ?>)); 
-							})();</script>
+							<div><?= HTML::pruifier()->purify($group_announcement) ?></div>
 							<?php else: ?>
 							<div>（暂无公告）</div>
 							<?php endif ?>

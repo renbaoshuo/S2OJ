@@ -17,11 +17,9 @@
 					<?= $group['title'] ?>
 				</a>
 				<?php if ($group_announcement): ?>
-				<div id="announcement-content-<?= $group['id'] ?>" class="text-break"></div>
-				<script>(function(){
-					$('#announcement-content-<?= $group['id'] ?>')
-						.html(DOMPurify.sanitize(decodeURIComponent("<?= urlencode($group_announcement) ?>"), <?= DOM_SANITIZE_CONFIG ?>)); 
-				})();</script>
+				<div class="text-break">
+					<?= HTML::pruifier()->purify($group_announcement) ?>
+				</div>
 				<?php else: ?>
 				<div>（暂无公告）</div>
 				<?php endif ?>
