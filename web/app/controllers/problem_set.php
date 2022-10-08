@@ -66,10 +66,10 @@
 			if (isset($_COOKIE['show_tags_mode'])) {
 				foreach (queryProblemTags($problem['id']) as $tag) {
 					if (isset($REQUIRE_LIB['bootstrap5'])) {
-						echo '<a class="uoj-problem-tag my-1">';
+						echo ' <a class="uoj-problem-tag my-1">';
 						echo '<span class="badge bg-secondary">';
 					} else {
-						echo '<a class="uoj-problem-tag">';
+						echo ' <a class="uoj-problem-tag">';
 						echo '<span class="badge badge-pill badge-secondary">';
 					}
 					echo HTML::escape($tag), '</span>';
