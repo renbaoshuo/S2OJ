@@ -55,9 +55,13 @@ label {
 	border-top-color: transparent;
 }
 
-.uoj-table > thead > tr,
-.uoj-table > tbody > tr {
+.uoj-table > thead > tr > th:first-child,
+.uoj-table > tbody > tr > td:first-child {
 	border-left-color: transparent;
+}
+
+.uoj-table > thead > tr > th:last-child,
+.uoj-table > tbody > tr > td:last-child {
 	border-right-color: transparent;
 }
 

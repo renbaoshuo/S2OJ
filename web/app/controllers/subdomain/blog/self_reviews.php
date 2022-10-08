@@ -66,13 +66,11 @@ $col_names = array('contest_id');
 			$problem_review_id = "review-$contest_id-$i";
 			$result .= '<td>' . chr(ord('A') + $i) . '. <a href="/problem/' . $problem_id . '">' . $problem['title'] . '</a></td>';
 			$result .= '<td>' . $purifier->purify($problem_self_review != null ? $problem_self_review['content'] : '') . '</td>';
-			$esc_problem_self_review = rawurlencode($problem_self_review != null ? $problem_self_review['content'] : '');
 
 			if ($i == 0) {
 				$contest_review_id = "review-$contest_id-overall";
 				$contest_self_review = DB::selectFirst("select content from contests_reviews where contest_id = $contest_id and problem_id = -1 and poster = '$username'");
-				$esc_contest_self_review = rawurlencode($contest_self_review != null ? $contest_self_review['content'] : '');
-				$result .= '<td rowspan="' . $n_contest_problems . '">' . $purifier->purify($problem_self_review != null ? $problem_self_review['content'] : '') . '</td>';
+				$result .= '<td rowspan="' . $n_contest_problems . '">' . $purifier->purify($contest_self_review != null ? $contest_self_review['content'] : '') . '</td>';
 			}
 
 			$result .= '</tr>';
