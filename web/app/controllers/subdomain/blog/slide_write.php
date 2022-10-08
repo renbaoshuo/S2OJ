@@ -17,6 +17,10 @@
 			become404Page();
 		}
 	}
+
+	if (!isset($_COOKIE['bootstrap4'])) {
+		$REQUIRE_LIB['bootstrap5'] = '';
+	}
 	
 	$blog_editor = new UOJBlogEditor();
 	$blog_editor->type = 'slide';
@@ -59,6 +63,8 @@
 		} else {
 			insertSlide($data);
 			$blog = array('id' => DB::insert_id(), 'tags' => array());
+			$ret['blog_write_url'] = HTML::blog_url(UOJContext::user()['username'], "/slide/{$blog['id']}/write");
+			$ret['blog_url'] = HTML::blog_url(UOJContext::user()['username'], "/slide/{$blog['id']}");
 		}
 		if ($data['tags'] !== $blog['tags']) {
 			DB::delete("delete from blogs_tags where blog_id = {$blog['id']}");
@@ -72,8 +78,17 @@
 	$blog_editor->runAtServer();
 	?>
 <?php echoUOJPageHeader('写幻灯片') ?>
-<div class="text-right">
-<a href="http://uoj.ac/blog/75">这玩意儿怎么用？</a>
+<div class="
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	text-end
+	<?php else: ?>
+	text-right
+	<?php endif ?>">
+<a class="
+	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+	text-decoration-none
+	<?php endif ?>
+	" href="http://uoj.ac/blog/75">这玩意儿怎么用？</a>
 </div>
 <?php $blog_editor->printHTML() ?>
 <?php echoUOJPageFooter() ?>
