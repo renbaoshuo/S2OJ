@@ -8,6 +8,8 @@
 	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
 		become403Page();
 	}
+
+	$REQUIRE_LIB['bootstrap5'] = '';
 	
 	if (!UOJContext::hasBlogPermission()) {
 		become403Page();
@@ -28,6 +30,8 @@
 	$delete_form->runAtServer();
 	?>
 <?php echoUOJPageHeader('删除博客 - ' . HTML::stripTags($blog['title'])) ?>
-<h3>您真的要删除博客 <?= $blog['title'] ?> 吗？该操作不可逆！</h3>
+<h1 class="h3 text-center">
+	您真的要删除博客 “<?= $blog['title'] ?>” <span class="fs-5">（博客 ID：<?= $blog['id'] ?>）</span>吗？该操作不可逆！
+</h1>
 <?php $delete_form->printHTML(); ?>
 <?php echoUOJPageFooter() ?>
