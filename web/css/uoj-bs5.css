@@ -51,6 +51,16 @@ label {
 	border-bottom-color: transparent;
 }
 
+.uoj-table > thead > tr:first-child {
+	border-top-color: transparent;
+}
+
+.uoj-table > thead > tr,
+.uoj-table > tbody > tr {
+	border-left-color: transparent;
+	border-right-color: transparent;
+}
+
 .uoj-click-zan-block {
 	display: inline-block;
 	min-width: 100px;
