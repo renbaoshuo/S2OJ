@@ -81,11 +81,9 @@ function fTime($time, $gran = -1) {
 					<?php endif ?>
 					</span>
 				</h3>
-				<?php $motto_id = uniqid("motto-{$user['username']}-"); ?>
-				<div class="card-text" id="<?= $motto_id ?>"></div>
-				<script type="text/javascript">
-					$(function() { $('#<?= $motto_id ?>').html(DOMPurify.sanitize(decodeURIComponent("<?= rawurlencode($user['motto']) ?>"), <?= DOM_SANITIZE_CONFIG ?>)); });
-				</script>
+				<div class="card-text">
+					<?= HTML::pruifier()->purify($user['motto']) ?>
+				</div>
 			</div>
 			<ul class="list-group list-group-flush">
 				<?php if ($user['realname']): ?>
