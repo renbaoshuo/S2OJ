@@ -1,5 +1,5 @@
 <?php
-	if (!Auth::check()) {
+	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
 	}
 

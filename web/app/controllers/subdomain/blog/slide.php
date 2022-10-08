@@ -1,8 +1,12 @@
 <?php
 	requirePHPLib('form');
 
-	if (!Auth::check()) {
+	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
+	}
+
+	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
+		become403Page();
 	}
 	
 	if (!isset($_GET['id']) || !validateUInt($_GET['id']) || !($blog = queryBlog($_GET['id'])) || !UOJContext::isHisSlide($blog)) {
