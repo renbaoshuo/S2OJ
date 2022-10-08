@@ -524,7 +524,7 @@ EOD;
 				<?php elseif ($contest['cur_progress'] <= CONTEST_TESTING): ?>
 					<?= UOJLocale::get('contests::final testing') ?>
 				<?php else: ?>
-					<?= UOJLocale::get('contests::finished') ?>
+					<?= UOJLocale::get('contests::ended') ?>
 				<?php endif ?>
 			</div>
 		</div>
