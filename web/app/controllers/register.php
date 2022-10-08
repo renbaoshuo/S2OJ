@@ -1,4 +1,8 @@
 <?php
+	if (!UOJConfig::$data['switch']['open-register'] && DB::selectCount("SELECT COUNT(*) FROM user_info")) {
+		become404Page();
+	}
+
 	function handleRegisterPost() {
 		if (!crsf_check()) {
 			return '页面已过期';
