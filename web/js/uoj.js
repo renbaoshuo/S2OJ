@@ -1165,7 +1165,8 @@ function showStandings() {
 			col_tr += '</tr>';
 			return col_tr;
 		}, {
-			table_classes: ['table', 'table-bordered', 'overflow-auto', 'text-center', 'uoj-table', 'uoj-standings-table', 'mb-0'],
+			div_classes: ['table-responsive'],
+			table_classes: ['table', 'table-bordered', 'text-center', 'uoj-table', 'uoj-standings-table', 'mb-0'],
 			page_len: 100,
 			print_after_table: function() {
 				return '<div class="card-footer bg-transparent text-end text-muted">' + uojLocale("contests::n participants", standings.length) + '</div><script>if (window.MathJax) window.MathJax.typeset();</scr' + 'ipt>';

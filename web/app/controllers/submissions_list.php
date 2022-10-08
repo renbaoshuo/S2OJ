@@ -119,7 +119,7 @@ d-inline-block
 			'judge_time_hidden' => '',
 			'table_config' => (isset($REQUIRE_LIB['bootstrap5']) 
 				? array(
-					'div_classes' => array('card', 'mb-3', 'overflow-auto'),
+					'div_classes' => array('card', 'mb-3', 'table-responsive'),
 					'table_classes' => array('table', 'mb-0', 'uoj-table', 'text-center')
 				)
 				: array()
