@@ -39,6 +39,7 @@ return [
 	'sex' => 'Sex',
 	'motto' => 'Motto',
 	'view all' => 'View all',
+	'hidden' => 'Hidden',
 	'appraisal' => 'Appraisal',
 	'submit' => 'Submit',
 	'browse' => 'Browse',

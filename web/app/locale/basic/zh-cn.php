@@ -39,6 +39,7 @@ return [
 	'sex' => '性别',
 	'motto' => '格言',
 	'view all' => '查看全部',
+	'hidden' => '隐藏',
 	'appraisal' => '评价',
 	'submit' => '提交',
 	'browse' => '浏览',
