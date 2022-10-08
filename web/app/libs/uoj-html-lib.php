@@ -1359,8 +1359,9 @@ function echoRanklist($config = array()) {
 	$header_row .= '<th style="width: 5em;">'.UOJLocale::get('solved').'</th>';
 	$header_row .= '</tr>';
 
+	$purifier = HTML::pruifier();
 	$users = array();
-	$print_row = function($user, $now_cnt) use (&$users, $config) {
+	$print_row = function($user, $now_cnt) use (&$users, $config, $purifier) {
 		if (!$users) {
 			if ($now_cnt == 1) {
 				$rank = 1;
@@ -1376,13 +1377,9 @@ function echoRanklist($config = array()) {
 		echo '<tr>';
 		echo '<td>' . $user['rank'] . '</td>';
 		echo '<td>' . getUserLink($user['username']) . '</td>';
-		$motto_id = uniqid("motto-{$user['username']}-");
-		echo "<td id=\"$motto_id\"></td>";
-		$motto = rawurlencode($user['motto']);
-		$dom_sanitize_config = DOM_SANITIZE_CONFIG;
-		echo '<script type="text/javascript">';
-		echo "$(function() { $('#$motto_id').html(DOMPurify.sanitize(decodeURIComponent(\"{$motto}\"), $dom_sanitize_config)); });";
-		echo '</script>';
+		echo "<td>";
+		echo $purifier->purify($user['motto']);
+		echo "</td>";
 		echo '<td>' . $user['ac_num'] . '</td>';
 		echo '</tr>';
 		
