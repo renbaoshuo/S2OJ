@@ -1115,7 +1115,7 @@ function showStandings() {
 			'<th style="width:' + (show_self_reviews ? '8' : '14') + 'em">'+uojLocale('username')+'</th>' +
 			'<th style="width:5em">'+uojLocale('contests::total score')+'</th>' +
 			$.map(problems, function(col, idx) {
-				return '<th style="width:' + (show_self_reviews ? '10' : '8') + 'em;">' + '<a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode('A'.charCodeAt(0) + idx) + '</a>' + '</th>';
+				return '<th style="width:' + (show_self_reviews ? '10' : '8') + 'em;">' + '<a href="/contest/' + contest_id + '/problem/' + col + '" class="text-decoration-none">' + String.fromCharCode('A'.charCodeAt(0) + idx) + '</a>' + '</th>';
 			}).join('') +
 			(show_self_reviews ? '<th style="width:16em;">赛后总结</th>' : '') +
 		'</tr>',
