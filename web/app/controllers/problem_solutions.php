@@ -204,9 +204,9 @@ EOD;
 						<?php $row['removeForm']->printHTML(); ?>
 					</li>
 					<?php endif ?>
-					<?php if (Auth::check() && (isSuperUser(Auth::user()) || Auth::id() == $blog['poster'])): ?>
+					<?php if (Auth::check() && (isSuperUser(Auth::user()) || Auth::id() == $row['poster'])): ?>
 					<li class="list-inline-item">
-						<a class="text-decoration-none" href="<?=HTML::blog_url($blog['poster'], '/blog/'.$row['blog_id'].'/write')?>">
+						<a class="text-decoration-none" href="<?= HTML::blog_url($row['poster'], '/post/'.$row['blog_id'].'/write') ?>">
 							修改
 						</a>
 					</li>
