@@ -190,7 +190,10 @@ EOD;
 						<time class="text-muted"><?= $row['post_time'] ?></time>
 					</span>
 					<?php if ($row['is_hidden']): ?>
-					<span class="badge text-bg-danger ms-2">隐藏</span>
+					<span class="badge text-bg-danger ms-2">
+						<i class="bi bi-eye-slash-fill"></i>
+						<?= UOJLocale::get('hidden') ?>
+					</span>
 					<?php endif ?>
 				</div>
 
