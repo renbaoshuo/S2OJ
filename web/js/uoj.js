@@ -1135,13 +1135,7 @@ function showStandings() {
 
 					col_tr += '</div>';
 					if (show_self_reviews) {
-						col_tr += '<div id="review-' + row[2][0] + '-' + i + '"></div>'
-							+ '<script>'
-							+ '(function() {'
-							+ 'var purify_result = DOMPurify.sanitize(decodeURIComponent("' + encodeURIComponent(String(col[3] || '')) + '"), {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del", "br"], ALLOWED_ATTR: ["href"]});'
-							+ '$("#review-' + row[2][0] + '-' + i + '")'
-							+ '.html(purify_result ? \'<div class="mt-2 pt-2 border-top">\' + purify_result + \'</div>\' : \'\'); })();'
-							+ '</scr' + 'ipt>';
+						col_tr += col[3] ? '<div class="mt-2 pt-2 border-top">' + col[3] + '</div>' : '';
 					} else {
 						if (standings_version < 2) {
 							col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';

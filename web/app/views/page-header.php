@@ -96,9 +96,6 @@
 		<!-- Color converter -->
 		<?= HTML::js_src('/js/color-converter.min.js') ?>
 		
-		<!-- DOM Santizer -->
-		<?= HTML::js_src('/js/purify.min.js') ?>
-		
 		<!-- uoj -->
 		<?= HTML::js_src('/js/uoj.js?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
 		
