@@ -95,7 +95,7 @@ EOD;
 					return '博客不存在';
 				}
 
-				if (!isSuperUser($myUser)) {
+				if (!hasProblemPermission($myUser, $problem)) {
 					if ($blog['poster'] != $myUser['username']) {
 						if ($blog['is_hidden']) {
 							return '博客不存在';
@@ -103,10 +103,10 @@ EOD;
 
 						return '只能提交本人撰写的博客';
 					}
-				}
 
-				if ($blog['is_hidden']) {
-					return '只能提交公开的博客';
+					if ($blog['is_hidden']) {
+						return '只能提交公开的博客';
+					}
 				}
 
 				if (querySolution($problem['id'], $x)) {
@@ -135,9 +135,12 @@ EOD;
 	}
 
 	$pag_config = array('page_len' => 5);
-	$pag_config['col_names'] = array('blog_id', 'content', 'poster', 'post_time', 'zan');
+	$pag_config['col_names'] = array('blog_id', 'content', 'poster', 'post_time', 'zan', 'is_hidden');
 	$pag_config['table_name'] = "problems_solutions inner join blogs on problems_solutions.blog_id = blogs.id";
-	$pag_config['cond'] = "problem_id = {$problem['id']} and is_hidden = 0";
+	$pag_config['cond'] = "problem_id = {$problem['id']}";
+	if (!hasProblemPermission($myUser, $problem)) {
+		$pag_config['cond'] .= " and (is_hidden = 0 or poster = '{$myUser['username']}')";
+	}
 	$pag_config['tail'] = "order by zan desc, post_time desc, id asc";
 	$pag = new Paginator($pag_config);
 
@@ -186,19 +189,34 @@ EOD;
 						<?= UOJLocale::get('post time') ?>:
 						<time class="text-muted"><?= $row['post_time'] ?></time>
 					</span>
+					<?php if ($row['is_hidden']): ?>
+					<span class="badge text-bg-danger ms-2">隐藏</span>
+					<?php endif ?>
 				</div>
 
 				<div class="markdown-body">
 					<?= $row['content'] ?>
 				</div>
 
-				<div class="mt-3 text-end">
+				<ul class="mt-3 text-end list-inline">
 					<?php if (isset($row['removeForm'])): ?>
+					<li class="list-inline-item">
 						<?php $row['removeForm']->printHTML(); ?>
+					</li>
 					<?php endif ?>
-					<a class="text-decoration-none" href="/blogs/<?= $row['blog_id'] ?>">在 Ta 的博客上查看</a>
-					<?= getClickZanBlock('B', $row['blog_id'], $row['zan']) ?>
-				</div>
+					<?php if (Auth::check() && (isSuperUser(Auth::user()) || Auth::id() == $blog['poster'])): ?>
+					<li class="list-inline-item">
+						<a class="text-decoration-none" href="<?=HTML::blog_url($blog['poster'], '/blog/'.$row['blog_id'].'/write')?>">
+							修改
+						</a>
+					</li>
+					<?php endif ?>
+					<li class="list-inline-item">
+						<a class="text-decoration-none" href="/blogs/<?= $row['blog_id'] ?>">在 Ta 的博客上查看</a>
+					<li class="list-inline-item">
+						<?= getClickZanBlock('B', $row['blog_id'], $row['zan']) ?>
+					</li>
+				</ul>
 			</li>
 		<?php endforeach ?>
 		<?php if ($pag->isEmpty()): ?>
