@@ -1150,11 +1150,7 @@ function showStandings() {
 			}
 
 			if (show_self_reviews) {
-				col_tr += '<td><div id="review-' + row[2][0] + '"></div>'
-					+ '<script>'
-					+ '(function() { $("#review-' + row[2][0] + '")'
-					+ '.html(DOMPurify.sanitize(decodeURIComponent("' + encodeURIComponent(String(row[4] || '')) + '"), {ALLOWED_TAGS: ["a", "b", "i", "u", "em", "strong", "sub", "sup", "small", "del", "br"], ALLOWED_ATTR: ["href"]})); })();'
-					+ '</scr' + 'ipt></td>';
+				col_tr += '<td>' + (row[2][0] || '') + '</td>';
 			}
 			col_tr += '</tr>';
 			return col_tr;
