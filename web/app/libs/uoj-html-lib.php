@@ -374,7 +374,7 @@ function echoSubmissionsListOnlyOne($submission, $config, $user) {
 	global $REQUIRE_LIB;
 
 	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		echo '<div class="card mb-3">';
+		echo '<div class="card mb-3 table-responsive">';
 		echo '<table class="table text-center uoj-table mb-0">';
 	} else {
 		echo '<div class="table-responsive">';
@@ -1202,7 +1202,7 @@ function echoHackListOnlyOne($hack, $config, $user) {
 	global $REQUIRE_LIB;
 	
 	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		echo '<div class="card mb-3">';
+		echo '<div class="card mb-3 table-responsive">';
 		echo '<table class="table text-center uoj-table mb-0">';
 	} else {
 		echo '<div class="table-responsive">';

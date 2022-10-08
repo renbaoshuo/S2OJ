@@ -1,5 +1,5 @@
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-<div class="card card-default mb-3">
+<div class="card card-default table-responsive mb-3">
 	<table class="table uoj-table text-center mb-0">
 <?php else: ?>
 <div class="table-responsive">
@@ -28,7 +28,7 @@
 
 <h3><?= UOJLocale::get('contests::contest notice') ?></h3>
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-<div class="card card-default mb-3">
+<div class="card card-default table-responsive mb-3">
 	<table class="table uoj-table text-center mb-0">
 <?php else: ?>
 <div class="table-responsive">
