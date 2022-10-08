@@ -6,6 +6,7 @@ return [
 	'template problems' => '模板题库',
 	'add new' => '添加新题',
 	'add new list' => '添加新题单',
+	'my problem' => '我的题目',
 	'title' => '标题',
 	'total' => '总题数',
 	'ac' => 'AC',

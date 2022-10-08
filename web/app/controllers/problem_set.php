@@ -49,22 +49,21 @@
 			} else {
 				echo '<td class="text-left">';
 			}
-			if ($problem['uploader'] == $myUser['username']) {
-				echo ' <span class="text-info">[我的题目]</span> ';
-			}
 			echo '<a ';
 			if (isset($REQUIRE_LIB['bootstrap5'])) {
 				echo ' class="text-decoration-none" ';
 			}
 			echo ' href="/problem/', $problem['id'], '">', $problem['title'], '</a>';
+
+			if ($problem['uploader'] == $myUser['username']) {
+				echo ' <span class="badge text-white bg-info">', UOJLocale::get('problems::my problem') ,'</span> ';
+			}
 			
 			if ($problem['is_hidden']) {
 				echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
 			}
 
 			if (isset($_COOKIE['show_tags_mode'])) {
-				echo ' <span class="text-info" style="font-size: 10px">' . $problem["uploader"] . '</span> ';
-
 				foreach (queryProblemTags($problem['id']) as $tag) {
 					if (isset($REQUIRE_LIB['bootstrap5'])) {
 						echo '<a class="uoj-problem-tag my-1">';

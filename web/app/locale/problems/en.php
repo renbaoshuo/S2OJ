@@ -6,6 +6,7 @@ return [
 	'template problems' => 'Template Problems',
 	'add new' => 'Add new problem',
 	'add new list' => 'Add new problem list',
+	'my problem' => 'My problem',
 	'title' => 'Title',
 	'total' => 'Total',
 	'ac' => 'AC',
