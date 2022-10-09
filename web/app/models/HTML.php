@@ -142,7 +142,7 @@ class HTML {
 		return implode("&", $r);
 	}
 	
-	public static function pruifier() {
+	public static function purifier() {
 		include_once $_SERVER['DOCUMENT_ROOT'] . '/app/vendor/htmlpurifier/HTMLPurifier.auto.php';
 		$config = HTMLPurifier_Config::createDefault();
 		//$config->set('HTML.Doctype', 'HTML 4.01 Transitional');
@@ -156,6 +156,42 @@ class HTML {
 		$def->addElement('header',  'Block', 'Flow', 'Common');
 		$def->addElement('footer',  'Block', 'Flow', 'Common');
 		
+		return new HTMLPurifier($config);
+	}
+
+	public static function purifier_inline() {
+		include_once $_SERVER['DOCUMENT_ROOT'] . '/app/vendor/htmlpurifier/HTMLPurifier.auto.php';
+
+		$allowed_html = [
+			'a' => ['href' => 'URI'],
+			'b' => [],
+			'i' => [],
+			'u' => [],
+			's' => [],
+			'em' => [],
+			'strong' => [],
+			'sub' => [],
+			'sup' => [],
+			'small' => [],
+			'del' => [],
+			'br' => [],
+		];
+
+		$config = HTMLPurifier_Config::createDefault();
+		
+		$allowed_elements = [];
+		$allowed_attributes = [];
+
+		foreach ($allowed_html as $element => $attributes) {
+			$allowed_elements[$element] = true;
+			foreach ($attributes as $attribute => $x) {
+				$allowed_attributes["$element.$attribute"] = true;
+			}
+		}
+
+		$config->set('HTML.AllowedElements', $allowed_elements);
+		$config->set('HTML.AllowedAttributes', $allowed_attributes);
+
 		return new HTMLPurifier($config);
 	}
 }

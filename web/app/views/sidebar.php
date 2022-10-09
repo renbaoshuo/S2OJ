@@ -18,7 +18,7 @@
 				</a>
 				<?php if ($group_announcement): ?>
 				<div class="text-break">
-					<?= HTML::pruifier()->purify($group_announcement) ?>
+					<?= HTML::purifier_inline()->purify($group_announcement) ?>
 				</div>
 				<?php else: ?>
 				<div>（暂无公告）</div>

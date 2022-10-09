@@ -101,7 +101,7 @@ class UOJBlogEditor {
 		
 		$this->post_data['is_hidden'] = isset($_POST["{$this->name}_is_hidden"]) ? 1 : 0;
 		
-		$purifier = HTML::pruifier();
+		$purifier = HTML::purifier();
 		
 		$this->post_data['title'] = HTML::escape($this->post_data['title']);
 		

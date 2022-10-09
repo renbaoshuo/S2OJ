@@ -50,7 +50,7 @@ $col_names = array('contest_id');
 		$n_contest_problems = count($contest_problems);
 
 		$result = '';
-		$purifier = HTML::pruifier();
+		$purifier = HTML::purifier_inline();
 
 		for ($i = 0; $i < $n_contest_problems; $i++) {
 			$problem_id = $contest_problems[$i]['problem_id'];

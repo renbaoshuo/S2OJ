@@ -1,7 +1,5 @@
 <?php
 
-define('DOM_SANITIZE_CONFIG', "{ALLOWED_TAGS: ['a', 'b', 'i', 'u', 'em', 'strong', 'sub', 'sup', 'small', 'del', 'br'], ALLOWED_ATTR: ['href']}");
-
 function uojHandleAtSign($str, $uri) {
 	$referrers = array();
 	$res = preg_replace_callback('/@(@|[a-zA-Z0-9_]{1,20})/', function($matches) use (&$referrers) {
@@ -1359,7 +1357,7 @@ function echoRanklist($config = array()) {
 	$header_row .= '<th style="width: 5em;">'.UOJLocale::get('solved').'</th>';
 	$header_row .= '</tr>';
 
-	$purifier = HTML::pruifier();
+	$purifier = HTML::purifier_inline();
 	$users = array();
 	$print_row = function($user, $now_cnt) use (&$users, $config, $purifier) {
 		if (!$users) {

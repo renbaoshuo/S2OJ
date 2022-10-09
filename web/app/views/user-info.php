@@ -82,7 +82,7 @@ function fTime($time, $gran = -1) {
 					</span>
 				</h3>
 				<div class="card-text">
-					<?= HTML::pruifier()->purify($user['motto']) ?>
+					<?= HTML::purifier_inline()->purify($user['motto']) ?>
 				</div>
 			</div>
 			<ul class="list-group list-group-flush">

@@ -112,7 +112,7 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 	}
 
 	if ($show_reviews) {
-		$purifier = HTML::pruifier();
+		$purifier = HTML::purifier_inline();
 		foreach ($contest_data['people'] as $person) {
 			foreach ($contest_data['problems'] as $key => $problem) {
 				$review_result = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = {$problem} and poster = '{$person[0]}'");

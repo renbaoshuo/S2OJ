@@ -312,7 +312,7 @@
 								<b><?= $group['title'] ?></b>
 							</a>
 							<?php if ($group_announcement): ?>
-							<div><?= HTML::pruifier()->purify($group_announcement) ?></div>
+							<div><?= HTML::purifier_inline()->purify($group_announcement) ?></div>
 							<?php else: ?>
 							<div>（暂无公告）</div>
 							<?php endif ?>

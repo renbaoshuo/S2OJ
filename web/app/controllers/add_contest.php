@@ -46,7 +46,7 @@
 	$time_form->handle = function(&$vdata) {
 		$start_time_str = $vdata['start_time']->format('Y-m-d H:i:s');
 				
-		$purifier = HTML::pruifier();
+		$purifier = HTML::purifier_inline();
 		
 		$esc_name = $_POST['name'];
 		$esc_name = $purifier->purify($esc_name);
