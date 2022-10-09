@@ -9,6 +9,7 @@ class ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
+        '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -16,6 +17,10 @@ class ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Component\\Finder\\' => 25,
+        ),
+        'P' => 
+        array (
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'G' => 
         array (
@@ -32,9 +37,23 @@ class ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900
         array (
             0 => __DIR__ . '/..' . '/symfony/finder',
         ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
         'Gregwar\\' => 
         array (
             0 => __DIR__ . '/..' . '/gregwar/captcha/src/Gregwar',
+        ),
+    );
+
+    public static $prefixesPsr0 = array (
+        'H' => 
+        array (
+            'HTMLPurifier' => 
+            array (
+                0 => __DIR__ . '/..' . '/ezyang/htmlpurifier/library',
+            ),
         ),
     );
 
@@ -51,6 +70,7 @@ class ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900::$prefixesPsr0;
             $loader->classMap = ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900::$classMap;
 
         }, null, ClassLoader::class);

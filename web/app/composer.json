@@ -1,5 +1,7 @@
 {
     "require": {
-        "gregwar/captcha": "^1.1"
+        "gregwar/captcha": "^1.1",
+        "phpmailer/phpmailer": "^6.6",
+        "ezyang/htmlpurifier": "^4.16"
     }
 }
