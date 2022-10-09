@@ -1150,7 +1150,7 @@ function showStandings() {
 			}
 
 			if (show_self_reviews) {
-				col_tr += '<td>' + (row[2][0] || '') + '</td>';
+				col_tr += '<td>' + (row[4] || '') + '</td>';
 			}
 			col_tr += '</tr>';
 			return col_tr;
