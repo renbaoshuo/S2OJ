@@ -114,7 +114,14 @@ class UOJBlogEditor {
 		if ($this->show_editor) {
 			if ($this->type == 'blog') {
 				$content_md = $_POST[$this->name . '_content_md'];
-				$this->post_data['content'] = $parsedown->text($this->post_data['content_md']);
+				$dom = new DOMDocument;
+				$dom->loadHTML(mb_convert_encoding($parsedown->text($this->post_data['content_md']), 'HTML-ENTITIES', 'UTF-8'));
+				$elements = $dom->getElementsByTagName('table');
+				foreach ($elements as $element) {
+					$element->setAttribute('class',
+						$element->getAttribute('class') . ' table table-bordered');
+				}
+				$this->post_data['content'] = $purifier->purify($dom->saveHTML());
 
 				if (preg_match('/^.*<!--.*readmore.*-->.*$/m', $this->post_data['content'], $matches, PREG_OFFSET_CAPTURE)) {
 					$content_less = substr($this->post_data['content'], 0, $matches[0][1]);
@@ -203,18 +210,6 @@ class UOJBlogEditor {
 				echo '<article class="markdown-body">';
 				echo $this->post_data['content'];
 				echo '</article>';
-
-				if (isset($REQUIRE_LIB['bootstrap5'])) {
-					echo <<<EOD
-<script>
-$(document).ready(function() {
-	$('.markdown-body table').each(function() {
-		$(this).addClass('table table-bordered');
-	});
-});
-</script>
-EOD;
-				}
 				echoUOJPageFooter(array('ShowPageFooter' => false));
 			} elseif ($this->type == 'slide') {
 				uojIncludeView('slide', array_merge(

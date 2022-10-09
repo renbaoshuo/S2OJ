@@ -522,15 +522,6 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 </aside>
 
 </div>
-
-<!-- 表格处理 -->
-<script>
-	$(document).ready(function() {
-		$('.markdown-body table').each(function() {
-			$(this).addClass('table table-bordered');
-		});
-	});
-</script>
 <?php endif ?>
 
 <?php if ($contest && $contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
