@@ -2,6 +2,15 @@
     "require": {
         "gregwar/captcha": "^1.1",
         "phpmailer/phpmailer": "^6.6",
-        "ezyang/htmlpurifier": "^4.16"
-    }
+        "ezyang/htmlpurifier": "^4.16",
+        "erusev/parsedown": "^1.7",
+        "benjaminhoegh/parsedown-math": "dev-master"
+    },
+	"autoload": {
+		"classmap": [
+			"vendor/benjaminhoegh/parsedown-math/ParsedownMath.php"
+		]
+	},
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

@@ -1,6 +1,6 @@
 <?php
 
-require $_SERVER['DOCUMENT_ROOT'].'/app/vendor/phpmailer/PHPMailerAutoload.php';
+use PHPMailer\PHPMailer\PHPMailer;
 
 class UOJMail {
 	public static function noreply() {

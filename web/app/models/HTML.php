@@ -143,7 +143,6 @@ class HTML {
 	}
 	
 	public static function purifier() {
-		include_once $_SERVER['DOCUMENT_ROOT'] . '/app/vendor/htmlpurifier/HTMLPurifier.auto.php';
 		$config = HTMLPurifier_Config::createDefault();
 		//$config->set('HTML.Doctype', 'HTML 4.01 Transitional');
 		$config->set('Cache.DefinitionImpl', null);
@@ -160,8 +159,6 @@ class HTML {
 	}
 
 	public static function purifier_inline() {
-		include_once $_SERVER['DOCUMENT_ROOT'] . '/app/vendor/htmlpurifier/HTMLPurifier.auto.php';
-
 		$allowed_html = [
 			'a' => ['href' => 'URI'],
 			'b' => [],
