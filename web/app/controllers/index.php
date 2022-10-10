@@ -157,7 +157,7 @@
 
 		<?php if (Auth::check()): ?>
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-				<?php uojIncludeView('sidebar') ?>
+				<?php uojIncludeView('sidebar', ['assignments_hidden' => '', 'groups_hidden' => '']) ?>
 			<?php endif ?>
 		<?php endif ?>
 

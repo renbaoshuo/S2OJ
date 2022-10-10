@@ -1,10 +1,10 @@
 <?php if (Auth::check()): ?>
-<?php if (!isset($group_announcements_hidden)): ?>
+<?php if (!isset($groups_hidden)): ?>
 <?php $groups = queryGroupsOfUser(Auth::id()); ?>
 <?php if (count($groups)): ?>
 <div class="card card-default mb-2" id="group-user-announcements">
 	<div class="card-header fw-bold bg-transparent">
-		小组公告
+		<?= UOJLocale::get('group announcements') ?>
 	</div>
 	<ul class="list-group list-group-flush">
 		<?php foreach ($groups as $group): ?>
@@ -21,14 +21,63 @@
 					<?= HTML::purifier_inline()->purify($group_announcement) ?>
 				</div>
 				<?php else: ?>
-				<div>（暂无公告）</div>
+				<div class="text-muted">
+					<?= UOJLocale::get('none') ?>
+				</div>
 				<?php endif ?>
 			</li>
 		<?php endforeach ?>
 	</ul>
 </div>
+
+<?php if (!isset($assignments_hidden)): ?>
+<?php
+$assignments = [];
+	foreach ($groups as $group) {
+		$assignments = array_merge($assignments, queryGroupActiveAssignments($group['id']));
+	}
+
+	usort($assignments, function($a, $b) {
+		$deadline_a = DateTime::createFromFormat('Y-m-d H:i:s', $a['deadline']);
+		$deadline_b = DateTime::createFromFormat('Y-m-d H:i:s', $b['deadline']);
+
+		return $deadline_a->getTimestamp() - $deadline_b->getTimestamp();
+	});
+	?>
+<?php if (count($assignments)): ?>
+<div class="card card-default mb-2" id="group-assignments">
+	<div class="card-header fw-bold bg-transparent">
+		<?= UOJLocale::get('assignments') ?>
+	</div>
+	<ul class="list-group list-group-flush">
+		<?php foreach ($assignments as $assignment): ?>
+			<li class="list-group-item">
+				<?php
+				$deadline = DateTime::createFromFormat('Y-m-d H:i:s', $assignment['deadline']);
+			$create_time = DateTime::createFromFormat('Y-m-d H:i:s', $assignment['create_time']);
+			$now = new DateTime();
+			?>
+				<a href="<?= HTML::url('/assignment/'.$assignment['id']) ?>" class="fw-bold text-decoration-none">
+					<?= $assignment['title'] ?>
+					<?php if ($deadline < $now): ?>
+						<sup class="fw-normal text-danger">overdue</sup>
+					<?php elseif ($deadline->getTimestamp() - $now->getTimestamp() < 86400): ?>
+						<sup class="fw-normal text-danger">soon</sup>
+					<?php elseif ($now->getTimestamp() - $create_time->getTimestamp() < 86400): ?>
+						<sup class="fw-normal text-danger">new</sup>
+					<?php endif ?>
+				</a>
+				<div class="text-end small text-muted">
+					截止时间: <?= $deadline->format('Y-m-d H:i') ?>
+				</div>
+			</li>
+		<?php endforeach ?>
+	</ul>
+</div>
+<?php endif // count($assignments) ?>
+<?php endif // !isset($assignments_hidden) ?>
 <?php endif // count($groups) ?>
-<?php endif // !isset($group_announcements_hidden) ?>
+<?php endif // !isset($group_hidden) ?>
 <?php endif // Auth::check() ?>
 
 <?php if (!UOJConfig::$data['switch']['force-login'] || Auth::check()): ?>
