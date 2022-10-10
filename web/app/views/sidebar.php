@@ -32,7 +32,7 @@
 
 <?php if (!isset($assignments_hidden)): ?>
 <?php
-$assignments = [];
+	$assignments = [];
 	foreach ($groups as $group) {
 		$assignments = array_merge($assignments, queryGroupActiveAssignments($group['id']));
 	}
