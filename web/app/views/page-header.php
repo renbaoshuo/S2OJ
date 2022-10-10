@@ -247,7 +247,10 @@
 		</script>
 	</head>
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	<body class="d-flex flex-column min-vh-100 bg-light">
+	<body class="d-flex flex-column min-vh-100
+	<?php if ($ShowPageHeader): ?>
+		bg-light
+	<?php endif ?>">
 	<?php else: ?>
 	<body>
 	<?php endif ?>
