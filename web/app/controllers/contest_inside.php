@@ -300,6 +300,10 @@
 				$content = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = {$contest_problems[$i]['problem_id']} and poster = '{$myUser['username']}'")['content'];
 				$self_reviews_update_form->addVTextArea('self_review_update__problem_' . chr(ord('A') + $i), '<b>' . chr(ord('A') + $i) . '</b>: ' . $contest_problems[$i]['problem']['title'], $content,
 					function ($content) {
+						if (strlen($content) > 200) {
+							return '总结不能超过200字';
+						}
+
 						return '';
 					},
 					null,
@@ -310,6 +314,10 @@
 			$content = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = -1 and poster = '{$myUser['username']}'")['content'];
 			$self_reviews_update_form->addVTextArea('self_review_update__overall', '比赛总结', $content,
 				function ($content) {
+					if (strlen($content) > 200) {
+						return '总结不能超过200字';
+					}
+
 					return '';
 				},
 				null,
