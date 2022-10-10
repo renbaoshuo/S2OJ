@@ -3,7 +3,7 @@
 	requireLib('mathjax');
 
 	$REQUIRE_LIB['bootstrap5'] = '';
-?>
+	?>
 <?php echoUOJPageHeader(UOJLocale::get('help'))	?>
 <div class="card card-default">
 <article class="card-body">
