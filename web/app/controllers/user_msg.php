@@ -179,7 +179,7 @@ function addButton(conversationName, send_time, type) {
 
 function addBubble(content, send_time, read_time, msgId, conversation, page, type) {
 	$("#history-list").append(
-			'<div style=' + (type ? "margin-left:0%;margin-right:20%;" : "margin-left:20%;margin-right:0%;") + '>' +
+			'<div style=' + (!type ? "margin-left:0%;margin-right:20%;" : "margin-left:20%;margin-right:0%;") + '>' +
 				'<div class="card border-info mb-4">' +
 					'<div class="card-body" style="background:#17a2b8; word-break: break-all">' +
 						'<div style="white-space:pre-wrap">' +
