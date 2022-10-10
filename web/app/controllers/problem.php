@@ -222,7 +222,12 @@ EOD
 
 <?php
 	$REQUIRE_LIB['mathjax'] = '';
-	$REQUIRE_LIB['shjs'] = '';
+
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		requireLib('hljs');
+	} else {
+		$REQUIRE_LIB['shjs'] = '';
+	}
 	?>
 
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::problem')) ?>
