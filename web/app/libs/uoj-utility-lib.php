@@ -163,6 +163,9 @@ function isProblemManager($user) {
 	if ($user == null) {
 		return false;
 	}
+	if (isSuperUser($user)) {
+		return true;
+	}
 	return hasUserType($user, 'problem_manager');
 }
 function isContestJudger($user) {

@@ -200,7 +200,7 @@ function isContestProblemVisibleToUser($problem, $contest, $user) {
 }
 
 function isSubmissionVisibleToUser($submission, $problem, $user) {
-	if (isSuperUser($user)) {
+	if (isProblemManager($user)) {
 		return true;
 	} elseif (!$submission['is_hidden']) {
 		return true;

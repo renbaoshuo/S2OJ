@@ -467,9 +467,9 @@ function echoSubmissionsList($cond, $tail, $config, $user) {
 	
 	$table_name = isset($config['table_name']) ? $config['table_name'] : 'submissions';
 	
-	if (!isSuperUser($user)) {
+	if (!isProblemManager($user)) {
 		if ($user != null) {
-			$permission_cond = "submissions.is_hidden = false or (submissions.is_hidden = true and submissions.problem_id in (select problem_id from problems_permissions where username = '{$user['username']}'))";
+			$permission_cond = "submissions.is_hidden = false or submissions.submitter = '{$user['username']}' or (submissions.is_hidden = true and (submissions.problem_id in (select problem_id from problems_permissions where username = '{$user['username']}') or submissions.problem_id in (select id from problems where uploader = '{$user['username']}')))";
 		} else {
 			$permission_cond = "submissions.is_hidden = false";
 		}
