@@ -39,16 +39,6 @@ text-decoration-none text-body
 			<article class="markdown-body">
 				<?= $content ?>
 			</article>
-
-			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-			<script>
-				$(document).ready(function() {
-					$('.markdown-body table').each(function() {
-						$(this).addClass('table table-bordered');
-					});
-				});
-			</script>
-			<?php endif ?>
 			<!-- content end -->
 
 		<?php elseif ($blog_type == 'slide'): ?>

@@ -222,7 +222,12 @@ EOD
 
 <?php
 	$REQUIRE_LIB['mathjax'] = '';
-	$REQUIRE_LIB['shjs'] = '';
+
+	if (isset($REQUIRE_LIB['bootstrap5'])) {
+		requireLib('hljs');
+	} else {
+		$REQUIRE_LIB['shjs'] = '';
+	}
 	?>
 
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::problem')) ?>
@@ -522,15 +527,6 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 </aside>
 
 </div>
-
-<!-- 表格处理 -->
-<script>
-	$(document).ready(function() {
-		$('.markdown-body table').each(function() {
-			$(this).addClass('table table-bordered');
-		});
-	});
-</script>
 <?php endif ?>
 
 <?php if ($contest && $contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>

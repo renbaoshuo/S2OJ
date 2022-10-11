@@ -168,14 +168,6 @@
 </aside>
 
 </div>
-
-<script>
-	$(document).ready(function() {
-		$('.markdown-body table').each(function() {
-			$(this).addClass('table table-bordered');
-		});
-	});
-</script>
 <?php endif ?>
 
 <?php echoUOJPageFooter() ?>

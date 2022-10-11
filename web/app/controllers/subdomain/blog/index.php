@@ -23,7 +23,7 @@
 	
 	$REQUIRE_LIB['mathjax'] = '';
 	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		$REQUIRE_LIB['hljs'] = '';
+		requireLib('hljs');
 	} else {
 		$REQUIRE_LIB['shjs'] = '';
 	}
