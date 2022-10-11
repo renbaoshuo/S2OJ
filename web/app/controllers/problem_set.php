@@ -11,7 +11,7 @@
 		become403Page();
 	}
 
-	$REQUIRE_LIB['bootstrap5'] = '';
+	requireLib('bootstrap5');
 	
 	if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)) {
 		$new_problem_form = new UOJForm('new_problem');
@@ -32,7 +32,7 @@
 	}
 	
 	function echoProblem($problem) {
-		global $myUser, $REQUIRE_LIB;
+		global $myUser;
 
 		if (isProblemVisibleToUser($problem, $myUser)) {
 			echo '<tr class="text-center">';
@@ -103,7 +103,15 @@ EOD;
 		$cond[] = "'".DB::escape($search_tag)."' in (select tag from problems_tags where problems_tags.problem_id = problems.id)";
 	}
 	if (isset($_GET["search"])) {
-		$cond[]="title like '%".DB::escape($_GET["search"])."%' or id like '%".DB::escape($_GET["search"])."%'";
+		$cond[]="(title like '%".DB::escape($_GET["search"])."%' or id like '%".DB::escape($_GET["search"])."%')";
+	}
+
+	if (isset($_GET['is_hidden'])) {
+		$cond[] = 'is_hidden = 1';
+	}
+
+	if (Auth::check() && isset($_GET['my'])) {
+		$cond[] = "uploader = '{$myUser['username']}'";
 	}
 	
 	if ($cond) {
@@ -268,15 +276,42 @@ $('#input-show_difficulty').click(function() {
 <aside class="col mt-3 mt-lg-0">
 
 <!-- search bar -->
-<form method="get">
+<form method="get" class="mb-3" id="form-problem_search">
 	<div class="input-group mb-3">
 		<input id="search-input" name="search" type="text" class="form-control" placeholder="搜索">
 		<button class="btn btn-outline-secondary" type="submit">
 			<i class="bi bi-search"></i>
 		</button>
 	</div>
+	<?php if (Auth::check()): ?>
+	<div class="form-check d-inline-block">
+		<input
+			type="checkbox" name="my"
+			<?= isset($_GET['my']) ? 'checked="checked"' : '' ?>
+			class="form-check-input" id="input-my">
+		<label class="form-check-label" for="input-my">
+			我的题目
+		</label>
+	</div>
+	<?php endif ?>
+	<?php if (isProblemManager(Auth::user())): ?>
+	<div class="form-check d-inline-block ms-2">
+		<input
+			type="checkbox" name="is_hidden"
+			<?= isset($_GET['is_hidden']) ? 'checked="checked"' : '' ?>
+			class="form-check-input" id="input-is_hidden">
+		<label class="form-check-label" for="input-is_hidden">
+			隐藏题目
+		</label>
+	</div>
+	<?php endif ?>
 </form>
-<script>$('#search-input').val(new URLSearchParams(location.search).get('search'));</script>
+<script>
+	$('#search-input').val(new URLSearchParams(location.search).get('search'));
+	$('#input-my, #input-is_hidden').click(function() {
+		$('#form-problem_search').submit();
+	});
+</script>
 
 <!-- sidebar -->
 <?php uojIncludeView('sidebar', []) ?>
