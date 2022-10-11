@@ -22,7 +22,7 @@ return function ($type) {
 
 			echo "Processing blog $id...\n";
 
-			if ($type == 'blog') {
+			if ($type == 'B') {
 				$dom = new DOMDocument;
 				$dom->loadHTML(mb_convert_encoding($parsedown->text($content_md), 'HTML-ENTITIES', 'UTF-8'));
 				$elements = $dom->getElementsByTagName('table');
@@ -39,7 +39,7 @@ return function ($type) {
 				} else {
 					$content = $purifier->purify($content);
 				}
-			} elseif ($type == 'slide') {
+			} elseif ($type == 'S') {
 				$content_array = yaml_parse($content_md);
 				if ($content_array === false || !is_array($content_array)) {
 					continue;
@@ -59,7 +59,6 @@ return function ($type) {
 				};
 		
 				$config = array();
-				$content = '';
 				foreach ($content_array as $slide_name => $slide_content) {
 					if (is_array($slide_content) && is_array($slide_content['config'])) {
 						foreach (array('theme') as $config_key) {
