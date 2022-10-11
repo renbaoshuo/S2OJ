@@ -6,6 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'DynamicParent' => $vendorDir . '/benjaminhoegh/parsedown-math/ParsedownMath.php',
-    'ParsedownMath' => $vendorDir . '/benjaminhoegh/parsedown-math/ParsedownMath.php',
+    'ParsedownMath' => $vendorDir . '/parsedown-math/ParsedownMath.php',
 );

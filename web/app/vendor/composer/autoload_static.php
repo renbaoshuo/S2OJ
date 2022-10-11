@@ -41,13 +41,6 @@ class ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900
     );
 
     public static $prefixesPsr0 = array (
-        'p' => 
-        array (
-            'parsedownMath' => 
-            array (
-                0 => __DIR__ . '/..' . '/benjaminhoegh/parsedown-math',
-            ),
-        ),
         'P' => 
         array (
             'Parsedown' => 
@@ -65,8 +58,7 @@ class ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900
     );
 
     public static $classMap = array (
-        'DynamicParent' => __DIR__ . '/..' . '/benjaminhoegh/parsedown-math/ParsedownMath.php',
-        'ParsedownMath' => __DIR__ . '/..' . '/benjaminhoegh/parsedown-math/ParsedownMath.php',
+        'ParsedownMath' => __DIR__ . '/..' . '/parsedown-math/ParsedownMath.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

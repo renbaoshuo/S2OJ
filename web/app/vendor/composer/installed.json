@@ -1,54 +1,5 @@
 [
     {
-        "name": "benjaminhoegh/parsedown-math",
-        "version": "dev-master",
-        "version_normalized": "9999999-dev",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/BenjaminHoegh/ParsedownMath.git",
-            "reference": "668b11b80c7d1dc9812274405426cb62bbb4d78b"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/BenjaminHoegh/ParsedownMath/zipball/668b11b80c7d1dc9812274405426cb62bbb4d78b",
-            "reference": "668b11b80c7d1dc9812274405426cb62bbb4d78b",
-            "shasum": ""
-        },
-        "require": {
-            "php": "^5.6||^8.0"
-        },
-        "time": "2022-05-17T18:37:50+00:00",
-        "type": "library",
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "parsedownMath": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "description": "An extension of Parsedown that adds support for LaTeX.",
-        "homepage": "https://github.com/BenjaminHoegh/ParsedownMath",
-        "keywords": [
-            "latex",
-            "markdown",
-            "parsedown",
-            "parser"
-        ],
-        "funding": [
-            {
-                "url": "https://paypal.me/BenjaminHoegh",
-                "type": "custom"
-            },
-            {
-                "url": "https://www.buymeacoffee.com/BenjaminHoegh",
-                "type": "custom"
-            }
-        ]
-    },
-    {
         "name": "erusev/parsedown",
         "version": "1.7.4",
         "version_normalized": "1.7.4.0",
