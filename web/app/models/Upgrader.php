@@ -9,6 +9,8 @@ class Upgrader {
 		passthru('mysql '.escapeshellarg(UOJConfig::$data['database']['database'])
 		        .' -u '.escapeshellarg(UOJConfig::$data['database']['username'])
 		        .' --password='.escapeshellarg(UOJConfig::$data['database']['password'])
+				.' -h '.escapeshellarg(UOJConfig::$data['database']['host'])
+				.' -P '.escapeshellarg(UOJConfig::$data['database']['port'])
 		        .'<'.escapeshellarg($filename), $ret);
 		if ($ret !== 0) {
 			die("run sql failed: ".HTML::escape($filename)."\n");

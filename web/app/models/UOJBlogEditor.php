@@ -121,7 +121,7 @@ class UOJBlogEditor {
 					$element->setAttribute('class',
 						$element->getAttribute('class') . ' table table-bordered');
 				}
-				$this->post_data['content'] = $purifier->purify($dom->saveHTML());
+				$this->post_data['content'] = $dom->saveHTML();
 
 				if (preg_match('/^.*<!--.*readmore.*-->.*$/m', $this->post_data['content'], $matches, PREG_OFFSET_CAPTURE)) {
 					$content_less = substr($this->post_data['content'], 0, $matches[0][1]);

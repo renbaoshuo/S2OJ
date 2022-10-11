@@ -2,6 +2,7 @@
 
 $_SERVER['DOCUMENT_ROOT'] = dirname(__DIR__);
 
+require_once $_SERVER['DOCUMENT_ROOT'] . '/app/vendor/autoload.php';
 require $_SERVER['DOCUMENT_ROOT'] . '/app/libs/uoj-lib.php';
 
 // TODO: more beautiful argv parser
@@ -9,7 +10,7 @@ require $_SERVER['DOCUMENT_ROOT'] . '/app/libs/uoj-lib.php';
 $handlers = [
 	'upgrade:up' => function ($name) {
 		if (func_num_args() != 1) {
-			die("php cli.php upgrade:up <name>\n");
+			die("php7.4 cli.php upgrade:up <name>\n");
 		}
 		Upgrader::transaction(function() use ($name) {
 			Upgrader::up($name);
@@ -18,7 +19,7 @@ $handlers = [
 	},
 	'upgrade:down' => function ($name) {
 		if (func_num_args() != 1) {
-			die("php cli.php upgrade:down <name>\n");
+			die("php7.4 cli.php upgrade:down <name>\n");
 		}
 		Upgrader::transaction(function() use ($name) {
 			Upgrader::down($name);
@@ -27,7 +28,7 @@ $handlers = [
 	},
 	'upgrade:refresh' => function ($name) {
 		if (func_num_args() != 1) {
-			die("php cli.php upgrade:refresh <name>\n");
+			die("php7.4 cli.php upgrade:refresh <name>\n");
 		}
 		Upgrader::transaction(function() use ($name) {
 			Upgrader::refresh($name);
@@ -36,7 +37,7 @@ $handlers = [
 	},
 	'upgrade:remove' => function ($name) {
 		if (func_num_args() != 1) {
-			die("php cli.php upgrade:remove <name>\n");
+			die("php7.4 cli.php upgrade:remove <name>\n");
 		}
 		Upgrader::transaction(function() use ($name) {
 			Upgrader::remove($name);
@@ -45,7 +46,7 @@ $handlers = [
 	},
 	'upgrade:latest' => function () {
 		if (func_num_args() != 0) {
-			die("php cli.php upgrade:latest\n");
+			die("php7.4 cli.php upgrade:latest\n");
 		}
 		Upgrader::transaction(function() {
 			Upgrader::upgradeToLatest();
@@ -54,7 +55,7 @@ $handlers = [
 	},
 	'upgrade:remove-all' => function () {
 		if (func_num_args() != 0) {
-			die("php cli.php upgrade:remove-all\n");
+			die("php7.4 cli.php upgrade:remove-all\n");
 		}
 		Upgrader::transaction(function() {
 			Upgrader::removeAll();
@@ -67,7 +68,7 @@ $handlers = [
 function showHelp() {
 	global $handlers;
 	echo "UOJ Command-Line Interface\n";
-	echo "php cli.php <task-name> params1 params2 ...\n";
+	echo "php7.4 cli.php <task-name> params1 params2 ...\n";
 	echo "\n";
 	echo "The following tasks are available:\n";
 	foreach ($handlers as $cmd => $handler) {

@@ -19,7 +19,7 @@ if [ ! -f \"/var/uoj_data/.UOJSetupDone\" ]; then\n\
 fi\n\
 service ntp start\n\
 service apache2 start\n\
-cd /opt/uoj/web && sh install.sh -d\n\
+cd /opt/uoj/web && sh install.sh -i\n\
 exec bash\n" >/opt/up && chmod +x /opt/up
 
 ENV LANG=C.UTF-8 TZ=Asia/Shanghai

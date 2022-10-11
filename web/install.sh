@@ -58,7 +58,7 @@ setWebConf(){
     ln -sf /opt/uoj/web /var/www/uoj
     chown -R www-data /var/www/uoj/app/storage
     # Set web config file
-    php -a <<UOJEOF
+    php7.4 -a <<UOJEOF
 \$config = include '/var/www/uoj/app/.default-config.php';
 \$config['database']['host']='$_database_host_';
 \$config['database']['password']='$_database_password_';
@@ -76,7 +76,7 @@ UOJEOF
     make all -j$(($(nproc) + 1)) && cd /opt/uoj/web
 }
 
-dockerInitProgress() {
+initProgress(){
     printf "\n\n==> Doing initial config and start service\n"
     #Set uoj_data path
     mkdir -p /var/uoj_data/upload
@@ -90,12 +90,8 @@ dockerInitProgress() {
 	mkdir -p /opt/uoj/web/app/storage/submission
 	mkdir -p /opt/uoj/web/app/storage/tmp
 	chmod -R 777 /opt/uoj/web/app/storage
-}
-
-initProgress(){
-	dockerInitProgress;
 	#Using cli upgrade to latest
-    php /var/www/uoj/app/cli.php upgrade:latest
+    php7.4 /var/www/uoj/app/cli.php upgrade:latest
     touch /var/uoj_data/.UOJSetupDone
     #Touch SetupDone flag file
     printf "\n\n***Installation complete. Enjoy!***\n"
@@ -119,10 +115,6 @@ while [ $# -gt 0 ]; do
             echo 'Initing UOJ System web...'
             initProgress
         ;;
-		-d | --docker-init)
-			echo 'Initing UOJ System web for docker...'
-			dockerInitProgress
-		;;
         -? | --*)
             echo "Illegal option $1"
         ;;
