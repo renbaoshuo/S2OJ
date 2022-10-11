@@ -285,12 +285,22 @@ $.fn.click_zan_block = function() {
 		if (isNaN(cnt)) {
 			return;
 		}
+
+		var up_icon_html = isBootstrap5Page
+			? '<i class="bi bi-hand-thumbs-up"></i>'
+			: '<span class="glyphicon glyphicon-thumbs-up"></span>';
+		var down_icon_html = isBootstrap5Page
+			? '<i class="bi bi-hand-thumbs-down"></i>'
+			: '<span class="glyphicon glyphicon-thumbs-down"></span>';
+
 		if (val == 1) {
 			$(this).addClass('uoj-click-zan-block-cur-up');
+			up_icon_html = '<i class="bi bi-hand-thumbs-up-fill"></i>';
 		} else if (val == 0) {
 			$(this).addClass('uoj-click-zan-block-cur-zero');
 		} else if (val == -1) {
 			$(this).addClass('uoj-click-zan-block-cur-down');
+			down_icon_html = '<i class="bi bi-hand-thumbs-down-fill"></i>';
 		} else {
 			return;
 		}
@@ -301,13 +311,6 @@ $.fn.click_zan_block = function() {
 		} else {
 			$(this).addClass('uoj-click-zan-block-negative');
 		}
-		
-		var up_icon_html = isBootstrap5Page
-			? '<i class="bi bi-hand-thumbs-up"></i>'
-			: '<span class="glyphicon glyphicon-thumbs-up"></span>';
-		var down_icon_html = isBootstrap5Page
-			? '<i class="bi bi-hand-thumbs-down"></i>'
-			: '<span class="glyphicon glyphicon-thumbs-down"></span>';
 
 		var node = this;
 		var up_node = $('<a href="#" class="uoj-click-zan-up">'+up_icon_html+(show_text ? uojLocale('click-zan::good') : '')+'</a>').click(function(e) {
