@@ -103,6 +103,22 @@ mb-4" role="navigation">
 						<?= UOJLocale::get('blogs') ?>
 					</a>
 				</li>
+				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="bi bi-grid-3x3-gap"></i>
+							<?= UOJLocale::get('apps') ?>
+						</a>
+						<ul class="dropdown-menu">
+							<li>
+								<a class="dropdown-item" href="<?= HTML::url('/image-hosting') ?>">
+									<i class="bi bi-images"></i>
+									<?= UOJLocale::get('image hosting') ?>
+								</a>
+							</li>
+						</ul>
+					</li>
+				<?php endif ?>
 				<li class="nav-item">
 					<a class="nav-link" href="<?= HTML::url('/faq') ?>">
 						<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
