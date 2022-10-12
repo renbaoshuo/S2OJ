@@ -4,7 +4,7 @@ function uojRand($l, $r) {
 	return mt_rand($l, $r);
 }
 
-function uojRandString($len, $charset = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+function uojRandString($len, $charset = '0123456789abcdefghijklmnopqrstuvwxyz') {
 	$n_chars = strlen($charset);
 	$str = '';
 	for ($i = 0; $i < $len; $i++) {
@@ -13,10 +13,10 @@ function uojRandString($len, $charset = '0123456789abcdefghijklmnopqrstuvwxyzABC
 	return $str;
 }
 
-function uojRandAvaiableFileName($dir) {
+function uojRandAvaiableFileName($dir, $length = 20, $suffix = '') {
 	do {
-		$fileName = $dir . uojRandString(20);
-	} while (file_exists(UOJContext::storagePath().$fileName));
+		$fileName = $dir . uojRandString($length);
+	} while (file_exists(UOJContext::storagePath().$fileName.$suffix));
 	return $fileName;
 }
 

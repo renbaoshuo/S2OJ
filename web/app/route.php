@@ -5,7 +5,7 @@ Route::pattern('id', '[1-9][0-9]{0,9}');
 Route::pattern('contest_id', '[1-9][0-9]{0,9}');
 Route::pattern('tab', '\S{1,20}');
 Route::pattern('rand_str_id', '[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]{20}');
-Route::pattern('image_name', '[0123456789abcdefghijklmnopqrstuvwxyz]{7}');
+Route::pattern('image_name', '[0-9a-z]{1,20}');
 Route::pattern('upgrade_name', '[a-zA-Z0-9_]{1,50}');
 
 Route::group([
