@@ -112,7 +112,9 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 	}
 
 	if ($show_reviews) {
+		$parsedown = HTML::parsedown();
 		$purifier = HTML::purifier_inline();
+
 		foreach ($contest_data['people'] as $person) {
 			foreach ($contest_data['problems'] as $key => $problem) {
 				$review_result = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = {$problem} and poster = '{$person[0]}'");
@@ -122,7 +124,7 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 				}
 
 				if ($review_result['content']) {
-					$score[$person[0]][$key][] = $purifier->purify($review_result['content']);
+					$score[$person[0]][$key][] = $purifier->purify($parsedown->line($review_result['content']));
 				}
 			}
 		}
@@ -147,7 +149,7 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 			$review_result = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = -1 and poster = '{$person[0]}'");
 
 			if ($review_result['content']) {
-				$cur[] = $purifier->purify($review_result['content']);
+				$cur[] = $purifier->purify($parsedown->line($review_result['content']));
 			}
 		}
 

@@ -563,6 +563,7 @@ EOD;
 
 		<div class="col-md-6">
 			<h4>修改我的赛后总结</h4>
+			<div class="small">赛后总结支持 Markdown 语法。</div>
 			<?php $self_reviews_update_form->printHTML(); ?>
 		</div>
 		<?php endif ?>	

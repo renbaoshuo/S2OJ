@@ -41,16 +41,16 @@ $col_names = array('contest_id');
 	$header_row .= '<th style="width: 35em;">'.UOJLocale::get('contests::contest self review').'</th>';
 	$header_row .= '</tr>';
 
-	$print_row =  function($row) {
+	$parsedown = HTML::parsedown();
+	$purifier = HTML::purifier_inline();
+
+	$print_row =  function($row) use ($parsedown, $purifier) {
 		global $username;
 
 		$contest_id = $row['contest_id'];
 		$contest = queryContest($contest_id);
 		$contest_problems = queryContestProblems($contest_id);
 		$n_contest_problems = count($contest_problems);
-
-		$result = '';
-		$purifier = HTML::purifier_inline();
 
 		for ($i = 0; $i < $n_contest_problems; $i++) {
 			$problem_id = $contest_problems[$i]['problem_id'];
@@ -65,12 +65,12 @@ $col_names = array('contest_id');
 
 			$problem_review_id = "review-$contest_id-$i";
 			$result .= '<td>' . chr(ord('A') + $i) . '. <a href="/problem/' . $problem_id . '">' . $problem['title'] . '</a></td>';
-			$result .= '<td>' . $purifier->purify($problem_self_review != null ? $problem_self_review['content'] : '') . '</td>';
+			$result .= '<td>' . $purifier->purify($problem_self_review != null ? $parsedown->line($problem_self_review['content']) : '') . '</td>';
 
 			if ($i == 0) {
 				$contest_review_id = "review-$contest_id-overall";
 				$contest_self_review = DB::selectFirst("select content from contests_reviews where contest_id = $contest_id and problem_id = -1 and poster = '$username'");
-				$result .= '<td rowspan="' . $n_contest_problems . '">' . $purifier->purify($contest_self_review != null ? $contest_self_review['content'] : '') . '</td>';
+				$result .= '<td rowspan="' . $n_contest_problems . '">' . $purifier->purify($contest_self_review != null ? $parsedown->line($contest_self_review['content']) : '') . '</td>';
 			}
 
 			$result .= '</tr>';
