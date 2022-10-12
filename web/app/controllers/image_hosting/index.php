@@ -10,7 +10,7 @@
 	}
 
 	$REQUIRE_LIB['bootstrap5'] = '';
-?>
+	?>
 
 <?php echoUOJPageHeader(UOJLocale::get('image hosting')) ?>
 
