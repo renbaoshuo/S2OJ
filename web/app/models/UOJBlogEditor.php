@@ -102,12 +102,7 @@ class UOJBlogEditor {
 		$this->post_data['is_hidden'] = isset($_POST["{$this->name}_is_hidden"]) ? 1 : 0;
 		
 		$purifier = HTML::purifier();
-		$parsedown = new ParsedownMath([
-			'math' => [
-				'enabled' => true,
-				'matchSingleDollar' => true
-			]
-		]);
+		$parsedown = HTML::parsedown();
 		
 		$this->post_data['title'] = HTML::escape($this->post_data['title']);
 		

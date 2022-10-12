@@ -1357,9 +1357,10 @@ function echoRanklist($config = array()) {
 	$header_row .= '<th style="width: 5em;">'.UOJLocale::get('solved').'</th>';
 	$header_row .= '</tr>';
 
+	$parsedown = HTML::parsedown();
 	$purifier = HTML::purifier_inline();
 	$users = array();
-	$print_row = function($user, $now_cnt) use (&$users, $config, $purifier) {
+	$print_row = function($user, $now_cnt) use (&$users, $config, $purifier, $parsedown) {
 		if (!$users) {
 			if ($now_cnt == 1) {
 				$rank = 1;
@@ -1376,7 +1377,7 @@ function echoRanklist($config = array()) {
 		echo '<td>' . $user['rank'] . '</td>';
 		echo '<td>' . getUserLink($user['username']) . '</td>';
 		echo "<td>";
-		echo $purifier->purify($user['motto']);
+		echo $purifier->purify($parsedown->line($user['motto']));
 		echo "</td>";
 		echo '<td>' . $user['ac_num'] . '</td>';
 		echo '</tr>';

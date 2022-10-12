@@ -107,7 +107,7 @@
 		<label for="input-motto" class="col-sm-2 control-label"><?= UOJLocale::get('motto') ?></label>
 		<div class="col-sm-3">
 			<textarea class="form-control" id="input-motto"  name="motto"><?=HTML::escape($myUser['motto'])?></textarea>
-			<span class="help-block" id="help-motto"></span>
+			<span class="help-block" id="help-motto">格言支持 Markdown 语法。</span>
 		</div>
 	</div>
 	<div class="form-group">

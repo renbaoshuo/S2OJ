@@ -191,4 +191,13 @@ class HTML {
 
 		return new HTMLPurifier($config);
 	}
+
+	public static function parsedown() {
+		return new ParsedownMath([
+			'math' => [
+				'enabled' => true,
+				'matchSingleDollar' => true
+			]
+		]);
+	}
 }

@@ -59,7 +59,7 @@
 					</div>
 					<div class="list-group-item">
 						<h4 class="list-group-item-heading"><?= UOJLocale::get('motto') ?></h4>
-						<div class="list-group-item-text"><?= HTML::purifier_inline()->purify($user['motto']) ?></div>
+						<div class="list-group-item-text"><?= HTML::purifier_inline()->purify(HTML::parsedown()->line($user['motto'])) ?></div>
 					</div>
 					
 					<?php if (isSuperUser($myUser)): ?>
