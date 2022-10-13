@@ -100,4 +100,6 @@ return [
 	'last active at' => 'Last active at',
 	'online' => 'Online',
 	'offline' => 'Offline',
+	'apps' => 'Apps',
+	'image hosting' => 'Image Hosting',
 ];

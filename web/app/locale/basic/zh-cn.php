@@ -100,4 +100,6 @@ return [
 	'online' => '在线',
 	'offline' => '离线',
 	'last active at' => '最后活动于',
+	'apps' => '应用',
+	'image hosting' => '图床',
 ];

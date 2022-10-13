@@ -89,6 +89,7 @@ initProgress(){
     service apache2 restart
 	mkdir -p /opt/uoj/web/app/storage/submission
 	mkdir -p /opt/uoj/web/app/storage/tmp
+	mkdir -p /opt/uoj/web/app/storage/image_hosting
 	chmod -R 777 /opt/uoj/web/app/storage
 	#Using cli upgrade to latest
     php7.4 /var/www/uoj/app/cli.php upgrade:latest

@@ -51,3 +51,7 @@ function validateIP($ip) {
 function validateURL($url) {
 	return filter_var($url, FILTER_VALIDATE_URL) !== false;
 }
+
+function validateString($str) {
+	return preg_match('/[^0-9a-zA-Z]/', $str) !== true;
+}
