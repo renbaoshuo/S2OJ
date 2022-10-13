@@ -81,6 +81,10 @@
 		imagepng($img, $_FILES["image_upload_file"]["tmp_name"]);
 		imagedestroy($img);
 
+		if (filesize($_FILES["image_upload_file"]["tmp_name"]) > 5242880) { // 5 MB
+			throwError('too_large');
+		}
+
 		$filename = uojRandAvaiableFileName('/image_hosting/', 10, '.png');
 		if (!move_uploaded_file($_FILES["image_upload_file"]["tmp_name"], UOJContext::storagePath().$filename)) {
 			throwError('unknown error');
