@@ -58,10 +58,10 @@
 		$watermark_text = UOJConfig::$data['profile']['oj-name-short'];
 		if (isSuperUser($myUser) && $_POST['watermark'] == 'no_watermark') {
 			$watermark_text = "";
-			$hash .= "__no";
+			$hash .= "__no_watermark";
 		} elseif ($_POST['watermark'] == 'site_shortname_and_username') {
 			$watermark_text .= ' @'.Auth::id();
-			$hash .= "__id";
+			$hash .= "__id_".Auth::id();
 		}
 
 		$existing_image = DB::selectFirst("SELECT * FROM users_images WHERE `hash` = '$hash'");

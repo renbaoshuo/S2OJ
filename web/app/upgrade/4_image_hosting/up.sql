@@ -14,7 +14,7 @@ CREATE TABLE `users_images` (
   `height` int(11) NOT NULL,
   `upload_time` datetime NOT NULL,
   `size` int(11) NOT NULL,
-  `hash` varchar(70) NOT NULL,
+  `hash` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `uploader` (`uploader`),
   KEY `path` (`path`),
