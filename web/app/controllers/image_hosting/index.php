@@ -123,7 +123,7 @@
 <div class="card card-default">
 <div class="card-body">
 	<form class="row m-0" id="image-upload-form" method="post" enctype="multipart/form-data">
-		<div class="col-12 col-md-3 col-lg-3 order-1 drop mx-auto" id="image-upload-form-drop">
+		<div class="col-12 col-md-3 col-lg-3 order-1 drop mx-auto mx-md-0" id="image-upload-form-drop">
 			<svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="56" class="mb-2">
 				<g>
 					<path fill="#3498db" d="M424.49 120.48a12 12 0 0 0-17 0L272 256l-39.51-39.52a12 12 0 0 0-17 0L160 272v48h352V208zM64 336V128H48a48 48 0 0 0-48 48v256a48 48 0 0 0 48 48h384a48 48 0 0 0 48-48v-16H144a80.09 80.09 0 0 1-80-80z"></path>
@@ -183,7 +183,7 @@
 				</label>
 			</div>
 		</div>
-		<div class="col-12 col-lg-4 order-3 order-md-4 order-lg-3 mt-3 mt-lg-0 ms-lg-2">
+		<div class="col order-3 order-md-4 order-lg-3 mt-3 mt-lg-0 ms-lg-2">
 			<h2 class="h4">上传须知</h2>
 			<ul>
 				<li>上传的图片必须符合法律与社会道德；</li>
