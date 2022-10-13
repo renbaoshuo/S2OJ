@@ -603,6 +603,58 @@ EOD;
 EOD;
 	};
 
+	$image_hosting_cols = ['*'];
+	$image_hosting_config = ['page_len' => 20, 'table_classes' => ['table', 'table-bordered', 'table-hover', 'table-striped']];
+	$image_hosting_header_row = <<<EOD
+	<tr>
+		<th>ID</th>
+		<th>上传者</th>
+		<th>预览</th>
+		<th style="width: 3em">文件大小</th>
+		<th style="width: 12em">上传时间</th>
+	</tr>
+EOD;
+	$image_hosting_print_row = function($row) {
+		$user_link = getUserLink($row['uploader']);
+		if ($row['size'] < 1024 * 512) {
+			$size = strval(round($row['size'] * 1.0 / 1024, 1)) . ' KB';
+		} else {
+			$size = strval(round($row['size'] * 1.0 / 1024 / 1024, 1)) . ' MB';
+		}
+
+		echo <<<EOD
+	<tr>
+		<td>{$row['id']}</td>
+		<td>$user_link</td>
+		<td><img src="{$row['path']}" width="250"></td>
+		<td>$size</td>
+		<td>{$row['upload_time']}</td>
+	</tr>
+EOD;
+	};
+
+	$image_deleter = new UOJForm('image_deleter');
+	$image_deleter->addInput('image_deleter_id', 'text', '图片 ID', '',
+		function ($x, &$vdata) {
+			if (!validateUInt($x)) {
+				return 'ID 不合法';
+			}
+			if (!DB::selectCount("select count(*) from users_images where id = $x")) {
+				return '图片不存在';
+			}
+			$vdata['id'] = $x;
+			return '';
+		},
+		null
+	);
+	$image_deleter->handle = function(&$vdata) {
+		$id = $vdata['id'];
+		$result = DB::selectFirst("SELECT * from users_images WHERE id = $id");
+		unlink(UOJContext::storagePath().$result['path']);
+		DB::delete("DELETE FROM users_images WHERE id = $id");
+	};
+	$image_deleter->runAtServer();
+
 	$tabs_info = array(
 		'users' => array(
 			'name' => '用户管理',
@@ -627,6 +679,10 @@ EOD;
 		'judger' => array(
 			'name' => '评测机管理',
 			'url' => '/super-manage/judger'
+		),
+		'image_hosting' => array(
+			'name' => '图床管理',
+			'url' => '/super-manage/image_hosting'
 		)
 	);
 	
@@ -758,6 +814,13 @@ EOD;
 			</div>
 			<h3>评测机列表</h3>
 			<?php echoLongTable($judgerlist_cols, 'judger_info', "1=1", '', $judgerlist_header_row, $judgerlist_print_row, $judgerlist_config) ?>
+		<?php elseif ($cur_tab === 'image_hosting'): ?>
+			<h3>图床管理</h3>
+			<?php echoLongTable($image_hosting_cols, 'users_images', "1=1", 'order by id desc', $image_hosting_header_row, $image_hosting_print_row, $image_hosting_config) ?>
+			<div>
+				<h4>删除图片</h4>
+				<?php $image_deleter->printHTML() ?>
+			</div>
 		<?php endif ?>
 	</div>
 </div>
