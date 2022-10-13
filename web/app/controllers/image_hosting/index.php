@@ -130,7 +130,7 @@
 					<path fill="#89d1f5" d="M528 32H144a48 48 0 0 0-48 48v256a48 48 0 0 0 48 48h384a48 48 0 0 0 48-48V80a48 48 0 0 0-48-48zM208 80a48 48 0 1 1-48 48 48 48 0 0 1 48-48zm304 240H160v-48l55.52-55.52a12 12 0 0 1 17 0L272 256l135.52-135.52a12 12 0 0 1 17 0L512 208z"></path>
 				</g>
 			</svg>
-			<span class="small">点击此处选择图片</span>
+			<span id="select-image-text" class="small">点击此处选择图片</span>
 		</div>
 		<input id="image_upload_file" name="image_upload_file" type="file" accept="image/*" style="display: none;" />
 		<div class="modal fade" id="image-upload-modal" tabindex="-1" aria-hidden="true">
@@ -154,7 +154,7 @@
 						<div class="mt-3" id="modal-help-message" style="display: none"></div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel-upload">取消</button>
 						<button type="submit" class="btn btn-primary">确定</button>
 					</div>
 				</div>
@@ -207,6 +207,7 @@
 </div>
 <script>
 var image_upload_modal = new bootstrap.Modal('#image-upload-modal');
+var droppedFiles = false;
 
 function refreshCaptcha() {
 	var timestamp = new Date().getTime();
@@ -265,6 +266,20 @@ $('#image-upload-form').submit(function(event) {
 });
 $('#image-upload-form-drop').click(function() {
 	$('#image_upload_file').click();
+});
+$('#image-upload-form-drop').on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+	e.preventDefault();
+	e.stopPropagation();
+}).on('dragover dragenter', function() {
+	$('#select-image-text').html('松开以上传');
+}).on('dragleave dragend drop', function() {
+	$('#select-image-text').html('点击此处选择图片');
+}).on('drop', function(e) {
+	$('#image_upload_file').prop('files', e.originalEvent.dataTransfer.files);
+	$('#image_upload_file').trigger('change');
+});
+$('#image-upload-modal').on('hide.bs.modal', function() {
+	$('#image-upload-form').trigger('reset');
 });
 $('#image_upload_file').change(function() {
 	if ($(this).prop('files')) {
