@@ -335,8 +335,8 @@ $pag_config = [
 	'cond' => "uploader = '{$myUser['username']}'",
 	'tail' => 'order by upload_time desc',
 ];
-$pag = new Paginator($pag_config);
-?>
+	$pag = new Paginator($pag_config);
+	?>
 
 <h2 class="h3 mt-4 mb-3">
 	我的图片
