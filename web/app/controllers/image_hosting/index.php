@@ -382,6 +382,12 @@ $pag = new Paginator($pag_config);
 	<?php endforeach ?>
 </div>
 
+<?php if ($pag->isEmpty()): ?>
+	<div class="mt-4 text-muted">
+		<?= UOJLocale::get('none') ?>
+	</div>
+<?php endif ?>
+
 <div class="text-end">
 	<?= $pag->pagination() ?>
 </div>
