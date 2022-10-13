@@ -22,7 +22,7 @@
 		die(json_encode(['status' => 'error', 'message' => $msg]));
 	}
 
-	$allowedTypes = [IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF];
+	$allowedTypes = [IMAGETYPE_PNG, IMAGETYPE_JPEG];
 	if ($_POST['image_upload_file_submit'] == 'submit') {
 		header('Content-Type: application/json');
 
@@ -81,7 +81,7 @@
 		imagepng($img, $_FILES["image_upload_file"]["tmp_name"]);
 		imagedestroy($img);
 
-		if (filesize($_FILES["image_upload_file"]["tmp_name"]) > 5242880) { // 5 MB
+		if (($size = filesize($_FILES["image_upload_file"]["tmp_name"])) > 5242880) { // 5 MB
 			throwError('too_large');
 		}
 
