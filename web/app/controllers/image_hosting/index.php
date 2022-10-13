@@ -54,6 +54,7 @@
 
 		list($width, $height, $type) = $size;
 		$hash = hash_file("sha256", $_FILES['image_upload_file']['tmp_name']);
+		$scale = ceil($width / 750.0);
 
 		$watermark_text = UOJConfig::$data['profile']['oj-name-short'];
 		if (isSuperUser($myUser) && $_POST['watermark'] == 'no_watermark') {
@@ -70,16 +71,17 @@
 			die(json_encode(['status' => 'success', 'path' => $existing_image['path']]));
 		}
 
-		$img = imagecreatefromstring(file_get_contents($_FILES["image_upload_file"]["tmp_name"]));
-		$white = imagecolorallocatealpha($img, 255, 255, 255, 30);
-		$black = imagecolorallocatealpha($img, 50, 50, 50, 70);
-		$scale = ceil($width / 750.0);
-
-		imagettftext($img, strval($scale * 16), 0, ($scale * 16) + $scale, max(0, $height - ($scale * 16) + 5) + $scale, $black, UOJContext::documentRoot().'/fonts/roboto-mono/RobotoMono-Bold.ttf', $watermark_text);
-		imagefilter($img, IMG_FILTER_GAUSSIAN_BLUR);
-		imagettftext($img, strval($scale * 16), 0, ($scale * 16), max(0, $height - ($scale * 16) + 5), $white, UOJContext::documentRoot().'/fonts/roboto-mono/RobotoMono-Bold.ttf', $watermark_text);
-		imagepng($img, $_FILES["image_upload_file"]["tmp_name"]);
-		imagedestroy($img);
+		$image = new Imagick($_FILES["image_upload_file"]["tmp_name"]);
+		$draw = new ImagickDraw();
+		$draw->setFont(UOJContext::documentRoot().'/fonts/roboto-mono/RobotoMono-Bold.ttf');
+		$draw->setFontSize($scale * 14);
+		$draw->setGravity(Imagick::GRAVITY_SOUTHEAST);
+		$draw->setFillColor("rgba(100,100,100,0.5)");
+		$image->annotateImage($draw, 15, 10, 0, $watermark_text);
+		$draw->setFillColor("rgba(255,255,255,0.65)");
+		$image->annotateImage($draw, 15 + $scale, 10 + $scale, 0, $watermark_text);
+		$image->setImageFormat('png');
+		$image->writeImage();
 
 		if (($size = filesize($_FILES["image_upload_file"]["tmp_name"])) > 5242880) { // 5 MB
 			throwError('too_large');
