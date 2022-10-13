@@ -58,10 +58,10 @@
 		$watermark_text = UOJConfig::$data['profile']['oj-name-short'];
 		if (isSuperUser($myUser) && $_POST['watermark'] == 'no_watermark') {
 			$watermark_text = "";
-			$hash += "__no";
+			$hash .= "__no";
 		} elseif ($_POST['watermark'] == 'site_shortname_and_username') {
 			$watermark_text .= ' @'.Auth::id();
-			$hash += "__id";
+			$hash .= "__id";
 		}
 
 		$existing_image = DB::selectFirst("SELECT * FROM users_images WHERE `hash` = '$hash'");
@@ -71,11 +71,13 @@
 		}
 
 		$img = imagecreatefromstring(file_get_contents($_FILES["image_upload_file"]["tmp_name"]));
-		$white = imagecolorallocate($img, 255, 255, 255);
-		$black = imagecolorallocate($img, 150, 150, 150);
+		$white = imagecolorallocatealpha($img, 255, 255, 255, 30);
+		$black = imagecolorallocatealpha($img, 50, 50, 50, 70);
+		$scale = ceil($width / 750.0);
 
-		imagettftext($img, '16', 0, 10 + 1, max(0, $height - 20) + 1, $black, UOJContext::documentRoot().'/fonts/roboto-mono/RobotoMono-Bold.ttf', $watermark_text);
-		imagettftext($img, '16', 0, 10, max(0, $height - 20), $white, UOJContext::documentRoot().'/fonts/roboto-mono/RobotoMono-Bold.ttf', $watermark_text);
+		imagettftext($img, strval($scale * 16), 0, ($scale * 16) + $scale, max(0, $height - ($scale * 16) + 5) + $scale, $black, UOJContext::documentRoot().'/fonts/roboto-mono/RobotoMono-Bold.ttf', $watermark_text);
+		imagefilter($img, IMG_FILTER_GAUSSIAN_BLUR);
+		imagettftext($img, strval($scale * 16), 0, ($scale * 16), max(0, $height - ($scale * 16) + 5), $white, UOJContext::documentRoot().'/fonts/roboto-mono/RobotoMono-Bold.ttf', $watermark_text);
 		imagepng($img, $_FILES["image_upload_file"]["tmp_name"]);
 		imagedestroy($img);
 
@@ -87,6 +89,24 @@
 		DB::insert("INSERT INTO users_images (`path`, uploader, width, height, upload_time, size, `hash`) VALUES ('$filename', '{$myUser['username']}', $width, $height, now(), {$_FILES["image_upload_file"]["size"]}, '$hash')");
 
 		die(json_encode(['status' => 'success', 'path' => $filename]));
+	} elseif ($_POST['image_delete_submit'] == 'submit') {
+		crsf_defend();
+
+		$id = $_POST['image_delete_id'];
+		if (!validateUInt($id)) {
+			becomeMsgPage('ID 不合法。<a href="'.UOJContext::requestURI().'">返回</a>');
+		} else {
+			$result = DB::selectFirst("SELECT * from users_images WHERE id = $id");
+			if (!$result) {
+				becomeMsgPage('图片不存在。<a href="'.UOJContext::requestURI().'">返回</a>');
+			} else {
+				unlink(UOJContext::storagePath().$result['path']);
+				DB::delete("DELETE FROM users_images WHERE id = $id");
+
+				header("Location: ". UOJContext::requestURI());
+				die();
+			}
+		}
 	}
 	?>
 
@@ -260,6 +280,9 @@ $('#image-upload-form').submit(function(event) {
 				}
 			}
 		},
+		error: function() {
+			$('#modal-help-message').html('上传失败，请刷新页面重试。').addClass('text-danger').show();
+		}
 	});
 
 	return false;
@@ -301,6 +324,96 @@ $('#image_upload_file').change(function() {
 		$('#modal-help-message').html('').hide();
 		image_upload_modal.show();
 	}
+});
+</script>
+
+<?php
+$pag_config = [
+	'page_len' => 40,
+	'col_names' => ['*'],
+	'table_name' => 'users_images',
+	'cond' => "uploader = '{$myUser['username']}'",
+	'tail' => 'order by upload_time desc',
+];
+$pag = new Paginator($pag_config);
+?>
+
+<h2 class="h3 mt-4 mb-3">
+	我的图片
+</h2>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+	<?php foreach ($pag->get() as $idx => $row): ?>
+		<div class="col">
+			<div class="card">
+				<img src="<?= $row['path'] ?>" class="card-img-top" height="200" style="object-fit: contain">
+				<div class="card-footer bg-transparent small px-2">
+					<div class="d-flex flex-wrap justify-content-between">
+						<time><?= $row['upload_time'] ?></time>
+						<span>
+							<?php if ($row['size'] < 1024 * 512): ?>
+								<?= round($row['size'] * 1.0 / 1024, 1) ?> KB
+							<?php else: ?>
+								<?= round($row['size'] * 1.0 / 1024 / 1024, 1) ?> MB
+							<?php endif ?>
+						</span>
+					</div>
+					<div class="d-flex flex-wrap justify-content-between mt-2">
+						<form method="post" onsubmit="return confirm('您确定要删除这张图片吗？');">
+							<input type="hidden" name="image_delete_submit" value="submit">
+							<input type="hidden" name="image_delete_id" value="<?= $row['id'] ?>">
+							<input type="hidden" name="_token" value="<?= crsf_token() ?>">
+							<button class="btn btn-sm btn-outline-danger image-delete-button" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="删除">
+								<i class="bi bi-trash3"></i>
+							</button>
+						</form>
+						<div class="btn-group">
+							<button class="btn btn-sm btn-outline-secondary image-copy-url-button" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="复制链接" data-image-path="<?= $row['path'] ?>">
+								<i class="bi bi-clipboard"></i>
+							</button>
+							<button class="btn btn-sm btn-outline-secondary image-copy-md-button" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="复制 Markdown 源码" data-image-path="<?= $row['path'] ?>">
+								<i class="bi bi-markdown"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	<?php endforeach ?>
+</div>
+
+<div class="text-end">
+	<?= $pag->pagination() ?>
+</div>
+
+<div class="toast-container position-fixed bottom-0 start-0 ms-3 mb-4">
+	<div id="copy-url-toast" class="toast text-bg-success align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+		<div class="d-flex">
+			<div class="toast-body">
+				复制成功！
+			</div>
+			<button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+		</div>
+	</div>
+</div>
+
+<script>
+$(document).ready(function() {
+	[...document.querySelectorAll('[data-bs-toggle="tooltip"]')].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+});
+
+var copy_url_toast = new bootstrap.Toast('#copy-url-toast', { delay: 2000 });
+
+$('.image-copy-url-button').click(function() {
+	var url = new URL($(this).data('image-path'), location.origin);
+	navigator.clipboard.writeText(url);
+	copy_url_toast.show();
+});
+
+$('.image-copy-md-button').click(function() {
+	var url = new URL($(this).data('image-path'), location.origin);
+	navigator.clipboard.writeText('![](' + url + ')');
+	copy_url_toast.show();
 });
 </script>
 

@@ -847,7 +847,7 @@ CREATE TABLE `users_images` (
   `hash` varchar(70) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `uploader` (`uploader`),
-  KET `path` (`path`),
+  KEY `path` (`path`),
   KEY `upload_time` (`upload_time`),
   KEY `size` (`size`),
   KEY `hash` (`hash`)
