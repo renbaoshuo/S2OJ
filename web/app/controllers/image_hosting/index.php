@@ -14,7 +14,9 @@
 	}
 
 	$limit = $myUser['images_size_limit'];
-	$used = DB::select("SELECT SUM(size) FROM `users_images` WHERE uploader = {$myUser['username']}")["SUM(size)"];
+	$_result = DB::selectFirst("SELECT SUM(size), count(*) FROM `users_images` WHERE uploader = '{$myUser['username']}'");
+	$used = $_result["SUM(size)"];
+	$count = $_result["count(*)"];
 
 	function throwError($msg) {
 		die(json_encode(['status' => 'error', 'message' => $msg]));
@@ -120,76 +122,87 @@
 
 <div class="card card-default">
 <div class="card-body">
-<form class="row m-0" id="image-upload-form" method="post" enctype="multipart/form-data">
-	<div class="col-12 col-md-3 drop mx-auto" id="image-upload-form-drop">
-		<svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="56" class="mb-2">
-			<g>
-				<path fill="#3498db" d="M424.49 120.48a12 12 0 0 0-17 0L272 256l-39.51-39.52a12 12 0 0 0-17 0L160 272v48h352V208zM64 336V128H48a48 48 0 0 0-48 48v256a48 48 0 0 0 48 48h384a48 48 0 0 0 48-48v-16H144a80.09 80.09 0 0 1-80-80z"></path>
-				<path fill="#89d1f5" d="M528 32H144a48 48 0 0 0-48 48v256a48 48 0 0 0 48 48h384a48 48 0 0 0 48-48V80a48 48 0 0 0-48-48zM208 80a48 48 0 1 1-48 48 48 48 0 0 1 48-48zm304 240H160v-48l55.52-55.52a12 12 0 0 1 17 0L272 256l135.52-135.52a12 12 0 0 1 17 0L512 208z"></path>
-			</g>
-		</svg>
-		<span class="small">点击此处选择图片</span>
-	</div>
-	<input id="image_upload_file" name="image_upload_file" type="file" accept="image/*" style="display: none;" />
-	<div class="modal fade" id="image-upload-modal" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="exampleModalLabel">上传图片</h1>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<div class="mb-3">
-						您确定要上传图片吗？
+	<form class="row m-0" id="image-upload-form" method="post" enctype="multipart/form-data">
+		<div class="col-12 col-md-3 col-lg-3 order-1 drop mx-auto" id="image-upload-form-drop">
+			<svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="56" class="mb-2">
+				<g>
+					<path fill="#3498db" d="M424.49 120.48a12 12 0 0 0-17 0L272 256l-39.51-39.52a12 12 0 0 0-17 0L160 272v48h352V208zM64 336V128H48a48 48 0 0 0-48 48v256a48 48 0 0 0 48 48h384a48 48 0 0 0 48-48v-16H144a80.09 80.09 0 0 1-80-80z"></path>
+					<path fill="#89d1f5" d="M528 32H144a48 48 0 0 0-48 48v256a48 48 0 0 0 48 48h384a48 48 0 0 0 48-48V80a48 48 0 0 0-48-48zM208 80a48 48 0 1 1-48 48 48 48 0 0 1 48-48zm304 240H160v-48l55.52-55.52a12 12 0 0 1 17 0L272 256l135.52-135.52a12 12 0 0 1 17 0L512 208z"></path>
+				</g>
+			</svg>
+			<span class="small">点击此处选择图片</span>
+		</div>
+		<input id="image_upload_file" name="image_upload_file" type="file" accept="image/*" style="display: none;" />
+		<div class="modal fade" id="image-upload-modal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="exampleModalLabel">上传图片</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
-					<div class="mb-3" id="modal-file-info"></div>
-					<div class="input-group">
-						<input type="text" class="form-control" id="input-captcha" name="captcha" placeholder="<?= UOJLocale::get('enter verification code') ?>" maxlength="20" />
-						<span class="input-group-text p-0 overflow-hidden rounded-0" style="border-bottom-right-radius: var(--bs-border-radius) !important">
-							<img id="captcha" class="col w-100 h-100" src="/captcha">
-						</span>
+					<div class="modal-body">
+						<div class="mb-3">
+							您确定要上传图片吗？
+						</div>
+						<div class="mb-3" id="modal-file-info"></div>
+						<div class="input-group">
+							<input type="text" class="form-control" id="input-captcha" name="captcha" placeholder="<?= UOJLocale::get('enter verification code') ?>" maxlength="20" />
+							<span class="input-group-text p-0 overflow-hidden rounded-0" style="border-bottom-right-radius: var(--bs-border-radius) !important">
+								<img id="captcha" class="col w-100 h-100" src="/captcha">
+							</span>
+						</div>
+						<div class="mt-3" id="modal-help-message" style="display: none"></div>
 					</div>
-					<div class="mt-3" id="modal-help-message" style="display: none"></div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-					<button type="submit" class="btn btn-primary">确定</button>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+						<button type="submit" class="btn btn-primary">确定</button>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="col-12 col-md-3 mt-3 mt-md-0 ms-md-2">
-		<h2 class="h4">水印</h2>
-		<?php if (isSuperUser($myUser)): ?>
-		<div class="form-check d-inline-block d-md-block me-2">
-			<input class="form-check-input" type="radio" name="watermark" id="watermark-no_watermark" data-value="no_watermark">
-			<label class="form-check-label" for="watermark-no_watermark">
-				无水印
-			</label>
+		<div class="col-12 col-md-4 col-lg-2 order-2 mt-3 mt-md-0 ms-md-2">
+			<h2 class="h4">水印</h2>
+			<?php if (isSuperUser($myUser)): ?>
+			<div class="form-check d-inline-block d-md-block me-2">
+				<input class="form-check-input" type="radio" name="watermark" id="watermark-no_watermark" data-value="no_watermark">
+				<label class="form-check-label" for="watermark-no_watermark">
+					无水印
+				</label>
+			</div>
+			<?php endif ?>
+			<div class="form-check d-inline-block d-md-block me-2">
+				<input class="form-check-input" type="radio" name="watermark" id="watermark-site_shortname" data-value="site_shortname" checked>
+				<label class="form-check-label" for="watermark-site_shortname">
+					<?= UOJConfig::$data['profile']['oj-name-short'] ?>
+				</label>
+			</div>
+			<div class="form-check d-inline-block d-md-block me-2">
+				<input class="form-check-input" type="radio" name="watermark" id="watermark-site_shortname_and_username" data-value="site_shortname_and_username">
+				<label class="form-check-label" for="watermark-site_shortname_and_username">
+					<?= UOJConfig::$data['profile']['oj-name-short'] ?> @<?= Auth::id() ?>
+				</label>
+			</div>
 		</div>
-		<?php endif ?>
-		<div class="form-check d-inline-block d-md-block me-2">
-			<input class="form-check-input" type="radio" name="watermark" id="watermark-site_shortname" data-value="site_shortname" checked>
-			<label class="form-check-label" for="watermark-site_shortname">
-				<?= UOJConfig::$data['profile']['oj-name-short'] ?>
-			</label>
+		<div class="col-12 col-lg-4 order-3 order-md-4 order-lg-3 mt-3 mt-lg-0 ms-lg-2">
+			<h2 class="h4">上传须知</h2>
+			<ul>
+				<li>上传的图片必须符合法律与社会道德；</li>
+				<li>图床仅供 S2OJ 站内使用，校外用户无法查看；</li>
+				<li>在合适的地方插入图片即可引用。</li>
+			</ul>
 		</div>
-		<div class="form-check d-inline-block d-md-block me-2">
-			<input class="form-check-input" type="radio" name="watermark" id="watermark-site_shortname_and_username" data-value="site_shortname_and_username">
-			<label class="form-check-label" for="watermark-site_shortname_and_username">
-				<?= UOJConfig::$data['profile']['oj-name-short'] ?> @<?= Auth::id() ?>
-			</label>
+		<div class="col-12 col-md-5 col-lg-3 order-4 order-md-3 order-lg-4 mt-3 mt-md-0 ms-md-2">
+			<h2 class="h4">使用统计</h2>
+			<div class="d-flex justify-content-between">
+				<span class="small">已用空间</span>
+				<span><?= round($used * 1.0 / 1024 / 1024, 2) ?> MB / <?= round($limit * 1.0 / 1024 / 1024, 2) ?> MB</span>
+			</div>
+			<div class="d-flex justify-content-between">
+				<span class="small">上传总数</span>
+				<span><?= $count ?> 张</span>
+			</div>
 		</div>
-	</div>
-	<div class="col mt-3 mt-md-0 ms-md-2">
-		<h2 class="h4">上传须知</h2>
-		<ul>
-			<li>上传的图片必须符合法律与社会道德；</li>
-			<li>图床仅供 S2OJ 站内使用；</li>
-			<li>在合适的地方插入图片即可引用。</li>
-		</ul>
-	</div>
-</form>
+	</form>
 </div>
 </div>
 <script>
