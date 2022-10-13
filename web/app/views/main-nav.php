@@ -111,7 +111,7 @@ mb-4" role="navigation">
 						</a>
 						<ul class="dropdown-menu">
 							<li>
-								<a class="dropdown-item" href="<?= HTML::url('/image-hosting') ?>">
+								<a class="dropdown-item" href="<?= HTML::url('/image_hosting') ?>">
 									<i class="bi bi-images"></i>
 									<?= UOJLocale::get('image hosting') ?>
 								</a>

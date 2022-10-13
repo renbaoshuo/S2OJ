@@ -11,6 +11,14 @@ services:
     environment:
       - MYSQL_DATABASE=app_uoj233
       - MYSQL_ROOT_PASSWORD=root
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 28080:80
+    environment:
+      - PMA_ARBITRARY=1
   
   uoj-judger:
     build:

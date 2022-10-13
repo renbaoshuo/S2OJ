@@ -17,7 +17,7 @@ function uojRandAvaiableFileName($dir, $length = 20, $suffix = '') {
 	do {
 		$fileName = $dir . uojRandString($length);
 	} while (file_exists(UOJContext::storagePath().$fileName.$suffix));
-	return $fileName;
+	return $fileName.$suffix;
 }
 
 function uojRandAvaiableTmpFileName() {

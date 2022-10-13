@@ -81,8 +81,8 @@ Route::group([
 		Route::any('/click-zan', '/click_zan.php');
 
 		// Image Hosting
-		Route::any('/image-hosting', '/image_hosting/index.php');
-		Route::get('/image-hosting/{image_name}.png', '/image_hosting/get_image.php');
+		Route::any('/image_hosting', '/image_hosting/index.php');
+		Route::get('/image_hosting/{image_name}.png', '/image_hosting/get_image.php');
 	}
 );
 
