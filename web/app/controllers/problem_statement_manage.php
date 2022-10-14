@@ -112,8 +112,8 @@
 <p>提示：</p>
 <ol>
 <li>请勿引用不稳定的外部资源（如来自个人服务器的图片或文档等），以便备份及后期维护；</li>
-<li>请勿在题面中直接插入大段 HTML 源码，这可能会破坏页面的显示，可以考虑使用 <a href="http://island205.github.io/h2m/">转换工具</a> 转换后再作修正；</li>
-<li>图片上传推荐使用 <a href="https://smms.app" target="_blank">SM.MS</a> 图床，以免后续产生外链图片大量失效的情况。</li>
+<li>请勿在题面中直接插入大段 HTML 源码，这可能会破坏页面的显示，可以考虑使用 <a href="/html2markdown">转换工具</a> 转换后再作修正；</li>
+<li>图片上传推荐使用 <a href="/image_hosting" target="_blank">S2OJ</a> 图床，以免后续产生外链图片大量失效的情况。</li>
 </ol>
 </div>
 

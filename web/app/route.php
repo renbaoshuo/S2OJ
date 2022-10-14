@@ -80,9 +80,10 @@ Route::group([
 		
 		Route::any('/click-zan', '/click_zan.php');
 
-		// Image Hosting
+		// Apps
 		Route::any('/image_hosting', '/image_hosting/index.php');
 		Route::get('/image_hosting/{image_name}.png', '/image_hosting/get_image.php');
+		Route::any('/html2markdown', '/html2markdown.php');
 	}
 );
 

@@ -102,4 +102,5 @@ return [
 	'last active at' => '最后活动于',
 	'apps' => '应用',
 	'image hosting' => '图床',
+	'html to markdown' => 'HTML 转 Markdown',
 ];

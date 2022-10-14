@@ -102,4 +102,5 @@ return [
 	'offline' => 'Offline',
 	'apps' => 'Apps',
 	'image hosting' => 'Image Hosting',
+	'html to markdown' => 'HTML to Markdown',
 ];

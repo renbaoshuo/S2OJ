@@ -116,6 +116,12 @@ mb-4" role="navigation">
 									<?= UOJLocale::get('image hosting') ?>
 								</a>
 							</li>
+							<li>
+								<a class="dropdown-item" href="<?= HTML::url('/html2markdown') ?>">
+									<i class="bi bi-markdown"></i>
+									<?= UOJLocale::get('html to markdown') ?>
+								</a>
+							</li>
 						</ul>
 					</li>
 				<?php endif ?>
