@@ -634,6 +634,9 @@ EOD;
 	};
 
 	$image_deleter = new UOJForm('image_deleter');
+	$image_deleter->submit_button_config['align'] = 'compressed';
+	$image_deleter->submit_button_config['text'] = '删除';
+	$image_deleter->submit_button_config['class_str'] = 'btn btn-danger';
 	$image_deleter->addInput('image_deleter_id', 'text', '图片 ID', '',
 		function ($x, &$vdata) {
 			if (!validateUInt($x)) {
@@ -654,6 +657,39 @@ EOD;
 		DB::delete("DELETE FROM users_images WHERE id = $id");
 	};
 	$image_deleter->runAtServer();
+
+	$change_user_image_total_size_limit_form = new UOJForm('change_user_image_total_size_limit');
+	$change_user_image_total_size_limit_form->submit_button_config['align'] = 'compressed';
+	$change_user_image_total_size_limit_form->addInput('change_user_image_total_size_limit_username', 'text', '用户名', '',
+		function ($x, &$vdata) {
+			if (!validateUsername($x)) {
+				return '用户名不合法';
+			}
+			if (!queryUser($x)) {
+				return '用户不存在';
+			}
+			$vdata['username'] = $x;
+			return '';
+		},
+		null
+	);
+	$change_user_image_total_size_limit_form->addInput('change_user_image_total_size_limit_limit', 'text', '存储限制（单位：Byte）', '104857600',
+		function ($x, &$vdata) {
+			if (!validateUInt($x, 10)) {
+				return '限制不合法';
+			}
+			if (intval($x) > 2147483648) {
+				return '限制不能大于 2 GB';
+			}
+			$vdata['limit'] = $x;
+			return '';
+		},
+		null
+	);
+	$change_user_image_total_size_limit_form->handle = function(&$vdata) {
+		DB::update("UPDATE user_info SET images_size_limit = {$vdata['limit']} WHERE username = '{$vdata['username']}'");
+	};
+	$change_user_image_total_size_limit_form->runAtServer();
 
 	$tabs_info = array(
 		'users' => array(
@@ -820,6 +856,10 @@ EOD;
 			<div>
 				<h4>删除图片</h4>
 				<?php $image_deleter->printHTML() ?>
+			</div>
+			<div>
+				<h4>修改用户存储上限</h4>
+				<?php $change_user_image_total_size_limit_form->printHTML() ?>
 			</div>
 		<?php endif ?>
 	</div>

@@ -20,14 +20,14 @@ function validateMotto($motto) {
 	return is_string($motto) && ($len = mb_strlen($motto, 'UTF-8')) !== false && $len <= 1024;
 }
 
-function validateUInt($x) { // [0, 1000000000)
+function validateUInt($x, $len = 8) { // [0, 1000000000)
 	if (!is_string($x)) {
 		return false;
 	}
 	if ($x === '0') {
 		return true;
 	}
-	return preg_match('/^[1-9][0-9]{0,8}$/', $x);
+	return preg_match('/^[1-9][0-9]{0,'.$len.'}$/', $x);
 }
 
 function validateInt($x) {
