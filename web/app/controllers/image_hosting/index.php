@@ -54,7 +54,7 @@
 
 		list($width, $height, $type) = $size;
 		$hash = hash_file("sha256", $_FILES['image_upload_file']['tmp_name']);
-		$scale = ceil($width / 750.0);
+		$scale = ceil($height / 600.0);
 
 		$watermark_text = UOJConfig::$data['profile']['oj-name-short'];
 		if (isSuperUser($myUser) && $_POST['watermark'] == 'no_watermark') {
