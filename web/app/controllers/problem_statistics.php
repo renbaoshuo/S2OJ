@@ -79,6 +79,7 @@
 <div class="row">
 <div class="col-lg-9">
 
+<?php if ($contest): ?>
 <!-- 比赛导航 -->
 <?php
 	$tabs_info = array(
@@ -114,9 +115,10 @@
 		);
 	}
 	?>
-<div class="mb-2">
-	<?= HTML::tablist($tabs_info, '', 'nav-pills') ?>
-</div>
+	<div class="mb-2">
+		<?= HTML::tablist($tabs_info, '', 'nav-pills') ?>
+	</div>
+<?php endif ?>
 
 <div class="card card-default mb-2">
 <div class="card-body">
