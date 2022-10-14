@@ -163,7 +163,7 @@ $table_config = [
 	'div_classes' => 'mb-3',
 	'table_classes' => ['table', 'mb-0', 'text-center'],
 ];
-?>
+	?>
 
 <?php if ($submissions_sort_by_choice == 'time'): ?>
 	<?php echoSubmissionsList("best_ac_submissions.submission_id = submissions.id and best_ac_submissions.problem_id = {$problem['id']}", 'order by best_ac_submissions.used_time, best_ac_submissions.used_memory, best_ac_submissions.tot_size', array('problem_hidden' => '', 'judge_time_hidden' => '', 'table_name' => 'best_ac_submissions, submissions', 'table_config' => $table_config), $myUser); ?>
