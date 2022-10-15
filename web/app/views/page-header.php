@@ -69,7 +69,7 @@
 		<?= HTML::js_src('/js/jquery.autosize.min.js') ?>
 		<script type="text/javascript">
 			$(document).ready(function() {
-				$('textarea').autosize();
+				$('textarea:not([data-no-autosize])').autosize();
 			});
 		</script>
 		

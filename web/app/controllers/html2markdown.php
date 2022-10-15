@@ -20,14 +20,15 @@
 	<div class="card-body">
 		<div class="row row-cols-1 row-cols-md-2">
 			<div class="col">
-				<h2 class="h4">HTML 源码</h2>
 				<textarea class="form-control" id="html" placeholder="input html here"></textarea>
 			</div>
 			<div class="col">
-				<h2 class="h4">Markdown 源码</h2>
-				<textarea readonly class="form-control" id="markdown" placeholder="output markdown here"></textarea>
+				<textarea data-no-autosize readonly class="form-control" id="markdown" placeholder="output markdown here" style="height: 100%"></textarea>
 			</div>
 		</div>
+	</div>
+	<div class="card-footer bg-transparent text-end">
+		<a href="https://s2oj.github.io/#/user/apps/html2markdown" target="_blank">使用教程</a>
 	</div>
 </div>
 

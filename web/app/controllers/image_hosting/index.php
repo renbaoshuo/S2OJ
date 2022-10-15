@@ -217,7 +217,7 @@
 				<li>图片上传后会被自动转码为 PNG 格式；</li>
 				<li>在合适的地方插入图片即可引用。</li>
 			</ul>
-			<p class="small">更多信息可以查看 <a href="https://s2oj.github.io/#/user/image_hosting" target="_blank">使用文档</a>。</p>
+			<p class="small">更多信息可以查看 <a href="https://s2oj.github.io/#/user/apps/image_hosting" target="_blank">使用文档</a>。</p>
 		</div>
 		<div class="col-12 col-md-5 col-lg-3 order-4 order-md-3 order-lg-4 mt-3 mt-md-0 ms-md-2">
 			<h2 class="h4">使用统计</h2>
