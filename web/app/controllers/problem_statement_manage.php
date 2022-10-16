@@ -12,9 +12,7 @@
 		become403Page();
 	}
 
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
-	}
+	requireLib('bootstrap5');
 	
 	$problem_content = queryProblemContent($problem['id']);
 	$problem_tags = queryProblemTags($problem['id']);
@@ -56,25 +54,15 @@
 	?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - 编辑 - 题目管理') ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="row">
+<!-- left col -->
 <div class="col-lg-9">
-<?php endif ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <h1 class="h2">
-<?php else: ?>
-<h1 class="page-header text-center">
-<?php endif ?>
 	#<?=$problem['id']?>. <?=$problem['title']?> 管理
 </h1>
 
-<ul class="nav
-	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	nav-pills my-3
-	<?php else: ?>
-	nav-tabs
-	<?php endif ?>" role="tablist">
+<ul class="nav nav-pills my-3" role="tablist">
 	<li class="nav-item">
 		<a class="nav-link active" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
 			题面
@@ -90,46 +78,32 @@
 			数据
 		</a>
 	</li>
-
-<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-	<li class="nav-item">
-		<a class="nav-link" href="/problem/<?=$problem['id']?>" role="tab">
-			返回
-		</a>
-	</li>
-<?php endif ?>
 </ul>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="card card-default">
 <div class="card-body">
-<?php endif ?>
-
-<div class="mb-2
-	<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-	mt-3
-	<?php endif ?>">
-<p>提示：</p>
-<ol>
-<li>请勿引用不稳定的外部资源（如来自个人服务器的图片或文档等），以便备份及后期维护；</li>
-<li>请勿在题面中直接插入大段 HTML 源码，这可能会破坏页面的显示，可以考虑使用 <a href="/html2markdown">转换工具</a> 转换后再作修正；</li>
-<li>图片上传推荐使用 <a href="/image_hosting" target="_blank">S2OJ</a> 图床，以免后续产生外链图片大量失效的情况。</li>
-</ol>
-</div>
-
-<hr>
-
 <?php $problem_editor->printHTML() ?>
-
-
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 </div>
-<?php endif ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<!-- 提示信息 -->
+<div class="card mt-3">
+<div class="card-body">
+	<h2 class="h4 card-title">提示</h2>
+	<ol>
+		<li>请勿引用不稳定的外部资源（如来自个人服务器的图片或文档等），以便备份及后期维护；</li>
+		<li>请勿在题面中直接插入大段 HTML 代码，这可能会破坏页面的显示，可以考虑使用 <a class="text-decoration-none" href="/html2markdown" target="_blank">转换工具</a> 转换后再作修正；</li>
+		<li>图片上传推荐使用 <a class="text-decoration-none" href="/image_hosting" target="_blank">S2OJ 图床</a>，以免后续产生外链图片大量失效的情况。</li>
+	</ol>
+	<p class="card-text">
+		更多内容请查看 S2OJ 用户手册中的「<a class="text-decoration-none" href="https://s2oj.github.io/#/manage/problem?id=%e4%bc%a0%e9%a2%98%e6%8c%87%e5%bc%95">传题指引</a>」部分。
+	</p>
+</div>
 </div>
 
+</div>
+
+<!-- right col -->
 <aside class="col mt-3 mt-lg-0">
 
 <div class="card card-default mb-2">
@@ -168,6 +142,5 @@
 </aside>
 
 </div>
-<?php endif ?>
 
 <?php echoUOJPageFooter() ?>
