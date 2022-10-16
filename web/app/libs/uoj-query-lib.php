@@ -26,7 +26,7 @@ function hasViewPermission($str, $user, $problem, $submission) {
 }
 
 function hasViewSolutionPermission($str, $user, $problem) {
-	if (isSuperUser($user)) {
+	if (isSuperUser($user) || isProblemManager($user)) {
 		return true;
 	}
 	if ($str == 'ALL') {
