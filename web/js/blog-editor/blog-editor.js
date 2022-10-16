@@ -212,6 +212,9 @@ function blog_editor_init(name, editor_config) {
 				if (data.blog_url) {
 					$('#a-' + name + '_view_blog').attr('href', data.blog_url).show();
 				}
+				if (data.blog_id) {
+					$('#div-blog-id').html('<small>博客 ID：<b>' + data.blog_id + '</b></small>').show();
+				}
 			}
 		}).fail(function() {
 			if (config.need_preview) {

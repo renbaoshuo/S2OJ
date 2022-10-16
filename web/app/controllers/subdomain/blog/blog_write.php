@@ -60,6 +60,7 @@
 		} else {
 			insertBlog($data);
 			$blog = array('id' => DB::insert_id(), 'tags' => array());
+			$ret['blog_id'] = $blog['id'];
 			$ret['blog_write_url'] = HTML::blog_url(UOJContext::user()['username'], "/post/{$blog['id']}/write");
 			$ret['blog_url'] = HTML::blog_url(UOJContext::user()['username'], "/post/{$blog['id']}");
 		}
@@ -77,6 +78,18 @@
 <?php echoUOJPageHeader('写博客') ?>
 
 <div class="card">
+<div class="card-header bg-transparent d-flex justify-content-between">
+	<div class="fw-bold">写博客</div>
+	<div id="div-blog-id"
+		<?php if (!$blog): ?>
+		style="display: none"
+		<?php endif ?>
+		>
+	<?php if ($blog): ?>
+		<small>博客 ID：<b><?= $blog['id'] ?></b></small>
+	<?php endif ?>
+	</div>
+</div>
 <div class="card-body">
 <?php $blog_editor->printHTML() ?>
 </div>
