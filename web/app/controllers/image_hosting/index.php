@@ -318,8 +318,9 @@ $('#image_upload_file').change(function() {
 		var watermark_type = $('input[name=watermark]:checked', '#image-upload-form').data('value');
 		var html = '';
 
-		html += '大小：<b>'+($(this).prop('files')[0].size / 1024).toFixed(2)+'</b> KB。';
-		
+		html += '<p><img src="'+ URL.createObjectURL($(this).prop('files')[0]) +'" height="150" style="object-fit: contain"></p>';
+		html += '<p class="small">大小：<b>'+($(this).prop('files')[0].size / 1024).toFixed(2)+'</b> KB。';
+
 		if (watermark_type === 'no_watermark') {
 			html += '不添加水印。';
 		} else if (watermark_type === 'site_shortname_and_username') {
@@ -327,6 +328,8 @@ $('#image_upload_file').change(function() {
 		} else {
 			html += '使用水印：<?= UOJConfig::$data['profile']['oj-name-short'] ?>。';
 		}
+
+		html += '</p>';
 
 		$('#modal-file-info').html(html);
 		$('#modal-help-message').html('').hide();
