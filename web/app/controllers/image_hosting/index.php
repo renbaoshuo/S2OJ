@@ -233,8 +233,19 @@
 	</form>
 </div>
 </div>
+<div class="toast-container position-fixed bottom-0 start-0 ms-3 mb-4" style="z-index: 999999">
+	<div id="image-upload-toast" class="toast text-bg-danger align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+		<div class="d-flex">
+			<div class="toast-body">
+				文件非法：不是有效的图片格式。
+			</div>
+			<button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+		</div>
+	</div>
+</div>
 <script>
 var image_upload_modal = new bootstrap.Modal('#image-upload-modal');
+var image_upload_toast = new bootstrap.Toast('#image-upload-toast', { delay: 2000 });
 var droppedFiles = false;
 
 function refreshCaptcha() {
@@ -309,17 +320,36 @@ $('#image-upload-form-drop').on('drag dragstart dragend dragover dragenter dragl
 	$('#image_upload_file').prop('files', e.originalEvent.dataTransfer.files);
 	$('#image_upload_file').trigger('change');
 });
+$(document).on('paste', function(e) {
+	if (e.originalEvent.clipboardData) {
+		$('#image_upload_file').prop('files', e.originalEvent.clipboardData.files);
+	}
+
+	$('#image_upload_file').trigger('change');
+});
 $('#image-upload-modal').on('hide.bs.modal', function() {
 	$('#image-upload-form').trigger('reset');
 });
 $('#image_upload_file').change(function() {
-	if ($(this).prop('files')) {
+	var items = $(this).prop('files');
+	var file = null;
+
+	if (items && items.length) {
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                file = items[i];
+                break;
+            }
+        }
+    }
+
+	if (file) {
 		refreshCaptcha();
 		var watermark_type = $('input[name=watermark]:checked', '#image-upload-form').data('value');
 		var html = '';
 
-		html += '<p><img src="'+ URL.createObjectURL($(this).prop('files')[0]) +'" height="150" style="object-fit: contain"></p>';
-		html += '<p class="small">大小：<b>'+($(this).prop('files')[0].size / 1024).toFixed(2)+'</b> KB。';
+		html += '<p><img src="'+ URL.createObjectURL(file) +'" height="150" style="object-fit: contain"></p>';
+		html += '<p class="small">大小：<b>'+(file.size / 1024).toFixed(2)+'</b> KB。';
 
 		if (watermark_type === 'no_watermark') {
 			html += '不添加水印。';
@@ -334,6 +364,8 @@ $('#image_upload_file').change(function() {
 		$('#modal-file-info').html(html);
 		$('#modal-help-message').html('').hide();
 		image_upload_modal.show();
+	} else {
+		image_upload_toast.show();
 	}
 });
 </script>
