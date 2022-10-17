@@ -37,7 +37,7 @@ EOD;
 	$config['table_classes'] = array('table', 'table-hover');
 
 	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		$config['div_classes'] = array('card', 'my-3');
+		$config['div_classes'] = array('card', 'my-3', 'table-responsive');
 		$config['table_classes'] = array('table', 'uoj-table', 'mb-0');
 	}
 	?>
