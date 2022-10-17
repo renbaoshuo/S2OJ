@@ -119,12 +119,12 @@ mb-4" role="navigation">
 					</a>
 					<ul class="dropdown-menu">
 						<li>
-							<a class="dropdown-item" href="<?= HTML::url('/user/profile/' . Auth::id()) ?>">
+							<a class="dropdown-item" href="<?= HTML::url('/user/' . Auth::id()) ?>">
 								<?= UOJLocale::get('my profile') ?>
 							</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="<?= HTML::url('/user/msg') ?>">
+							<a class="dropdown-item" href="<?= HTML::url('/user_msg') ?>">
 								<?= UOJLocale::get('private message') ?>
 								<?php if ($new_user_msg_num): ?>
 								<span class="badge bg-danger rounded-pill">
@@ -134,7 +134,7 @@ mb-4" role="navigation">
 							</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="<?= HTML::url('/user/system-msg') ?>">
+							<a class="dropdown-item" href="<?= HTML::url('/user/'.Auth::id().'system_msg') ?>">
 								<?= UOJLocale::get('system message') ?>
 								<?php if ($new_system_msg_num): ?>
 								<span class="badge bg-danger rounded-pill">

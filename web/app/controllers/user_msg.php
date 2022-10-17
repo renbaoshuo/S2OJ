@@ -210,7 +210,7 @@ function submitMessagePost(conversationName) {
 		$('#help-message').text('');
 		$('#form-group-message').removeClass('has-error');
 
-		$.post('/user/msg', {
+		$.post('', {
 				user_msg : 1,
 				receiver : conversationName,
 				message : $('#input-message').val()
@@ -224,7 +224,7 @@ function refreshHistory(conversation, page) {
 		var ret = false;
 		$('#conversation-name').text(conversation);
 		$('#pageShow').text("第" + page.toString() + "页");
-		$.get('/user/msg', {
+		$.get('', {
 				getHistory : '',
 				conversationName : conversation,
 				pageNumber : page
@@ -246,7 +246,7 @@ function refreshHistory(conversation, page) {
 
 function refreshConversations() {
 	$("#conversations").empty();
-    $.get('/user/msg', {
+    $.get('', {
 			getConversations : ""
 		}, function(msg) {
 			var result = JSON.parse(msg);

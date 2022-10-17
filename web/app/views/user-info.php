@@ -160,12 +160,13 @@ function fTime($time, $gran = -1) {
 		<nav class="nav mb-2">
 			<?php if (Auth::check()): ?>
 				<?php if (Auth::id() != $user['username']): ?>
-					<a class="nav-link" href="/user/msg?enter=<?= $user['username'] ?>">
+					<a class="nav-link" href="/user_msg?enter=<?= $user['username'] ?>">
 						<i class="bi bi-chat-left-dots"></i>
 						<?= UOJLocale::get('send private message') ?>
 					</a>
-				<?php else: ?>
-					<a class="nav-link" href="/user/modify-profile">
+				<?php endif ?>
+				<?php if (Auth::id() == $user['username'] || isSuperUser(Auth::user())): ?>
+					<a class="nav-link" href="/user/<?= $user['username'] ?>/edit">
 						<i class="bi bi-pencil"></i>
 						<?= UOJLocale::get('modify my profile') ?>
 					</a>

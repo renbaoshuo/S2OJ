@@ -180,7 +180,7 @@ EOD;
 				<?php $poster = queryUser($row['poster']); ?>
 				<div class="mb-3">
 					<span class="me-2 d-inline-block">
-						<a class="text-decoration-none" href="<?= HTML::url('/user/profile/'.$poster['username']) ?>">
+						<a class="text-decoration-none" href="<?= HTML::url('/user/'.$poster['username']) ?>">
 							<img src="<?= HTML::avatar_addr($poster, 64) ?>" width="32" height="32" class="rounded" />
 						</a>
 						<?= getUserLink($poster['username']) ?>

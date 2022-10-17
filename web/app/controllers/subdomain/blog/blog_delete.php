@@ -31,7 +31,7 @@
 <p>您的博客 <b>{$blog['title']}</b>（ID：{$blog['id']}）已经被 {$admin_user_link} 删除，现将博客原文备份发送给您，请查收。</p>
 <pre><code class="language-markdown">{$blog_content}</code></pre>
 EOD;
-				sendSystemMsg($blog['poster'], '博客删除通知', $content);
+			sendSystemMsg($blog['poster'], '博客删除通知', $content);
 		}
 
 		deleteBlog($blog['id']);

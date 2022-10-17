@@ -84,8 +84,8 @@
 		题目相关问题请联系各校区的竞赛教练以及题目管理员。
 	</p>
 	<p class="card-text">
-		系统相关问题请邮件联系 <a href="https://sjzezoj.com/user/profile/baoshuo" class="uoj-username">baoshuo</a>（<a href="mailto:i@baoshuo.ren">i@baoshuo.ren</a>）
-		和 <a href="https://sjzezoj.com/user/profile/nekko" class="uoj-username">nekko</a>（<a href="mailto:1139855151@qq.com">1139855151@qq.com</a>）。
+		系统相关问题请邮件联系 <a href="https://sjzezoj.com/user/baoshuo" class="uoj-username">baoshuo</a>（<a href="mailto:i@baoshuo.ren">i@baoshuo.ren</a>）
+		和 <a href="https://sjzezoj.com/user/nekko" class="uoj-username">nekko</a>（<a href="mailto:1139855151@qq.com">1139855151@qq.com</a>）。
 	</p>
 
 	<h5 class="mt-4">开源项目</h5>

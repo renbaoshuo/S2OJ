@@ -70,10 +70,12 @@ Route::group([
 		Route::any('/register', '/register.php');
 		Route::any('/forgot-password', '/forgot_pw.php');
 		Route::any('/reset-password', '/reset_pw.php');
-		Route::any('/user/profile/{username}', '/user_info.php');
-		Route::any('/user/modify-profile', '/change_user_info.php');
-		Route::any('/user/msg', '/user_msg.php');
-		Route::any('/user/system-msg', '/user_system_msg.php');
+
+		Route::any('/user/{username}', '/user_info.php');
+		Route::any('/user/{username}/edit', '/user_info_edit.php');
+		Route::any('/user_msg', '/user_msg.php');
+		Route::any('/user/{username}/system_msg', '/user_system_msg.php');
+
 		Route::any('/super-manage(?:/{tab})?', '/super_manage.php');
 		
 		Route::any('/download.php', '/download.php');

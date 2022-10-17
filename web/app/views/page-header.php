@@ -267,9 +267,9 @@
 							<span class="uoj-username" data-link="0"><?= Auth::id() ?></span> <?= $new_msg_tot_html ?>
 						</a>
 						<ul class="dropdown-menu" role="menu">
-							<li role="presentation"><a class="dropdown-item" href="<?= HTML::url('/user/profile/' . Auth::id()) ?>"><?= UOJLocale::get('my profile') ?></a></li>
-							<li role="presentation"><a class="dropdown-item" href="<?= HTML::url('/user/msg') ?>"><?= UOJLocale::get('private message') ?>&nbsp;&nbsp;<?= $new_user_msg_num_html ?></a></li>
-							<li role="presentation"><a class="dropdown-item" href="<?= HTML::url('/user/system-msg') ?>"><?= UOJLocale::get('system message') ?>&nbsp;&nbsp;<?= $new_system_msg_num_html ?></a></li>
+							<li role="presentation"><a class="dropdown-item" href="<?= HTML::url('/user/' . Auth::id()) ?>"><?= UOJLocale::get('my profile') ?></a></li>
+							<li role="presentation"><a class="dropdown-item" href="<?= HTML::url('/user_msg') ?>"><?= UOJLocale::get('private message') ?>&nbsp;&nbsp;<?= $new_user_msg_num_html ?></a></li>
+							<li role="presentation"><a class="dropdown-item" href="<?= HTML::url('/user/'.Auth::id().'/system_msg') ?>"><?= UOJLocale::get('system message') ?>&nbsp;&nbsp;<?= $new_system_msg_num_html ?></a></li>
 							<?php if (isSuperUser(Auth::user())): ?>
 								<li role="presentation"><a class="dropdown-item" href="<?= HTML::url('/super-manage') ?>"><?= UOJLocale::get('system manage') ?></a></li>
 							<?php endif ?>

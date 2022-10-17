@@ -206,7 +206,7 @@
 				<?php else: ?>
 				media-left
 				<?php endif ?>">
-				<a href="<?= HTML::url('/user/profile/'.$poster['username']) ?>" class="d-none d-sm-block
+				<a href="<?= HTML::url('/user/'.$poster['username']) ?>" class="d-none d-sm-block
 					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 					text-decoration-none
 					<?php endif ?>">

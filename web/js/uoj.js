@@ -129,7 +129,7 @@ function getUserLink(username, realname) {
 	if (realname) {
 		text = text + ' <span class="uoj-realname d-inline-block">(' + realname + ')</span>';
 	}
-	return '<a class="uoj-username" href="' + uojHome + '/user/profile/' + username + '">' + text + '</a>';
+	return '<a class="uoj-username" href="' + uojHome + '/user/' + username + '">' + text + '</a>';
 }
 function getUserSpan(username, realname) {
 	if (!username) {

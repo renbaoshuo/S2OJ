@@ -81,9 +81,9 @@
 		</div>
 		<?php if (Auth::check()): ?>
 		<?php if (Auth::id() != $user['username']): ?>
-		<a type="button" class="btn btn-info btn-sm" href="/user/msg?enter=<?= $user['username'] ?>"><span class="glyphicon glyphicon-envelope"></span> <?= UOJLocale::get('send private message') ?></a>
+		<a type="button" class="btn btn-info btn-sm" href="/user_msg?enter=<?= $user['username'] ?>"><span class="glyphicon glyphicon-envelope"></span> <?= UOJLocale::get('send private message') ?></a>
 		<?php else: ?>
-		<a type="button" class="btn btn-info btn-sm" href="/user/modify-profile"><span class="glyphicon glyphicon-pencil"></span> <?= UOJLocale::get('modify my profile') ?></a>
+		<a type="button" class="btn btn-info btn-sm" href="/user/<?= $user['username'] ?>/edit"><span class="glyphicon glyphicon-pencil"></span> <?= UOJLocale::get('modify my profile') ?></a>
 		<?php endif ?>
 		<?php endif ?>
 		

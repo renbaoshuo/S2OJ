@@ -3,22 +3,32 @@
 		redirectToLogin();
 	}
 
+	if (!validateUsername($_GET['username']) || !($user = queryUser($_GET['username']))) {
+		become404Page();
+	}
+
+	if (!isSuperUser($myUser) && $myUser['username'] != $user['username']) {
+		become403Page();
+	}
+
 	function handlePost() {
-		global $myUser;
-		if (!isset($_POST['old_password'])) {
-			return '无效表单';
-		}
-		$old_password = $_POST['old_password'];
-		if (!validatePassword($old_password) || !checkPassword($myUser, $old_password)) {
-			return "失败：密码错误。";
+		global $myUser, $user;
+		if ($user['username'] == Auth::id()) {
+			if (!isset($_POST['old_password'])) {
+				return '无效表单';
+			}
+			$old_password = $_POST['old_password'];
+			if (!validatePassword($old_password) || !checkPassword($user, $old_password)) {
+				return "失败：密码错误。";
+			}
 		}
 		if ($_POST['ptag']) {
 			$password = $_POST['password'];
 			if (!validatePassword($password)) {
 				return "失败：无效密码。";
 			}
-			$password = getPasswordToStore($password, $myUser['username']);
-			DB::update("update user_info set password = '$password' where username = '{$myUser['username']}'");
+			$password = getPasswordToStore($password, $user['username']);
+			DB::update("update user_info set password = '$password' where username = '{$user['username']}'");
 		}
 
 		$email = $_POST['email'];
@@ -26,7 +36,7 @@
 			return "失败：无效电子邮箱。";
 		}
 		$esc_email = DB::escape($email);
-		DB::update("update user_info set email = '$esc_email' where username = '{$myUser['username']}'");
+		DB::update("update user_info set email = '$esc_email' where username = '{$user['username']}'");
 
 		if ($_POST['Qtag']) {
 			$qq = $_POST['qq'];
@@ -34,19 +44,19 @@
 				return "失败：无效QQ。";
 			}
 			$esc_qq = DB::escape($qq);
-			DB::update("update user_info set qq = '$esc_qq' where username = '{$myUser['username']}'");
+			DB::update("update user_info set qq = '$esc_qq' where username = '{$user['username']}'");
 		} else {
-			DB::update("update user_info set QQ = NULL where username = '{$myUser['username']}'");
+			DB::update("update user_info set QQ = NULL where username = '{$user['username']}'");
 		}
 		if ($_POST['sex'] == "U" || $_POST['sex'] == 'M' || $_POST['sex'] == 'F') {
 			$sex = $_POST['sex'];
 			$esc_sex = DB::escape($sex);
-			DB::update("update user_info set sex = '$esc_sex' where username = '{$myUser['username']}'");
+			DB::update("update user_info set sex = '$esc_sex' where username = '{$user['username']}'");
 		}
 		
 		if (validateMotto($_POST['motto'])) {
 			$esc_motto = DB::escape($_POST['motto']);
-			DB::update("update user_info set motto = '$esc_motto' where username = '{$myUser['username']}'");
+			DB::update("update user_info set motto = '$esc_motto' where username = '{$user['username']}'");
 		}
 		
 		return "ok";
@@ -60,8 +70,18 @@
 	$REQUIRE_LIB['md5'] = '';
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('modify my profile')) ?>
-<h2 class="page-header"><?= UOJLocale::get('modify my profile') ?></h2>
+<h2 class="page-header">
+	<?php if ($user['username'] == Auth::id()): ?>
+		<?= UOJLocale::get('modify my profile') ?>
+	<?php else: ?>
+		修改 <?= $user['username'] ?> 的个人信息
+	<?php endif ?>
+</h2>
+<?php if (isSuperUser($myUser)): ?>
+	<p>您正在使用管理特权修改 <?= $user['username'] ?> 的个人信息。</p>
+<?php endif ?>
 <form id="form-update" class="form-horizontal">
+	<?php if ($user['username'] == Auth::id()): ?>
 	<h4><?= UOJLocale::get('please enter your password for authorization') ?></h4>
 	<div id="div-old_password" class="form-group">
 		<label for="input-old_password" class="col-sm-2 control-label"><?= UOJLocale::get('password') ?></label>
@@ -70,6 +90,7 @@
 			<span class="help-block" id="help-old_password"></span>
 		</div>
 	</div>
+	<?php endif ?>
 	<h4><?= UOJLocale::get('please enter your new profile') ?></h4>
 	<div id="div-password" class="form-group">
 		<label for="input-password" class="col-sm-2 control-label"><?= UOJLocale::get('new password') ?></label>
@@ -82,14 +103,14 @@
 	<div id="div-email" class="form-group">
 		<label for="input-email" class="col-sm-2 control-label"><?= UOJLocale::get('email') ?></label>
 		<div class="col-sm-3">
-			<input type="email" class="form-control" name="email" id="input-email" value="<?=$myUser['email']?>" placeholder="<?= UOJLocale::get('enter your email') ?>" maxlength="50" />
+			<input type="email" class="form-control" name="email" id="input-email" value="<?=$user['email']?>" placeholder="<?= UOJLocale::get('enter your email') ?>" maxlength="50" />
 			<span class="help-block" id="help-email"></span>
 		</div>
 	</div>
 	<div id="div-qq" class="form-group">
 		<label for="input-qq" class="col-sm-2 control-label"><?= UOJLocale::get('QQ') ?></label>
 		<div class="col-sm-3">
-			<input type="text" class="form-control" name="qq" id="input-qq" value="<?= $myUser['qq'] != 0 ? $myUser['qq'] : '' ?>" placeholder="<?= UOJLocale::get('enter your QQ') ?>" maxlength="50" />
+			<input type="text" class="form-control" name="qq" id="input-qq" value="<?= $user['qq'] != 0 ? $user['qq'] : '' ?>" placeholder="<?= UOJLocale::get('enter your QQ') ?>" maxlength="50" />
 			<span class="help-block" id="help-qq"></span>
 		</div>
 	</div>
@@ -97,16 +118,16 @@
 		<label for="input-sex" class="col-sm-2 control-label"><?= UOJLocale::get('sex') ?></label>
 		<div class="col-sm-3">
 			<select class="form-control" id="input-sex"  name="sex">
-				<option value="U"<?= Auth::user()['sex'] == 'U' ? ' selected="selected"' : ''?>><?= UOJLocale::get('refuse to answer') ?></option>
-				<option value="M"<?= Auth::user()['sex'] == 'M' ? ' selected="selected"' : ''?>><?= UOJLocale::get('male') ?></option>
-				<option value="F"<?= Auth::user()['sex'] == 'F' ? ' selected="selected"' : ''?>><?= UOJLocale::get('female') ?></option>
+				<option value="U"<?= $user['sex'] == 'U' ? ' selected="selected"' : ''?>><?= UOJLocale::get('refuse to answer') ?></option>
+				<option value="M"<?= $user['sex'] == 'M' ? ' selected="selected"' : ''?>><?= UOJLocale::get('male') ?></option>
+				<option value="F"<?= $user['sex'] == 'F' ? ' selected="selected"' : ''?>><?= UOJLocale::get('female') ?></option>
 			</select>
 		</div>
 	</div>
 	<div id="div-motto" class="form-group">
 		<label for="input-motto" class="col-sm-2 control-label"><?= UOJLocale::get('motto') ?></label>
 		<div class="col-sm-3">
-			<textarea class="form-control" id="input-motto"  name="motto"><?=HTML::escape($myUser['motto'])?></textarea>
+			<textarea class="form-control" id="input-motto"  name="motto"><?=HTML::escape($user['motto'])?></textarea>
 			<span class="help-block" id="help-motto">格言支持 Markdown 语法。</span>
 		</div>
 	</div>
@@ -126,7 +147,10 @@
 	function validateUpdatePost() {
 		var ok = true;
 		ok &= getFormErrorAndShowHelp('email', validateEmail);
+
+	<?php if ($user['username'] == Auth::id()): ?>
 		ok &= getFormErrorAndShowHelp('old_password', validatePassword);
+	<?php endif ?>
 
 		if ($('#input-password').val().length > 0)
 			ok &= getFormErrorAndShowHelp('password', validateSettingPassword);
@@ -138,14 +162,16 @@
 	function submitUpdatePost() {
 		if (!validateUpdatePost())
 			return;
-		$.post('/user/modify-profile', {
+		$.post('', {
 			change   : '',
 			etag     : $('#input-email').val().length,
 			ptag     : $('#input-password').val().length,
 			Qtag     : $('#input-qq').val().length,
 			email    : $('#input-email').val(),
 			password : md5($('#input-password').val(), "<?= getPasswordClientSalt() ?>"),
+		<?php if ($user['username'] == Auth::id()): ?>
 			old_password : md5($('#input-old_password').val(), "<?= getPasswordClientSalt() ?>"),
+		<?php endif ?>
 			qq       : $('#input-qq').val(),
 			sex      : $('#input-sex').val(),
 			motto    : $('#input-motto').val()
@@ -162,7 +188,7 @@
 						}
 					}],
 					onhidden : function(dialog) {
-						window.location.href = '/user/profile/<?=$myUser['username']?>';
+						window.location.href = '/user/<?=$user['username']?>';
 					}
 				});
 			} else {
