@@ -3,6 +3,7 @@
 Route::pattern('username', '[a-zA-Z0-9_]{1,20}');
 Route::pattern('id', '[1-9][0-9]{0,9}');
 Route::pattern('contest_id', '[1-9][0-9]{0,9}');
+Route::pattern('list_id', '[1-9][0-9]{0,9}');
 Route::pattern('tab', '\S{1,20}');
 Route::pattern('rand_str_id', '[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]{20}');
 Route::pattern('image_name', '[0-9a-z]{1,20}');
@@ -49,8 +50,7 @@ Route::group([
 		Route::any('/groups', '/groups.php');
 		Route::any('/group/{id}', '/group.php');
 		Route::any('/group/{id}/manage', '/group_manage.php');
-
-		Route::any('/assignment/{id}', '/assignment.php');
+		Route::any('/group/{id}/assignment/{list_id}', '/group_assignment.php');
 		
 		Route::any('/blogs', '/blogs.php');
 		if (UOJConfig::$data['switch']['blog-domain-mode'] != 3) {

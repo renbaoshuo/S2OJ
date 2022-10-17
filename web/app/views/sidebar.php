@@ -57,7 +57,7 @@
 			$create_time = DateTime::createFromFormat('Y-m-d H:i:s', $assignment['create_time']);
 			$now = new DateTime();
 			?>
-				<a href="<?= HTML::url('/assignment/'.$assignment['id']) ?>" class="fw-bold text-decoration-none">
+				<a href="<?= HTML::url('/group/'.$assignment['group_id'].'/assignment/'.$assignment['list_id']) ?>" class="fw-bold text-decoration-none">
 					<?= $assignment['title'] ?>
 					<?php if ($deadline < $now): ?>
 						<sup class="fw-normal text-danger">overdue</sup>

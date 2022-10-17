@@ -15,6 +15,7 @@ return [
 	'pending final test' => 'pending final test',
 	'final testing' => 'final testing',
 	'ended' => 'ended',
+	'total score' => 'total score',
 	'add new contest' => 'Add new contest',
 	'contest dashboard' => 'Dashboard',
 	'contest submissions' => 'Submissions',

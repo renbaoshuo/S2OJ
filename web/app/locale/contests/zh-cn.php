@@ -15,6 +15,7 @@ return [
 	'pending final test' => '等待评测',
 	'final testing' => '正在评测',
 	'ended' => '已结束',
+	'total score' => '总分',
 	'add new contest' => '添加比赛',
 	'contest dashboard' => '比赛主页',
 	'contest submissions' => '提交记录',

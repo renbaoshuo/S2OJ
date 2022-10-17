@@ -260,7 +260,7 @@
 		if (isset($REQUIRE_LIB['bootstrap5'])) {
 			echo ' class="text-decoration-none" ';
 		}
-		echo ' href="/assignment/', $ass['id'], '">查看完成情况</a>)';
+		echo ' href="/group/',$group['id'],'/assignment/', $ass['list_id'], '">查看完成情况</a>)';
 		echo '</li>';
 	}
 
