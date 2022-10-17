@@ -141,13 +141,20 @@
 
 				global $contest;
 				$contest_data = queryContestData($contest);
+				$problems_count = DB::selectCount("select count(*) from contests_problems where contest_id = {$contest['id']} order by dfn, problem_id");
 				calcStandings($contest, $contest_data, $score, $standings, true);
 
 				for ($i = 0; $i < count($standings); $i++) {
-					$user = queryUser($standings[$i][2][0]);
-					$user_link = getUserLink($user['username']);
-
 					DB::query("update contests_registrants set rank = {$standings[$i][3]} where contest_id = {$contest['id']} and username = '{$standings[$i][2][0]}'");
+					
+					$user_link = getUserLink($standings[$i][2][0]);
+					$total_score = $problems_count * 100;
+					$tail = $standings[$i][0] == $total_score ? '，请继续保持！' : '，请继续努力！';
+					$content = <<<EOD
+<p>{$user_link} 您好：</p>
+<p>您参与的比赛 <a href="/contest/{$contest['id']}">{$contest['name']}</a> 现已结束，您的成绩为 <a class="uoj-score" data-max="{$total_score}">{$standings[$i][0]}</a>{$tail}</p>
+EOD;
+					sendSystemMsg($standings[$i][2][0], '比赛成绩公布', $content);
 				}
 				DB::query("update contests set status = 'finished' where id = {$contest['id']}");
 			};
