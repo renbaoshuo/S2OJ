@@ -898,7 +898,7 @@ UNLOCK TABLES;
 CREATE TABLE `user_system_msg` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `content` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `receiver` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `send_time` datetime NOT NULL,
   `read_time` datetime DEFAULT NULL,
