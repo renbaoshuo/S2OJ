@@ -197,7 +197,7 @@ EOD;
 	} elseif ($cur_tab == 'backstage') {
 		if (isSuperUser(Auth::user())) {
 			$post_notice = new UOJForm('post_notice');
-			$post_notice->addInput('title', 'text', '标题', '',
+			$post_notice->addVInput('title', 'text', '标题', '',
 				function($title) {
 					if (!$title) {
 						return '标题不能为空';
@@ -206,7 +206,7 @@ EOD;
 				},
 				null
 			);
-			$post_notice->addTextArea('content', '正文', '', 
+			$post_notice->addVTextArea('content', '正文', '', 
 				function($content) {
 					if (!$content) {
 						return '公告不能为空';

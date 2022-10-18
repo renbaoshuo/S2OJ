@@ -1,8 +1,7 @@
-<div class="card card-default" id="standings"></div>
-
-<div class="table-responsive">
-	<table id="standings-table" class="table table-bordered table-striped table-text-center table-vertical-middle"></table>
-</div>
+<div id="standings" class="
+<?php if (!isset($no_bs5_card)): ?>
+	card card-default
+<?php endif ?>"></div>
 
 <script type="text/javascript">
 standings_version=<?=$contest['extra_config']['standings_version']?>;

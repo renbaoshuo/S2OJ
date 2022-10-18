@@ -7,8 +7,14 @@ if (!isset($can_reply)) {
 
 ?>
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-<div class="card card-default table-responsive mb-3">
-	<table class="table uoj-table text-center mb-0">
+<div class="table-responsive mb-3
+	<?php if (!isset($no_bs5_card)): ?>
+		card card-default
+	<?php endif ?>">
+	<table class="table text-center mb-0
+	<?php if (!isset($no_bs5_card)): ?>
+	uoj-table
+	<?php endif ?>">
 <?php else: ?>
 <div class="table-responsive">
 	<table class="table table-bordered table-hover table-vertical-middle table-text-center">
