@@ -40,7 +40,7 @@
 		);
 	}
 	if ($blog) {
-		$blog_editor->blog_url = HTML::blog_url(UOJContext::user()['username'], "/post/{$blog['id']}");
+		$blog_editor->blog_url = HTML::blog_url(UOJContext::userid(), "/post/{$blog['id']}");
 	} else {
 		$blog_editor->blog_url = null;
 	}
@@ -49,7 +49,7 @@
 		DB::update("update blogs set title = '".DB::escape($data['title'])."', content = '".DB::escape($data['content'])."', content_md = '".DB::escape($data['content_md'])."', is_hidden = {$data['is_hidden']} where id = {$id}");
 	}
 	function insertBlog($data) {
-		DB::insert("insert into blogs (title, content, content_md, poster, is_hidden, post_time) values ('".DB::escape($data['title'])."', '".DB::escape($data['content'])."', '".DB::escape($data['content_md'])."', '".Auth::id()."', {$data['is_hidden']}, now())");
+		DB::insert("insert into blogs (title, content, content_md, poster, is_hidden, post_time) values ('".DB::escape($data['title'])."', '".DB::escape($data['content'])."', '".DB::escape($data['content_md'])."', '".UOJContext::userid()."', {$data['is_hidden']}, now())");
 	}
 	
 	$blog_editor->save = function($data) {
@@ -61,8 +61,8 @@
 			insertBlog($data);
 			$blog = array('id' => DB::insert_id(), 'tags' => array());
 			$ret['blog_id'] = $blog['id'];
-			$ret['blog_write_url'] = HTML::blog_url(UOJContext::user()['username'], "/post/{$blog['id']}/write");
-			$ret['blog_url'] = HTML::blog_url(UOJContext::user()['username'], "/post/{$blog['id']}");
+			$ret['blog_write_url'] = HTML::blog_url(UOJContext::userid(), "/post/{$blog['id']}/write");
+			$ret['blog_url'] = HTML::blog_url(UOJContext::userid(), "/post/{$blog['id']}");
 		}
 		if ($data['tags'] !== $blog['tags']) {
 			DB::delete("delete from blogs_tags where blog_id = {$blog['id']}");
