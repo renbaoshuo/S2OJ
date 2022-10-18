@@ -273,4 +273,5 @@ function deleteBlog($id) {
 	DB::delete("delete from blogs_comments where blog_id = $id");
 	DB::delete("delete from important_blogs where blog_id = $id");
 	DB::delete("delete from blogs_tags where blog_id = $id");
+	DB::delete("DELETE FROM problems_solutions WHERE blog_id = $id");
 }
