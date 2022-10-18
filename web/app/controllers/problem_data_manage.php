@@ -3,6 +3,7 @@
 		redirectToLogin();
 	}
 
+	requireLib('bootstrap5');
 	requirePHPLib('form');
 	requirePHPLib('judger');
 	requirePHPLib('data');
@@ -20,7 +21,8 @@
 	$data_dir = "/var/uoj_data/${problem['id']}";
 
 	function echoFileNotFound($file_name) {
-		echo '<h4>', htmlspecialchars($file_name), '<sub class="text-danger"> ', '文件未找到', '</sub></h4>';
+		echo '<h5>', htmlspecialchars($file_name), '</h5>';
+		echo '<div class="small text-danger"> ', '文件未找到', '</div>';
 	}
 	function echoFilePre($file_name) {
 		global $data_dir;
@@ -34,8 +36,9 @@
 		}
 		finfo_close($finfo);
 
-		echo '<h4>', htmlspecialchars($file_name), '<sub> ', $mimetype, '</sub></h4>';
-		echo "<pre>\n";
+		echo '<h5 class="mb-1">', htmlspecialchars($file_name), '</h5>';
+		echo '<div class="text-muted small mb-1 font-monospace">', $mimetype, '</div>';
+		echo '<pre class="bg-light rounded uoj-pre">', "\n";
 
 		$output_limit = 1000;
 		if (strStartWith($mimetype, 'text/')) {
@@ -77,7 +80,7 @@
 
 	//添加配置文件
 	if ($_POST['problem_settings_file_submit']=='submit') {
-		if ($_POST['use_builtin_checker'] and $_POST['n_tests'] and $_POST['input_pre'] and $_POST['input_suf'] and $_POST['output_pre'] and $_POST['output_suf'] and $_POST['time_limit'] and $_POST['memory_limit']) {
+		if ($_POST['use_builtin_checker'] and $_POST['n_tests']) {
 			$set_filename="/var/uoj_data/upload/{$problem['id']}/problem.conf";
 			$has_legacy=false;
 			if (file_exists($set_filename)) {
@@ -100,20 +103,28 @@
 			} else {
 				fwrite($setfile, "n_sample_tests 0\n");
 			}
-			fwrite($setfile, "input_pre ".$_POST['input_pre']."\n");
-			fwrite($setfile, "input_suf ".$_POST['input_suf']."\n");
-			fwrite($setfile, "output_pre ".$_POST['output_pre']."\n");
-			fwrite($setfile, "output_suf ".$_POST['output_suf']."\n");
-			fwrite($setfile, "time_limit ".$_POST['time_limit']."\n");
-			fwrite($setfile, "memory_limit ".$_POST['memory_limit']."\n");
+			if (isset($_POST['input_pre'])) {
+				fwrite($setfile, "input_pre ".$_POST['input_pre']."\n");
+			}
+			if (isset($_POST['input_suf'])) {
+				fwrite($setfile, "input_suf ".$_POST['input_suf']."\n");
+			}
+			if (isset($_POST['output_pre'])) {
+				fwrite($setfile, "output_pre ".$_POST['output_pre']."\n");
+			}
+			if (isset($_POST['output_suf'])) {
+				fwrite($setfile, "output_suf ".$_POST['output_suf']."\n");
+			}
+			fwrite($setfile, "time_limit ".($_POST['time_limit'] ?: 1)."\n");
+			fwrite($setfile, "memory_limit ".($_POST['memory_limit'] ?: 256)."\n");
 			fclose($setfile);
 			if (!$has_legacy) {
-				echo "<script>alert('添加成功！')</script>";
+				echo "<script>alert('添加成功！请点击「检验配置并同步数据」按钮以应用新配置文件。')</script>";
 			} else {
-				echo "<script>alert('替换成功!')</script>";
+				echo "<script>alert('替换成功！请点击「检验配置并同步数据」按钮以应用新配置文件。')</script>";
 			}
 		} else {
-			$errmsg = "添加配置文件失败，请检查是否所有输入框都已填写！";
+			$errmsg = "添加配置文件失败，请检查是否所有必填输入框都已填写！";
 			becomeMsgPage('<div>' . $errmsg . '</div><a href="/problem/'.$problem['id'].'/manage/data">返回</a>');
 		}
 	}
@@ -121,27 +132,13 @@
 
 	$info_form = new UOJForm('info');
 	$http_host = HTML::escape(UOJContext::httpHost());
-	$info_form->appendHTML(<<<EOD
-<div class="form-group row">
-	<!--<label class="col-sm-3 control-label">zip上传数据</label>
-	<div class="col-sm-9">
-		<div class="form-control-static">
-			<row>
-			<button type="button" style="width:30%" class="btn btn-primary" data-toggle="modal" data-target="#UploadDataModal">上传数据</button>
-			<button type="submit" style="width:30%" id="button-submit-data" name="submit-data" value="data" class="btn btn-danger">检验配置并同步数据</button>
-			</row>
-		</div>
-	</div>-->
-</div>
-EOD
-	);
 	$attachment_url = HTML::url("/download.php?type=attachment&id={$problem['id']}");
 	$info_form->appendHTML(<<<EOD
 <div class="form-group row">
 	<label class="col-sm-3 control-label">problem_{$problem['id']}_attachment.zip</label>
 	<div class="col-sm-9">
 		<div class="form-control-static">
-			<a href="$attachment_url">$attachment_url</a>
+			<a class="text-decoration-none" href="$attachment_url">$attachment_url</a>
 		</div>
 	</div>
 </div>
@@ -153,7 +150,7 @@ EOD
 	<label class="col-sm-3 control-label">problem_{$problem['id']}.zip</label>
 	<div class="col-sm-9">
 		<div class="form-control-static">
-			<a href="$download_url">$download_url</a>
+			<a class="text-decoration-none" href="$download_url">$download_url</a>
 		</div>
 	</div>
 </div>
@@ -164,7 +161,7 @@ EOD
 	<label class="col-sm-3 control-label">testlib.h</label>
 	<div class="col-sm-9">
 		<div class="form-control-static">
-			<a href="/download.php?type=testlib.h">下载</a>
+			<a class="text-decoration-none" href="/download.php?type=testlib.h">下载</a>
 		</div>
 	</div>
 </div>
@@ -176,7 +173,7 @@ EOD
 <div class="form-group row">
 	<label class="col-sm-3 control-label">提交文件配置</label>
 	<div class="col-sm-9">
-		<div class="form-control-static"><pre>
+		<div class="form-control-static"><pre class="uoj-pre bg-light rounded">
 $esc_submission_requirement
 </pre>
 		</div>
@@ -189,7 +186,7 @@ EOD
 <div class="form-group row">
 	<label class="col-sm-3 control-label">其它配置</label>
 	<div class="col-sm-9">
-		<div class="form-control-static"><pre>
+		<div class="form-control-static"><pre class="uoj-pre bg-light rounded">
 $esc_extra_config
 </pre>
 		</div>
@@ -253,9 +250,11 @@ EOD
 			$this->setDisplayer('problem.conf', function($self) {
 				global $info_form;
 				$info_form->printHTML();
-				echo '<div class="top-buffer-md"></div>';
 
-				echo '<table class="table table-bordered table-hover table-striped table-text-center">';
+				echo '<hr class="my-3">';
+
+				echo '<table class="table table-bordered text-center caption-top">';
+				echo '<caption>problem.conf</caption>';
 				echo '<thead>';
 				echo '<tr>';
 				echo '<th>key</th>';
@@ -272,7 +271,7 @@ EOD
 					} elseif ($info['status'] == 'danger') {
 						echo '<tr class="text-danger">';
 						echo '<td>', htmlspecialchars($key), '</td>';
-						echo '<td>', htmlspecialchars($info['val']), ' <span class="glyphicon glyphicon-remove"></span>', '</td>';
+						echo '<td>', htmlspecialchars($info['val']), ' <span class="bi bi-x-large"></span>', '</td>';
 						echo '</tr>';
 					}
 				}
@@ -322,9 +321,10 @@ EOD
 		}
 	}
 
+	$problem_conf = getUOJConf("$data_dir/problem.conf");
+
 	function getDataDisplayer() {
-		global $data_dir;
-		global $problem;
+		global $data_dir, $problem, $problem_conf;
 
 		$allow_files = array_flip(array_filter(scandir($data_dir), function($x) {
 			return $x !== '.' && $x !== '..';
@@ -346,11 +346,13 @@ EOD
 			};
 		};
 
-		$problem_conf = getUOJConf("$data_dir/problem.conf");
 		if ($problem_conf === -1) {
 			return (new DataDisplayer())->setDisplayer('problem.conf', function() {
 				global $info_form;
 				$info_form->printHTML();
+				
+				echo '<hr class="my-3">';
+
 				echoFileNotFound('problem.conf');
 			});
 		}
@@ -358,7 +360,10 @@ EOD
 			return (new DataDisplayer())->setDisplayer('problem.conf', function() {
 				global $info_form;
 				$info_form->printHTML();
-				echo '<h4 class="text-danger">problem.conf 格式有误</h4>';
+				
+				echo '<hr class="my-3">';
+
+				echo '<div class="fw-bold text-danger">problem.conf 文件格式有误</div>';
 				echoFilePre('problem.conf');
 			});
 		}
@@ -435,7 +440,7 @@ EOD
 			if (!isset($problem_conf['interaction_mode'])) {
 				if (isset($problem_conf['use_builtin_checker'])) {
 					$data_disp->addDisplayer('checker', function($self) {
-						echo '<h4>use builtin checker : ', $self->problem_conf['use_builtin_checker']['val'], '</h4>';
+						echo '<h5>use builtin checker : ', $self->problem_conf['use_builtin_checker']['val'], '</h5>';
 					});
 				} else {
 					$data_disp->addDisplayer('checker', $getDisplaySrcFunc('chk'));
@@ -469,7 +474,6 @@ EOD
 	$hackable_form->handle = function() {
 		global $problem;
 		$problem['hackable'] = !$problem['hackable'];
-		//$problem['hackable'] = 0;
 		$ret = dataSyncProblemData($problem);
 		if ($ret) {
 			becomeMsgPage('<div>' . $ret . '</div><a href="/problem/'.$problem['id'].'/manage/data">返回</a>');
@@ -478,8 +482,8 @@ EOD
 		$hackable = $problem['hackable'] ? 1 : 0;
 		DB::query("update problems set hackable = $hackable where id = ${problem['id']}");
 	};
-	$hackable_form->submit_button_config['class_str'] = 'btn btn-warning btn-block';
-	$hackable_form->submit_button_config['text'] = $problem['hackable'] ? '禁止使用hack' : '允许使用hack';
+	$hackable_form->submit_button_config['class_str'] = 'btn btn-warning d-block w-100';
+	$hackable_form->submit_button_config['text'] = $problem['hackable'] ? '禁用 Hack 功能' : '启用 Hack 功能';
 	$hackable_form->submit_button_config['smart_confirm'] = '';
 
 	$data_form = new UOJForm('data');
@@ -491,7 +495,7 @@ EOD
 			becomeMsgPage('<div>' . $ret . '</div><a href="/problem/'.$problem['id'].'/manage/data">返回</a>');
 		}
 	};
-	$data_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
+	$data_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
 	$data_form->submit_button_config['text'] = '检验配置并同步数据';
 	$data_form->submit_button_config['smart_confirm'] = '';
 	
@@ -500,7 +504,7 @@ EOD
 		global $problem;
 		dataClearProblemData($problem);
 	};
-	$clear_data_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
+	$clear_data_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
 	$clear_data_form->submit_button_config['text'] = '清空题目数据';
 	$clear_data_form->submit_button_config['smart_confirm'] = '';
 
@@ -510,7 +514,7 @@ EOD
 		rejudgeProblem($problem);
 	};
 	$rejudge_form->succ_href = "/submissions?problem_id={$problem['id']}";
-	$rejudge_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
+	$rejudge_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
 	$rejudge_form->submit_button_config['text'] = '重测该题';
 	$rejudge_form->submit_button_config['smart_confirm'] = '';
 	
@@ -520,7 +524,7 @@ EOD
 		rejudgeProblemGe97($problem);
 	};
 	$rejudgege97_form->succ_href = "/submissions?problem_id={$problem['id']}";
-	$rejudgege97_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
+	$rejudgege97_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
 	$rejudgege97_form->submit_button_config['text'] = '重测 >=97 的程序';
 	$rejudgege97_form->submit_button_config['smart_confirm'] = '';
 	
@@ -560,7 +564,7 @@ EOD
 		$esc_config = DB::escape(json_encode($config));
 		DB::query("update problems set extra_config = '$esc_config' where id = '{$problem['id']}'");
 	};
-	$view_type_form->submit_button_config['class_str'] = 'btn btn-warning btn-block top-buffer-sm';
+	$view_type_form->submit_button_config['class_str'] = 'btn btn-warning d-block w-100 mt-2';
 	
 	$solution_view_type_form = new UOJForm('solution_view_type');
 	$solution_view_type_form->addVSelect('view_solution_type',
@@ -587,7 +591,7 @@ EOD
 		$esc_config = DB::escape(json_encode($config));
 		DB::query("update problems set extra_config = '$esc_config' where id = '{$problem['id']}'");
 	};
-	$solution_view_type_form->submit_button_config['class_str'] = 'btn btn-warning btn-block top-buffer-sm';
+	$solution_view_type_form->submit_button_config['class_str'] = 'btn btn-warning d-block w-100 mt-2';
 
 	$difficulty_form = new UOJForm('difficulty');
 	$difficulty_form->addVInput('difficulty', 'text', '难度系数', $problem_extra_config['difficulty'],
@@ -605,7 +609,7 @@ EOD
 		$esc_config = DB::escape(json_encode($config));
 		DB::query("update problems set extra_config = '$esc_config' where id = '{$problem['id']}'");
 	};
-	$difficulty_form->submit_button_config['class_str'] = 'btn btn-warning btn-block top-buffer-sm';
+	$difficulty_form->submit_button_config['class_str'] = 'btn btn-warning d-block w-100 mt-2';
 
 	if ($problem['hackable']) {
 		$test_std_form = new UOJForm('test_std');
@@ -614,7 +618,7 @@ EOD
 			
 			$user_std = queryUser('std');
 			if (!$user_std) {
-				becomeMsgPage('请建立"std"账号。');
+				becomeMsgPage('请建立 std 账号。');
 			}
 			
 			$requirement = json_decode($problem['submission_requirement'], true);
@@ -655,7 +659,7 @@ EOD
 			DB::insert("insert into submissions (problem_id, submit_time, submitter, content, language, tot_size, status, result, is_hidden) values ({$problem['id']}, now(), '{$user_std['username']}', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json', $is_hidden)");
 		};
 		$test_std_form->succ_href = "/submissions?problem_id={$problem['id']}";
-		$test_std_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
+		$test_std_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
 		$test_std_form->submit_button_config['text'] = '检验数据正确性';
 		$test_std_form->runAtServer();
 	}
@@ -670,224 +674,291 @@ EOD
 	$rejudgege97_form->runAtServer();
 	$info_form->runAtServer();
 	?>
-<?php
-	$REQUIRE_LIB['dialog'] = '';
-	?>
+
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - 数据 - 题目管理') ?>
-<h1 class="page-header" align="center">#<?=$problem['id']?> : <?=$problem['title']?> 管理</h1>
-<ul class="nav nav-tabs" role="tablist">
-	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">编辑</a></li>
-	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/managers" role="tab">管理者</a></li>
-	<li class="nav-item"><a class="nav-link active" href="/problem/<?= $problem['id'] ?>/manage/data" role="tab">数据</a></li>
-	<li class="nav-item"><a class="nav-link" href="/problem/<?=$problem['id']?>" role="tab">返回</a></li>
-</ul>
 
 <div class="row">
-	<div class="col-md-10 top-buffer-sm">
-		<div class="row">
-			<div class="col-md-3 top-buffer-sm" id="div-file_list">
-				<ul class="nav nav-pills flex-column">
-					<?php $data_disp->echoDataFilesList('problem.conf'); ?>
-				</ul>
-			</div>
-			<div class="col-md-9 top-buffer-sm" id="div-file_content">
-				<?php $data_disp->displayFile('problem.conf'); ?>
-			</div>
-			<script type="text/javascript">
-				curFileName = '';
-				$('#div-file_list a').click(function(e) {
-					$('#div-file_content').html('<h3>Loading...</h3>');
-					$(this).tab('show');
+<!-- left col -->
+<div class="col">
 
-					var fileName = $(this).text();
-					curFileName = fileName;
-					$.get('/problem/<?= $problem['id'] ?>/manage/data', {
-							display_file: '',
-							file_name: fileName
-						},
-						function(data) {
-							if (curFileName != fileName) {
-								return;
-							}
-							$('#div-file_content').html(data);
-						},
-						'html'
-					);
-					return false;
-				});
-			</script>
-		</div>
-	</div>
-	<div class="col-md-2 top-buffer-sm">
-		<div class="top-buffer-md">
-			<?php if ($problem['hackable']): ?>
-				<span class="glyphicon glyphicon-ok"></span> hack功能已启用
-			<?php else: ?>
-				<span class="glyphicon glyphicon-remove"></span> hack功能已禁止
-			<?php endif ?>
-			<?php $hackable_form->printHTML() ?>
-		</div>
-		<div class="top-buffer-md">
-		<?php if ($problem['hackable']): ?>
-			<?php $test_std_form->printHTML() ?>
-		<?php endif ?>
-		</div>
-		<div class="top-buffer-md">
-			<button id="button-display_view_type" type="button" class="btn btn-primary btn-block" onclick="$('#div-view_type').toggle('fast');">提交记录可视权限</button>
-			<div class="top-buffer-sm" id="div-view_type" style="display:none; padding-left:5px; padding-right:5px;">
-				<?php $view_type_form->printHTML(); ?>
-			</div>
-		</div>
-		<div class="top-buffer-md">
-			<button id="button-solution_view_type" type="button" class="btn btn-primary btn-block" onclick="$('#div-solution_view_type').toggle('fast');">题解可视权限</button>
-			<div class="top-buffer-sm" id="div-solution_view_type" style="display:none; padding-left:5px; padding-right:5px;">
-				<?php $solution_view_type_form->printHTML(); ?>
-			</div>
-		</div>
-		<div class="top-buffer-md">
-			<?php $data_form->printHTML(); ?>
-		</div>
-		<div class="top-buffer-md">
-			<?php $clear_data_form->printHTML(); ?>
-		</div>
-		<div class="top-buffer-md">
-			<?php $rejudge_form->printHTML(); ?>
-		</div>
-		<div class="top-buffer-md">
-			<?php $rejudgege97_form->printHTML(); ?>
-		</div>
+<h1 class="h2">
+	#<?=$problem['id']?>. <?=$problem['title']?> 管理
+</h1>
 
-		<div class="top-buffer-md">
-			<button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#UploadDataModal">上传数据</button>
-		</div>
-		<div class="top-buffer-md">
-			<button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#ProblemSettingsFileModal">试题配置</button>
-		</div>
+<ul class="nav nav-pills my-3" role="tablist">
+	<li class="nav-item">
+		<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
+			题面
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/managers" role="tab">
+			管理者
+		</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link active" href="/problem/<?= $problem['id'] ?>/manage/data" role="tab">
+			数据
+		</a>
+	</li>
+</ul>
 
-		<div class="top-buffer-md">
-			<button id="button-difficulty" type="button" class="btn btn-block btn-primary" onclick="$('#div-difficulty').toggle('fast');">难度系数</button>
-			<div class="top-buffer-sm" id="div-difficulty" style="display:none; padding-left:5px; padding-right:5px;">
-				<?php $difficulty_form->printHTML(); ?>
-			</div>
-		</div>
+<div class="card">
+	<div class="card-header" id="div-file_list">
+		<ul class="nav nav-tabs card-header-tabs">
+			<?php $data_disp->echoDataFilesList('problem.conf'); ?>
+		</ul>
 	</div>
 
-	<div class="modal fade" id="UploadDataModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  		<div class="modal-dialog">
-    			<div class="modal-content">
-      				<div class="modal-header">
-						<h4 class="modal-title" id="myModalLabel">上传数据</h4>
-        				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-      				</div>
-      				<div class="modal-body">
-        				<form action="" method="post" enctype="multipart/form-data" role="form">
-							<div class="form-group">
-									<label for="exampleInputFile">上传zip文件</label>
-									<input type="file" name="problem_data_file" id="problem_data_file">
-									<p class="help-block">说明：请将所有数据放置于压缩包根目录内。若压缩包内仅存在文件夹而不存在文件，则会将这些一级子文件夹下的内容移动到根目录下，然后这些一级子文件夹删除；若这些子文件夹内存在同名文件，则会发生随机替换，仅保留一个副本。</p>
-							</div>
-							<input type="hidden" name="problem_data_file_submit" value="submit">
-      				</div>
-      				<div class="modal-footer">
-						<button type="submit" class="btn btn-success">上传</button>
-						</form>
-        				<button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
-      				</div>
-    			</div>
-  		</div>
+	<div class="card-body" id="div-file_content">
+		<?php $data_disp->displayFile('problem.conf'); ?>
 	</div>
 
-	<div class="modal fade" id="ProblemSettingsFileModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  		<div class="modal-dialog">
-    			<div class="modal-content">
-      				<div class="modal-header">
-						<h4 class="modal-title" id="myModalLabel">试题配置</h4>
-        				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-      				</div>
-      				<div class="modal-body">
-        				<form class="form-horizontal" action="" method="post" role="form">
-        					<div class="form-group row">
-    							<label for="use_builtin_checker" class="col-sm-5 control-label">比对函数</label>
-    							<div class="col-sm-7">
-								<select class="form-control" id="use_builtin_checker" name="use_builtin_checker">
-  									<option value="ncmp">ncmp: 整数序列</option>
-  									<option value="wcmp">wcmp: 字符串序列</option>
-									<option value="lcmp">lcmp: 多行数据（忽略行内与行末的多余空格，同时忽略文末回车）</option>
-									<option value="fcmp">fcmp: 多行数据（不忽略行末空格，但忽略文末回车）</option>
-									<option value="rcmp4">rcmp4: 浮点数序列（误差不超过 1e-4）</option>
-									<option value="rcmp6">rcmp6: 浮点数序列（误差不超过 1e-6）</option>
-									<option value="rcmp9">rcmp9: 浮点数序列（误差不超过 1e-9）</option>
-									<option value="yesno">yesno: Yes、No（不区分大小写）</option>
-									<option value="uncmp">uncmp: 整数集合</option>
-									<option value="bcmp">bcmp: 二进制文件</option>
-									<option value="ownchk">自定义校验器（需上传 chk.cpp）</option>
-								</select>
-      								<!--<input type="hidden" class="form-control" id="use_builtin_checker" name="use_builtin_checker" placeholder="比对函数">-->
-    							</div>
-  							</div>
-  							<div class="form-group row">
-    							<label for="n_tests" class="col-sm-5 control-label">n_tests</label>
-    							<div class="col-sm-7">
-      								<input type="text" class="form-control" id="n_tests" name="n_tests" placeholder="数据点个数">
-    							</div>
-  							</div>
-  							<div class="form-group row">
-    							<label for="n_ex_tests" class="col-sm-5 control-label">n_ex_tests</label>
-    							<div class="col-sm-7">
-      								<input type="text" class="form-control" id="n_ex_tests" name="n_ex_tests" placeholder="额外数据点个数">
-    							</div>
-  							</div>
-  							<div class="form-group row">
-    							<label for="n_sample_tests" class="col-sm-5 control-label">n_sample_tests</label>
-    							<div class="col-sm-7">
-      								<input type="text" class="form-control" id="n_sample_tests" name="n_sample_tests" placeholder="样例测试点个数">
-    							</div>
-  							</div>
-  							<div class="form-group row">
-    							<label for="input_pre" class="col-sm-5 control-label">input_pre</label>
-    							<div class="col-sm-7">
-      								<input type="text" class="form-control" id="input_pre" name="input_pre" placeholder="输入文件名称">
-    							</div>
-  							</div>
-  							<div class="form-group row">
-    							<label for="input_suf" class="col-sm-5 control-label">input_suf</label>
-    							<div class="col-sm-7">
-      								<input type="text" class="form-control" id="input_suf" name="input_suf" placeholder="输入文件后缀">
-    							</div>
-  							</div>
-  							<div class="form-group row">
-    							<label for="output_pre" class="col-sm-5 control-label">output_pre</label>
-    							<div class="col-sm-7">
-      								<input type="text" class="form-control" id="output_pre" name="output_pre" placeholder="输出文件名称">
-    							</div>
-  							</div>
-  							<div class="form-group row">
-    							<label for="output_suf" class="col-sm-5 control-label">output_suf</label>
-    							<div class="col-sm-7">
-      								<input type="text" class="form-control" id="output_suf" name="output_suf" placeholder="输出文件后缀">
-    							</div>
-  							</div>
-  							<div class="form-group row">
-    							<label for="time_limit" class="col-sm-5 control-label">time_limit</label>
-    							<div class="col-sm-7">
-      								<input type="text" class="form-control" id="time_limit" name="time_limit" placeholder="时间限制（不能为小数！）">
-    							</div>
-  							</div>
-  							<div class="form-group row">
-    							<label for="memory_limit" class="col-sm-5 control-label">memory_limit</label>
-    							<div class="col-sm-7">
-      								<input type="text" class="form-control" id="memory_limit" name="memory_limit" placeholder="内存限制">
-    							</div>
-  							</div>
-							<input type="hidden" name="problem_settings_file_submit" value="submit">
-      				</div>
-      				<div class="modal-footer">
-						<button type="submit" class="btn btn-success">确定</button>
-						</form>
-        				<button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
-      				</div>
-    			</div>
-  		</div>
+	<script type="text/javascript">
+		curFileName = '';
+		$('#div-file_list a').click(function(e) {
+			$('#div-file_content').html('<h3>Loading...</h3>');
+			$(this).tab('show');
+
+			var fileName = $(this).text();
+			curFileName = fileName;
+			$.get('/problem/<?= $problem['id'] ?>/manage/data', {
+					display_file: '',
+					file_name: fileName
+				},
+				function(data) {
+					if (curFileName != fileName) {
+						return;
+					}
+					$('#div-file_content').html(data);
+				},
+				'html'
+			);
+			return false;
+		});
+	</script>
+</div>
+
+
+</div>
+
+<!-- right col -->
+<aside class="col-12 col-lg-3 mt-3 mt-lg-0 d-flex flex-column">
+
+<div class="card card-default mt-3 mt-lg-0 mb-2 order-2 order-lg-1">
+	<ul class="nav nav-pills nav-fill flex-column" role="tablist">
+		<li class="nav-item text-start">
+			<a href="/problem/<?= $problem['id'] ?>" class="nav-link" role="tab">
+				<i class="bi bi-journal-text"></i>
+				<?= UOJLocale::get('problems::statement') ?>
+			</a>
+		</li>
+		<li class="nav-item text-start">
+			<a href="/problem/<?= $problem['id'] ?>/solutions" class="nav-link" role="tab">
+				<i class="bi bi-journal-bookmark"></i>
+				<?= UOJLocale::get('problems::solutions') ?>
+			</a>
+		</li>
+		<li class="nav-item text-start">
+			<a class="nav-link" href="/problem/<?= $problem['id'] ?>/statistics">
+				<i class="bi bi-graph-up"></i>
+				<?= UOJLocale::get('problems::statistics') ?>
+			</a>
+		</li>
+		<li class="nav-item text-start">
+			<a class="nav-link active" href="#" role="tab">
+				<i class="bi bi-sliders"></i>
+				<?= UOJLocale::get('problems::manage') ?>
+			</a>
+		</li>
+	</ul>
+	<div class="card-footer bg-transparent">
+		评价：<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
 	</div>
 </div>
+
+<div class="order-1 order-lg-2">
+	<div>
+		<?php if ($problem['hackable']): ?>
+			<i class="bi bi-check-lg text-success"></i> Hack 功能已启用
+		<?php else: ?>
+			<i class="bi bi-x-lg text-danger"></i> Hack 功能已禁用
+		<?php endif ?>
+		<?php $hackable_form->printHTML() ?>
+	</div>
+	<?php if ($problem['hackable']): ?>
+	<div class="mt-2">
+		<?php $test_std_form->printHTML() ?>
+	</div>
+	<?php endif ?>
+	<div class="mt-2">
+		<button id="button-display_view_type" type="button" class="btn btn-primary d-block w-100" onclick="$('#div-view_type').toggle('fast');">提交记录可视权限</button>
+		<div class="mt-2" id="div-view_type" style="display:none; padding-left:5px; padding-right:5px;">
+			<?php $view_type_form->printHTML(); ?>
+		</div>
+	</div>
+	<div class="mt-2">
+		<button id="button-solution_view_type" type="button" class="btn btn-primary d-block w-100" onclick="$('#div-solution_view_type').toggle('fast');">题解可视权限</button>
+		<div class="mt-2" id="div-solution_view_type" style="display:none; padding-left:5px; padding-right:5px;">
+			<?php $solution_view_type_form->printHTML(); ?>
+		</div>
+	</div>
+	<div class="mt-2">
+		<?php $data_form->printHTML(); ?>
+	</div>
+	<div class="mt-2">
+		<?php $clear_data_form->printHTML(); ?>
+	</div>
+	<div class="mt-2">
+		<?php $rejudge_form->printHTML(); ?>
+	</div>
+	<div class="mt-2">
+		<?php $rejudgege97_form->printHTML(); ?>
+	</div>
+
+	<div class="mt-2">
+		<button type="button" class="btn d-block w-100 btn-primary" data-bs-toggle="modal" data-bs-target="#UploadDataModal">上传数据</button>
+	</div>
+	<div class="mt-2">
+		<button type="button" class="btn d-block w-100 btn-primary" data-bs-toggle="modal" data-bs-target="#ProblemSettingsFileModal">试题配置</button>
+	</div>
+
+	<div class="mt-2">
+		<button id="button-difficulty" type="button" class="btn d-block w-100 btn-primary" onclick="$('#div-difficulty').toggle('fast');">难度系数</button>
+		<div class="mt-2" id="div-difficulty" style="display:none; padding-left:5px; padding-right:5px;">
+			<?php $difficulty_form->printHTML(); ?>
+		</div>
+	</div>
+</div>
+</aside>
+
+</div>
+
+<div class="modal fade" id="UploadDataModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="myModalLabel">上传数据</h4>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form action="" method="post" enctype="multipart/form-data" role="form">
+						<div class="form-group">
+								<label for="exampleInputFile">上传zip文件</label>
+								<input type="file" name="problem_data_file" id="problem_data_file">
+								<p class="help-block">说明：请将所有数据放置于压缩包根目录内。若压缩包内仅存在文件夹而不存在文件，则会将这些一级子文件夹下的内容移动到根目录下，然后这些一级子文件夹删除；若这些子文件夹内存在同名文件，则会发生随机替换，仅保留一个副本。</p>
+						</div>
+						<input type="hidden" name="problem_data_file_submit" value="submit">
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-success">上传</button>
+					</form>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+				</div>
+			</div>
+	</div>
+</div>
+
+<div class="modal fade" id="ProblemSettingsFileModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="myModalLabel">试题配置</h4>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" action="" method="post" role="form">
+						<div class="form-group row">
+							<label for="use_builtin_checker" class="col-sm-5 control-label">比对函数</label>
+							<div class="col-sm-7">
+							<?php $checker_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'use_builtin_checker', 'ownchk') : ""; ?>
+							<select class="form-select" id="use_builtin_checker" name="use_builtin_checker">
+								<option value="ncmp" <?= $checker_value == "ncmp" ? 'selected' : '' ?>>ncmp: 整数序列</option>
+								<option value="wcmp" <?= $checker_value == "wcmp" ? 'selected' : '' ?>>wcmp: 字符串序列</option>
+								<option value="lcmp" <?= $checker_value == "lcmp" ? 'selected' : '' ?>>lcmp: 多行数据（忽略行内与行末的多余空格，同时忽略文末回车）</option>
+								<option value="fcmp" <?= $checker_value == "fcmp" ? 'selected' : '' ?>>fcmp: 多行数据（不忽略行末空格，但忽略文末回车）</option>
+								<option value="rcmp4" <?= $checker_value == "rcmp4" ? 'selected' : '' ?>>rcmp4: 浮点数序列（误差不超过 1e-4）</option>
+								<option value="rcmp6" <?= $checker_value == "rcmp6" ? 'selected' : '' ?>>rcmp6: 浮点数序列（误差不超过 1e-6）</option>
+								<option value="rcmp9" <?= $checker_value == "rcmp9" ? 'selected' : '' ?>>rcmp9: 浮点数序列（误差不超过 1e-9）</option>
+								<option value="yesno" <?= $checker_value == "yesno" ? 'selected' : '' ?>>yesno: Yes、No（不区分大小写）</option>
+								<option value="uncmp" <?= $checker_value == "uncmp" ? 'selected' : '' ?>>uncmp: 整数集合</option>
+								<option value="bcmp" <?= $checker_value == "bcmp" ? 'selected' : '' ?>>bcmp: 二进制文件</option>
+								<option value="ownchk" <?= $checker_value == "ownchk" ? 'selected' : '' ?>>自定义校验器（需上传 chk.cpp）</option>
+							</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="n_tests" class="col-sm-5 control-label">n_tests</label>
+							<div class="col-sm-7">
+								<?php $n_tests_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'n_tests', '') : ""; ?>
+								<input type="number" class="form-control" id="n_tests" name="n_tests" placeholder="数据点个数（必填）" value="<?= $n_tests_value ?>">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="n_ex_tests" class="col-sm-5 control-label">n_ex_tests</label>
+							<div class="col-sm-7">
+								<?php $n_ex_tests_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'n_ex_tests', 0) : ""; ?>
+								<input type="number" class="form-control" id="n_ex_tests" name="n_ex_tests" placeholder="额外数据点个数（默认为 0）" value="<?= $n_ex_tests_value ?>">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="n_sample_tests" class="col-sm-5 control-label">n_sample_tests</label>
+							<div class="col-sm-7">
+								<?php $n_sample_tests_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'n_sample_tests', 0) : ""; ?>
+								<input type="number" class="form-control" id="n_sample_tests" name="n_sample_tests" placeholder="样例测试点个数（默认为 0）" value="<?= $n_sample_tests_value ?>">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="input_pre" class="col-sm-5 control-label">input_pre</label>
+							<div class="col-sm-7">
+								<?php $input_pre_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'input_pre', 'input') : ""; ?>
+								<input type="text" class="form-control" id="input_pre" name="input_pre" placeholder="输入文件名称（默认为 input）" value="<?= $input_pre_value ?>">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="input_suf" class="col-sm-5 control-label">input_suf</label>
+							<div class="col-sm-7">
+								<?php $input_suf_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'input_suf', 'txt') : ""; ?>
+								<input type="text" class="form-control" id="input_suf" name="input_suf" placeholder="输入文件后缀（默认为 txt）" value="<?= $input_suf_value ?>">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="output_pre" class="col-sm-5 control-label">output_pre</label>
+							<div class="col-sm-7">
+								<?php $output_pre_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'output_pre', 'output') : ""; ?>
+								<input type="text" class="form-control" id="output_pre" name="output_pre" placeholder="输出文件名称（默认为 output）" value="<?= $output_pre_value ?>">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="output_suf" class="col-sm-5 control-label">output_suf</label>
+							<div class="col-sm-7">
+								<?php $output_suf_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'output_suf', 'txt') : ""; ?>
+								<input type="text" class="form-control" id="output_suf" name="output_suf" placeholder="输出文件后缀（默认为 txt）" value="<?= $output_suf_value ?>">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="time_limit" class="col-sm-5 control-label">time_limit</label>
+							<div class="col-sm-7">
+								<?php $time_limit_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'time_limit', 1) : ""; ?>
+								<input type="number" class="form-control" id="time_limit" name="time_limit" placeholder="时间限制（不能填写小数，默认为 1s）" value="<?= $time_limit_value ?>">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="memory_limit" class="col-sm-5 control-label">memory_limit</label>
+							<div class="col-sm-7">
+								<?php $memory_limit_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'memory_limit', 256) : ""; ?>
+								<input type="number" class="form-control" id="memory_limit" name="memory_limit" placeholder="内存限制（默认为 256 MB）" value="<?= $memory_limit_value ?>">
+							</div>
+						</div>
+						<input type="hidden" name="problem_settings_file_submit" value="submit">
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-success">确定</button>
+					</form>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+				</div>
+			</div>
+	</div>
+</div>
+
 <?php echoUOJPageFooter() ?>

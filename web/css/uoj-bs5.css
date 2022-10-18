@@ -8,6 +8,10 @@ pre {
 	tab-size: 4;
 }
 
+.uoj-pre {
+	padding: 1em;
+}
+
 .uoj-username,
 .uoj-score {
 	font-weight: 800;
