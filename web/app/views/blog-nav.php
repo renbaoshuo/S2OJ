@@ -134,7 +134,7 @@ mb-4" role="navigation">
 							</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="<?= HTML::url('/user/'.Auth::id().'system_msg') ?>">
+							<a class="dropdown-item" href="<?= HTML::url('/user/'.Auth::id().'/system_msg') ?>">
 								<?= UOJLocale::get('system message') ?>
 								<?php if ($new_system_msg_num): ?>
 								<span class="badge bg-danger rounded-pill">
