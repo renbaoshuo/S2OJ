@@ -275,21 +275,24 @@ EOD;
 	</div>
 </div>
 
-<?php if (isset($add_new_solution_form)): ?>
 <div class="card card-default mb-2">
 	<div class="card-header bg-transparent fw-bold">
 		增加题解
 	</div>
 	<div class="card-body">
-		<?php $add_new_solution_form->printHTML(); ?>
+		<?php if (isset($add_new_solution_form)): ?>
+			<?php $add_new_solution_form->printHTML(); ?>
+		<?php else: ?>
+			您当前无法为本题新增题解。
+		<?php endif ?>
 	</div>
 	<div class="card-footer bg-transparent">
-		<a class="text-decoration-none" href="<?= HTML::blog_url(Auth::id(), '/post/new/write?title=' . urlencode('【题解】#' . $problem['id'] . '. ' . $problem['title']) . '&is_hidden=0') ?>">
+		<a target="_blank" class="text-decoration-none" href="<?= HTML::blog_url(Auth::id(), '/post/new/write?title=' . urlencode('【题解】#' . $problem['id'] . '. ' . $problem['title']) . '&is_hidden=0&add_solution_for=' . $problem['id']) ?>">
 			快速新建文章
 		</a>
+		<div class="small text-muted mt-1">发布文章后，请返回本页输入博客 ID</div>
 	</div>
 </div>
-<?php endif ?>
 
 <?php uojIncludeView('sidebar', array()); ?>
 
