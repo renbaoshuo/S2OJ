@@ -20,16 +20,16 @@ class UOJMarkdown extends ParsedownMath {
 
 	// https://github.com/taufik-nurrohman/parsedown-extra-plugin/blob/1653418c5a9cf5277cd28b0b23ba2d95d18e9bc4/ParsedownExtraPlugin.php#L347-L358
     protected function doGetContent($Element) {
-        if (isset($Element['text'])) {
-            return $Element['text'];
-        }
-        if (isset($Element['rawHtml'])) {
-            return $Element['rawHtml'];
-        }
-        if (isset($Element['handler']['argument'])) {
-            return implode("\n", (array) $Element['handler']['argument']);
-        }
-        return null;
+    	if (isset($Element['text'])) {
+    		return $Element['text'];
+    	}
+    	if (isset($Element['rawHtml'])) {
+    		return $Element['rawHtml'];
+    	}
+    	if (isset($Element['handler']['argument'])) {
+    		return implode("\n", (array) $Element['handler']['argument']);
+    	}
+    	return null;
     }
 
 	// https://github.com/taufik-nurrohman/parsedown-extra-plugin/blob/1653418c5a9cf5277cd28b0b23ba2d95d18e9bc4/ParsedownExtraPlugin.php#L369-L378
@@ -54,25 +54,25 @@ class UOJMarkdown extends ParsedownMath {
 	// https://gist.github.com/ShNURoK42/b5ce8baa570975db487c
     protected function inlineUserMention($Excerpt) {
     	if (preg_match('/^@([^\s]+)/', $Excerpt['text'], $matches)) {
-			if (validateUsername($matches[1]) && ($user = queryUser($matches[1]))) {
-				return [
-					'extent' => strlen($matches[0]),
-					'element' => [
-						'name' => 'a',
-						'text' => '@' . $user['username'],
-						'attributes' => [
-							'href' => '/user/' . $user['username'],
-							'class' => 'uoj-username',
-							'data-realname' => $user['realname'],
-						],
-					],
-				];
-			}
+    		if (validateUsername($matches[1]) && ($user = queryUser($matches[1]))) {
+    			return [
+    				'extent' => strlen($matches[0]),
+    				'element' => [
+    					'name' => 'a',
+    					'text' => '@' . $user['username'],
+    					'attributes' => [
+    						'href' => '/user/' . $user['username'],
+    						'class' => 'uoj-username',
+    						'data-realname' => $user['realname'],
+    					],
+    				],
+    			];
+    		}
 
-			return [
-				'extent' => strlen($matches[0]),
-				'markup' => $matches[0],
-			];
+    		return [
+    			'extent' => strlen($matches[0]),
+    			'markup' => $matches[0],
+    		];
     	}
     }
 }
