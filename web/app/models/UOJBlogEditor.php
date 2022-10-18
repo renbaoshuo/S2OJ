@@ -108,15 +108,7 @@ class UOJBlogEditor {
 		
 		if ($this->show_editor) {
 			if ($this->type == 'blog') {
-				$content_md = $_POST[$this->name . '_content_md'];
-				$dom = new DOMDocument;
-				$dom->loadHTML(mb_convert_encoding($parsedown->text($this->post_data['content_md']), 'HTML-ENTITIES', 'UTF-8'));
-				$elements = $dom->getElementsByTagName('table');
-				foreach ($elements as $element) {
-					$element->setAttribute('class',
-						$element->getAttribute('class') . ' table table-bordered');
-				}
-				$this->post_data['content'] = $dom->saveHTML();
+				$this->post_data['content'] = $parsedown->text($this->post_data['content_md']);
 
 				if (preg_match('/^.*<!--.*readmore.*-->.*$/m', $this->post_data['content'], $matches, PREG_OFFSET_CAPTURE)) {
 					$content_less = substr($this->post_data['content'], 0, $matches[0][1]);

@@ -193,7 +193,7 @@ class HTML {
 	}
 
 	public static function parsedown() {
-		return new ParsedownMath([
+		return new UOJMarkdown([
 			'math' => [
 				'enabled' => true,
 				'matchSingleDollar' => true
