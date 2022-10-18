@@ -108,7 +108,13 @@ d-inline-block
 <?php endif ?>
 		">
 			<label for="input-status" class="control-label"><?= UOJLocale::get('problems::result') ?>:</label>
-			<select class="form-control input-sm" id="input-status" name="status">
+			<select class="input-sm
+			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+				form-select
+			<?php else: ?>
+				form-control
+			<?php endif ?>
+			" id="input-status" name="status">
 				<option value=""<?= $selected_all?>>All</option>
 				<option value="1"<?= $selected_succ ?>>Success!</option>
 				<option value="2"<?= $selected_fail ?>>Failed.</option>
