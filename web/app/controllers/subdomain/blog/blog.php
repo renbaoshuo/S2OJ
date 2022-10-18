@@ -62,14 +62,15 @@
 		$page = floor($rank / 20) + 1;
 		
 		$uri = getLongTablePageUri($page) . '#' . "comment-{$comment_id}";
-		
+		$user_link = getUserLink($myUser['username']);
+
 		foreach ($referrers as $referrer) {
-			$content = '有人在博客 ' . $blog['title'] . ' 的评论里提到你：<a href="' . $uri . '">点击此处查看</a>';
+			$content = $user_link . ' 在博客 ' . $blog['title'] . ' 的评论里提到你：<a href="' . $uri . '">点击此处查看</a>';
 			sendSystemMsg($referrer, '有人提到你', $content);
 		}
 		
 		if ($blog['poster'] !== $myUser['username']) {
-			$content = '有人回复了您的博客 ' . $blog['title'] . ' ：<a href="' . $uri . '">点击此处查看</a>';
+			$content = $user_link . ' 回复了您的博客 ' . $blog['title'] . ' ：<a href="' . $uri . '">点击此处查看</a>';
 			sendSystemMsg($blog['poster'], '博客新回复通知', $content);
 		}
 		
