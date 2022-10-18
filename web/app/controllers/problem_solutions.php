@@ -95,7 +95,7 @@ EOD;
 					return '博客不存在';
 				}
 
-				if (!hasProblemPermission($myUser, $problem)) {
+				if (!isSuperUser($myUser)) {
 					if ($blog['poster'] != $myUser['username']) {
 						if ($blog['is_hidden']) {
 							return '博客不存在';
@@ -103,7 +103,9 @@ EOD;
 
 						return '只能提交本人撰写的博客';
 					}
+				}
 
+				if (!hasProblemPermission($myUser, $problem)) {
 					if ($blog['is_hidden']) {
 						return '只能提交公开的博客';
 					}
@@ -138,9 +140,13 @@ EOD;
 	$pag_config['col_names'] = array('blog_id', 'content', 'poster', 'post_time', 'zan', 'is_hidden');
 	$pag_config['table_name'] = "problems_solutions inner join blogs on problems_solutions.blog_id = blogs.id";
 	$pag_config['cond'] = "problem_id = {$problem['id']}";
+
+	// 根据实际使用需要，题目管理员可以通过题解页面看到其他用户提交的题解，并且即使该题解对应的博客是隐藏状态也会照常显示
+	// 如需仅允许超级管理员查看，请将下一行中 if 语句的条件改为 (!isSuperUser($myUser))
 	if (!hasProblemPermission($myUser, $problem)) {
 		$pag_config['cond'] .= " and (is_hidden = 0 or poster = '{$myUser['username']}')";
 	}
+
 	$pag_config['tail'] = "order by zan desc, post_time desc, id asc";
 	$pag = new Paginator($pag_config);
 
