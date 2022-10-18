@@ -2,7 +2,7 @@
 	requirePHPLib('form');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
-		redirectToLogin();
+		become403Page(UOJLocale::get('need login'));
 	}
 
 	$name = $_GET['image_name'];
