@@ -72,6 +72,16 @@ EOD);
 
 				return '';
 			}, null);
+		$update_profile_form->addVInput('github', 'text', 'GitHub', $user['github'],
+			function($github, &$vdata) {
+				if ($github && !validateGitHubUsername($github)) {
+					return 'GitHub 用户名不合法。';
+				}
+
+				$vdata['github'] = $github;
+
+				return '';
+			}, null);
 		if (isSuperUser($myUser)) {
 			$update_profile_form->addVInput('school', 'text', UOJLocale::get('school'), $user['school'],
 				function($school, &$vdata) {
@@ -117,6 +127,7 @@ EOD);
 		$update_profile_form->handle = function(&$vdata) use ($user, $myUser) {
 			$esc_email = DB::escape($vdata['email']);
 			$esc_qq = DB::escape($vdata['qq']);
+			$esc_github = DB::escape($vdata['github']);
 			$esc_sex = DB::escape($vdata['sex']);
 			$esc_motto = DB::escape($vdata['motto']);
 			$esc_codeforces_handle = DB::escape($vdata['codeforces_handle']);
@@ -127,7 +138,7 @@ EOD);
 				DB::update("UPDATE user_info SET school = '$esc_school' WHERE username = '{$user['username']}'");
 			}
 
-			DB::update("UPDATE user_info SET email = '$esc_email', qq = '$esc_qq', sex = '$esc_sex', motto = '$esc_motto', codeforces_handle = '$esc_codeforces_handle' WHERE username = '{$user['username']}'");
+			DB::update("UPDATE user_info SET email = '$esc_email', qq = '$esc_qq', sex = '$esc_sex', motto = '$esc_motto', codeforces_handle = '$esc_codeforces_handle', github = '$esc_github' WHERE username = '{$user['username']}'");
 		};
 		$update_profile_form->submit_button_config['margin_class'] = 'mt-3';
 		$update_profile_form->submit_button_config['text'] = '更新';
