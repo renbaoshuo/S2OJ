@@ -128,7 +128,7 @@ EOD);
 			$esc_email = DB::escape($vdata['email']);
 			$esc_qq = DB::escape($vdata['qq']);
 			$esc_github = DB::escape($vdata['github']);
-			$esc_sex = DB::escape($vdata['sex']);
+			$esc_sex = DB::escape($_POST['sex']);
 			$esc_motto = DB::escape($vdata['motto']);
 			$esc_codeforces_handle = DB::escape($vdata['codeforces_handle']);
 
