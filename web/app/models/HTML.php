@@ -144,8 +144,10 @@ class HTML {
 	
 	public static function purifier() {
 		$config = HTMLPurifier_Config::createDefault();
-		//$config->set('HTML.Doctype', 'HTML 4.01 Transitional');
-		$config->set('Cache.DefinitionImpl', null);
+		// $config->set('Cache.DefinitionImpl', null);
+		$config->set('HTML.DefinitionID', 'UOJ__HTML::purifier()');
+		$config->set('HTML.DefinitionRev', 1);
+		$config->set('Output.Newline', true);
 		$def = $config->getHTMLDefinition(true);
 		
 		$def->addElement('section', 'Block', 'Flow', 'Common');
@@ -154,6 +156,16 @@ class HTML {
 		$def->addElement('aside',   'Block', 'Flow', 'Common');
 		$def->addElement('header',  'Block', 'Flow', 'Common');
 		$def->addElement('footer',  'Block', 'Flow', 'Common');
+		
+		$extra_allowed_html = [
+			'span' => ['data-realname' => 'Text', 'data-uoj-username' => 'Number'],
+		];
+
+		foreach ($extra_allowed_html as $element => $attributes) {
+			foreach ($attributes as $attribute => $type) {
+				$def->addAttribute($element, $attribute, $type);
+			}
+		}
 		
 		return new HTMLPurifier($config);
 	}
@@ -172,6 +184,7 @@ class HTML {
 			'small' => [],
 			'del' => [],
 			'br' => [],
+			'span' => ['data-realname' => 'Text', 'data-uoj-username' => 'Number'],
 		];
 
 		$config = HTMLPurifier_Config::createDefault();
@@ -181,13 +194,24 @@ class HTML {
 
 		foreach ($allowed_html as $element => $attributes) {
 			$allowed_elements[$element] = true;
-			foreach ($attributes as $attribute => $x) {
+			foreach ($attributes as $attribute => $type) {
 				$allowed_attributes["$element.$attribute"] = true;
 			}
 		}
 
 		$config->set('HTML.AllowedElements', $allowed_elements);
 		$config->set('HTML.AllowedAttributes', $allowed_attributes);
+
+		// $config->set('Cache.DefinitionImpl', null);
+		$config->set('HTML.DefinitionID', 'UOJ__HTML::purifier_inline()');
+		$config->set('HTML.DefinitionRev', 1);
+		$def = $config->getHTMLDefinition(true);
+
+		foreach ($allowed_html as $element => $attributes) {
+			foreach ($attributes as $attribute => $type) {
+				$def->addAttribute($element, $attribute, $type);
+			}
+		}
 
 		return new HTMLPurifier($config);
 	}

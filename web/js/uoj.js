@@ -428,7 +428,7 @@ $(document).ready(function() {
 // highlight
 $.fn.uoj_highlight = function() {
 	return $(this).each(function() {
-		$(this).find("span.uoj-username").each(replaceWithHighlightUsername);
+		$(this).find("span.uoj-username, span[data-uoj-username]").each(replaceWithHighlightUsername);
 		$(this).find(".uoj-honor").uoj_honor();
 		$(this).find(".uoj-testcase").uoj_testcase();
 		$(this).find(".uoj-score").each(function() {

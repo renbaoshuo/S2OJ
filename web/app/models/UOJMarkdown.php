@@ -54,16 +54,16 @@ class UOJMarkdown extends ParsedownMath {
 	// https://gist.github.com/ShNURoK42/b5ce8baa570975db487c
     protected function inlineUserMention($Excerpt) {
     	if (preg_match('/^@([^\s]+)/', $Excerpt['text'], $matches)) {
-    		if (validateUsername($matches[1]) && ($user = queryUser($matches[1]))) {
+    		if (validateUsername($matches[1]) && ($user = queryUser($matches[1])) && $user['usergroup'] != 'B') {
     			return [
     				'extent' => strlen($matches[0]),
     				'element' => [
-    					'name' => 'a',
+    					'name' => 'span',
     					'text' => '@' . $user['username'],
     					'attributes' => [
-    						'href' => '/user/' . $user['username'],
     						'class' => 'uoj-username',
     						'data-realname' => $user['realname'],
+							'data-uoj-username' => 1,
     					],
     				],
     			];
