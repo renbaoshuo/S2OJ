@@ -9,6 +9,7 @@ return [
 	'private message' => '私信',
 	'system message' => '系统消息',
 	'system manage' => '系统管理',
+	'avatar' => '头像',
 	'contests' => '比赛',
 	'problems' => '题库',
 	'problems lists' => '题单',
@@ -35,11 +36,15 @@ return [
 	'username' => '用户名',
 	'password' => '密码',
 	'new password' => '新密码',
+	'current password' => '当前密码',
+	'confirm new password' => '确认新密码',
 	'verification code' => '验证码',
 	'email' => 'Email',
 	'QQ' => 'QQ',
+	'school' => '学校',
 	'sex' => '性别',
 	'motto' => '格言',
+	'codeforces handle' => 'Codeforces 用户名',
 	'view all' => '查看全部',
 	'hidden' => '隐藏',
 	'appraisal' => '评价',
@@ -58,6 +63,9 @@ return [
 	'user profile' => '用户信息',
 	'send private message' => '发送私信',
 	'modify my profile' => '更改个人信息',
+	'modify his profile' => function($name) {
+		return "更改 $name 的个人信息";
+	},
 	'visit his blog' => function($name) {
 		return "访问 $name 的博客";
 	},
@@ -68,7 +76,7 @@ return [
 	'please enter your password for authorization' => '请输入您的密码进行身份验证',
 	'please enter your new profile' => '请输入新的个人信息',
 	'leave it blank if you do not want to change the password' => '如果不想修改密码请留空',
-	'change avatar help' => '想改头像？见<a href="/faq">帮助</a>',
+	'change avatar help' => '想改头像？见 <a class="text-decoration-none" href="/faq">帮助</a>',
 	'enter your username' => '输入用户名',
 	'enter your email' => '输入 Email',
 	'enter your password' => '输入密码',

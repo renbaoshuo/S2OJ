@@ -24,14 +24,14 @@ class HTML {
 		return '<input type="hidden" name="_token" value="'.crsf_token().'" />';
 	}
 	public static function div_vinput($name, $type, $label_text, $default_value) {
-		return '<div id="'."div-$name".'">'
-			. '<label for="'."input-$name".'" class="control-label">'.$label_text.'</label>'
+		return '<div id="'."div-$name".'" class="mb-3">'
+			. '<label for="'."input-$name".'" class="control-label form-label">'.$label_text.'</label>'
 			. '<input type="'.$type.'" class="form-control" name="'.$name.'" id="'."input-$name".'" value="'.HTML::escape($default_value).'" />'
-			. '<span class="help-block" id="'."help-$name".'"></span>'
+			. '<span class="help-block invalid-feedback" id="'."help-$name".'"></span>'
 			. '</div>';
 	}
 	public static function div_vtextarea($name, $label_text, $default_value) {
-		return '<div id="'."div-$name".'">'
+		return '<div id="'."div-$name".'" class="mb-3">'
 			. '<label for="'."input-$name".'" class="control-label">'.$label_text.'</label>'
 			. '<textarea class="form-control" name="'.$name.'" id="'."input-$name".'">'.HTML::escape($default_value).'</textarea>'
 			. '<span class="help-block" id="'."help-$name".'"></span>'

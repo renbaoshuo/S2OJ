@@ -9,6 +9,7 @@ return [
 	'private message' => 'Private Message',
 	'system message' => 'System Message',
 	'system manage' => 'System Manage',
+	'avatar' => 'Avatar',
 	'contests' => 'Contests',
 	'problems' => 'Problems',
 	'problems lists' => 'Problems Lists',
@@ -35,11 +36,15 @@ return [
 	'username' => 'Username',
 	'password' => 'Password',
 	'new password' => 'New password',
+	'current password' => 'Current password',
+	'confirm new password' => 'Confirm new password',
 	'verification code' => 'Verification code',
 	'email' => 'Email',
 	'QQ' => 'QQ',
+	'school' => 'School',
 	'sex' => 'Sex',
 	'motto' => 'Motto',
+	'codeforces handle' => 'Codeforces handle',
 	'view all' => 'View all',
 	'hidden' => 'Hidden',
 	'appraisal' => 'Appraisal',
@@ -58,6 +63,9 @@ return [
 	'user profile' => 'User profile',
 	'send private message' => 'Send private message',
 	'modify my profile' => 'Modify my profile',
+	'modify his profile' => function($name) {
+		return "Modify $name's profile";
+	},
 	'visit his blog' => function($name) {
 		return "Visit $name's blog";
 	},
@@ -68,7 +76,7 @@ return [
 	'please enter your password for authorization' => 'Please enter your password for authorization',
 	'please enter your new profile' => 'Please enter your new profile',
 	'leave it blank if you do not want to change the password' => 'Leave it blank if you do not want to change the password',
-	'change avatar help' => 'Do you want to change your avatar? Please see <a href="/faq">Help</a>',
+	'change avatar help' => 'Do you want to change your avatar? Please see <a class="text-decoration-none" href="/faq">Help</a>',
 	'enter your username' => 'Enter your username',
 	'enter your email' => 'Enter your email',
 	'enter your password' => 'Enter your password',

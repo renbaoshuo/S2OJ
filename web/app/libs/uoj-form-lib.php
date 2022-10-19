@@ -159,7 +159,7 @@ EOD;
 		public function addVSelect($name, $options, $label_text, $default_value) {
 			$default_value = htmlspecialchars($default_value);
 			$html = <<<EOD
-<div id="div-$name">
+<div id="div-$name" class="mb-3">
 	<label for="input-$name" class="control-label">$label_text</label>
 	<select class="form-control form-select" id="input-{$name}" name="$name">
 
@@ -534,14 +534,15 @@ EOD;
 				if ($field['validator_js'] != 'always_ok') {
 					echo <<<EOD
 		if (${field['name']}_err) {
-			$('#div-${field['name']}').addClass('has-error');
+			$('#div-${field['name']}').addClass('has-error');  // for bootstrap4
+			$('#input-${field['name']}').addClass('is-invalid');
 			$('#help-${field['name']}').text(${field['name']}_err);
 			ok = false;
 		} else {
-			$('#div-${field['name']}').removeClass('has-error');
+			$('#div-${field['name']}').removeClass('has-error');  // for bootstrap4
+			$('#input-${field['name']}').removeClass('is-invalid');
 			$('#help-${field['name']}').text('');
 		}
-
 EOD;
 				}
 			}
@@ -562,11 +563,13 @@ EOD;
 		$(this).find("input[type='file']").each(function() {
 			for (var i = 0; i < this.files.length; i++) {
 				if (this.files[i].size > 10 * 1024 * 1024) {
-					$('#div-' + $(this).attr('name')).addClass('has-error');
+					$('#div-' + $(this).attr('name')).addClass('has-error');  // for bootstrap4
+					$('#input-' + $(this).attr('name')).addClass('is-invalid');
 					$('#help-' + $(this).attr('name')).text('文件大小不能超过10M');
 					ok = false;
 				} else {
-					$('#div-' + $(this).attr('name')).removeClass('has-error');
+					$('#div-' + $(this).attr('name')).removeClass('has-error');  // for bootstrap4
+					$('#input-' + $(this).attr('name')).removeClass('is-invalid');
 					$('#help-' + $(this).attr('name')).text('');
 				}
 			}
