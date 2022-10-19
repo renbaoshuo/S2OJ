@@ -1,4 +1,6 @@
 <?php
+	requireLib('bootstrap5');
+
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
 	}
@@ -8,7 +10,7 @@
 	}
 
 	$config = [
-		'page_len' => 100,
+		'page_len' => 50,
 		'div_classes' => ['card', 'mb-3'],
 		'table_classes' => ['table', 'uoj-table', 'mb-0', 'text-center'],
 	];
@@ -19,10 +21,25 @@
 	} else {
 		become404Page();
 	}
-	
-	requireLib('bootstrap5');
 	?>
+
 <?php echoUOJPageHeader($title) ?>
+
+<div class="row">
+<!-- left col -->
+<div class="col-lg-9">
 <h1 class="h2"><?= $title ?></h1>
+
 <?php echoRanklist($config) ?>
+</div>
+<!-- end left col -->
+
+<!-- right col -->
+<aside class="col-lg-3 mt-3 mt-lg-0">
+<?php uojIncludeView('sidebar', array()) ?>
+</aside>
+<!-- end right col -->
+
+</div>
+
 <?php echoUOJPageFooter() ?>
