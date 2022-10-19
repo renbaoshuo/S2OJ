@@ -45,7 +45,7 @@
 	}
 
 	$pag_config = [
-		'page_len' => 20,
+		'page_len' => 10,
 		'col_names' => ['*'],
 		'table_name' => 'user_system_msg',
 		'cond' => "receiver = '{$user['username']}'",
@@ -71,6 +71,10 @@
 	?>
 
 <?php echoUOJPageHeader('系统消息') ?>
+
+<div class="row">
+<!-- left col -->
+<div class="col-lg-9">
 
 <h1 class="h2">
 	系统消息
@@ -108,5 +112,16 @@
 </div>
 
 <?= $pag->pagination() ?>
+
+</div>
+<!-- end left col -->
+
+<!-- right col -->
+<aside class="col-lg-3 mt-3 mt-lg-0">
+<?php uojIncludeView('sidebar', array()) ?>
+</aside>
+<!-- end right col -->
+
+</div>
 
 <?php echoUOJPageFooter() ?>
