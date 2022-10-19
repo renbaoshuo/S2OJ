@@ -836,41 +836,44 @@ EOD
 
 <div class="modal fade" id="UploadDataModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h4 class="modal-title" id="myModalLabel">上传数据</h4>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="myModalLabel">上传数据</h4>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form action="" method="post" enctype="multipart/form-data" role="form">
 				<div class="modal-body">
-					<form action="" method="post" enctype="multipart/form-data" role="form">
-						<div class="form-group">
-								<label for="exampleInputFile">上传zip文件</label>
-								<input type="file" name="problem_data_file" id="problem_data_file">
-								<p class="help-block">说明：请将所有数据放置于压缩包根目录内。若压缩包内仅存在文件夹而不存在文件，则会将这些一级子文件夹下的内容移动到根目录下，然后这些一级子文件夹删除；若这些子文件夹内存在同名文件，则会发生随机替换，仅保留一个副本。</p>
-						</div>
-						<input type="hidden" name="problem_data_file_submit" value="submit">
+					<label class="form-label" for="problem_data_file">上传 zip 文件</label>
+					<input class="form-control" type="file" name="problem_data_file" id="problem_data_file" accept=".zip">
+
+					<p class="form-text">
+						说明：请将所有数据放置于压缩包根目录内。若压缩包内仅存在文件夹而不存在文件，则会将这些一级子文件夹下的内容移动到根目录下，然后这些一级子文件夹删除；若这些子文件夹内存在同名文件，则会发生随机替换，仅保留一个副本。
+					</p>
+
+					<!-- hidden input for server-side check -->
+					<input type="hidden" name="problem_data_file_submit" value="submit">
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-success">上传</button>
-					</form>
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
 				</div>
-			</div>
+			</form>
+		</div>
 	</div>
 </div>
 
 <div class="modal fade" id="ProblemSettingsFileModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h4 class="modal-title" id="myModalLabel">试题配置</h4>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="myModalLabel">试题配置</h4>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form class="form-horizontal" action="" method="post" role="form">
 				<div class="modal-body">
-					<form class="form-horizontal" action="" method="post" role="form">
-						<div class="form-group row">
-							<label for="use_builtin_checker" class="col-sm-5 control-label">比对函数</label>
-							<div class="col-sm-7">
+					<div class="form-group row">
+						<label for="use_builtin_checker" class="col-sm-5 control-label">比对函数</label>
+						<div class="col-sm-7">
 							<?php $checker_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'use_builtin_checker', 'ownchk') : ""; ?>
 							<select class="form-select" id="use_builtin_checker" name="use_builtin_checker">
 								<option value="ncmp" <?= $checker_value == "ncmp" ? 'selected' : '' ?>>ncmp: 整数序列</option>
@@ -885,79 +888,79 @@ EOD
 								<option value="bcmp" <?= $checker_value == "bcmp" ? 'selected' : '' ?>>bcmp: 二进制文件</option>
 								<option value="ownchk" <?= $checker_value == "ownchk" ? 'selected' : '' ?>>自定义校验器（需上传 chk.cpp）</option>
 							</select>
-							</div>
 						</div>
-						<div class="form-group row">
-							<label for="n_tests" class="col-sm-5 control-label">n_tests</label>
-							<div class="col-sm-7">
-								<?php $n_tests_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'n_tests', '') : ""; ?>
-								<input type="number" class="form-control" id="n_tests" name="n_tests" placeholder="数据点个数（必填）" value="<?= $n_tests_value ?>">
-							</div>
+					</div>
+					<div class="form-group row">
+						<label for="n_tests" class="col-sm-5 control-label">n_tests</label>
+						<div class="col-sm-7">
+							<?php $n_tests_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'n_tests', '') : ""; ?>
+							<input type="number" class="form-control" id="n_tests" name="n_tests" placeholder="数据点个数（必填）" value="<?= $n_tests_value ?>">
 						</div>
-						<div class="form-group row">
-							<label for="n_ex_tests" class="col-sm-5 control-label">n_ex_tests</label>
-							<div class="col-sm-7">
-								<?php $n_ex_tests_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'n_ex_tests', 0) : ""; ?>
-								<input type="number" class="form-control" id="n_ex_tests" name="n_ex_tests" placeholder="额外数据点个数（默认为 0）" value="<?= $n_ex_tests_value ?>">
-							</div>
+					</div>
+					<div class="form-group row">
+						<label for="n_ex_tests" class="col-sm-5 control-label">n_ex_tests</label>
+						<div class="col-sm-7">
+							<?php $n_ex_tests_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'n_ex_tests', 0) : ""; ?>
+							<input type="number" class="form-control" id="n_ex_tests" name="n_ex_tests" placeholder="额外数据点个数（默认为 0）" value="<?= $n_ex_tests_value ?>">
 						</div>
-						<div class="form-group row">
-							<label for="n_sample_tests" class="col-sm-5 control-label">n_sample_tests</label>
-							<div class="col-sm-7">
-								<?php $n_sample_tests_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'n_sample_tests', 0) : ""; ?>
-								<input type="number" class="form-control" id="n_sample_tests" name="n_sample_tests" placeholder="样例测试点个数（默认为 0）" value="<?= $n_sample_tests_value ?>">
-							</div>
+					</div>
+					<div class="form-group row">
+						<label for="n_sample_tests" class="col-sm-5 control-label">n_sample_tests</label>
+						<div class="col-sm-7">
+							<?php $n_sample_tests_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'n_sample_tests', 0) : ""; ?>
+							<input type="number" class="form-control" id="n_sample_tests" name="n_sample_tests" placeholder="样例测试点个数（默认为 0）" value="<?= $n_sample_tests_value ?>">
 						</div>
-						<div class="form-group row">
-							<label for="input_pre" class="col-sm-5 control-label">input_pre</label>
-							<div class="col-sm-7">
-								<?php $input_pre_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'input_pre', 'input') : ""; ?>
-								<input type="text" class="form-control" id="input_pre" name="input_pre" placeholder="输入文件名称（默认为 input）" value="<?= $input_pre_value ?>">
-							</div>
+					</div>
+					<div class="form-group row">
+						<label for="input_pre" class="col-sm-5 control-label">input_pre</label>
+						<div class="col-sm-7">
+							<?php $input_pre_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'input_pre', 'input') : ""; ?>
+							<input type="text" class="form-control" id="input_pre" name="input_pre" placeholder="输入文件名称（默认为 input）" value="<?= $input_pre_value ?>">
 						</div>
-						<div class="form-group row">
-							<label for="input_suf" class="col-sm-5 control-label">input_suf</label>
-							<div class="col-sm-7">
-								<?php $input_suf_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'input_suf', 'txt') : ""; ?>
-								<input type="text" class="form-control" id="input_suf" name="input_suf" placeholder="输入文件后缀（默认为 txt）" value="<?= $input_suf_value ?>">
-							</div>
+					</div>
+					<div class="form-group row">
+						<label for="input_suf" class="col-sm-5 control-label">input_suf</label>
+						<div class="col-sm-7">
+							<?php $input_suf_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'input_suf', 'txt') : ""; ?>
+							<input type="text" class="form-control" id="input_suf" name="input_suf" placeholder="输入文件后缀（默认为 txt）" value="<?= $input_suf_value ?>">
 						</div>
-						<div class="form-group row">
-							<label for="output_pre" class="col-sm-5 control-label">output_pre</label>
-							<div class="col-sm-7">
-								<?php $output_pre_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'output_pre', 'output') : ""; ?>
-								<input type="text" class="form-control" id="output_pre" name="output_pre" placeholder="输出文件名称（默认为 output）" value="<?= $output_pre_value ?>">
-							</div>
+					</div>
+					<div class="form-group row">
+						<label for="output_pre" class="col-sm-5 control-label">output_pre</label>
+						<div class="col-sm-7">
+							<?php $output_pre_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'output_pre', 'output') : ""; ?>
+							<input type="text" class="form-control" id="output_pre" name="output_pre" placeholder="输出文件名称（默认为 output）" value="<?= $output_pre_value ?>">
 						</div>
-						<div class="form-group row">
-							<label for="output_suf" class="col-sm-5 control-label">output_suf</label>
-							<div class="col-sm-7">
-								<?php $output_suf_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'output_suf', 'txt') : ""; ?>
-								<input type="text" class="form-control" id="output_suf" name="output_suf" placeholder="输出文件后缀（默认为 txt）" value="<?= $output_suf_value ?>">
-							</div>
+					</div>
+					<div class="form-group row">
+						<label for="output_suf" class="col-sm-5 control-label">output_suf</label>
+						<div class="col-sm-7">
+							<?php $output_suf_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'output_suf', 'txt') : ""; ?>
+							<input type="text" class="form-control" id="output_suf" name="output_suf" placeholder="输出文件后缀（默认为 txt）" value="<?= $output_suf_value ?>">
 						</div>
-						<div class="form-group row">
-							<label for="time_limit" class="col-sm-5 control-label">time_limit</label>
-							<div class="col-sm-7">
-								<?php $time_limit_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'time_limit', 1) : ""; ?>
-								<input type="number" class="form-control" id="time_limit" name="time_limit" placeholder="时间限制（不能填写小数，默认为 1s）" value="<?= $time_limit_value ?>">
-							</div>
+					</div>
+					<div class="form-group row">
+						<label for="time_limit" class="col-sm-5 control-label">time_limit</label>
+						<div class="col-sm-7">
+							<?php $time_limit_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'time_limit', 1) : ""; ?>
+							<input type="number" class="form-control" id="time_limit" name="time_limit" placeholder="时间限制（不能填写小数，默认为 1s）" value="<?= $time_limit_value ?>">
 						</div>
-						<div class="form-group row">
-							<label for="memory_limit" class="col-sm-5 control-label">memory_limit</label>
-							<div class="col-sm-7">
-								<?php $memory_limit_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'memory_limit', 256) : ""; ?>
-								<input type="number" class="form-control" id="memory_limit" name="memory_limit" placeholder="内存限制（默认为 256 MB）" value="<?= $memory_limit_value ?>">
-							</div>
+					</div>
+					<div class="form-group row">
+						<label for="memory_limit" class="col-sm-5 control-label">memory_limit</label>
+						<div class="col-sm-7">
+							<?php $memory_limit_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'memory_limit', 256) : ""; ?>
+							<input type="number" class="form-control" id="memory_limit" name="memory_limit" placeholder="内存限制（默认为 256 MB）" value="<?= $memory_limit_value ?>">
 						</div>
-						<input type="hidden" name="problem_settings_file_submit" value="submit">
+					</div>
+					<input type="hidden" name="problem_settings_file_submit" value="submit">
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-success">确定</button>
-					</form>
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
 				</div>
-			</div>
+			</form>
+		</div>
 	</div>
 </div>
 
