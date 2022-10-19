@@ -41,7 +41,7 @@
 		$deadline_a = DateTime::createFromFormat('Y-m-d H:i:s', $a['deadline']);
 		$deadline_b = DateTime::createFromFormat('Y-m-d H:i:s', $b['deadline']);
 
-		return $deadline_a->getTimestamp() - $deadline_b->getTimestamp();
+		return $deadline_b->getTimestamp() - $deadline_a->getTimestamp();
 	});
 	?>
 <?php if (count($assignments)): ?>
