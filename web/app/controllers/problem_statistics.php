@@ -1,4 +1,7 @@
 <?php
+	requireLib('bootstrap5');
+	requireLib('morris');
+
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
 	}
@@ -6,8 +9,6 @@
 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
 		become404Page();
 	}
-	
-	requireLib('bootstrap5');
 	
 	$contest = validateUInt($_GET['contest_id']) ? queryContest($_GET['contest_id']) : null;
 	if ($contest != null) {
@@ -71,12 +72,12 @@
 	
 	$submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']) ? 'time' : 'tot_size';
 	?>
-<?php
-	$REQUIRE_LIB['morris'] = "";
-	?>
+
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::statistics')) ?>
 
 <div class="row">
+
+<!-- left col -->
 <div class="col-lg-9">
 
 <?php if ($contest): ?>
@@ -263,7 +264,7 @@ new Morris.Line({
 </div>
 
 <!-- Right col -->
-<aside class="col mt-3 mt-lg-0">
+<aside class="col-lg-3 mt-3 mt-lg-0">
 
 <?php if ($contest): ?>
 <!-- Contest card -->

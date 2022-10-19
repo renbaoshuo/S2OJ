@@ -7,10 +7,7 @@
 		become403Page();
 	}
 
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
-	}
-
+	requireLib('bootstrap5');
 	requirePHPLib('form');
 	
 	if (!isSuperUser($myUser)) {
@@ -59,39 +56,28 @@
 	?>
 <?php echoUOJPageHeader('添加比赛') ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="row">
 <div class="col-lg-9">
-<?php endif ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="card card-default mb-2">
 <div class="card-body">
-<?php endif ?>
 
-<h1 class="page-header
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-h2 card-title
-<?php endif ?>
-">添加比赛</h1>
+<h1 class="h2 card-title">添加比赛</h1>
 
 <div class="w-full" style="max-width: 400px">
 <?php $time_form->printHTML(); ?>
 </div>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
-</div>
-<?php endif ?>
-
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 
-<aside class="col mt-3 mt-lg-0">
+</div>
+
+<!-- right col -->
+<aside class="col-lg-3 mt-3 mt-lg-0">
 <?php uojIncludeView('sidebar', array()) ?>
 </aside>
 
 </div>
-<?php endif ?>
 
 <?php echoUOJPageFooter() ?>

@@ -1,8 +1,7 @@
 <?php
+	requireLib('bootstrap5');
 	requirePHPLib('form');
 	requirePHPLib('judger');
-
-	$REQUIRE_LIB['bootstrap5'] = '';
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
@@ -237,15 +236,13 @@ EOD;
 </div>
 
 <!-- Pagination -->
-<div class="text-center">
-	<?= $pag->pagination(); ?>
-</div>
+<?= $pag->pagination() ?>
 
 <!-- End left col -->
 </div>
 
 <!-- Right col -->
-<aside class="col mt-3 mt-lg-0">
+<aside class="col-lg-3 mt-3 mt-lg-0">
 
 <div class="card card-default mb-2">
 	<ul class="nav nav-pills nav-fill flex-column" role="tablist">

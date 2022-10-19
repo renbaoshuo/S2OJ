@@ -411,7 +411,7 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 </div>
 <!-- End left col -->
 
-<aside class="col mt-3 mt-lg-0">
+<aside class="col-lg-3 mt-3 mt-lg-0">
 <!-- Right col -->
 
 <?php if ($contest): ?>

@@ -1,10 +1,15 @@
 <?php
-	requireLib('shjs');
+	requireLib('bootstrap5');
+	requireLib('hljs');
 	requireLib('mathjax');
-
-	$REQUIRE_LIB['bootstrap5'] = '';
 	?>
+
 <?php echoUOJPageHeader(UOJLocale::get('help'))	?>
+
+<div class="row">
+<!-- left col -->
+<div class="col-lg-9">
+
 <div class="card card-default">
 <article class="card-body">
 	<h1 class="h3 card-title mb-3">常见问题及其解答 (FAQ)</h1>
@@ -100,6 +105,16 @@
 		请移步 <a href="https://s2oj.github.io/">S2OJ 使用文档</a>。
 	</p>
 </article>
+</div>
+
+<!-- end left col -->
+</div>
+
+<!-- right col -->
+<aside class="col-lg-3 mt-3 mt-lg-0">
+<?php uojIncludeView('sidebar', array()) ?>
+</aside>
+
 </div>
 
 <?php echoUOJPageFooter() ?>

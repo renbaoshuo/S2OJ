@@ -1,4 +1,5 @@
 <?php
+	requireLib('bootstrap5');
 	requirePHPLib('form');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
@@ -11,8 +12,6 @@
 	if (!hasProblemPermission($myUser, $problem)) {
 		become403Page();
 	}
-
-	requireLib('bootstrap5');
 	
 	$problem_content = queryProblemContent($problem['id']);
 	$problem_tags = queryProblemTags($problem['id']);
@@ -104,7 +103,7 @@
 </div>
 
 <!-- right col -->
-<aside class="col mt-3 mt-lg-0">
+<aside class="col-lg-3 mt-3 mt-lg-0">
 
 <div class="card card-default mb-2">
 	<ul class="nav nav-pills nav-fill flex-column" role="tablist">

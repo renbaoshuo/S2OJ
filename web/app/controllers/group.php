@@ -178,10 +178,11 @@
 
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<!-- end left col -->
 </div>
 
-<aside class="col mt-3 mt-lg-0">
-
+<!-- right col -->
+<aside class="col-lg-3 mt-3 mt-lg-0">
 <?php uojIncludeView('sidebar', array()); ?>
 </aside>
 

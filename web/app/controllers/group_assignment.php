@@ -120,7 +120,7 @@
 <!-- end left col -->
 </div>
 
-<aside class="col mt-3 mt-lg-0">
+<aside class="col-lg-3 mt-3 mt-lg-0">
 <!-- right col -->
 
 <?php uojIncludeView('sidebar', ['assignments_hidden' => true]); ?>

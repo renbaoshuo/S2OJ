@@ -73,7 +73,7 @@ EOD;
 <!-- end left col -->
 
 <!-- right col -->
-<aside class="col mt-3 mt-lg-0">
+<aside class="col-lg-3 mt-3 mt-lg-0">
 <?php uojIncludeView('sidebar', array()) ?>
 </aside>
 <!-- end right col -->

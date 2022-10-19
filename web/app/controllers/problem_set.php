@@ -273,7 +273,7 @@ $('#input-show_difficulty').click(function() {
 <!-- end left col -->
 
 <!-- right col -->
-<aside class="col mt-3 mt-lg-0">
+<aside class="col-lg-3 mt-3 mt-lg-0">
 
 <!-- search bar -->
 <form method="get" class="mb-3" id="form-problem_search">
