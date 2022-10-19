@@ -219,12 +219,6 @@
 		<?= HTML::js_src('/js/ckeditor/ckeditor.js') ?>
 		<?php endif ?>
 
-		<?php if (isset($REQUIRE_LIB['github_contribution_graph'])): ?>
-			<!-- github contribution graph -->
-			<?= HTML::css_link('/css/github_contribution_graph.css') ?>
-			<?= HTML::js_src('/js/jquery.github_contribution_graph.js') ?>
-		<?php endif ?>
-
 		<?php if (isset($REQUIRE_LIB['calendar_heatmap'])): ?>
 			<!-- jquery-calendar-heatmap -->
 			<?= HTML::css_link('/css/jquery.calendar_heatmap.min.css') ?>
