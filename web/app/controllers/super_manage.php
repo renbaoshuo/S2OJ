@@ -596,7 +596,6 @@ EOD);
 		};
 		
 		$change_user_image_total_size_limit_form->runAtServer();
-
 	}
 	?>
 
@@ -1085,15 +1084,15 @@ echoSubmissionsList(
 		<th>IP</th>
 	</tr>
 EOD,
-function($row) {
-	echo <<<EOD
+		function($row) {
+			echo <<<EOD
 		<tr>
 			<td>{$row['judger_name']}</td>
 			<td>{$row['password']}</td>
 			<td>{$row['ip']}</td>
 		</tr>
 EOD;
-},
+		},
 		[
 			'page_len' => 10,
 			'div_classes' => ['card', 'mb-3', 'table-responsive'],
@@ -1111,12 +1110,12 @@ EOD;
 	</div>
 <?php elseif ($cur_tab == 'image_hosting'): ?>
 <?php
-echoLongTable(
-	['*'],
-	'users_images',
-	'1',
-	'order by id desc',
-	<<<EOD
+	echoLongTable(
+		['*'],
+		'users_images',
+		'1',
+		'order by id desc',
+		<<<EOD
 	<tr>
 		<th style="width: 10em">上传者</th>
 		<th style="width: 14em">预览</th>
@@ -1125,16 +1124,16 @@ echoLongTable(
 		<th style="width: 6em">操作</th>
 	</tr>
 EOD,
-	function($row) {
-		$user_link = getUserLink($row['uploader']);
-		if ($row['size'] < 1024 * 512) {
-			$size = strval(round($row['size'] * 1.0 / 1024, 1)) . ' KB';
-		} else {
-			$size = strval(round($row['size'] * 1.0 / 1024 / 1024, 1)) . ' MB';
-		}
-		$token = crsf_token();
+		function($row) {
+			$user_link = getUserLink($row['uploader']);
+			if ($row['size'] < 1024 * 512) {
+				$size = strval(round($row['size'] * 1.0 / 1024, 1)) . ' KB';
+			} else {
+				$size = strval(round($row['size'] * 1.0 / 1024 / 1024, 1)) . ' MB';
+			}
+			$token = crsf_token();
 
-		echo <<<EOD
+			echo <<<EOD
 	<tr>
 		<td>$user_link</td>
 		<td><img src="{$row['path']}" width="250" loading="lazy"></td>
@@ -1149,12 +1148,12 @@ EOD,
 		</td>
 	</tr>
 EOD;
-	},
-	[
-		'page_len' => 20,
-		'div_classes' => ['card', 'mb-3', 'table-responsive'],
-		'table_classes' => ['table', 'uoj-table', 'mb-0'],
-	]
+		},
+		[
+			'page_len' => 20,
+			'div_classes' => ['card', 'mb-3', 'table-responsive'],
+			'table_classes' => ['table', 'uoj-table', 'mb-0'],
+		]
 	); ?>
 	<div class="card mt-3">
 		<div class="card-body">
