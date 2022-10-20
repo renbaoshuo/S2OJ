@@ -1,5 +1,6 @@
 <?php
 return [
+	'belongs to these groups' => '属于这些小组：',
 	'avatar source' => '头像来源',
 	'website' => '网址',
 	'user type' => '用户类型',

@@ -257,7 +257,31 @@ function fTime($time, $gran = -1) {
 				<?= UOJLocale::get('contests::contest self reviews') ?>
 			</a>
 		</nav>
-		<div class="card card-default mb-2">
+		
+		<?php if (!isset($is_blog_aboutme)): ?>
+		<?php $groups = queryGroupsOfUser($user['username']) ?>
+		<div class="card mb-2">
+		<div class="card-body">
+			<h4 class="card-title h5">
+				<?= UOJLocale::get('user::belongs to these groups') ?>
+			</h4>
+			<ul class="mb-0">
+				<?php foreach ($groups as $group): ?>
+				<li>
+					<a class="text-decoration-none" href="<?= HTML::url('/group/'.$group['id']) ?>">
+						<?= $group['title'] ?>
+					</a>
+				</li>
+				<?php endforeach ?>
+				<?php if (!count($groups)): ?>
+				<?= UOJLocale::get('none') ?>
+				<?php endif ?>
+			</ul>
+		</div>
+		</div>
+		<?php endif ?>
+
+		<div class="card mb-2">
 			<div class="card-body">
 <?php
 $_result = DB::query("select date_format(submit_time, '%Y-%m-%d'), problem_id from submissions where submitter = '{$user['username']}' and score = 100 and date(submit_time) between date_sub(curdate(), interval 1 year) and curdate()");
@@ -286,7 +310,7 @@ while ($row = DB::fetch($_result)) {
 				</script>
 			</div>
 		</div>
-		<div class="card card-default mb-2">
+		<div class="card mb-2">
 		<div class="card-body">
 			<?php $ac_problems = DB::selectAll("select a.problem_id as problem_id, b.title as title from best_ac_submissions a inner join problems b on a.problem_id = b.id where submitter = '{$user['username']}' order by id") ?>
 			<h4 class="card-title h5">
