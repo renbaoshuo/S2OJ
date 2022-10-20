@@ -1039,7 +1039,7 @@ echoSubmissionsList(
 				$submission_result = json_decode($submission['result'], true);
 				?>
 				<tr style="cursor: pointer" data-bs-toggle="collapse" data-bs-target="#custom_test__<?= $submission['id'] ?>">
-					<td class="text-center">#<?= $submission['id'] ?></td>
+					<td class="text-center text-primary">#<?= $submission['id'] ?></td>
 					<td class="text-center">#<?= $submission['problem_id'] ?></td>
 					<td><?= getUserLink($submission['submitter']) ?></td>
 					<td><?= $submission['submit_time'] ?></td>
