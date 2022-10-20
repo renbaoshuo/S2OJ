@@ -111,7 +111,7 @@ EOD;
 	<label for="input-$name" class="col-sm-2 control-label">$label_text</label>
 	<div class="col-sm-3">
 		<input type="$type" class="form-control" name="$name" id="input-$name" value="$default_value" />
-		<span class="help-block" id="help-$name"></span>
+		<span class="help-block invalid-feedback" id="help-$name"></span>
 	</div>
 </div>
 EOD;
@@ -197,7 +197,7 @@ EOD;
 	<label for="input-$name" class="col-sm-2 control-label">$label_text</label>
 	<div class="col-sm-10">
 		<textarea class="form-control" name="$name" id="input-$name">$default_value</textarea>
-		<span class="help-block" id="help-$name"></span>
+		<span class="help-block invalid-feedback" id="help-$name"></span>
 	</div>
 </div>
 EOD;
@@ -210,7 +210,7 @@ EOD;
 <div id="div-$name" class="form-group">
 	<label for="input-$name" class="control-label">$label_text</label>
 	<textarea class="form-control" name="$name" id="input-$name">$default_value</textarea>
-	<span class="help-block" id="help-$name"></span>
+	<span class="help-block invalid-feedback" id="help-$name"></span>
 </div>
 EOD;
 			$this->add($name, $html, $validator_php, $validator_js, $no_val);
@@ -270,7 +270,7 @@ EOD;
 <div id="div-$name">
 	<label for="input-$name" class="control-label">$label_text</label>
 	<textarea class="ckeditor" name="$name" id="input-$name">$default_value</textarea>
-	<span class="help-block" id="help-$name"></span>
+	<span class="help-block invalid-feedback" id="help-$name"></span>
 </div>
 EOD;
 			$this->add($name, $html, $validator_php, $validator_js);
@@ -333,7 +333,7 @@ EOD
 <div id="div-$name">
 	<label for="input-$name" class="control-label">$label_text</label>
 	<textarea name="$name" id="input-$name">$default_value</textarea>
-	<span class="help-block" id="help-$name"></span>
+	<span class="help-block invalid-feedback" id="help-$name"></span>
 </div>
 <script type="text/javascript">
 $('#input-$name').slide_editor();
@@ -794,7 +794,7 @@ EOD;
 			<button type="button" class="btn btn-primary" style="width:100px; !important" onclick="$('#input-{$name}').click();"><span class="glyphicon glyphicon-folder-open"></span> $browse_text</button>
 		</span>
 	</div>
-	<span class="help-block" id="help-{$name}"></span>
+	<span class="help-block invalid-feedback" id="help-{$name}"></span>
 </div>
 EOD;
 		

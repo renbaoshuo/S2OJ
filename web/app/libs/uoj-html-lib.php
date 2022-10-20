@@ -88,7 +88,7 @@ function getUserLink($username) {
 		if ($realname == "") {
 			return '<span class="uoj-username">'.$username.'</span>';
 		} else {
-			return '<span class="uoj-username" data-realname="'.$realname.'">'.$username.'</span>';
+			return '<span class="uoj-username" data-realname="'.HTML::escape($realname).'">'.$username.'</span>';
 		}
 	} else {
 		$esc_username = HTML::escape($username);

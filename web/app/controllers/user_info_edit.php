@@ -341,7 +341,7 @@ EOD);
 				</div>
 				<?php if (isSuperUser($myUser) && $user['username'] != $myUser['username']): ?>
 				<div class="alert alert-warning mb-0" role="alert">
-					如需重置其他用户的密码，请前往 <a href="/super-manage/users" class="alert-link">系统管理</a> 页面操作。
+					如需重置其他用户的密码，请前往 <a href="/super_manage/users" class="alert-link">系统管理</a> 页面操作。
 				</div>
 				<?php endif ?>
 
@@ -410,6 +410,20 @@ EOD);
 				<?php else: ?>
 				<fieldset disabled>
 				<?php endif ?>
+				<div class="mb-3">
+					<span>
+						<?= UOJLocale::get('user::user group') ?>
+					</span>
+					<span class="d-inline-block ms-3">
+						<?php if ($user['usergroup'] == 'S'): ?>
+							<?= UOJLocale::get('user::super user') ?>
+						<?php elseif ($user['usergroup'] == 'B'): ?>
+							<?= UOJLocale::get('user::banned user') ?>
+						<?php else: ?>
+							<?= UOJLocale::get('user::normal user') ?>
+						<?php endif ?>
+					</span>
+				</div>
 				<div class="input-group mb-3">
 					<label for="input-user_type" class="form-label">
 						<?= UOJLocale::get('user::user type') ?>

@@ -576,18 +576,38 @@ $.fn.long_table = function(data, cur_page, header_row, get_row_str, config) {
 		if (n_pages > 1) {
 			var pagination = $('<ul class="pagination top-buffer-no bot-buffer-sm justify-content-center"></ul>');
 			if (cur_page > 1) {
-				pagination.append(get_page_li(cur_page - 1, '<span class="glyphicon glyphicon glyphicon-backward"></span>'));
+				if (isBootstrap5Page) {
+					pagination.append(get_page_li(1, '<i class="bi bi-chevron-double-left"></i>'));
+					pagination.append(get_page_li(cur_page - 1, '<i class="bi bi-chevron-left"></i>'));
+				} else {
+					pagination.append(get_page_li(cur_page - 1, '<span class="glyphicon glyphicon glyphicon-backward"></span>'));
+				}
 			} else {
-				pagination.append(get_page_li(-1, '<span class="glyphicon glyphicon glyphicon-backward"></span>'));
+				if (isBootstrap5Page) {
+					pagination.append(get_page_li(-1, '<i class="bi bi-chevron-double-left"></i>'));
+					pagination.append(get_page_li(-1, '<i class="bi bi-chevron-left"></i>'));
+				} else {
+					pagination.append(get_page_li(-1, '<span class="glyphicon glyphicon glyphicon-backward"></span>'));
+				}
 			}
 			var max_extend = config.max_extend != undefined ? config.max_extend : 5;
 			for (var i = Math.max(cur_page - max_extend, 1); i <= Math.min(cur_page + max_extend, n_pages); i++) {
 				pagination.append(get_page_li(i, i.toString()));
 			}
 			if (cur_page < n_pages) {
-				pagination.append(get_page_li(cur_page + 1, '<span class="glyphicon glyphicon glyphicon-forward"></span>'));
+				if (isBootstrap5Page) {
+					pagination.append(get_page_li(cur_page + 1, '<i class="bi bi-chevron-right"></i>'));
+					pagination.append(get_page_li(n_pages, '<i class="bi bi-chevron-double-right"></i>'));
+				} else {
+					pagination.append(get_page_li(cur_page + 1, '<span class="glyphicon glyphicon glyphicon-forward"></span>'));
+				}
 			} else {
-				pagination.append(get_page_li(-1, '<span class="glyphicon glyphicon glyphicon-forward"></span>'));
+				if (isBootstrap5Page) {
+					pagination.append(get_page_li(-1, '<i class="bi bi-chevron-right"></i>'));
+					pagination.append(get_page_li(-1, '<i class="bi bi-chevron-double-right"></i>'));
+				} else {
+					pagination.append(get_page_li(-1, '<span class="glyphicon glyphicon glyphicon-forward"></span>'));
+				}
 			}
 			$(table_div).append($('<div class="text-center"></div>').append(pagination));
 		}
