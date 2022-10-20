@@ -68,7 +68,7 @@ function fTime($time, $gran = -1) {
 			<div class="card-body">
 				<?php if ($user['usergroup'] == 'S'): ?>
 				<span class="badge bg-secondary">
-					<?= UOJLocale::get('admin') ?>
+					<?= UOJLocale::get('user::admin') ?>
 				</span>
 				<?php endif ?>
 				<h3>
@@ -102,35 +102,99 @@ function fTime($time, $gran = -1) {
 				<li class="list-group-item">
 					<i class="bi bi-key-fill me-1"></i>
 					<?php foreach (explode(',', $user['usertype']) as $idx => $type): ?>
-						<?php if ($idx): ?>, <?php endif ?>
-						<?php if ($type == 'teacher'): ?>
-							<?= UOJLocale::get('teacher') ?>
-						<?php elseif ($type == 'student'): ?>
-							<?= UOJLocale::get('student') ?>
-						<?php elseif ($type == 'problem_uploader'): ?>
-							<?= UOJLocale::get('problem uploader') ?>
-						<?php elseif ($type == 'problem_manager'): ?>
-							<?= UOJLocale::get('problem manager') ?>
-						<?php elseif ($type == 'contest_judger'): ?>
-							<?= UOJLocale::get('contest judger') ?>
-						<?php elseif ($type == 'contest_only'): ?>
-							<?= UOJLocale::get('contest only') ?>
-						<?php else: ?>
-							<?= HTML::escape($type) ?>
-						<?php endif ?>
+						<?php if ($idx): ?>,<?php endif ?>
+						<span><?= UOJLocale::get('user::' . str_replace('_', ' ', $type)) ?: HTML::escape($type) ?></span>
 					<?php endforeach ?>
 				</li>
 				<?php endif ?>
+				<?php if ($user['email']): ?>
 				<li class="list-group-item">
 					<i class="bi bi-envelope-fill me-1"></i>
 					<a class="text-decoration-none text-body" href="mailto:<?= HTML::escape($user['email']) ?>">
 						<?= HTML::escape($user['email']) ?>
 					</a>
 				</li>
+				<?php endif ?>
 				<?php if ($user['qq']): ?>
 				<li class="list-group-item">
 					<i class="align-text-bottom me-1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16"><path d="M433.754 420.445c-11.526 1.393-44.86-52.741-44.86-52.741 0 31.345-16.136 72.247-51.051 101.786 16.842 5.192 54.843 19.167 45.803 34.421-7.316 12.343-125.51 7.881-159.632 4.037-34.122 3.844-152.316 8.306-159.632-4.037-9.045-15.25 28.918-29.214 45.783-34.415-34.92-29.539-51.059-70.445-51.059-101.792 0 0-33.334 54.134-44.859 52.741-5.37-.65-12.424-29.644 9.347-99.704 10.261-33.024 21.995-60.478 40.144-105.779C60.683 98.063 108.982.006 224 0c113.737.006 163.156 96.133 160.264 214.963 18.118 45.223 29.912 72.85 40.144 105.778 21.768 70.06 14.716 99.053 9.346 99.704z" fill="currentColor"/></svg></i>
-					<?= HTML::escape($user['qq']) ?>
+					<a class="text-decoration-none text-body" href="http://wpa.qq.com/msgrd?v=3&uin=<?= HTML::escape($user['qq']) ?>&site=qq&menu=yes" target="_blank">
+						<?= HTML::escape($user['qq']) ?>
+					</a>
+				</li>
+				<?php endif ?>
+				<?php if ($user['github']): ?>
+				<li class="list-group-item">
+					<i class="bi bi-github me-1"></i>
+					<a class="text-decoration-none text-body" href="https://github.com/<?= HTML::escape($user['github']) ?>" target="_blank">
+						<?= HTML::escape($user['github']) ?>
+					</a>
+				</li>
+				<?php endif ?>
+				<?php if ($user['codeforces_handle']): ?>
+				<li class="list-group-item d-flex align-items-center">
+					<div class="flex-shrink-0"><i class="align-text-bottom me-1"><svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 24 24" width="16" height="16"><title>Codeforces</title><path d="M4.5 7.5C5.328 7.5 6 8.172 6 9v10.5c0 .828-.672 1.5-1.5 1.5h-3C.673 21 0 20.328 0 19.5V9c0-.828.673-1.5 1.5-1.5h3zm9-4.5c.828 0 1.5.672 1.5 1.5v15c0 .828-.672 1.5-1.5 1.5h-3c-.827 0-1.5-.672-1.5-1.5v-15c0-.828.673-1.5 1.5-1.5h3zm9 7.5c.828 0 1.5.672 1.5 1.5v7.5c0 .828-.672 1.5-1.5 1.5h-3c-.828 0-1.5-.672-1.5-1.5V12c0-.828.672-1.5 1.5-1.5h3z"/></svg></i>&nbsp;</div>
+					<div>
+						<a id="codeforces-profile-link" class="text-decoration-none" href="https://codeforces.com/profile/<?= $user['codeforces_handle'] ?>" target="_blank" style="color: rgba(var(--bs-body-color-rgb), var(--bs-text-opacity)) !important;">
+							<?= $user['codeforces_handle'] ?>
+						</a>
+						<div id="codeforces-rating" style="font-family: verdana, arial, sans-serif; line-height: 1.2em; text-transform: capitalize;"></div>
+					</div>
+					<script>
+						function getRatingColor(rating) {
+							if (rating >= 2400) return 'ff0000';
+							if (rating >= 2100) return 'ff8c00';
+							if (rating >= 1900) return 'aa00aa';
+							if (rating >= 1600) return '0000ff';
+							if (rating >= 1400) return '03a89e';
+							if (rating >= 1200) return '008000';
+							return '808080';
+						}
+
+						function showCodeforcesRating(handle, rating, text) {
+							var color = '#' + getRatingColor(rating);
+							
+							$('#codeforces-profile-link')
+								.html(rating >= 3000 ? ('<span style="color:#000!important">' + handle[0] + '</span>' + handle.substring(1)) : handle)
+								.css('color', color)
+								.css('font-family', 'Helvetica Neue, Helvetica, Arial, sans-serif')
+								.css('font-size', '1.1em')
+								.css('font-weight', 'bold');
+							$('#codeforces-rating')
+								.html(text + ', ' + rating)
+								.css('color', color);
+						}
+
+						function processCodeforcesInfoData(data) {
+							if (!data || data.status !== 'OK' || !data.result || !data.result.length) return;
+
+							var result = data.result[0];
+
+							if (result.rating) {
+								showCodeforcesRating(result.handle, result.rating, result.rank);
+							} else {
+								showCodeforcesRating(result.handle, 0, 'Unrated');
+							}
+						}
+
+						$(document).ready(function() {
+							if (('Promise' in window) && ('any' in Promise)) {
+								// race
+								Promise.any([
+									fetch('https://codeforces.com/api/user.info?handles=<?= $user['codeforces_handle'] ?>'),
+									fetch('https://codeforc.es/api/user.info?handles=<?= $user['codeforces_handle'] ?>')
+								]).then(function(res) {
+									return res.json();
+								}).then(function(data) {
+									processCodeforcesInfoData(data);
+								});
+							} else {
+								$.get('https://codeforces.com/api/user.info?handles=<?= $user['codeforces_handle'] ?>', function(data) {
+									processCodeforcesInfoData(data);
+								});
+							}
+						});
+					</script>
 				</li>
 				<?php endif ?>
 			</ul>
@@ -139,16 +203,16 @@ function fTime($time, $gran = -1) {
 				<?php if (time() - $last_visited < 60 * 15): // 15 mins ?>
 					<span class="text-success">
 						<i class="bi bi-circle-fill me-1"></i>
-						<?= UOJLocale::get('online') ?>
+						<?= UOJLocale::get('user::online') ?>
 					</span>
 				<?php else: ?>
 					<span class="text-danger">
 						<i class="bi bi-circle-fill me-1"></i>
-						<?= UOJLocale::get('offline') ?>
+						<?= UOJLocale::get('user::offline') ?>
 					</span>
 					<?php if ($last_visited > 0): ?>
 						<span class="text-muted small">
-							, <?= UOJLocale::get('last active at') ?>
+							, <?= UOJLocale::get('user::last active at') ?>
 							<?= fTime($last_visited, 0) ?>
 						</span>
 					<?php endif ?>
@@ -182,7 +246,7 @@ function fTime($time, $gran = -1) {
 
 			<a class="nav-link" href="<?= HTML::blog_url($user['username'], '/self_reviews') ?>">
 				<i class="bi bi-arrow-right-square"></i>
-				赛后总结
+				<?= UOJLocale::get('contests::contest self reviews') ?>
 			</a>
 		</nav>
 		<div class="card card-default mb-2">
@@ -215,7 +279,7 @@ while ($row = DB::fetch($_result)) {
 			</div>
 		</div>
 		<div class="card card-default mb-2">
-			<div class="card-body">
+		<div class="card-body">
 			<?php $ac_problems = DB::selectAll("select a.problem_id as problem_id, b.title as title from best_ac_submissions a inner join problems b on a.problem_id = b.id where submitter = '{$user['username']}' order by id") ?>
 			<h4 class="card-title h5">
 				<?= UOJLocale::get('accepted problems').': '.UOJLocale::get('n problems in total', count($ac_problems))?>
@@ -233,7 +297,7 @@ while ($row = DB::fetch($_result)) {
 					<?= UOJLocale::get('none'); ?>
 				<?php endif ?>
 			</ul>
-			</div>
+		</div>
 		</div>
 
 		<?php if (isSuperUser($myUser)): ?>
