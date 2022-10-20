@@ -1,6 +1,7 @@
 <?php
 return [
 	'website' => '网址',
+	'user type' => '用户类型',
 	'admin' => '管理员',
 	'student' => '学生',
 	'teacher' => '老师',

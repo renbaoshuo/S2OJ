@@ -27,9 +27,13 @@
 			'url' => "/user/{$user['username']}/edit/profile",
 		],
 		'password' => [
-			'name' => '<i class="bi bi-key-fill"></i> 修改密码',
+			'name' => '<i class="bi bi-lock-fill"></i> 修改密码',
 			'url' => "/user/{$user['username']}/edit/password",
 		],
+		'privilege' => [
+			'name' => '<i class="bi bi-key-fill"></i> 特权',
+			'url' => "/user/{$user['username']}/edit/privilege",
+		]
 	];
 	
 	if (!isset($tabs_info[$cur_tab])) {
@@ -177,6 +181,39 @@ EOD);
 			DB::update("UPDATE `user_info` SET `password` = '$password' where `username` = '{$user['username']}'");
 			die(json_encode(['status' => 'success', 'message' => '密码修改成功']));
 		}
+	} elseif ($cur_tab == 'privilege') {
+		if (isset($_POST['submit-privilege']) && $_POST['submit-privilege'] == 'privilege' && isSuperUser($myUser)) {
+			header('Content-Type: application/json');
+
+			$user['usertype'] = 'student';
+
+			if ($_POST['user_type'] == 'teacher') {
+				removeUserType($user, 'student');
+				addUserType($user, 'teacher');
+			} else {
+				addUserType($user, 'student');
+			}
+
+			if ($_POST['problem_uploader'] == 'yes') {
+				addUserType($user, 'problem_uploader');
+			}
+
+			if ($_POST['problem_manager'] == 'yes') {
+				addUserType($user, 'problem_manager');
+			}
+
+			if ($_POST['contest_judger'] == 'yes') {
+				addUserType($user, 'contest_judger');
+			}
+
+			if ($_POST['contest_only'] == 'yes') {
+				addUserType($user, 'contest_only');
+			}
+
+			DB::update("UPDATE `user_info` SET `usertype` = '{$user['usertype']}' where `username` = '{$user['username']}'");
+
+			die(json_encode(['status' => 'success', 'message' => '权限修改成功']));
+		}
 	}
 
 	$pageTitle = $user['username'] == $myUser['username']
@@ -260,6 +297,7 @@ EOD);
 					如需修改其他用户的密码，请前往 <a href="/super-manage/users" class="alert-link">系统管理</a> 页面操作。
 				</div>
 				<?php endif ?>
+
 				<div class="text-center">
 					<button type="submit" id="button-submit-change_password" name="submit-change_password" value="change_password" class="mt-3 btn btn-secondary">更新</button>
 				</div>
@@ -309,6 +347,99 @@ EOD);
 			return false;
 		});
 	</script>
+<?php elseif ($cur_tab == 'privilege'): ?>
+	<div class="card">
+		<div class="card-body">
+			<div id="result-alert" class="alert" role="alert" style="display: none"></div>
+			<form id="form-privilege" method="post">
+				<?php if (isSuperUser($myUser)): ?>
+				<fieldset>
+				<?php else: ?>
+				<fieldset disabled>
+				<?php endif ?>
+				<div class="input-group mb-3">
+					<label for="input-user_type" class="form-label">
+						<?= UOJLocale::get('user::user type') ?>
+					</label>
+					<div class="form-check ms-3">
+						<input class="form-check-input" type="radio" name="user_type" value="student" id="input-user_type" <?= hasUserType($user, 'student') && !hasUserType($user, 'teacher') ? 'checked' : '' ?>>
+						<label class="form-check-label" for="input-user_type">
+							<?= UOJLocale::get('user::student') ?>
+						</label>
+					</div>
+					<div class="form-check ms-2">
+						<input class="form-check-input" type="radio" name="user_type" value="teacher" id="input-user_type_2" <?= hasUserType($user, 'teacher') ? 'checked' : '' ?>>
+						<label class="form-check-label" for="input-user_type_2">
+							<?= UOJLocale::get('user::teacher') ?>
+						</label>
+					</div>
+				</div>
+
+				<div class="form-check form-switch">
+					<input class="form-check-input" type="checkbox" role="switch" name="problem_uploader" id="input-problem_uploader" <?= hasUserType($user, 'problem_uploader') ? 'checked' : '' ?>>
+					<label class="form-check-label" for="input-problem_uploader">
+						<?= UOJLocale::get('user::problem uploader') ?>
+					</label>
+				</div>
+
+				<div class="form-check form-switch">
+					<input class="form-check-input" type="checkbox" role="switch" name="problem_manager" id="input-problem_manager" <?= hasUserType($user, 'problem_manager') ? 'checked' : '' ?>>
+					<label class="form-check-label" for="input-problem_manager">
+						<?= UOJLocale::get('user::problem manager') ?>
+					</label>
+				</div>
+
+				<div class="form-check form-switch">
+					<input class="form-check-input" type="checkbox" role="switch" name="contest_judger" id="input-contest_judger" <?= hasUserType($user, 'contest_judger') ? 'checked' : '' ?>>
+					<label class="form-check-label" for="input-contest_judger">
+						<?= UOJLocale::get('user::contest judger') ?>
+					</label>
+				</div>
+
+				<div class="form-check form-switch">
+					<input class="form-check-input" type="checkbox" role="switch" name="contest_only" id="input-contest_only" <?= hasUserType($user, 'contest_only') ? 'checked' : '' ?>>
+					<label class="form-check-label" for="input-contest_only">
+						<?= UOJLocale::get('user::contest only') ?>
+					</label>
+				</div>
+				</fieldset>
+
+				<?php if (isSuperUser($myUser)): ?>
+				<div class="text-center">
+					<button type="submit" id="button-submit-privilege" name="submit-privilege" value="privilege" class="mt-3 btn btn-secondary">更新</button>
+				</div>
+				<?php endif ?>
+			</form>
+			<script>
+				$('#form-privilege').submit(function(e) {
+					$.post('', {
+						user_type: $('input[name=user_type]:checked').val(),
+						problem_uploader: $('input[name=problem_uploader]').prop('checked') ? 'yes' : 'no',
+						problem_manager: $('input[name=problem_manager]').prop('checked') ? 'yes' : 'no',
+						contest_judger: $('input[name=contest_judger]').prop('checked') ? 'yes' : 'no',
+						contest_only: $('input[name=contest_only]').prop('checked') ? 'yes' : 'no',
+						'submit-privilege': 'privilege',
+					}, function(res) {
+						if (res && res.status === 'success') {
+							$('#result-alert')
+								.html('权限修改成功！')
+								.addClass('alert-success')
+								.removeClass('alert-danger')
+								.show();
+						} else {
+							$('#result-alert')
+								.html('权限修改失败。' + (res.message || ''))
+								.removeClass('alert-success')
+								.addClass('alert-danger')
+								.show();
+						}
+					});
+
+					return false;
+				});
+			</script>
+		</div>
+	</div>
 <?php endif ?>
 <!-- end right col -->
 </div>

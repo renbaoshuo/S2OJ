@@ -1,6 +1,7 @@
 <?php
 return [
 	'website' => 'Website',
+	'user type' => 'User type',
 	'admin' => 'Admin',
 	'student' => 'Student',
 	'teacher' => 'Teacher',
