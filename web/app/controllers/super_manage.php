@@ -474,7 +474,7 @@ EOD);
 		]);
 		
 		$custom_test_deleter = new UOJForm('custom_test_deleter');
-		$custom_test_deleter->addInput('last', 'text', '删除末尾的 n 条记录', '5',
+		$custom_test_deleter->addInput('last', 'text', '删除末尾记录', '5',
 			function ($x, &$vdata) {
 				if (!validateUInt($x)) {
 					return '不合法';
@@ -494,6 +494,68 @@ EOD);
 		};
 		$custom_test_deleter->submit_button_config['align'] = 'compressed';
 		$custom_test_deleter->runAtServer();
+	} elseif ($cur_tab == 'image_hosting') {
+		if (isset($_POST['submit-delete_image']) && $_POST['submit-delete_image'] == 'delete_image') {
+			crsf_defend();
+
+			$image_id = $_POST['image_id'];
+
+			if (!validateUInt($image_id)) {
+				die('<script>alert("删除失败：图片 ID 无效");</script>' . SCRIPT_REFRESH_AS_GET);
+			}
+
+			if (!($image = DB::selectFirst("SELECT * from users_images where id = $image_id"))) {
+				die('<script>alert("删除失败：图片不存在");</script>' . SCRIPT_REFRESH_AS_GET);
+			}
+			
+			unlink(UOJContext::storagePath().$result['path']);
+			DB::delete("DELETE FROM users_images WHERE id = $image_id");
+
+			die('<script>alert("删除成功！");</script>' . SCRIPT_REFRESH_AS_GET);
+		}
+
+		
+		$change_user_image_total_size_limit_form = new UOJForm('change_user_image_total_size_limit');
+		$change_user_image_total_size_limit_form->submit_button_config['align'] = 'compressed';
+		$change_user_image_total_size_limit_form->addInput('change_user_image_total_size_limit_username', 'text', '用户名', '',
+			function ($x, &$vdata) {
+				if (!validateUsername($x)) {
+					return '用户名不合法';
+				}
+
+				if (!queryUser($x)) {
+					return '用户不存在';
+				}
+				
+				$vdata['username'] = $x;
+				
+				return '';
+			},
+			null
+		);
+		$change_user_image_total_size_limit_form->addInput('change_user_image_total_size_limit_limit', 'text', '存储限制（单位：Byte）', '104857600',
+			function ($x, &$vdata) {
+				if (!validateUInt($x, 10)) {
+					return '限制不合法';
+				}
+
+				if (intval($x) > 2147483648) {
+					return '限制不能大于 2 GB';
+				}
+				
+				$vdata['limit'] = $x;
+				
+				return '';
+			},
+			null
+		);
+
+		$change_user_image_total_size_limit_form->handle = function(&$vdata) {
+			DB::update("UPDATE user_info SET images_size_limit = {$vdata['limit']} WHERE username = '{$vdata['username']}'");
+		};
+		
+		$change_user_image_total_size_limit_form->runAtServer();
+
 	}
 	?>
 
@@ -963,7 +1025,61 @@ echoSubmissionsList(
 
 	<div class="card mt-3">
 		<div class="card-body">
+			<h5 class="card-title">删除末尾的 n 条记录</h5>
 			<?php $custom_test_deleter->printHTML() ?>
+		</div>
+	</div>
+<?php elseif ($cur_tab == 'image_hosting'): ?>
+<?php
+echoLongTable(
+	['*'],
+	'users_images',
+	'1',
+	'order by id desc',
+	<<<EOD
+	<tr>
+		<th style="width: 10em">上传者</th>
+		<th style="width: 14em">预览</th>
+		<th style="width: 6em">文件大小</th>
+		<th style="width: 8em">上传时间</th>
+		<th style="width: 6em">操作</th>
+	</tr>
+EOD,
+	function($row) {
+		$user_link = getUserLink($row['uploader']);
+		if ($row['size'] < 1024 * 512) {
+			$size = strval(round($row['size'] * 1.0 / 1024, 1)) . ' KB';
+		} else {
+			$size = strval(round($row['size'] * 1.0 / 1024 / 1024, 1)) . ' MB';
+		}
+		$token = crsf_token();
+
+		echo <<<EOD
+	<tr>
+		<td>$user_link</td>
+		<td><img src="{$row['path']}" width="250" loading="lazy"></td>
+		<td>$size</td>
+		<td>{$row['upload_time']}</td>
+		<td>
+			<form class="d-inline-block" method="POST" onsubmit="return confirm('你真的要删除这张图片吗？')">
+				<input type="hidden" name="_token" value="$token">
+				<input type="hidden" name="image_id" value="{$row['id']}">
+				<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-delete_image" value="delete_image">删除</button>
+			</form>
+		</td>
+	</tr>
+EOD;
+	},
+	[
+		'page_len' => 20,
+		'div_classes' => ['card', 'mb-3', 'table-responsive'],
+		'table_classes' => ['table', 'uoj-table', 'mb-0']
+	]
+	); ?>
+	<div class="card mt-3">
+		<div class="card-body">
+			<h5>修改用户图床空间上限</h5>
+			<?php $change_user_image_total_size_limit_form->printHTML() ?>
 		</div>
 	</div>
 <?php endif ?>
