@@ -1,5 +1,6 @@
 <?php
 return [
+	'real name' => 'Real name',
 	'belongs to these groups' => 'Belongs to these groups:',
 	'avatar source' => 'Avatar source',
 	'website' => 'Website',

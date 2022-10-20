@@ -51,6 +51,23 @@
 		<div id="help-username" class="form-text">用户名不能被修改。</div>
 	</div>
 EOD);
+		if (isSuperUser($myUser)) {
+			$update_profile_form->addVInput('realname', 'text', UOJLocale::get('user::real name'), $user['realname'],
+				function($realname, &$vdata) {
+					$vdata['realname'] = $realname;
+
+					return '';
+				}, null);
+		} else {
+			$real_name = UOJLocale::get('user::real name');
+			$update_profile_form->appendHTML(<<<EOD
+	<div class="mb-3">
+		<label for="input-realname" class="form-label">$real_name</label>
+		<input type="text" class="form-control" id="input-realname" aria-describedby="help-realname" value="{$user['realname']}" disabled>
+		<div id="help-realname" class="form-text">只有管理员才能修改用户的真实姓名。</div>
+	</div>
+EOD);
+		}
 		$update_profile_form->addVCheckboxes('avatar_source', [
 			'gravatar' => 'Gravatar',
 			'qq' => 'QQ',
@@ -154,9 +171,10 @@ EOD);
 			$esc_avatar_source = DB::escape($_POST['avatar_source']);
 
 			if (isSuperUser($myUser)) {
+				$esc_realname = DB::escape($vdata['realname']);
 				$esc_school = DB::escape($vdata['school']);
 
-				DB::update("UPDATE user_info SET school = '$esc_school' WHERE username = '{$user['username']}'");
+				DB::update("UPDATE user_info SET realname = '$esc_realname', school = '$esc_school' WHERE username = '{$user['username']}'");
 			}
 
 			DB::update("UPDATE user_info SET email = '$esc_email', qq = '$esc_qq', sex = '$esc_sex', motto = '$esc_motto', codeforces_handle = '$esc_codeforces_handle', github = '$esc_github', website = '$esc_website', avatar_source = '$esc_avatar_source' WHERE username = '{$user['username']}'");
