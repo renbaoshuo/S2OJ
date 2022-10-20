@@ -1,14 +1,12 @@
 <?php
+	requireLib('bootstrap5');
+
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
 	}
 
 	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
 		become403Page();
-	}
-
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
 	}
 
 	$conds = array();
@@ -61,60 +59,31 @@
 
 <div class="d-none d-sm-block">
 	<?php if (Auth::check()): ?>
-	<div class="float-right
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-btn-group
-<?php endif ?>">
+	<div class="float-right btn-group">
 		<a href="/hacks?hacker=<?= Auth::id() ?>" class="btn btn-success btn-sm"><?= UOJLocale::get('problems::hacks by me') ?></a>
 		<a href="/hacks?owner=<?= Auth::id() ?>" class="btn btn-danger btn-sm"><?= UOJLocale::get('problems::hacks to me') ?></a>
 	</div>
 	<?php endif ?>
 	<form id="form-search" class="form-inline" role="form">
-		<div id="form-group-submission_id" class="form-group
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-d-inline-block
-<?php endif ?>
-		">
+		<div id="form-group-submission_id" class="form-group d-inline-block">
 			<label for="input-submission_id" class="control-label"><?= UOJLocale::get('problems::submission id') ?>:</label>
 			<input type="text" class="form-control input-sm" name="submission_id" id="input-submission_id" value="<?= $q_submission_id ?>" maxlength="6" style="width:5em" />
 		</div>
-		<div id="form-group-problem_id" class="form-group
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-d-inline-block
-<?php endif ?>
-		">
+		<div id="form-group-problem_id" class="form-group d-inline-block">
 			<label for="input-problem_id" class="control-label"><?= UOJLocale::get('problems::problem id') ?>:</label>
 			<input type="text" class="form-control input-sm" name="problem_id" id="input-problem_id" value="<?= $q_problem_id ?>" maxlength="4" style="width:4em" />
 		</div>
-		<div id="form-group-hacker" class="form-group
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-d-inline-block
-<?php endif ?>
-		">
+		<div id="form-group-hacker" class="form-group d-inline-block">
 			<label for="input-hacker" class="control-label"><?= UOJLocale::get('problems::hacker') ?>:</label>
 			<input type="text" class="form-control input-sm" name="hacker" id="input-hacker" value="<?= $q_hacker ?>" maxlength="100" style="width:10em" />
 		</div>
-		<div id="form-group-owner" class="form-group
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-d-inline-block
-<?php endif ?>
-		">
+		<div id="form-group-owner" class="form-group d-inline-block">
 			<label for="input-owner" class="control-label"><?= UOJLocale::get('problems::owner') ?>:</label>
 			<input type="text" class="form-control input-sm" name="owner" id="input-owner" value="<?= $q_owner ?>" maxlength="100" style="width:10em" />
 		</div>
-		<div id="form-group-status" class="form-group
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-d-inline-block
-<?php endif ?>
-		">
+		<div id="form-group-status" class="form-group d-inline-block">
 			<label for="input-status" class="control-label"><?= UOJLocale::get('problems::result') ?>:</label>
-			<select class="input-sm
-			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-				form-select
-			<?php else: ?>
-				form-control
-			<?php endif ?>
-			" id="input-status" name="status">
+			<select class="input-sm form-select" id="input-status" name="status">
 				<option value=""<?= $selected_all?>>All</option>
 				<option value="1"<?= $selected_succ ?>>Success!</option>
 				<option value="2"<?= $selected_fail ?>>Failed.</option>
@@ -139,27 +108,19 @@ d-inline-block
 			location.href = url;
 		});
 	</script>
-	
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+
 	<div class="mt-3"></div>
-<?php else: ?>
-	<div class="top-buffer-sm"></div>
-<?php endif ?>
-		
 </div>
 
 <?php echoHacksList($cond,
 	'order by id desc',
-	array(
+	[
 		'judge_time_hidden' => '',
-		'table_config' => (isset($REQUIRE_LIB['bootstrap5']) 
-			? array(
-				'div_classes' => array('card', 'mb-3', 'table-responsive'),
-				'table_classes' => array('table', 'mb-0', 'uoj-table', 'text-center')
-			)
-			: array()
-		),
-	),
+		'table_config' => [
+			'div_classes' => ['card', 'mb-3', 'table-responsive'],
+			'table_classes' => ['table', 'mb-0', 'uoj-table', 'text-center'],
+		],
+	],
 	$myUser);
 	?>
 

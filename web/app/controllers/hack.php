@@ -1,5 +1,7 @@
 <?php
 	requirePHPLib('form');
+	requireLib('bootstrap5');
+	requireLib('hljs');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
@@ -11,10 +13,6 @@
 
 	if (!validateUInt($_GET['id']) || !($hack = queryHack($_GET['id']))) {
 		become404Page();
-	}
-
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
 	}
 
 	$submission = querySubmission($hack['submission_id']);	
@@ -66,13 +64,6 @@
 		}
 	}
 	?>
-<?php
-	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		$REQUIRE_LIB['hljs'] = '';
-	} else {
-		$REQUIRE_LIB['shjs'] = '';
-	}
-	?>
 <?php echoUOJPageHeader(UOJLocale::get('problems::hack').' #'.$hack['id']) ?>
 
 <h1 class="h3">
@@ -85,18 +76,12 @@
 		<div class="card-header bg-info">
 			<h4 class="card-title"><?= UOJLocale::get('details') ?></h4>
 		</div>
-		<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-		<div class="card-body">
-		<?php endif ?>
-			<?php echoJudgementDetails($hack['details'], $styler, 'details') ?>
-			<?php if ($should_show_details_to_me): ?>
-				<?php if ($styler->fade_all_details): ?>
-					<hr />
-					<?php echoHackDetails($hack['details'], 'final_details') ?>
-				<?php endif ?>
+		<?php echoJudgementDetails($hack['details'], $styler, 'details') ?>
+		<?php if ($should_show_details_to_me): ?>
+			<?php if ($styler->fade_all_details): ?>
+				<hr />
+				<?php echoHackDetails($hack['details'], 'final_details') ?>
 			<?php endif ?>
-		<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-		</div>
 		<?php endif ?>
 	</div>
 <?php endif ?>
