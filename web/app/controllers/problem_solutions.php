@@ -74,6 +74,7 @@ EOD;
 		$res_form->submit_button_config['margin_class'] = 'mt-0';
 		$res_form->submit_button_config['class_str'] = 'btn btn-link text-decoration-none text-danger p-0';
 		$res_form->submit_button_config['text'] = '移除';
+		$res_form->submit_button_config['confirm_text'] = '你真的要移除这篇题解吗？';
 		$res_form->submit_button_config['align'] = 'inline';
 
 		return $res_form;
