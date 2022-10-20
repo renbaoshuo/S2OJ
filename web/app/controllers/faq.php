@@ -78,6 +78,9 @@
 	<p class="card-text">
 		快使用 Gravatar 吧！Gravatar 地址：<a href="https://cn.gravatar.com" target="_blank">https://cn.gravatar.com</a>。进去后注册个帐号然后与邮箱绑定并上传头像，就 OK 啦！
 	</p>
+	<p class="card-text">
+		上不去 Gravatar？没关系，我们现在也支持 QQ 头像了！你只需要前往 “更改个人信息” 页面填写自己的 QQ 号，并将 “头像来源” 选为 “QQ” 就可以让你的 QQ 头像显示在 S2OJ 上啦！
+	</p>
 
 	<h5 class="mt-4">递归 10<sup>7</sup> 层怎么没爆栈啊</h5>
 	<p class="card-text">
