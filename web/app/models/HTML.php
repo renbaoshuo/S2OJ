@@ -8,6 +8,20 @@ class HTML {
 		return strip_tags($str);
 	}
 	public static function avatar_addr($user, $size) {
+		if ($user['avatar_source'] == 'qq' && $user['qq']) {
+			$s = '5';
+
+			if ($size <= 40) {
+				$s = '2';
+			} elseif ($size <= 100) {
+				$s = '3';
+			} elseif ($size <= 140) {
+				$s = '4';
+			}
+			
+			return "https://q1.qlogo.cn/g?b=qq&nk={$user['qq']}&s=$s";
+		}
+
 		return '//gravatar.loli.net/avatar/' . md5(strtolower(trim($user['email']))) . "?d=mm&amp;s=$size";
 	}
 

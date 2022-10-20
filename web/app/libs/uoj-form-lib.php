@@ -225,6 +225,40 @@ EOD;
 EOD;
 			$this->addNoVal($name, $html);
 		}
+		public function addVCheckboxes($name, $options, $label_text, $default_value) {
+			$default_value = htmlspecialchars($default_value);
+			$html = <<<EOD
+<div id="div-$name" class="input-group mb-3">
+	<label class="form-label me-3">$label_text</label>
+EOD;
+			foreach ($options as $opt_name => $opt_label) {
+				$html .= <<<EOD
+	<div class="form-check ms-2">
+EOD;
+				if ($opt_name != $default_value) {
+					$html .= <<<EOD
+		<input class="form-check-input" type="radio" id="input-$name-$opt_name" name="$name" value="$opt_name">
+EOD;
+				} else {
+					$html .= <<<EOD
+		<input class="form-check-input" type="radio" id="input-$name-$opt_name" name="$name" value="$opt_name" checked="checked">
+EOD;
+				}
+				$html .= <<<EOD
+		<label class="form-check-label" for="input-$name-$opt_name">$opt_label</label>
+	</div>
+EOD;
+			}
+			$html .= <<<EOD
+</div>
+EOD;
+			$this->add($name, $html,
+				function($opt) use ($options) {
+					return isset($options[$opt]) ? '' : "无效选项";
+				},
+				null
+			);
+		}
 		public function addCKEditor($name, $label_text, $default_value, $validator_php, $validator_js) {
 			$default_value = htmlspecialchars($default_value);
 			global $REQUIRE_LIB;

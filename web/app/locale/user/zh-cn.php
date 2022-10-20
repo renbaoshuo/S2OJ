@@ -1,5 +1,6 @@
 <?php
 return [
+	'avatar source' => '头像来源',
 	'website' => '网址',
 	'user type' => '用户类型',
 	'admin' => '管理员',

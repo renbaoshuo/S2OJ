@@ -1,5 +1,6 @@
 <?php
 return [
+	'avatar source' => 'Avatar source',
 	'website' => 'Website',
 	'user type' => 'User type',
 	'admin' => 'Admin',

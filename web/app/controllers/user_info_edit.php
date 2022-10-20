@@ -44,17 +44,22 @@
 		$update_profile_form = new UOJForm('update_profile');
 		$username = UOJLocale::get('username');
 		$avatar = UOJLocale::get('avatar');
-		$change_avatar_help = UOJLocale::get('change avatar help');
 		$update_profile_form->appendHTML(<<<EOD
 	<div class="mb-3">
 		<label for="input-username" class="form-label">$username</label>
 		<input type="text" class="form-control" id="input-username" aria-describedby="help-username" value="{$user['username']}" disabled>
 		<div id="help-username" class="form-text">用户名不能被修改。</div>
 	</div>
-	<div class="mb-3">
-		<div>$avatar</div>
-		<div class="mt-1 small text-muted">$change_avatar_help</div>
-	</div>
+EOD);
+		$update_profile_form->addVCheckboxes('avatar_source', [
+			'gravatar' => 'Gravatar',
+			'qq' => 'QQ',
+		], UOJLocale::get('user::avatar source'), $user['avatar_source']);
+		$change_avatar_help = UOJLocale::get('change avatar help');
+		$update_profile_form->appendHTML(<<<EOD
+	<div style="margin-top: -1.25rem;" class="mb-3 small text-muted">
+		$change_avatar_help
+		</div>
 EOD);
 		$update_profile_form->addVInput('email', 'email', UOJLocale::get('email'), $user['email'],
 			function($email, &$vdata) {
@@ -103,7 +108,7 @@ EOD);
 	</div>
 EOD);
 		}
-		$update_profile_form->addVSelect('sex', [
+		$update_profile_form->addVCheckboxes('sex', [
 				'U' => UOJLocale::get('refuse to answer'),
 				'M' => UOJLocale::get('male'),
 				'F' => UOJLocale::get('female'),
@@ -146,6 +151,7 @@ EOD);
 			$esc_motto = DB::escape($vdata['motto']);
 			$esc_codeforces_handle = DB::escape($vdata['codeforces_handle']);
 			$esc_website = DB::escape($vdata['website']);
+			$esc_avatar_source = DB::escape($_POST['avatar_source']);
 
 			if (isSuperUser($myUser)) {
 				$esc_school = DB::escape($vdata['school']);
@@ -153,7 +159,7 @@ EOD);
 				DB::update("UPDATE user_info SET school = '$esc_school' WHERE username = '{$user['username']}'");
 			}
 
-			DB::update("UPDATE user_info SET email = '$esc_email', qq = '$esc_qq', sex = '$esc_sex', motto = '$esc_motto', codeforces_handle = '$esc_codeforces_handle', github = '$esc_github', website = '$esc_website' WHERE username = '{$user['username']}'");
+			DB::update("UPDATE user_info SET email = '$esc_email', qq = '$esc_qq', sex = '$esc_sex', motto = '$esc_motto', codeforces_handle = '$esc_codeforces_handle', github = '$esc_github', website = '$esc_website', avatar_source = '$esc_avatar_source' WHERE username = '{$user['username']}'");
 		};
 		$update_profile_form->submit_button_config['margin_class'] = 'mt-3';
 		$update_profile_form->submit_button_config['text'] = '更新';
