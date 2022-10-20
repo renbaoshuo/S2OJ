@@ -160,9 +160,31 @@ EOD);
 			}
 
 			DB::update("UPDATE user_info SET email = '$esc_email', qq = '$esc_qq', sex = '$esc_sex', motto = '$esc_motto', codeforces_handle = '$esc_codeforces_handle', github = '$esc_github', website = '$esc_website', avatar_source = '$esc_avatar_source' WHERE username = '{$user['username']}'");
+
+			header('Content-Type: application/json');
+			die(json_encode(['status' => 'success']));
 		};
 		$update_profile_form->submit_button_config['margin_class'] = 'mt-3';
 		$update_profile_form->submit_button_config['text'] = '更新';
+		$update_profile_form->setAjaxSubmit(<<<EOD
+function(res) {
+	if (res.status === 'success') {
+		$('#result-alert')
+			.html('个人信息修改成功！')
+			.addClass('alert-success')
+			.removeClass('alert-danger')
+			.show();
+	} else {
+		$('#result-alert')
+			.html('个人信息修改失败。' + (res.message || ''))
+			.removeClass('alert-success')
+			.addClass('alert-danger')
+			.show();
+	}
+
+	$(window).scrollTop(0);
+}
+EOD);
 		$update_profile_form->runAtServer();
 	} elseif ($cur_tab == 'password') {
 		if (isset($_POST['submit-change_password']) && $_POST['submit-change_password'] == 'change_password') {
@@ -269,6 +291,7 @@ EOD);
 <?php if ($cur_tab == 'profile'): ?>
 	<div class="card">
 		<div class="card-body">
+			<div id="result-alert" class="alert" role="alert" style="display: none"></div>
 			<?php $update_profile_form->printHTML() ?>
 		</div>
 	</div>
@@ -314,6 +337,8 @@ EOD);
 		$('#form-change_password').submit(function() {
 			var ok = true;
 
+			$('#result-alert').hide();
+
 			ok &= getFormErrorAndShowHelp('current_password', validatePassword);
 			ok &= getFormErrorAndShowHelp('new_password', validateSettingPassword);
 
@@ -339,6 +364,8 @@ EOD);
 								.addClass('alert-danger')
 								.show();
 						}
+
+						$(window).scrollTop(0);
 					},
 					error: function() {
 						$('#result-alert')
@@ -346,6 +373,8 @@ EOD);
 							.removeClass('alert-success')
 							.addClass('alert-danger')
 							.show();
+
+						$(window).scrollTop(0);
 					}
 				});
 			}
@@ -418,6 +447,8 @@ EOD);
 			</form>
 			<script>
 				$('#form-privilege').submit(function(e) {
+					$('#result-alert').hide();
+
 					$.post('', {
 						user_type: $('input[name=user_type]:checked').val(),
 						problem_uploader: $('input[name=problem_uploader]').prop('checked') ? 'yes' : 'no',
@@ -432,12 +463,16 @@ EOD);
 								.addClass('alert-success')
 								.removeClass('alert-danger')
 								.show();
+
+							$(window).scrollTop(0);
 						} else {
 							$('#result-alert')
 								.html('权限修改失败。' + (res.message || ''))
 								.removeClass('alert-success')
 								.addClass('alert-danger')
 								.show();
+
+							$(window).scrollTop(0);
 						}
 					});
 
