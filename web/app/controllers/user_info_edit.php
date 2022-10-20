@@ -341,7 +341,7 @@ EOD);
 				</div>
 				<?php if (isSuperUser($myUser) && $user['username'] != $myUser['username']): ?>
 				<div class="alert alert-warning mb-0" role="alert">
-					如需修改其他用户的密码，请前往 <a href="/super-manage/users" class="alert-link">系统管理</a> 页面操作。
+					如需重置其他用户的密码，请前往 <a href="/super-manage/users" class="alert-link">系统管理</a> 页面操作。
 				</div>
 				<?php endif ?>
 
