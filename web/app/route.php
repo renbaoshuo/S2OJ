@@ -72,7 +72,7 @@ Route::group([
 		Route::any('/reset-password', '/reset_pw.php');
 
 		Route::any('/user/{username}', '/user_info.php');
-		Route::any('/user/{username}/edit', '/user_info_edit.php');
+		Route::any('/user/{username}/edit(?:/{tab})?', '/user_info_edit.php');
 		Route::any('/user_msg', '/user_msg.php');
 		Route::any('/user/{username}/system_msg', '/user_system_msg.php');
 

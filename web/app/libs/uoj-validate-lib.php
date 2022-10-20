@@ -55,3 +55,7 @@ function validateURL($url) {
 function validateString($str) {
 	return preg_match('/[^0-9a-zA-Z]/', $str) !== true;
 }
+
+function validateGitHubUsername($username) {
+	return is_string($username) && preg_match('/^[a-zA-Z0-9_-]{1,20}$/', $username);
+}

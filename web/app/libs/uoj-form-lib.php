@@ -159,7 +159,7 @@ EOD;
 		public function addVSelect($name, $options, $label_text, $default_value) {
 			$default_value = htmlspecialchars($default_value);
 			$html = <<<EOD
-<div id="div-$name">
+<div id="div-$name" class="mb-3">
 	<label for="input-$name" class="control-label">$label_text</label>
 	<select class="form-control form-select" id="input-{$name}" name="$name">
 
@@ -224,6 +224,40 @@ EOD;
 </div>
 EOD;
 			$this->addNoVal($name, $html);
+		}
+		public function addVCheckboxes($name, $options, $label_text, $default_value) {
+			$default_value = htmlspecialchars($default_value);
+			$html = <<<EOD
+<div id="div-$name" class="input-group mb-3">
+	<label class="form-label me-3">$label_text</label>
+EOD;
+			foreach ($options as $opt_name => $opt_label) {
+				$html .= <<<EOD
+	<div class="form-check ms-2">
+EOD;
+				if ($opt_name != $default_value) {
+					$html .= <<<EOD
+		<input class="form-check-input" type="radio" id="input-$name-$opt_name" name="$name" value="$opt_name">
+EOD;
+				} else {
+					$html .= <<<EOD
+		<input class="form-check-input" type="radio" id="input-$name-$opt_name" name="$name" value="$opt_name" checked="checked">
+EOD;
+				}
+				$html .= <<<EOD
+		<label class="form-check-label" for="input-$name-$opt_name">$opt_label</label>
+	</div>
+EOD;
+			}
+			$html .= <<<EOD
+</div>
+EOD;
+			$this->add($name, $html,
+				function($opt) use ($options) {
+					return isset($options[$opt]) ? '' : "无效选项";
+				},
+				null
+			);
 		}
 		public function addCKEditor($name, $label_text, $default_value, $validator_php, $validator_js) {
 			$default_value = htmlspecialchars($default_value);
@@ -534,14 +568,15 @@ EOD;
 				if ($field['validator_js'] != 'always_ok') {
 					echo <<<EOD
 		if (${field['name']}_err) {
-			$('#div-${field['name']}').addClass('has-error');
+			$('#div-${field['name']}').addClass('has-error');  // for bootstrap4
+			$('#input-${field['name']}').addClass('is-invalid');
 			$('#help-${field['name']}').text(${field['name']}_err);
 			ok = false;
 		} else {
-			$('#div-${field['name']}').removeClass('has-error');
+			$('#div-${field['name']}').removeClass('has-error');  // for bootstrap4
+			$('#input-${field['name']}').removeClass('is-invalid');
 			$('#help-${field['name']}').text('');
 		}
-
 EOD;
 				}
 			}
@@ -562,11 +597,13 @@ EOD;
 		$(this).find("input[type='file']").each(function() {
 			for (var i = 0; i < this.files.length; i++) {
 				if (this.files[i].size > 10 * 1024 * 1024) {
-					$('#div-' + $(this).attr('name')).addClass('has-error');
+					$('#div-' + $(this).attr('name')).addClass('has-error');  // for bootstrap4
+					$('#input-' + $(this).attr('name')).addClass('is-invalid');
 					$('#help-' + $(this).attr('name')).text('文件大小不能超过10M');
 					ok = false;
 				} else {
-					$('#div-' + $(this).attr('name')).removeClass('has-error');
+					$('#div-' + $(this).attr('name')).removeClass('has-error');  // for bootstrap4
+					$('#input-' + $(this).attr('name')).removeClass('is-invalid');
 					$('#help-' + $(this).attr('name')).text('');
 				}
 			}

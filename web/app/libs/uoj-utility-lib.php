@@ -129,7 +129,7 @@ function blog_name_decode($name) {
 	return $name;
 }
 
-function addUserType($user, $type) {
+function addUserType(&$user, $type) {
 	$usertype = explode(',', $user['usertype']);
 	if (!in_array($type, $usertype)) {
 		$usertype[] = $type;
@@ -137,7 +137,7 @@ function addUserType($user, $type) {
 	$user['usertype'] = implode(',', $usertype);
 	return $user;
 }
-function removeUserType($user, $type) {
+function removeUserType(&$user, $type) {
 	$usertype = explode(',', $user['usertype']);
 	if (in_array($type, $usertype)) {
 		$usertype = array_diff($usertype, array($type));

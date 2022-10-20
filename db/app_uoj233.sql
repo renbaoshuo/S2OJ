@@ -816,6 +816,10 @@ CREATE TABLE `user_info` (
   `last_login` timestamp NOT NULL DEFAULT 0,
   `last_visited` timestamp NOT NULL DEFAULT 0,
   `images_size_limit` int(11) UNSIGNED NOT NULL DEFAULT 104857600, /* 100 MiB */
+  `codeforces_handle` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `github` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `website` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `avatar_source` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'gravatar',
   PRIMARY KEY (`username`),
   KEY `ac_num` (`ac_num`,`username`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

@@ -105,7 +105,7 @@ class Upgrader {
 	
 	public static function upgradeToLatest() {
 		$names = array_filter(scandir(self::upgraderRoot()), function ($name) {
-			return is_dir(self::upgraderRoot().'/'.$name) && preg_match('/^\d+_[a-zA-Z_]+$/', $name);
+			return is_dir(self::upgraderRoot().'/'.$name) && preg_match('/^\d+_[0-9a-zA-Z_]+$/', $name);
 		});
 		
 		natsort($names);
