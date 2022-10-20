@@ -76,8 +76,10 @@ function fTime($time, $gran = -1) {
 					<span class="fs-6 align-middle"
 					<?php if ($user['sex'] == 'M'): ?>
 						style="color: blue"><i class="bi bi-gender-male"></i>
-					<?php elseif ($user['sex' == 'F']): ?>
+					<?php elseif ($user['sex'] == 'F'): ?>
 						style="color: red"><i class="bi bi-gender-female"></i>
+					<?php else: ?>
+						>
 					<?php endif ?>
 					</span>
 				</h3>
