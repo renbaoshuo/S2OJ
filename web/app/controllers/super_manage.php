@@ -494,6 +494,47 @@ EOD);
 		};
 		$custom_test_deleter->submit_button_config['align'] = 'compressed';
 		$custom_test_deleter->runAtServer();
+	} elseif ($cur_tab == 'judger') {
+		$judger_adder = new UOJForm('judger_adder');
+		$judger_adder->addInput('judger_adder_name', 'text', '评测机名称', '',
+			function ($x, &$vdata) {
+				if (!validateUsername($x)) {
+					return '不合法';
+				}
+				if (DB::selectCount("select count(*) from judger_info where judger_name='$x'")!=0) {
+					return '不合法';
+				}
+				$vdata['name'] = $x;
+				return '';
+			},
+			null
+		);
+		$judger_adder->handle = function(&$vdata) {
+			$password = uojRandString(32);
+			DB::insert("insert into judger_info (judger_name,password) values('{$vdata['name']}','{$password}')");
+		};
+		$judger_adder->submit_button_config['align'] = 'compressed';
+		$judger_adder->runAtServer();
+		
+		$judger_deleter = new UOJForm('judger_deleter');
+		$judger_deleter->addInput('judger_deleter_name', 'text', '评测机名称', '',
+			function ($x, &$vdata) {
+				if (!validateUsername($x)) {
+					return '不合法';
+				}
+				if (DB::selectCount("select count(*) from judger_info where judger_name='$x'")!=1) {
+					return '不合法';
+				}
+				$vdata['name'] = $x;
+				return '';
+			},
+			null
+		);
+		$judger_deleter->handle = function(&$vdata) {
+			DB::delete("delete from judger_info where judger_name='{$vdata['name']}'");
+		};
+		$judger_deleter->submit_button_config['align'] = 'compressed';
+		$judger_deleter->runAtServer();
 	} elseif ($cur_tab == 'image_hosting') {
 		if (isset($_POST['submit-delete_image']) && $_POST['submit-delete_image'] == 'delete_image') {
 			crsf_defend();
@@ -1029,6 +1070,45 @@ echoSubmissionsList(
 			<?php $custom_test_deleter->printHTML() ?>
 		</div>
 	</div>
+<?php elseif ($cur_tab == 'judger'): ?>
+	<h3>评测机列表</h3>
+	<?php
+	echoLongTable(
+		['*'],
+		'judger_info',
+		'1',
+		'',
+		<<<EOD
+	<tr>
+		<th>评测机名称</th>
+		<th>密码</th>
+		<th>IP</th>
+	</tr>
+EOD,
+function($row) {
+	echo <<<EOD
+		<tr>
+			<td>{$row['judger_name']}</td>
+			<td>{$row['password']}</td>
+			<td>{$row['ip']}</td>
+		</tr>
+EOD;
+},
+		[
+			'page_len' => 10,
+			'div_classes' => ['card', 'mb-3', 'table-responsive'],
+			'table_classes' => ['table', 'uoj-table', 'mb-0'],
+		]
+	); ?>
+	
+	<div class="card">
+		<div class="card-body">
+			<h5>添加评测机</h5>
+			<?php $judger_adder->printHTML(); ?>
+			<h5>删除评测机</h5>
+			<?php $judger_deleter->printHTML(); ?>
+		</div>
+	</div>
 <?php elseif ($cur_tab == 'image_hosting'): ?>
 <?php
 echoLongTable(
@@ -1073,7 +1153,7 @@ EOD;
 	[
 		'page_len' => 20,
 		'div_classes' => ['card', 'mb-3', 'table-responsive'],
-		'table_classes' => ['table', 'uoj-table', 'mb-0']
+		'table_classes' => ['table', 'uoj-table', 'mb-0'],
 	]
 	); ?>
 	<div class="card mt-3">
