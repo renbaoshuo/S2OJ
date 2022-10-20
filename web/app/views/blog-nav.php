@@ -145,7 +145,7 @@ mb-4" role="navigation">
 						</li>
 						<?php if (isSuperUser(Auth::user())): ?>
 							<li>
-								<a class="dropdown-item" href="<?= HTML::url('/super-manage') ?>">
+								<a class="dropdown-item" href="<?= HTML::url('/super_manage') ?>">
 									<?= UOJLocale::get('system manage') ?>
 								</a>
 							</li>

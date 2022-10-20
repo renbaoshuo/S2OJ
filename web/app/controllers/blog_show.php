@@ -11,5 +11,5 @@
 		become404Page();
 	}
 	
-	redirectTo(HTML::blog_url($blog['poster'], '/post/'.$_GET['id']));
+	redirectTo(HTML::blog_url($blog['poster'], '/post/'.$_GET['id'] . ($_GET['sub'] ?: '')));
 	?>
