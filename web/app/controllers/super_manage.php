@@ -668,7 +668,7 @@ EOD);
 
 							col_tr += '<td>' + row['id'] + '</td>';
 							col_tr += '<td>' +
-									(row['is_hidden'] ? '<span class="text-danger">[隐藏]</span> ' : '') +
+									(row['is_hidden'] == 1 ? '<span class="text-danger">[隐藏]</span> ' : '') +
 									'<a class="text-decoration-none" href="/blogs/' + row['id'] + '">' +
 										row['title'] +
 									'</a>' +
