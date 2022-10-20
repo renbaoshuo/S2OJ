@@ -410,6 +410,20 @@ EOD);
 				<?php else: ?>
 				<fieldset disabled>
 				<?php endif ?>
+				<div class="mb-3">
+					<span>
+						<?= UOJLocale::get('user::user group') ?>
+					</span>
+					<span class="d-inline-block ms-3">
+						<?php if ($user['usergroup'] == 'S'): ?>
+							<?= UOJLocale::get('user::super user') ?>
+						<?php elseif ($user['usergroup'] == 'B'): ?>
+							<?= UOJLocale::get('user::banned user') ?>
+						<?php else: ?>
+							<?= UOJLocale::get('user::normal user') ?>
+						<?php endif ?>
+					</span>
+				</div>
 				<div class="input-group mb-3">
 					<label for="input-user_type" class="form-label">
 						<?= UOJLocale::get('user::user type') ?>

@@ -1,5 +1,9 @@
 <?php
 return [
+	'user group' => 'User Group',
+	'super user' => 'Super User',
+	'normal user' => 'Normal User',
+	'banned user' => 'Banned User',
 	'real name' => 'Real name',
 	'belongs to these groups' => 'Belongs to these groups:',
 	'avatar source' => 'Avatar source',

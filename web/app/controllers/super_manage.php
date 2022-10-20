@@ -7,6 +7,10 @@
 
 	define('SCRIPT_REFRESH_AS_GET', '<script>;window.location = window.location.origin + window.location.pathname + (window.location.search.length ? window.location.search + "&" : "?") + "_=" + (+new Date()) + window.location.hash;</script>');
 
+	if (!Auth::check()) {
+		redirectToLogin();
+	}
+
 	if (!isSuperUser($myUser)) {
 		become403Page();
 	}
@@ -225,7 +229,234 @@
 		$add_link_form->succ_href = '/super_manage/index#links';
 		$add_link_form->runAtServer();
 	} elseif ($cur_tab == 'users') {
-		//
+		$user_list_cond = [];
+
+		if (isset($_GET['username']) && $_GET['username'] != "") {
+			$user_list_cond[] = "username like '%" . DB::escape($_GET['username']) . "%'";
+		}
+		if (isset($_GET['usergroup']) && $_GET['usergroup'] != "") {
+			$user_list_cond[] = "usergroup = '" . DB::escape($_GET['usergroup']) . "'";
+		}
+		if (isset($_GET['usertype']) && $_GET['usertype'] != "") {
+			$user_list_cond[] = "usertype like '%" . DB::escape($_GET['usertype']) . "%'";
+		}
+
+		if ($user_list_cond) {
+			$user_list_cond = join($user_list_cond, ' and ');
+		} else {
+			$user_list_cond = '1';
+		}
+
+		$register_form = new UOJForm('register');
+		$register_form->addVInput('new_username', 'text', '用户名', '',
+			function ($username, &$vdata) {
+				if (!validateUsername($username)) {
+					return '用户名不合法';
+				}
+
+				if (queryUser($username)) {
+					return '该用户已存在';
+				}
+
+				$vdata['username'] = $username;
+
+				return '';
+			},
+			null
+		);
+		$register_form->addVInput('new_password', 'password', '密码', '',
+			function ($password, &$vdata) {
+				$vdata['password'] = $password;
+
+				return '';
+			},
+			'validatePassword'
+		);
+		$register_form->addVInput('new_email', 'text', '电子邮件（选填）', '',
+			function ($email, &$vdata) {
+				if ($email && !validateEmail($email)) {
+					return '邮件地址不合法';
+				}
+
+				$vdata['email'] = $email;
+
+				return '';
+			},
+			null
+		);
+		$register_form->addVInput('new_realname', 'text', '真实姓名（选填）', '',
+			function ($realname, &$vdata) {
+				$vdata['realname'] = $realname;
+
+				return '';
+			},
+			null
+		);
+		$register_form->addVInput('new_school', 'text', '学校名称（选填）', '',
+			function ($school, &$vdata) {
+				$vdata['school'] = $school;
+
+				return '';
+			},
+			null
+		);
+		$register_form->handle = function(&$vdata) {
+			$username = $vdata['username'];
+			$realname = DB::escape($vdata['realname']);
+			$school = DB::escape($vdata['school']);
+			$email = DB::escape($vdata['email']);
+			$password = hash_hmac('md5', $vdata['password'], getPasswordClientSalt());
+			$password = getPasswordToStore($password, $username);
+			$svn_password = uojRandString(10);
+	
+			DB::query("insert into user_info (username, realname, email, school, password, svn_password, register_time, usergroup) values ('$username', '$realname', '$email', '$school', '$password', '$svn_password', now(), 'U')");
+			
+			header('Content-Type: application/json');
+			die(json_encode(['status' => 'success', 'message' => '']));
+		};
+		$register_form->setAjaxSubmit(<<<EOD
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert-register')
+					.html('用户新建成功！' + (res.message || ''))
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert-register')
+					.html('用户新建失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
+
+			$(window).scrollTop(0);
+		}
+EOD);
+		$register_form->runAtServer();
+
+		$change_password_form = new UOJForm('change_password');
+		$change_password_form->addVInput('p_username', 'text', '用户名', '',
+			function ($username, &$vdata) {
+				if (!validateUsername($username)) {
+					return '用户名不合法';
+				}
+
+				if (!queryUser($username)) {
+					return '用户不存在';
+				}
+
+				$vdata['username'] = $username;
+				
+				return '';
+			},
+			null
+		);
+		$change_password_form->addVInput('p_password', 'password', '密码', '',
+			function ($password, &$vdata) {
+				$vdata['password'] = $password;
+
+				return '';
+			},
+			'validatePassword'
+		);
+		$change_password_form->handle = function(&$vdata) {
+			$esc_username = DB::escape($vdata['username']);
+			$password = hash_hmac('md5', $vdata['password'], getPasswordClientSalt());
+			$esc_password = DB::escape(getPasswordToStore($password, $vdata['username']));
+
+			DB::query("update user_info set password = '$esc_password' where username = '$esc_username'");
+
+			header('Content-Type: application/json');
+			die(json_encode(['status' => 'success', 'message' => '用户 ' . $vdata['username'] . ' 的密码已经被成功重置。']));
+		};
+		$change_password_form->submit_button_config['margin_class'] = 'mt-3';
+		$change_password_form->submit_button_config['text'] = '重置';
+		$change_password_form->setAjaxSubmit(<<<EOD
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert-reset-password')
+					.html('密码重置成功！' + (res.message || ''))
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert-reset-password')
+					.html('密码重置失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
+
+			$(window).scrollTop(0);
+		}
+EOD);
+		$change_password_form->runAtServer();
+
+		$change_usergroup_form = new UOJForm('change_usergroup');
+		$change_usergroup_form->addVInput('username', 'text', '用户名', '',
+			function ($username, &$vdata) {
+				if (!validateUsername($username)) {
+					return '用户名不合法';
+				}
+
+				if (!queryUser($username)) {
+					return '用户不存在';
+				}
+				
+				$vdata['username'] = $username;
+
+				return '';
+			},
+			null
+		);
+		$change_usergroup_form->addVSelect('op_type', [
+			'banneduser' => '设为封禁用户',
+			'normaluser' => '设为普通用户',
+			'superuser' => '设为超级用户',
+		], '操作类型', '');
+		$change_usergroup_form->handle = function($vdata) {
+			$username = $vdata['username'];
+			$usergroup = '';
+
+			switch ($_POST['op_type']) {
+				case 'banneduser':
+					DB::update("update user_info set usergroup = 'B', usertype = 'banned' where username = '{$username}'");
+					$usergroup = '被封禁的用户';
+					break;
+				case 'normaluser':
+					DB::update("update user_info set usergroup = 'U', usertype = 'student' where username = '{$username}'");
+					$usergroup = '普通用户';
+					break;
+				case 'superuser':
+					DB::update("update user_info set usergroup = 'S', usertype = 'student' where username = '{$username}'");
+					$usergroup = '超级用户';
+					break;
+			}
+
+			header('Content-Type: application/json');
+			die(json_encode(['status' => 'success', 'message' => '用户 ' . $username . ' 现在是 ' . $usergroup . '。']));
+		};
+		$change_usergroup_form->setAjaxSubmit(<<<EOD
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert-change_usergroup')
+					.html('修改成功！' + (res.message || ''))
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert-change_usergroup')
+					.html('修改失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
+
+			$(window).scrollTop(0);
+		}
+EOD);
+	$change_usergroup_form->runAtServer();
 	}
 	?>
 
@@ -257,7 +488,7 @@
 <!-- right col -->
 <div class="col-md-9">
 <?php if ($cur_tab == 'index'): ?>
-<div class="card">
+<div class="card mt-3 mt-md-0">
 	<div class="card-header">
 		<ul class="nav nav-tabs card-header-tabs" role="tablist">
 			<li class="nav-item">
@@ -441,24 +672,198 @@ $(document).ready(function() {
 });
 </script>
 <?php elseif ($cur_tab == 'users'): ?>
-<div class="card">
+<div class="card mt-3 mt-md-0">
 	<div class="card-header">
 		<ul class="nav nav-tabs card-header-tabs">
 			<li class="nav-item">
-				<a class="nav-link active" href="#" data-bs-toggle="tab" data-bs-target="#">Active</a>
+				<a class="nav-link active" href="#users" data-bs-toggle="tab" data-bs-target="#users">用户列表</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#">2</a>
+				<a class="nav-link" href="#new-user" data-bs-toggle="tab" data-bs-target="#new-user">新增用户</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="#reset-password" data-bs-toggle="tab" data-bs-target="#reset-password">重置密码</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="#user-group" data-bs-toggle="tab" data-bs-target="#user-group">用户类别</a>
 			</li>
 		</ul>
 	</div>
 	<div class="card-body">
 		<div class="tab-content">
-			<div class="tab-pane" id="">1</div>
-			<div class="tab-pane" id="">2</div>
+			<div class="tab-pane active" id="users">
+				<form class="row gy-2 gx-3 align-items-end mb-3" target="_self" method="GET">
+					<div class="col-auto">
+						<label for="username" class="form-label">用户名</label>
+						<input type="text" class="form-control" name="username" id="user-query-username" value="" />
+					</div>
+					<div class="col-auto">
+						<label for="user-query-usergroup" class="form-label">用户类别</label>
+						<select class="form-select" id="user-query-usergroup" name="usergroup">
+							<?php
+							$usergroups = [
+								'' => '*: 所有用户',
+								'B' => 'B: 封禁用户',
+								'U' => 'U: 普通用户',
+								'S' => 'S: 超级用户',
+							];
+	?>
+							<?php foreach ($usergroups as $name => $group): ?>
+								<option value="<?= $name ?>"
+								<?php if ($_GET['usergroup'] == $name): ?>
+									selected
+								<?php endif ?>
+								><?= $group ?></option>
+							<?php endforeach ?>
+						</select>
+					</div>
+					<div class="col-auto">
+						<label for="user-query-usertype" class="form-label">用户权限</label>
+						<select class="form-select" id="user-query-usertype" name="usertype">
+							<?php
+	$usertypes = [
+		'' => '*: 所有',
+		'student' => 'student: 学生',
+		'teacher' => 'teacher: 老师',
+		'problem_uploader' => 'problem_uploader: 题目上传者',
+		'problem_manager' => 'problem_manager: 题目管理员',
+		'contest_judger' => 'contest_judger: 比赛评测员',
+		'contest_only' => 'contest_only: 仅比赛参加者',
+	];
+	?>
+							<?php foreach ($usertypes as $name => $type): ?>
+								<option value="<?= $name ?>"
+								<?php if ($_GET['usertype'] == $name): ?>
+									selected
+								<?php endif ?>
+								><?= $type ?></option>
+							<?php endforeach ?>
+						</select>
+					</div>
+					<div class="col-auto">
+						<button type="submit" id="user-query-submit" class="mt-2 btn btn-secondary">查询</button>
+					</div>
+				</form>
+				<?php
+					echoLongTable(
+						['*'],
+						'user_info',
+						$user_list_cond,
+						'order by username asc',
+						<<<EOD
+	<tr>
+		<th>用户名</th>
+		<th>学校</th>
+		<th>用户类别</th>
+		<th>权限</th>
+		<th>注册时间</th>
+		<th>操作</th>
+	</tr>
+EOD,
+						function($row) {
+							echo '<tr>';
+							echo '<td>', '<span class="uoj-username" data-realname="', HTML::escape($row['realname']), '">', $row['username'], '</span>', '</td>';
+							echo '<td>', HTML::escape($row['school']), '</td>';
+							echo '<td>';
+							switch ($row['usergroup']) {
+								case 'S':
+									echo UOJLocale::get('user::super user');
+									break;
+								case 'B':
+									echo UOJLocale::get('user::banned user');
+									break;
+								default:
+									echo UOJLocale::get('user::normal user');
+									break;
+							}
+							echo '</td>';
+							echo '<td>';
+							foreach (explode(',', $row['usertype']) as $idx => $type) {
+								if ($idx) {
+									echo ', ';
+								}
+								echo UOJLocale::get('user::' . str_replace('_', ' ', $type)) ?: HTML::escape($type);
+							}
+							echo '</td>';
+							echo '<td>', $row['register_time'], '</td>';
+							echo '<td>', '<a class="text-decoration-none d-inline-block align-middle" href="/user/', $row['username'], '/edit">编辑</a>', '</td>';
+							echo '</tr>';
+						},
+						[
+							'page_len' => 20,
+							'div_classes' => ['table-responsive'],
+							'table_classes' => ['table', 'align-middle'],
+						],
+					);
+	?>
+			</div>
+			<div class="tab-pane" id="new-user">
+				<div id="result-alert-register" class="alert" role="alert" style="display: none"></div>
+				<div class="row row-cols-1 row-cols-md-2">
+					<div class="col">
+						<?php $register_form->printHTML() ?>
+					</div>
+					<div class="col mt-3 mt-md-0">
+						<h5>注意事项</h5>
+						<ul class="mb-0">
+							<li>用户名推荐格式为年级 + 姓名全拼，如 2022 级的张三同学可以设置为 <code>2022zhangsan</code>。对于外校学生，推荐格式为学校名称缩写 + 姓名拼音首字母，如山大附中的赵锦熙同学可以设置为 <code>sdfzzjx</code>)。</li>
+							<li>请提醒用户及时修改初始密码，以免账号被盗导致教学资源流出。请勿设置过于简单的初始密码。</li>
+							<li>我们推荐在创建账号时输入号主的电子邮件地址以便后期发生忘记密码等情况时进行验证。</li>
+							<li>创建账号后可以在「修改个人信息」页面中的「特权」选项卡为用户分配权限。特别地，如果该用户是外校学生，那么您可能需要将其设置为「仅比赛参加者」以禁止其查看已参与比赛以外的题目。</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="tab-pane" id="reset-password">
+				<div id="result-alert-reset-password" class="alert" role="alert" style="display: none"></div>
+				<div class="row row-cols-1 row-cols-md-2">
+					<div class="col">
+						<?php $change_password_form->printHTML() ?>
+					</div>
+					<div class="col mt-3 mt-md-0">
+						<h5>注意事项</h5>
+						<ul class="mb-0">
+							<li>在为用户重置密码前请核对对方身份以免被骗。</li>
+							<li>请勿设置过于简单的密码。</li>
+							<li>请提醒用户在登录后及时修改初始密码。</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="tab-pane" id="user-group">
+				<div id="result-alert-change_usergroup" class="alert" role="alert" style="display: none"></div>
+				<div class="row row-cols-1 row-cols-md-2">
+					<div class="col">
+						<?php $change_usergroup_form->printHTML() ?>
+					</div>
+					<div class="col mt-3 mt-md-0">
+						<h5>注意事项</h5>
+						<ul class="mb-0">
+							<li>用户被封禁后将不能再次登录系统。</li>
+							<li>将当前用户移除权限后将无法再次访问本页面。</li>
+							<li>在修改用户类别前请仔细核对用户名以免产生不必要的麻烦。</li>
+						</ul>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
+
+<script>
+$(document).ready(function() {
+	// Javascript to enable link to tab
+	var hash = location.hash.replace(/^#/, '');
+	if (hash) {
+		bootstrap.Tab.jQueryInterface.call($('.nav-tabs a[href="#' + hash + '"]'), 'show').blur();
+	}
+
+	// Change hash for page-reload
+	$('.nav-tabs a').on('shown.bs.tab', function(e) {
+		window.location.hash = e.target.hash;
+	});
+});
+</script>
 <?php endif ?>
 </div>
 <!-- end right col -->
