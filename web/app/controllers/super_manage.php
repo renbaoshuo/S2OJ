@@ -34,6 +34,10 @@
 			'name' => '自定义测试',
 			'url' => "/super_manage/custom_test",
 		],
+		'judger' => [
+			'name' => '评测机管理',
+			'url' => "/super_manage/judger",
+		],
 		'image_hosting' => [
 			'name' => '图床管理',
 			'url' => "/super_manage/image_hosting",
@@ -456,7 +460,40 @@ EOD);
 			$(window).scrollTop(0);
 		}
 EOD);
-	$change_usergroup_form->runAtServer();
+		$change_usergroup_form->runAtServer();
+	} elseif ($cur_tab == 'submissions') {
+	} elseif ($cur_tab == 'custom_test') {
+		requireLib('hljs');
+
+		$submissions_pag = new Paginator([
+			'col_names' => ['*'],
+			'table_name' => 'custom_test_submissions',
+			'cond' => '1',
+			'tail' => 'order by id desc',
+			'page_len' => 10
+		]);
+		
+		$custom_test_deleter = new UOJForm('custom_test_deleter');
+		$custom_test_deleter->addInput('last', 'text', '删除末尾的 n 条记录', '5',
+			function ($x, &$vdata) {
+				if (!validateUInt($x)) {
+					return '不合法';
+				}
+				$vdata['last'] = $x;
+				return '';
+			},
+			null
+		);
+		$custom_test_deleter->handle = function(&$vdata) {
+			$all = DB::selectAll("select * from custom_test_submissions order by id asc limit {$vdata['last']}");
+			foreach ($all as $submission) {
+				$content = json_decode($submission['content'], true);
+				unlink(UOJContext::storagePath().$content['file_name']);
+			}
+			DB::delete("delete from custom_test_submissions order by id asc limit {$vdata['last']}");
+		};
+		$custom_test_deleter->submit_button_config['align'] = 'compressed';
+		$custom_test_deleter->runAtServer();
 	}
 	?>
 
@@ -864,6 +901,71 @@ $(document).ready(function() {
 	});
 });
 </script>
+<?php elseif ($cur_tab === 'submissions'): ?>
+<h4>测评失败的提交记录</h4>
+<?php
+echoSubmissionsList(
+	"result_error = 'Judgement Failed'",
+	'order by id desc',
+	[
+		'result_hidden' => '',
+		'table_config' => [
+			'div_classes' => ['card', 'mb-3', 'table-responsive'],
+			'table_classes' => ['table', 'uoj-table', 'mb-0', 'text-center']
+		]
+	],
+	$myUser
+);
+	?>
+<?php elseif ($cur_tab === 'custom_test'): ?>
+	<div class="card mb-3 table-responsive">
+		<table class="table uoj-table mb-0">
+			<thead>
+				<tr>
+					<th class="text-center">ID</th>
+					<th class="text-center">题目 ID</th>
+					<th>提交者</th>
+					<th>提交时间</th>
+					<th>测评时间</th>
+				</tr>
+			</thead>
+			<tbody>
+			<?php foreach ($submissions_pag->get() as $submission): ?>
+				<?php
+				$problem = queryProblemBrief($submission['problem_id']);
+				$submission_result = json_decode($submission['result'], true);
+				?>
+				<tr style="cursor: pointer" data-bs-toggle="collapse" data-bs-target="#custom_test__<?= $submission['id'] ?>">
+					<td class="text-center">#<?= $submission['id'] ?></td>
+					<td class="text-center">#<?= $submission['problem_id'] ?></td>
+					<td><?= getUserLink($submission['submitter']) ?></td>
+					<td><?= $submission['submit_time'] ?></td>
+					<td><?= $submission['judge_time'] ?></td>
+				</tr>
+				<tr class="collapse" id="custom_test__<?= $submission['id'] ?>">
+					<td colspan="233">
+						<?php echoSubmissionContent($submission, getProblemCustomTestRequirement($problem)) ?>
+						<?php echoCustomTestSubmissionDetails($submission_result['details'], "submission-{$submission['id']}-details") ?>
+					</td>
+				</tr>
+			<?php endforeach ?>
+			<?php if ($submissions_pag->isEmpty()): ?>
+				<tr>
+					<td class="text-center" colspan="233">
+						<?= UOJLocale::get('none') ?>
+					</td>
+				</tr>
+			<?php endif ?>
+			</tbody>
+		</table>
+	</div>
+	<?= $submissions_pag->pagination() ?>
+
+	<div class="card mt-3">
+		<div class="card-body">
+			<?php $custom_test_deleter->printHTML() ?>
+		</div>
+	</div>
 <?php endif ?>
 </div>
 <!-- end right col -->
