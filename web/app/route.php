@@ -77,7 +77,6 @@ Route::group([
 		Route::any('/user_msg', '/user_msg.php');
 		Route::any('/user/{username}/system_msg', '/user_system_msg.php');
 
-		Route::any('/super-manage(?:/{tab})?', '/super_manage_old.php');
 		Route::any('/super_manage(?:/{tab})?', '/super_manage.php');
 		
 		Route::any('/download.php', '/download.php');
