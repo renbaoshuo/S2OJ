@@ -1,5 +1,6 @@
 <?php
 return [
+	'website' => 'Website',
 	'admin' => 'Admin',
 	'student' => 'Student',
 	'teacher' => 'Teacher',

@@ -197,6 +197,14 @@ function fTime($time, $gran = -1) {
 					</script>
 				</li>
 				<?php endif ?>
+				<?php if ($user['website']): ?>
+				<li class="list-group-item">
+					<i class="bi bi-link-45deg me-1"></i>
+					<a class="text-decoration-none text-body text-break" href="<?= HTML::escape($user['website']) ?>" target="_blank">
+						<?= HTML::escape($user['website']) ?>
+					</a>
+				</li>
+				<?php endif ?>
 			</ul>
 			<div class="card-footer bg-transparent">
 				<?php $last_visited = strtotime($user['last_visited']) ?>

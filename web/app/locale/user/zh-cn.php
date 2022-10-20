@@ -1,5 +1,6 @@
 <?php
 return [
+	'website' => '网址',
 	'admin' => '管理员',
 	'student' => '学生',
 	'teacher' => '老师',
