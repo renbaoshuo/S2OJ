@@ -221,7 +221,7 @@ EOD
 	?>
 
 <?php
-	$REQUIRE_LIB['mathjax'] = '';
+	requireLib('mathjax');
 
 	if (isset($REQUIRE_LIB['bootstrap5'])) {
 		requireLib('hljs');
@@ -359,10 +359,10 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 
 <?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
 <ul class="nav nav-tabs" role="tablist">
-	<li class="nav-item"><a class="nav-link active" href="#tab-statement" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-book"></span> <?= UOJLocale::get('problems::statement') ?></a></li>
-	<li class="nav-item"><a class="nav-link" href="#tab-submit-answer" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-upload"></span> <?= UOJLocale::get('problems::submit') ?></a></li>
+	<li class="nav-item"><a class="nav-link active" href="#statement" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-book"></span> <?= UOJLocale::get('problems::statement') ?></a></li>
+	<li class="nav-item"><a class="nav-link" href="#submit" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-upload"></span> <?= UOJLocale::get('problems::submit') ?></a></li>
 	<?php if ($custom_test_requirement): ?>
-	<li class="nav-item"><a class="nav-link" href="#tab-custom-test" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-console"></span> <?= UOJLocale::get('problems::custom test') ?></a></li>
+	<li class="nav-item"><a class="nav-link" href="#custom-test" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-console"></span> <?= UOJLocale::get('problems::custom test') ?></a></li>
 	<?php endif ?>
 	<?php if (!$contest || $contest['cur_progress'] >= CONTEST_FINISHED): ?>
 	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/solutions" role="tab"><?= UOJLocale::get('problems::solutions') ?></a></li>
@@ -381,10 +381,10 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 <?php endif ?>
 
 <div class="tab-content">
-	<div class="tab-pane active" id="tab-statement">
+	<div class="tab-pane active" id="statement">
 		<article class="mt-3 markdown-body"><?= $problem_content['statement'] ?></article>
 	</div>
-	<div class="tab-pane" id="tab-submit-answer">
+	<div class="tab-pane" id="submit">
 		<div class="top-buffer-sm"></div>
 		<?php if ($can_use_zip_upload): ?>
 		<?php $zip_answer_form->printHTML(); ?>
@@ -394,7 +394,7 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 		<?php $answer_form->printHTML(); ?>
 	</div>
 	<?php if ($custom_test_requirement): ?>
-	<div class="tab-pane" id="tab-custom-test">
+	<div class="tab-pane" id="custom-test">
 		<div class="top-buffer-sm"></div>
 		<?php $custom_test_form->printHTML(); ?>
 	</div>
@@ -446,20 +446,20 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 <div class="card card-default mb-2">
 	<ul class="nav nav-pills nav-fill flex-column" role="tablist">
 		<li class="nav-item text-start">
-			<a href="#tab-statement" class="nav-link active" role="tab" data-bs-toggle="pill" data-bs-target="#tab-statement">
+			<a href="#statement" class="nav-link active" role="tab" data-bs-toggle="pill" data-bs-target="#statement">
 				<i class="bi bi-journal-text"></i>
 				<?= UOJLocale::get('problems::statement') ?>
 			</a>
 		</li>
 		<li class="nav-item text-start">
-			<a href="#tab-submit-answer" class="nav-link" role="tab" data-bs-toggle="pill" data-bs-target="#tab-submit-answer">
+			<a href="#submit" class="nav-link" role="tab" data-bs-toggle="pill" data-bs-target="#submit">
 				<i class="bi bi-upload"></i>
 				<?= UOJLocale::get('problems::submit') ?>
 			</a>
 		</li>
 		<?php if ($custom_test_requirement): ?>
 		<li class="nav-item text-start">
-			<a class="nav-link" href="#tab-custom-test" role="tab" data-bs-toggle="pill" data-bs-target="#tab-custom-test">
+			<a class="nav-link" href="#custom-test" role="tab" data-bs-toggle="pill" data-bs-target="#custom-test">
 				<i class="bi bi-braces"></i>
 				<?= UOJLocale::get('problems::custom test') ?>
 			</a>
@@ -525,8 +525,28 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 	uojIncludeView('sidebar', $sidebar_config);
 	?>
 </aside>
+<!-- end right col -->
 
 </div>
+
+<script>
+$(document).ready(function() {
+	// Javascript to enable link to tab
+	var hash = location.hash.replace(/^#/, '');
+	if (hash) {
+		bootstrap.Tab.jQueryInterface.call($('.nav-pills a[href="#' + hash + '"]'), 'show').blur();
+	}
+
+	// Change hash for page-reload
+	$('.nav-pills a').on('shown.bs.tab', function(e) {
+		if (e.target.hash == '#statement') {
+			window.location.hash = '';
+		} else {
+			window.location.hash = e.target.hash;
+		}
+	});
+});
+</script>
 <?php endif ?>
 
 <?php if ($contest && $contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
