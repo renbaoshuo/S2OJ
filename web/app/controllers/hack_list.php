@@ -78,11 +78,18 @@
 			<div class="input-group">
 				<input type="text" class="form-control form-control-sm" name="hacker" id="input-hacker" value="<?= $q_hacker ?>" maxlength="20" style="width:10em" />
 				<?php if (Auth::check()): ?>
-				<a href="/hacks?hacker=<?= Auth::id() ?>" class="btn btn-outline-secondary btn-sm">
+				<a id="my-hacks" href="/hacks?hacker=<?= Auth::id() ?>" class="btn btn-outline-secondary btn-sm">
 					我的
 				</a>
 				<?php endif ?>
 			</div>
+			<script>
+				$('#my-hacks').click(function(event) {
+					event.preventDefault();
+					$('#input-hacker').val('<?= Auth::id() ?>');
+					$('#form-search').submit();
+				});
+			</script>
 		</div>
 		<div id="form-group-owner" class="col-auto">
 			<label for="input-owner" class="form-label">
@@ -91,11 +98,18 @@
 			<div class="input-group">
 				<input type="text" class="form-control form-control-sm" name="owner" id="input-owner" value="<?= $q_owner ?>" maxlength="20" style="width:10em" />
 				<?php if (Auth::check()): ?>
-				<a href="/hacks?owner=<?= Auth::id() ?>" class="btn btn-outline-secondary btn-sm">
+				<a id="my-owners" href="/hacks?owner=<?= Auth::id() ?>" class="btn btn-outline-secondary btn-sm">
 					我的
 				</a>
 				<?php endif ?>
 			</div>
+			<script>
+				$('#my-owners').click(function(event) {
+					event.preventDefault();
+					$('#input-owner').val('<?= Auth::id() ?>');
+					$('#form-search').submit();
+				});
+			</script>
 		</div>
 		<div id="form-group-status" class="col-auto">
 			<label for="input-status" class="form-label">
