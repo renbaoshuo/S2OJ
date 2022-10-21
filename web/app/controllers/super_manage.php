@@ -315,8 +315,7 @@
 	
 			DB::query("insert into user_info (username, realname, email, school, password, svn_password, register_time, usergroup) values ('$username', '$realname', '$email', '$school', '$password', '$svn_password', now(), 'U')");
 			
-			header('Content-Type: application/json');
-			die(json_encode(['status' => 'success', 'message' => '']));
+			returnJSONData(['status' => 'success', 'message' => '']);
 		};
 		$register_form->setAjaxSubmit(<<<EOD
 		function(res) {
@@ -371,8 +370,7 @@ EOD);
 
 			DB::query("update user_info set password = '$esc_password' where username = '$esc_username'");
 
-			header('Content-Type: application/json');
-			die(json_encode(['status' => 'success', 'message' => '用户 ' . $vdata['username'] . ' 的密码已经被成功重置。']));
+			returnJSONData(['status' => 'success', 'message' => '用户 ' . $vdata['username'] . ' 的密码已经被成功重置。']);
 		};
 		$change_password_form->submit_button_config['margin_class'] = 'mt-3';
 		$change_password_form->submit_button_config['text'] = '重置';
@@ -438,8 +436,7 @@ EOD);
 					break;
 			}
 
-			header('Content-Type: application/json');
-			die(json_encode(['status' => 'success', 'message' => '用户 ' . $username . ' 现在是 ' . $usergroup . '。']));
+			returnJSONData(['status' => 'success', 'message' => '用户 ' . $username . ' 现在是 ' . $usergroup . '。']);
 		};
 		$change_usergroup_form->setAjaxSubmit(<<<EOD
 		function(res) {

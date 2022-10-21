@@ -19,13 +19,11 @@
 	$count = $_result["count(*)"];
 
 	function throwError($msg) {
-		die(json_encode(['status' => 'error', 'message' => $msg]));
+		returnJSONData(['status' => 'error', 'message' => $msg]);
 	}
 
 	$allowedTypes = [IMAGETYPE_PNG, IMAGETYPE_JPEG];
 	if ($_POST['image_upload_file_submit'] == 'submit') {
-		header('Content-Type: application/json');
-
 		if (!crsf_check()) {
 			throwError('expired');
 		}
@@ -68,7 +66,7 @@
 		$existing_image = DB::selectFirst("SELECT * FROM users_images WHERE `hash` = '$hash'");
 
 		if ($existing_image) {
-			die(json_encode(['status' => 'success', 'path' => $existing_image['path']]));
+			returnJSONData(['status' => 'success', 'path' => $existing_image['path']]);
 		}
 
 		$image = new Imagick($_FILES["image_upload_file"]["tmp_name"]);
@@ -94,7 +92,7 @@
 
 		DB::insert("INSERT INTO users_images (`path`, uploader, width, height, upload_time, size, `hash`) VALUES ('$filename', '{$myUser['username']}', $width, $height, now(), {$_FILES["image_upload_file"]["size"]}, '$hash')");
 
-		die(json_encode(['status' => 'success', 'path' => $filename]));
+		returnJSONData(['status' => 'success', 'path' => $filename]);
 	} elseif ($_POST['image_delete_submit'] == 'submit') {
 		crsf_defend();
 

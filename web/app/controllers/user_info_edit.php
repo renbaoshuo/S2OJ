@@ -179,8 +179,7 @@ EOD);
 
 			DB::update("UPDATE user_info SET email = '$esc_email', qq = '$esc_qq', sex = '$esc_sex', motto = '$esc_motto', codeforces_handle = '$esc_codeforces_handle', github = '$esc_github', website = '$esc_website', avatar_source = '$esc_avatar_source' WHERE username = '{$user['username']}'");
 
-			header('Content-Type: application/json');
-			die(json_encode(['status' => 'success']));
+			returnJSONData(['status' => 'success']);
 		};
 		$update_profile_form->submit_button_config['margin_class'] = 'mt-3';
 		$update_profile_form->submit_button_config['text'] = '更新';
@@ -206,31 +205,28 @@ EOD);
 		$update_profile_form->runAtServer();
 	} elseif ($cur_tab == 'password') {
 		if (isset($_POST['submit-change_password']) && $_POST['submit-change_password'] == 'change_password') {
-			header('Content-Type: application/json');
-
 			$old_password = $_POST['current_password'];
 			$new_password = $_POST['new_password'];
 
 			if (!validatePassword($old_password) || !checkPassword($user, $old_password)) {
-				die(json_encode(['status' => 'error', 'message' => '旧密码错误']));
+				returnJSONData(['status' => 'error', 'message' => '旧密码错误']);
 			}
 
 			if (!validatePassword($new_password)) {
-				die(json_encode(['status' => 'error', 'message' => '新密码不合法']));
+				returnJSONData(['status' => 'error', 'message' => '新密码不合法']);
 			}
 
 			if ($old_password == $new_password) {
-				die(json_encode(['status' => 'error', 'message' => '新密码不能与旧密码相同']));
+				returnJSONData(['status' => 'error', 'message' => '新密码不能与旧密码相同']);
 			}
 
 			$password = getPasswordToStore($new_password, $user['username']);
 			DB::update("UPDATE `user_info` SET `password` = '$password' where `username` = '{$user['username']}'");
-			die(json_encode(['status' => 'success', 'message' => '密码修改成功']));
+
+			returnJSONData(['status' => 'success', 'message' => '密码修改成功']);
 		}
 	} elseif ($cur_tab == 'privilege') {
 		if (isset($_POST['submit-privilege']) && $_POST['submit-privilege'] == 'privilege' && isSuperUser($myUser)) {
-			header('Content-Type: application/json');
-
 			$user['usertype'] = 'student';
 
 			if ($_POST['user_type'] == 'teacher') {
@@ -258,7 +254,7 @@ EOD);
 
 			DB::update("UPDATE `user_info` SET `usertype` = '{$user['usertype']}' where `username` = '{$user['username']}'");
 
-			die(json_encode(['status' => 'success', 'message' => '权限修改成功']));
+			returnJSONData(['status' => 'success', 'message' => '权限修改成功']);
 		}
 	}
 

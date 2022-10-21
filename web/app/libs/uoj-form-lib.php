@@ -861,4 +861,9 @@ EOD;
 		};
 		return $form;
 	}
+
+	function returnJSONData($data) {
+		header('Content-Type: application/json');
+		die(json_encode($data));
+	}
 	?>
