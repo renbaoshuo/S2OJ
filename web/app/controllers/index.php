@@ -1,6 +1,6 @@
 <?php
 	$blogs = DB::selectAll("select blogs.id, title, poster, post_time from important_blogs, blogs where is_hidden = 0 and important_blogs.blog_id = blogs.id order by level desc, important_blogs.blog_id desc limit 5");
-	$countdowns = DB::selectAll("select * from countdowns order by endtime asc");
+	$countdowns = DB::selectAll("select * from countdowns order by end_time asc");
 	$friend_links = DB::selectAll("select * from friend_links order by level desc, id asc");
 
 	if (!isset($_COOKIE['bootstrap4'])) {
@@ -134,7 +134,7 @@
 					<?php endif ?> mb-0">
 					<?php foreach ($countdowns as $countdown): ?>
 						<?php
-							$enddate = strtotime($countdown['endtime']);
+							$enddate = strtotime($countdown['end_time']);
 						$nowdate = time();
 						$diff = floor(($enddate - $nowdate) / (24 * 60 * 60));
 						?>

@@ -56,12 +56,12 @@
 			$blog_id = $_POST['blog_id'];
 
 			if (!validateUInt($blog_id)) {
-				die('<script>alert("移除失败：博客 ID 无效");</script>' . SCRIPT_REFRESH_AS_GET);
+				dieWithAlert('移除失败：博客 ID 无效');
 			}
 			
 			DB::delete("DELETE FROM important_blogs WHERE blog_id = {$blog_id}");
 
-			die('<script>alert("移除成功！");</script>' . SCRIPT_REFRESH_AS_GET);
+			dieWithAlert('移除成功！');
 		}
 
 		$announcements = DB::selectAll("SELECT blogs.id as id, blogs.title as title, blogs.poster as poster, user_info.realname as realname, blogs.post_time as post_time, important_blogs.level as level, blogs.is_hidden as is_hidden FROM important_blogs INNER JOIN blogs ON important_blogs.blog_id = blogs.id INNER JOIN user_info ON blogs.poster = user_info.username ORDER BY level DESC, important_blogs.blog_id DESC");
@@ -121,15 +121,15 @@
 			$countdown_id = $_POST['countdown_id'];
 
 			if (!validateUInt($countdown_id)) {
-				die('<script>alert("删除失败：倒计时 ID 无效");</script>' . SCRIPT_REFRESH_AS_GET);
+				dieWithAlert('删除失败：倒计时 ID 无效');
 			}
 
 			DB::delete("DELETE FROM countdowns WHERE id = {$countdown_id}");
 
-			die('<script>alert("删除成功！");</script>' . SCRIPT_REFRESH_AS_GET);
+			dieWithAlert('删除成功！');
 		}
 
-		$countdowns = DB::selectAll("SELECT id, title, endtime FROM countdowns ORDER BY endtime ASC");
+		$countdowns = DB::selectAll("SELECT id, title, end_time FROM countdowns ORDER BY end_time ASC");
 
 		$add_countdown_form = new UOJForm('add_countdown');
 		$add_countdown_form->addInput('countdown_title', 'text', '标题', '',
@@ -144,10 +144,10 @@
 			},
 			null
 		);
-		$add_countdown_form->addInput('countdown_endtime', 'text', '结束时间', date("Y-m-d H:i:s"),
-			function($endtime, &$vdata) {
+		$add_countdown_form->addInput('countdown_end_time', 'text', '结束时间', date("Y-m-d H:i:s"),
+			function($end_time, &$vdata) {
 				try {
-					$vdata['endtime'] = new DateTime($endtime);
+					$vdata['end_time'] = new DateTime($end_time);
 				} catch (Exception $e) {
 					return '无效时间格式';
 				}
@@ -158,9 +158,9 @@
 		);
 		$add_countdown_form->handle = function(&$vdata) {
 			$esc_title = DB::escape($vdata['title']);
-			$esc_endtime = DB::escape($vdata['endtime']->format('Y-m-d H:i:s'));
+			$esc_end_time = DB::escape($vdata['end_time']->format('Y-m-d H:i:s'));
 
-			DB::insert("INSERT INTO countdowns (title, endtime) VALUES ('{$esc_title}', '{$esc_endtime}')");
+			DB::insert("INSERT INTO countdowns (title, end_time) VALUES ('{$esc_title}', '{$esc_end_time}')");
 		};
 		$add_countdown_form->submit_button_config['align'] = 'compressed';
 		$add_countdown_form->submit_button_config['text'] = '添加';
@@ -174,12 +174,12 @@
 			$item_id = $_POST['item_id'];
 
 			if (!validateUInt($item_id)) {
-				die('<script>alert("删除失败：ID 无效");</script>' . SCRIPT_REFRESH_AS_GET);
+				dieWithAlert('删除失败：ID 无效');
 			}
 
 			DB::delete("DELETE FROM links WHERE id = {$item_id}");
 
-			die('<script>alert("删除成功！");</script>' . SCRIPT_REFRESH_AS_GET);
+			dieWithAlert('删除成功！');
 		}
 
 		$links = DB::selectAll("SELECT `id`, `title`, `url`, `level` FROM `friend_links` ORDER BY `level` DESC, `id` ASC");
@@ -315,7 +315,7 @@
 	
 			DB::query("insert into user_info (username, realname, email, school, password, svn_password, register_time, usergroup) values ('$username', '$realname', '$email', '$school', '$password', '$svn_password', now(), 'U')");
 			
-			returnJSONData(['status' => 'success', 'message' => '']);
+			dieWithJsonData(['status' => 'success', 'message' => '']);
 		};
 		$register_form->setAjaxSubmit(<<<EOD
 		function(res) {
@@ -370,7 +370,7 @@ EOD);
 
 			DB::query("update user_info set password = '$esc_password' where username = '$esc_username'");
 
-			returnJSONData(['status' => 'success', 'message' => '用户 ' . $vdata['username'] . ' 的密码已经被成功重置。']);
+			dieWithJsonData(['status' => 'success', 'message' => '用户 ' . $vdata['username'] . ' 的密码已经被成功重置。']);
 		};
 		$change_password_form->submit_button_config['margin_class'] = 'mt-3';
 		$change_password_form->submit_button_config['text'] = '重置';
@@ -436,7 +436,7 @@ EOD);
 					break;
 			}
 
-			returnJSONData(['status' => 'success', 'message' => '用户 ' . $username . ' 现在是 ' . $usergroup . '。']);
+			dieWithJsonData(['status' => 'success', 'message' => '用户 ' . $username . ' 现在是 ' . $usergroup . '。']);
 		};
 		$change_usergroup_form->setAjaxSubmit(<<<EOD
 		function(res) {
@@ -539,17 +539,17 @@ EOD);
 			$image_id = $_POST['image_id'];
 
 			if (!validateUInt($image_id)) {
-				die('<script>alert("删除失败：图片 ID 无效");</script>' . SCRIPT_REFRESH_AS_GET);
+				dieWithAlert('删除失败：图片 ID 无效');
 			}
 
 			if (!($image = DB::selectFirst("SELECT * from users_images where id = $image_id"))) {
-				die('<script>alert("删除失败：图片不存在");</script>' . SCRIPT_REFRESH_AS_GET);
+				dieWithAlert('删除失败：图片不存在');
 			}
 			
 			unlink(UOJContext::storagePath().$result['path']);
 			DB::delete("DELETE FROM users_images WHERE id = $image_id");
 
-			die('<script>alert("删除成功！");</script>' . SCRIPT_REFRESH_AS_GET);
+			dieWithAlert('删除成功！');
 		}
 
 		
@@ -710,7 +710,7 @@ EOD);
 							col_tr += '<tr>';
 
 							col_tr += '<td>' + row['title'] + '</td>';
-							col_tr += '<td>' + row['endtime'] + '</td>';
+							col_tr += '<td>' + row['end_time'] + '</td>';
 							col_tr += '<td>' +
 									'<form method="POST" onsubmit=\'return confirm("你真的要删除这个倒计时吗？")\'>' +
 										'<input type="hidden" name="_token" value="<?= crsf_token() ?>">' +

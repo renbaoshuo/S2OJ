@@ -1,4 +1,5 @@
 <?php
+	requireLib('bootstrap5');
 	requirePHPLib('form');
 	requirePHPLib('judger');
 	requirePHPLib('data');
@@ -16,20 +17,19 @@
 		become404Page();
 	}
 
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
+	if (!isSuperUser($myUser) && $group['is_hidden']) {
+		become403Page();
 	}
 	?>
 
 <?php echoUOJPageHeader(UOJLocale::get('groups')) ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="row">
+<!-- left col -->
 <div class="col-lg-9">
-<div class="d-flex justify-content-between">
-<?php endif ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<!-- title -->
+<div class="d-flex justify-content-between">
 <h1 class="h2">
 	<?php if ($group['is_hidden']): ?>
 		<span class="fs-5 text-danger">[隐藏]</span>
@@ -37,57 +37,48 @@
 	<?= $group['title'] ?>
 	<span class="fs-5">(ID: #<?= $group['id'] ?>)</span>
 </h1>
-<?php else: ?>
-<h2 style="margin-top: 24px"><?= $group['title'] ?></h2>
-<p>(<b>小组 ID</b>: <?= $group['id'] ?>)</p>
-<?php endif ?>
 
 <?php if (isSuperUser($myUser)): ?>
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="text-end">
 	<a class="btn btn-primary" href="/group/<?= $group['id'] ?>/manage" role="button">
 		<?= UOJLocale::get('problems::manage') ?>
 	</a>
 </div>
-<?php else: ?>
-<ul class="nav nav-tabs" role="tablist">
-	<li class="nav-item"><a class="nav-link" href="/group/<?= $group['id'] ?>/manage" role="tab">管理</a></li>
-</ul>
 <?php endif ?>
-<?php endif ?>
-
-
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
-<?php endif ?>
+<!-- end title -->
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-<div class="card card-default mb-3">
+<!-- main content -->
+<div class="card mb-3">
+	<div class="card-body">
+		<h2 class="h4">
+			<?= UOJLocale::get('group announcement') ?>
+		</h2>
+		<?php if ($group['announcement']): ?>
+		<div class="text-break">
+			<?= HTML::purifier_inline()->purify(HTML::parsedown()->line($group['announcement'])) ?>
+		</div>
+		<?php else: ?>
+		<div class="text-muted">
+			<?= UOJLocale::get('none') ?>
+		</div>
+		<?php endif ?>
+	</div>
+</div>
+
+<div class="card mb-3">
 	<div class="card-body">
 		<h2 class="card-title h4">
-<?php else: ?>
-<div class="row">
-	<div class="col-sm-12 mt-4">
-		<h5>
-<?php endif ?>
 			<?= UOJLocale::get('news') ?>
 		</h5>
-		<ul
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	class="mb-0"
-<?php endif ?>
->
+		<ul class="mb-0">
 		<?php
 			$current_ac = queryGroupCurrentAC($group['id']);
 	foreach ($current_ac as $ac) {
 		echo '<li>';
 		echo getUserLink($ac['submitter']);
 		echo ' 解决了问题 ';
-		echo '<a ';
-		if (isset($REQUIRE_LIB['bootstrap5'])) {
-			echo ' class="text-decoration-none" ';
-		}
-		echo ' href="/problem/', $ac['problem_id'], '">', $ac['problem_title'], '</a> ';
+		echo '<a class="text-decoration-none" href="/problem/', $ac['problem_id'], '">', $ac['problem_title'], '</a> ';
 		echo '<time class="time">(', $ac['submit_time'], ')</time>';
 		echo '</li>';
 	}
@@ -99,94 +90,72 @@
 	</div>
 </div>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="card card-default mb-3">
 	<div class="card-body">
 		<h2 class="card-title h4">
-<?php else: ?>
-<div class="row">
-	<div class="col-sm-12 mt-4">
-		<h5>
-<?php endif ?>
 			<?= UOJLocale::get('assignments') ?>
 		</h5>
-		<ul
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	class="mb-0"
-<?php endif ?>
-	>
-		<?php
-	$assignments = queryGroupActiveAssignments($group['id']);
-	foreach ($assignments as $ass) {
-		$ddl = DateTime::createFromFormat('Y-m-d H:i:s', $ass['deadline']);
-		$create_time = DateTime::createFromFormat('Y-m-d H:i:s', $ass['create_time']);
-		$now = new DateTime();
+				<?php
+						$now = new DateTime();
+	echoLongTable(
+		['groups_assignments.list_id as list_id', 'lists.title as title', 'groups_assignments.end_time as end_time'],
+		'groups_assignments left join lists on lists.id = groups_assignments.list_id',
+		"groups_assignments.group_id = {$group['id']} and groups_assignments.end_time > addtime(now(), '-168:00:00')",
+		'order by end_time desc, list_id desc',
+		<<<EOD
+	<tr>
+		<th style="width:3em" class="text-center">ID</th>
+		<th style="width:12em">标题</th>
+		<th style="width:4em">状态</th>
+		<th style="width:8em">结束时间</th>
+	</tr>
+EOD,
+		function($row) use ($group, $now) {
+			$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['end_time']);
 
-		echo '<li>';
-		echo '<a ';
-		if (isset($REQUIRE_LIB['bootstrap5'])) {
-			echo ' class="text-decoration-none" ';
-		}
-		echo ' href="/problem_list/', $ass['list_id'], '">', $ass['title'], ' (题单 #', $ass['list_id'], ')</a>';
-
-		if ($ddl < $now) {
-			echo '<sup style="color:red">&nbsp;overdue</sup>';
-		} elseif ($ddl->getTimestamp() - $now->getTimestamp() < 86400) {  // 1d
-			echo '<sup style="color:red">&nbsp;soon</sup>';
-		} elseif ($now->getTimestamp() - $create_time->getTimestamp() < 86400) {  // 1d
-			echo '<sup style="color:red">&nbsp;new</sup>';
-		}
-
-		$ddl_str = $ddl->format('Y-m-d H:i');
-		echo ' (截止时间: ', $ddl_str, '，<a ';
-		if (isset($REQUIRE_LIB['bootstrap5'])) {
-			echo ' class="text-decoration-none" ';
-		}
-		echo ' href="/group/',$group['id'],'/assignment/', $ass['list_id'], '">查看完成情况</a>)';
-		echo '</li>';
-	}
-
-	if (count($assignments) == 0) {
-		echo '<p>暂无作业</p>';
-	}
+			echo '<tr>';
+			echo '<td class="text-center">', $row['list_id'], '</td>';
+			echo '<td>', '<a class="text-decoration-none" href="/group/', $group['id'], '/assignment/', $row['list_id'],'">', HTML::escape($row['title']), '</a>', '</td>';
+			if ($end_time < $now) {
+				echo '<td class="text-danger">已结束</td>';
+			} else {
+				echo '<td class="text-success">进行中</td>';
+			}
+			echo '<td>', $end_time->format('Y-m-d H:i:s'), '</td>';
+			echo '</tr>';
+		},
+		[
+			'echo_full' => true,
+			'div_classes' => ['table-responsive'],
+			'table_classes' => ['table', 'align-middle', 'mb-0'],
+		]
+	);
 	?>
-		</ul>
 	</div>
 </div>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="card card-default mb-3">
 	<div class="card-body">
 		<h2 class="card-title h4">
-<?php else: ?>
-<div class="row">
-	<div class="col-sm-12 mt-4">
-		<h5>
-<?php endif ?>
 			<?= UOJLocale::get('top solver') ?>
 		</h5>
-		<?php echoRanklist(array(
-			'echo_full' => true,
+		<?php echoRanklist([
+			'page_len' => 50,
 			'group_id' => $group_id,
 			'by_accepted' => true,
-			'table_classes' => isset($REQUIRE_LIB['bootstrap5'])
-							? array('table', 'text-center', 'mb-0')
-							: array('table', 'table-bordered', 'table-hover', 'table-striped', 'table-text-center')
-			)) ?>
+			'table_classes' => ['table', 'text-center', 'mb-0'],
+			]) ?>
 	</div>
 </div>
 
-
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <!-- end left col -->
 </div>
 
 <!-- right col -->
 <aside class="col-lg-3 mt-3 mt-lg-0">
-<?php uojIncludeView('sidebar', array()); ?>
+<?php uojIncludeView('sidebar'); ?>
 </aside>
 
 </div>
-<?php endif ?>
 
 <?php echoUOJPageFooter() ?>
