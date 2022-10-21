@@ -52,7 +52,7 @@
 	$usernames = [];
 	$n_users = count($users);
 	$n_problems = count($problems);
-	$submission_end_time = min(new DateTime(), DateTime::createFromFormat('Y-m-d H:i:s', $assignment['end_time']))->format('Y-m-d H:i:s');
+	$submission_end_time = min(new DateTime(), DateTime::createFromFormat('Y-m-d H:i:s', $assignment['end_time']))->getTimestamp();
 
 	foreach ($problems as $problem) {
 		$problem_ids[] = $problem['problem_id'];
@@ -77,7 +77,7 @@
 		];
 
 		foreach ($problem_ids as $problem_id) {
-			$cond = "submitter = '{$user['username']}' AND problem_id = $problem_id AND submit_time <= '$submission_end_time'";
+			$cond = "submitter = '{$user['username']}' AND problem_id = $problem_id AND unix_timestamp(submit_time) <= $submission_end_time";
 			$max_score_query = DB::selectFirst("SELECT MAX(score) AS score FROM submissions WHERE $cond");
 			if ($max_score_query) {
 				$max_score = $max_score_query['score'];
