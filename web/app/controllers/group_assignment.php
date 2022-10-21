@@ -52,7 +52,7 @@
 	$usernames = [];
 	$n_users = count($users);
 	$n_problems = count($problems);
-	$submission_end_time = min(new DateTime(), DateTime::createFromFormat('Y-m-d H:i:s', $assignment['end_time']))->getTimestamp();
+	$submission_end_time = min(new DateTime(), DateTime::createFromFormat('Y-m-d H:i:s', $assignment['end_time']));
 
 	foreach ($problems as $problem) {
 		$problem_ids[] = $problem['problem_id'];
@@ -64,34 +64,37 @@
 		$usernames[] = $user['username'];
 	}
 	
-	// standings: rank => [user => [username, realname], scores[], rank]
+	// standings: rank => [total_score, user => [username, realname], scores[]]
 	$standings = [];
 
 	foreach ($usernames as $username) {
 		$user = queryUser($username);
 		$row = ['total_score' => 0];
+		$scores = [];
 
 		$row['user'] = [
 			'username' => $user['username'],
 			'realname' => $user['realname'],
 		];
 
-		foreach ($problem_ids as $problem_id) {
-			$cond = "submitter = '{$user['username']}' AND problem_id = $problem_id AND unix_timestamp(submit_time) <= $submission_end_time";
-			$max_score_query = DB::selectFirst("SELECT MAX(score) AS score FROM submissions WHERE $cond");
-			if ($max_score_query) {
-				$max_score = $max_score_query['score'];
-			} else {
-				$max_score = 0;
-			}
-			$submission = DB::selectFirst("SELECT id, score FROM submissions WHERE $cond AND score = $max_score ORDER BY submit_time DESC LIMIT 1");
+		$cond = "submitter = '{$user['username']}' AND unix_timestamp(submit_time) <= " . $submission_end_time->getTimestamp();
+		$cond_problem = "problem_id IN (".implode(',', $problem_ids).")";
+		$query = DB::query("SELECT MAX(id) as id, problem_id, MAX(score) as score FROM submissions WHERE (problem_id, score) IN (SELECT problem_id, MAX(score) FROM submissions WHERE $cond AND $cond_problem GROUP BY problem_id) AND $cond GROUP BY problem_id");
 
-			if ($submission) {
+		while ($_row = DB::fetch($query)) {
+			$scores[$_row['problem_id']] = [
+				'submission_id' => $_row['id'],
+				'score' => $_row['score'],
+			];
+		}
+
+		foreach ($problem_ids as $problem_id) {
+			if ($scores[$problem_id]) {
 				$row['scores'][] = [
-					'submission_id' => $submission['id'],
-					'score' => intval($submission['score']),
+					'submission_id' => $scores[$problem_id]['submission_id'],
+					'score' => intval($scores[$problem_id]['score']),
 				];
-				$row['total_score'] += $submission['score'];
+				$row['total_score'] += $scores[$problem_id]['score'];
 			} else {
 				$row['scores'][] = null;
 			}
@@ -169,7 +172,7 @@ $('#standings').long_table(
 			var html = '';
 
 			html += '<div class="card-header bg-transparent text-muted text-start small">' +
-					'成绩统计截止时间：<?= $submission_end_time ?>' +
+					'成绩统计截止时间：<?= $submission_end_time->format('Y-m-d H:m:s') ?>' +
 				'</div>';
 
 			return html;
