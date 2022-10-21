@@ -78,7 +78,13 @@
 
 		foreach ($problem_ids as $problem_id) {
 			$cond = "submitter = '{$user['username']}' AND problem_id = $problem_id AND submit_time <= '$submission_end_time'";
-			$submission = DB::selectFirst("SELECT id, score FROM submissions INNER JOIN (SELECT MAX(score) AS score FROM submissions WHERE $cond) AS max USING (score) WHERE $cond ORDER BY submit_time DESC");
+			$max_score_query = DB::selectFirst("SELECT MAX(score) AS score FROM submissions WHERE $cond");
+			if ($max_score_query) {
+				$max_score = $max_score_query['score'];
+			} else {
+				$max_score = 0;
+			}
+			$submission = DB::selectFirst("SELECT id, score FROM submissions WHERE $cond AND score = $max_score ORDER BY submit_time DESC LIMIT 1");
 
 			if ($submission) {
 				$row['scores'][] = [
