@@ -1,4 +1,7 @@
 <?php
+	requireLib('bootstrap5');
+	requirePHPLib('judger');
+
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
 	}
@@ -37,11 +40,6 @@
 	} else {
 		$cond = '1';
 	}
-
-
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
-	}
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('submissions')) ?>
 
@@ -49,67 +47,57 @@
 	<?= UOJLocale::get('submissions') ?>
 </h1>
 
-<div class="d-none d-sm-block">
-	<?php if ($myUser != null): ?>
-	<div class="float-right">
-		<a href="/submissions?submitter=<?= $myUser['username'] ?>" class="btn btn-primary btn-sm"><?= UOJLocale::get('problems::my submissions') ?></a>
-	</div>
-	<?php endif ?>
-	<form id="form-search" class="form-inline" method="get">
-		<div id="form-group-problem_id" class="form-group
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-d-inline-block
-<?php endif ?>
-		">
-			<label for="input-problem_id" class="control-label"><?= UOJLocale::get('problems::problem id')?>:</label>
-			<input type="text" class="form-control input-sm" name="problem_id" id="input-problem_id" value="<?= $q_problem_id ?>" maxlength="4" style="width:4em" />
+<div class="d-none d-sm-block mb-3">
+	<form id="form-search" class="row gy-2 gx-3 align-items-end mb-3" target="_self" method="GET">
+		<div id="form-group-problem_id" class="col-auto">
+			<label for="input-problem_id" class="form-label">
+				<?= UOJLocale::get('problems::problem id')?>:
+			</label>
+			<input type="text" class="form-control form-control-sm" name="problem_id" id="input-problem_id" value="<?= $q_problem_id ?>" style="width:4em" />
 		</div>
-		<div id="form-group-submitter" class="form-group
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-d-inline-block
-<?php endif ?>
-		">
-			<label for="input-submitter" class="control-label"><?= UOJLocale::get('username')?>:</label>
-			<input type="text" class="form-control input-sm" name="submitter" id="input-submitter" value="<?= $q_submitter ?>" maxlength="20" style="width:10em" />
+		<div id="form-group-submitter" class="col-auto">
+			<label for="input-submitter" class="control-label">
+				<?= UOJLocale::get('username')?>:
+			</label>
+			<div class="input-group input-group-sm">
+				<input type="text" class="form-control form-control-sm" name="submitter" id="input-submitter" value="<?= $q_submitter ?>" maxlength="20" style="width:10em" />
+				<?php if (Auth::check()): ?>
+				<a id="my-submissions" href="/submissions?submitter=<?= Auth::id() ?>" class="btn btn-outline-secondary btn-sm">
+					我的
+				</a>
+				<?php endif ?>
+			</div>
+			<script>
+				$('#my-submissions').click(function(event) {
+					event.preventDefault();
+					$('#input-submitter').val('<?= Auth::id() ?>');
+					$('#form-search').submit();
+				});
+			</script>
 		</div>
-		<div id="form-group-score" class="form-group
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-d-inline-block
-<?php endif ?>
-		">
-			<label for="input-min_score" class="control-label"><?= UOJLocale::get('score range')?>:</label>
-			<input type="text" class="form-control input-sm" name="min_score" id="input-min_score" value="<?= $q_min_score ?>" maxlength="3" style="width:4em" placeholder="0" />
-			<label for="input-max_score" class="control-label">~</label>
-			<input type="text" class="form-control input-sm" name="max_score" id="input-max_score" value="<?= $q_max_score ?>" maxlength="3" style="width:4em" placeholder="100" />
+		<div id="form-group-score" class="col-auto">
+			<label for="input-min_score" class="control-label">
+				<?= UOJLocale::get('score range')?>:
+			</label>
+			<div class="input-group input-group-sm">
+				<input type="text" class="form-control" name="min_score" id="input-min_score" value="<?= $q_min_score ?>" maxlength="3" style="width:4em" placeholder="0" />
+				<span class="input-group-text" id="basic-addon3">~</span>
+				<input type="text" class="form-control" name="max_score" id="input-max_score" value="<?= $q_max_score ?>" maxlength="3" style="width:4em" placeholder="100" />
+			</div>
 		</div>
-		<div id="form-group-language" class="form-group
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-d-inline-block
-<?php endif ?>
-		">
+		<div id="form-group-language" class="col-auto">
 			<label for="input-language" class="control-label"><?= UOJLocale::get('problems::language')?>:</label>
-			<input type="text" class="form-control input-sm" name="language" id="input-language" value="<?= $html_esc_q_language ?>" maxlength="10" style="width:8em" />
+			<select class="form-select form-select-sm" id="input-language" name="language">
+				<option value="">All</option>
+				<?php foreach ($uojSupportedLanguages as $lang): ?>
+				<option value="<?= HTML::escape($lang) ?>" <?= $lang == $q_language ? 'selected' : '' ?>><?= HTML::escape($lang) ?></option>
+				<?php endforeach ?>
+			</select>
 		</div>
-		<button type="submit" id="submit-search" class="btn btn-secondary btn-sm ml-2"><?= UOJLocale::get('search')?></button>
+		<div class="col-auto">
+			<button type="submit" id="submit-search" class="btn btn-secondary btn-sm ml-2"><?= UOJLocale::get('search')?></button>
+		</div>
 	</form>
-	<script type="text/javascript">
-		$('#form-search').submit(function(e) {
-			e.preventDefault();
-			
-			url = '/submissions';
-			qs = [];
-			$(['problem_id', 'submitter', 'min_score', 'max_score', 'language']).each(function () {
-				if ($('#input-' + this).val()) {
-					qs.push(this + '=' + encodeURIComponent($('#input-' + this).val()));
-				}
-			});
-			if (qs.length > 0) {
-				url += '?' + qs.join('&');
-			}
-			location.href = url;
-		});
-	</script>
-	<div class="top-buffer-sm"></div>
 </div>
 
 <?php
