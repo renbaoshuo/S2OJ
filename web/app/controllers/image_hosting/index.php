@@ -19,7 +19,7 @@
 	$count = $_result["count(*)"];
 
 	function throwError($msg) {
-		returnJSONData(['status' => 'error', 'message' => $msg]);
+		dieWithJsonData(['status' => 'error', 'message' => $msg]);
 	}
 
 	$allowedTypes = [IMAGETYPE_PNG, IMAGETYPE_JPEG];
@@ -66,7 +66,7 @@
 		$existing_image = DB::selectFirst("SELECT * FROM users_images WHERE `hash` = '$hash'");
 
 		if ($existing_image) {
-			returnJSONData(['status' => 'success', 'path' => $existing_image['path']]);
+			dieWithJsonData(['status' => 'success', 'path' => $existing_image['path']]);
 		}
 
 		$image = new Imagick($_FILES["image_upload_file"]["tmp_name"]);
@@ -92,7 +92,7 @@
 
 		DB::insert("INSERT INTO users_images (`path`, uploader, width, height, upload_time, size, `hash`) VALUES ('$filename', '{$myUser['username']}', $width, $height, now(), {$_FILES["image_upload_file"]["size"]}, '$hash')");
 
-		returnJSONData(['status' => 'success', 'path' => $filename]);
+		dieWithJsonData(['status' => 'success', 'path' => $filename]);
 	} elseif ($_POST['image_delete_submit'] == 'submit') {
 		crsf_defend();
 

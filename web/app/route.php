@@ -49,7 +49,7 @@ Route::group([
 
 		Route::any('/groups', '/groups.php');
 		Route::any('/group/{id}', '/group.php');
-		Route::any('/group/{id}/manage', '/group_manage.php');
+		Route::any('/group/{id}/manage(?:/{tab})?', '/group_manage.php');
 		Route::any('/group/{id}/assignment/{list_id}', '/group_assignment.php');
 		
 		Route::any('/blogs', '/blogs.php');

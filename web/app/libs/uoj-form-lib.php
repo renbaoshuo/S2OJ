@@ -1,4 +1,6 @@
 <?php
+	define('SCRIPT_REFRESH_AS_GET', '<script>;window.location = window.location.origin + window.location.pathname + (window.location.search.length ? window.location.search + "&" : "?") + "_refresh_" + (+new Date()) + "=" + (+new Date()) + window.location.hash;</script>');
+
 	class UOJForm {
 		public $form_name;
 		public $succ_href;
@@ -862,8 +864,12 @@ EOD;
 		return $form;
 	}
 
-	function returnJSONData($data) {
+	function dieWithJsonData($data) {
 		header('Content-Type: application/json');
 		die(json_encode($data));
+	}
+
+	function dieWithAlert($str) {
+		die('<script>alert(decodeURIComponent("'.rawurlencode($str).'"));</script>'.SCRIPT_REFRESH_AS_GET);
 	}
 	?>

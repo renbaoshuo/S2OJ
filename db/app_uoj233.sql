@@ -366,7 +366,7 @@ UNLOCK TABLES;
 CREATE TABLE `countdowns` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` text NOT NULL,
-  `endtime` datetime NOT NULL,
+  `end_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -449,6 +449,21 @@ CREATE TABLE `groups` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `groups_assignments`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `groups_assignments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `list_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL,
+  `end_time` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `groups_users`
 --
 
@@ -458,22 +473,6 @@ CREATE TABLE `groups_users` (
   `group_id` int(11) NOT NULL,
   `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`group_id`, `username`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `assignments`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `assignments` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `list_id` int(11) NOT NULL,
-  `group_id` int(11) NOT NULL,
-  `create_time` datetime NOT NULL,
-  `deadline` datetime NOT NULL,
-  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

@@ -11,6 +11,8 @@
 			<?php
 				$group_detail = DB::selectFirst("select * from groups where id = {$group['id']}");
 			$group_announcement = $group_detail['announcement'];
+			$purifier = HTML::purifier_inline();
+			$parsedown = HTML::parsedown();
 			?>
 			<li class="list-group-item">
 				<a class="fw-bold text-decoration-none" href="<?= HTML::url('/group/'.$group['id']) ?>">
@@ -18,7 +20,7 @@
 				</a>
 				<?php if ($group_announcement): ?>
 				<div class="text-break">
-					<?= HTML::purifier_inline()->purify($group_announcement) ?>
+					<?= $purifier->purify($parsedown->line($group_announcement)) ?>
 				</div>
 				<?php else: ?>
 				<div class="text-muted">
@@ -38,11 +40,13 @@
 	}
 
 	usort($assignments, function($a, $b) {
-		$deadline_a = DateTime::createFromFormat('Y-m-d H:i:s', $a['deadline']);
-		$deadline_b = DateTime::createFromFormat('Y-m-d H:i:s', $b['deadline']);
+		$end_time_a = DateTime::createFromFormat('Y-m-d H:i:s', $a['end_time']);
+		$end_time_b = DateTime::createFromFormat('Y-m-d H:i:s', $b['end_time']);
 
-		return $deadline_b->getTimestamp() - $deadline_a->getTimestamp();
+		return $end_time_b->getTimestamp() - $end_time_a->getTimestamp();
 	});
+
+	$assignments = array_slice($assignments, 0, 5);
 	?>
 <?php if (count($assignments)): ?>
 <div class="card card-default mb-2" id="group-assignments">
@@ -53,22 +57,19 @@
 		<?php foreach ($assignments as $assignment): ?>
 			<li class="list-group-item">
 				<?php
-				$deadline = DateTime::createFromFormat('Y-m-d H:i:s', $assignment['deadline']);
-			$create_time = DateTime::createFromFormat('Y-m-d H:i:s', $assignment['create_time']);
+				$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $assignment['end_time']);
 			$now = new DateTime();
 			?>
 				<a href="<?= HTML::url('/group/'.$assignment['group_id'].'/assignment/'.$assignment['list_id']) ?>" class="fw-bold text-decoration-none">
 					<?= $assignment['title'] ?>
-					<?php if ($deadline < $now): ?>
+					<?php if ($end_time < $now): ?>
 						<sup class="fw-normal text-danger">overdue</sup>
-					<?php elseif ($deadline->getTimestamp() - $now->getTimestamp() < 86400): ?>
+					<?php elseif ($end_time->getTimestamp() - $now->getTimestamp() < 86400): ?>
 						<sup class="fw-normal text-danger">soon</sup>
-					<?php elseif ($now->getTimestamp() - $create_time->getTimestamp() < 86400): ?>
-						<sup class="fw-normal text-danger">new</sup>
 					<?php endif ?>
 				</a>
 				<div class="text-end small text-muted">
-					截止时间: <?= $deadline->format('Y-m-d H:i') ?>
+					截止时间: <?= $end_time->format('Y-m-d H:i') ?>
 				</div>
 			</li>
 		<?php endforeach ?>

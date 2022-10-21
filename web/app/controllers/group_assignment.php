@@ -40,85 +40,140 @@
 	<small class="fs-4">作业：</small><?= $list['title'] ?>
 </h1>
 <ul class="mt-3">
+	<li>对应题单：<a class="text-decoration-none" href="<?= HTML::url('/problem_list/'.$list['id']) ?>">#<?= $list['id'] ?></a></li>
 	<li>所属小组：<a class="text-decoration-none" href="<?= HTML::url('/group/'.$group['id']) ?>"><?= $group['title'] ?></a></li>
-	<li>开始时间：<?= $assignment['create_time'] ?></li>
-	<li>结束时间：<?= $assignment['deadline'] ?></li>
+	<li>结束时间：<?= $assignment['end_time'] ?></li>
 </ul>
 
 <?php
-		$query = DB::query("select problem_id from lists_problems where list_id = {$list['id']}");
+	$problems = DB::selectAll("select problem_id from lists_problems where list_id = {$list['id']}");
+	$users = queryGroupUsers($group['id']);
 	$problem_ids = [];
-	while ($row = DB::fetch($query)) {
-		$problem_ids[] = $row['problem_id'];
+	$usernames = [];
+	$n_users = count($users);
+	$n_problems = count($problems);
+	$submission_end_time = min(new DateTime(), DateTime::createFromFormat('Y-m-d H:i:s', $assignment['end_time']))->format('Y-m-d H:i:s');
+
+	foreach ($problems as $problem) {
+		$problem_ids[] = $problem['problem_id'];
 	}
 
-	$header_row = '';
-	$header_row .= '<tr>';
-	$header_row .= '<th style="width: 10em;">'.UOJLocale::get('username').'</th>';
-	$header_row .= '<th style="width: 2em;">'.UOJLocale::get('contests::total score').'</th>';
-	foreach ($problem_ids as $problem_id) {
-		$header_row .= '<th style="width: 2em;">' . '<a class="text-decoration-none" href="'.HTML::url('/problem/'.$problem_id).'">#'.$problem_id.'</a>' . '</th>';
+	sort($problem_ids);
+
+	foreach ($users as $user) {
+		$usernames[] = $user['username'];
 	}
-	$header_row .= '</tr>';
+	
+	// standings: rank => [user => [username, realname], scores[], rank]
+	$standings = [];
 
-	$print_row = function($row) use ($problem_ids) {
-		$username = $row['username'];
+	foreach ($usernames as $username) {
+		$user = queryUser($username);
+		$row = ['total_score' => 0];
 
-		$scores = [];
-		$sum = 0;
-		$total_score = count($problem_ids) * 100;
-		$query = DB::query("SELECT MAX(id), problem_id, MAX(score) FROM submissions WHERE (problem_id, score) IN (SELECT problem_id, MAX(score) FROM submissions WHERE submitter = '{$username}' AND problem_id IN (".implode(',', $problem_ids).") GROUP BY problem_id) AND submitter = '{$username}' GROUP BY problem_id");
-
-		while ($row = DB::fetch($query)) {
-			$scores[$row['problem_id']] = [
-				'submission_id' => $row['MAX(id)'],
-				'score' => $row['MAX(score)'],
-			];
-
-			$sum += $row['MAX(score)'];
-		}
-
-		if ($sum == $total_score) {
-			echo '<tr class="table-success">';
-		} else {
-			echo '<tr>';
-		}
-		echo '<td>' . getUserLink($username) . '</td>';
-		echo '<td>';
-		echo '<span class="uoj-score" data-max="', $total_score, '">', $sum, '</span>';
-		echo '</td>';
+		$row['user'] = [
+			'username' => $user['username'],
+			'realname' => $user['realname'],
+		];
 
 		foreach ($problem_ids as $problem_id) {
-			if (!isset($scores[$problem_id])) {
-				echo '<td>';
+			$cond = "submitter = '{$user['username']}' AND problem_id = $problem_id AND submit_time <= '$submission_end_time'";
+			$submission = DB::selectFirst("SELECT id, score FROM submissions INNER JOIN (SELECT MAX(score) AS score FROM submissions WHERE $cond) AS max USING (score) WHERE $cond ORDER BY submit_time DESC");
+
+			if ($submission) {
+				$row['scores'][] = [
+					'submission_id' => $submission['id'],
+					'score' => intval($submission['score']),
+				];
+				$row['total_score'] += $submission['score'];
 			} else {
-				if ($scores[$problem_id]['score'] == 100) {
-					echo '<td class="table-success">';
-				} else {
-					echo '<td>';
-				}
-				echo '<a class="text-decoration-none uoj-score" href="'.HTML::url('/submission/'.$scores[$problem_id]['submission_id']).'">'.$scores[$problem_id]['score'].'</a>';
+				$row['scores'][] = null;
 			}
-			echo '</td>';
 		}
-		echo '</tr>';
-	};
 
-	$from = "user_info a inner join groups_users b on (b.group_id = {$group['id']} and a.username = b.username)";
-	$col_names = array('a.username as username');
-	$cond = "1";
-	$tail = "order by a.username asc";
-	$config = [
-		'page_len' => 50,
-		'div_classes' => ['card', 'my-3', 'table-responsive', 'text-center'],
-		'table_classes' => ['table', 'uoj-table', 'mb-0'],
-	];
+		$standings[] = $row;
+	}
+	
+	usort($standings, function($lhs, $rhs) {
+		if ($lhs['total_score'] != $rhs['total_score']) {
+			return $rhs['total_score'] - $lhs['total_score'];
+		}
 
-	echoLongTable($col_names, $from, $cond, $tail, $header_row, $print_row, $config);
+		return strcmp($lhs['user']['username'], $rhs['user']['username']);
+	});
 	?>
 
-<!-- end left col -->
+<div id="standings"></div>
+
+<script>
+var n_problems = <?= $n_problems ?>;
+var max_total_score = <?= $n_problems * 100 ?>;
+var standings = <?= json_encode($standings) ?>;
+
+$('#standings').long_table(
+	standings,
+	1,
+	'<tr>' +
+		'<th style="width:10em"><?= UOJLocale::get('username') ?></th>' +
+		'<th style="width:2em"><?= UOJLocale::get('contests::total score') ?></th>' +
+	<?php foreach ($problem_ids as $problem_id): ?>
+		'<th style="width:2em">' +
+			'<a class="text-decoration-none" href="<?= HTML::url('/problem/' . $problem_id) ?>">#<?= $problem_id ?></a>' +
+		'</th>' +
+	<?php endforeach ?>
+	'</tr>',
+	function(row) {
+		var col_tr = '';
+
+		if (row['total_score'] == max_total_score) {
+			col_tr += '<tr class="table-success">';
+		} else {
+			col_tr += '<tr>';
+		}
+
+		col_tr += '<td>' + getUserLink(row['user']['username'], row['user']['realname']) + '</td>';
+		col_tr += '<td>' +
+					'<span class="uoj-score" data-max="' + max_total_score + '" style="color:' + getColOfScore(row['total_score'] / n_problems) + '">' + row['total_score'] + '</span>' +
+				'</td>';
+		for (var i = 0; i < row['scores'].length; i++) {
+			var col = row['scores'][i];
+
+			if (col) {
+				if (col['score'] == 100) {
+					col_tr += '<td class="table-success">';
+				} else {
+					col_tr += '<td>';
+				}
+				col_tr += '<a class="text-decoration-none uoj-score" href="/submission/' + col['submission_id'] + '" style="color:' + getColOfScore(col['score']) + '">' + col['score'] + '</a>';
+				col_tr += '</td>';
+			} else {
+				col_tr += '<td></td>';
+			}
+		}
+
+		col_tr += '</tr>';
+
+		return col_tr;
+	},
+	{
+		div_classes: ['card', 'my-3', 'table-responsive', 'text-center'],
+		table_classes: ['table', 'uoj-table', 'table-bordered', 'mb-0'],
+		page_len: 50,
+		print_before_table: function() {
+			var html = '';
+
+			html += '<div class="card-header bg-transparent text-muted text-start small">' +
+					'成绩统计截止时间：<?= $submission_end_time ?>' +
+				'</div>';
+
+			return html;
+		}
+	}
+);
+</script>
+
 </div>
+<!-- end left col -->
 
 <aside class="col-lg-3 mt-3 mt-lg-0">
 <!-- right col -->

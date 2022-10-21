@@ -51,11 +51,13 @@ label {
 	float: right;
 }
 
-.uoj-table > tbody > tr:last-child {
+.uoj-table > tbody > tr:last-child,
+.uoj-table > tbody > tr:last-child > td {
 	border-bottom-color: transparent;
 }
 
-.uoj-table > thead > tr:first-child {
+.uoj-table > thead > tr:first-child,
+.uoj-table > thead > tr:first-child > td {
 	border-top-color: transparent;
 }
 
