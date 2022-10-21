@@ -158,7 +158,7 @@ $('#standings').long_table(
 	{
 		div_classes: ['card', 'my-3', 'table-responsive', 'text-center'],
 		table_classes: ['table', 'uoj-table', 'table-bordered', 'mb-0'],
-		page_len: 20,
+		page_len: 50,
 		print_before_table: function() {
 			var html = '';
 
