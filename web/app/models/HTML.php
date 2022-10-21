@@ -33,6 +33,15 @@ class HTML {
 		$html .= '</ul>';
 		return $html;
 	}
+
+	public static function navListGroup($tabs_info, $cur) {
+		$html = '<div class="list-group">';
+		foreach ($tabs_info as $id => $tab) {
+			$html .= '<a role="button" class="list-group-item list-group-item-action'.($cur == $id ? ' active' : '').'" href="'.$tab['url'].'">'.$tab['name'].'</a>';
+		}
+		$html .= '</div>';
+		return $html;
+	}
 	
 	public static function hiddenToken() {
 		return '<input type="hidden" name="_token" value="'.crsf_token().'" />';

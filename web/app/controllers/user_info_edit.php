@@ -277,16 +277,7 @@ EOD);
 <!-- left col -->
 <div class="col-md-3">
 
-<div class="list-group">
-	<?php foreach ($tabs_info as $id => $tab): ?>
-	<a
-		role="button"
-		class="list-group-item list-group-item-action <?= $cur_tab == $id ? 'active' : '' ?>"
-		href="<?= $tab['url'] ?>">
-		<?= $tab['name'] ?>
-	</a>
-	<?php endforeach ?>
-</div>
+<?= HTML::navListGroup($tabs_info, $cur_tab) ?>
 
 <a
 	class="btn btn-light d-block mt-2 w-100 text-start text-primary"
