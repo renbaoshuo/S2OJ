@@ -230,8 +230,8 @@ EOD);
 			$user['usertype'] = 'student';
 
 			if ($_POST['user_type'] == 'teacher') {
-				removeUserType($user, 'student');
 				addUserType($user, 'teacher');
+				removeUserType($user, 'student');
 			} else {
 				addUserType($user, 'student');
 			}
