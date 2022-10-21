@@ -57,59 +57,62 @@
 <?= UOJLocale::get('hacks') ?>
 </h1>
 
-<div class="d-none d-sm-block">
-	<?php if (Auth::check()): ?>
-	<div class="float-right btn-group">
-		<a href="/hacks?hacker=<?= Auth::id() ?>" class="btn btn-success btn-sm"><?= UOJLocale::get('problems::hacks by me') ?></a>
-		<a href="/hacks?owner=<?= Auth::id() ?>" class="btn btn-danger btn-sm"><?= UOJLocale::get('problems::hacks to me') ?></a>
-	</div>
-	<?php endif ?>
-	<form id="form-search" class="form-inline" role="form">
-		<div id="form-group-submission_id" class="form-group d-inline-block">
-			<label for="input-submission_id" class="control-label"><?= UOJLocale::get('problems::submission id') ?>:</label>
-			<input type="text" class="form-control input-sm" name="submission_id" id="input-submission_id" value="<?= $q_submission_id ?>" maxlength="6" style="width:5em" />
+<div class="d-none d-sm-block mb-3">
+	<form id="form-search" class="row gy-2 gx-3 align-items-end mb-3" target="_self" method="GET">
+		<div id="form-group-submission_id" class="col-auto">
+			<label for="input-submission_id" class="form-label">
+				<?= UOJLocale::get('problems::submission id') ?>:
+			</label>
+			<input type="text" class="form-control form-control-sm" name="submission_id" id="input-submission_id" value="<?= $q_submission_id ?>" style="width:6em" />
 		</div>
-		<div id="form-group-problem_id" class="form-group d-inline-block">
-			<label for="input-problem_id" class="control-label"><?= UOJLocale::get('problems::problem id') ?>:</label>
-			<input type="text" class="form-control input-sm" name="problem_id" id="input-problem_id" value="<?= $q_problem_id ?>" maxlength="4" style="width:4em" />
+		<div id="form-group-problem_id" class="col-auto">
+			<label for="input-problem_id" class="form-label">
+				<?= UOJLocale::get('problems::problem id') ?>:
+			</label>
+			<input type="text" class="form-control form-control-sm" name="problem_id" id="input-problem_id" value="<?= $q_problem_id ?>" style="width:6em" />
 		</div>
-		<div id="form-group-hacker" class="form-group d-inline-block">
-			<label for="input-hacker" class="control-label"><?= UOJLocale::get('problems::hacker') ?>:</label>
-			<input type="text" class="form-control input-sm" name="hacker" id="input-hacker" value="<?= $q_hacker ?>" maxlength="100" style="width:10em" />
+		<div id="form-group-hacker" class="col-auto">
+			<label for="input-hacker" class="form-label">
+				<?= UOJLocale::get('problems::hacker') ?>:
+			</label>
+			<div class="input-group">
+				<input type="text" class="form-control form-control-sm" name="hacker" id="input-hacker" value="<?= $q_hacker ?>" maxlength="20" style="width:10em" />
+				<?php if (Auth::check()): ?>
+				<a href="/hacks?hacker=<?= Auth::id() ?>" class="btn btn-outline-secondary btn-sm">
+					我的
+				</a>
+				<?php endif ?>
+			</div>
 		</div>
-		<div id="form-group-owner" class="form-group d-inline-block">
-			<label for="input-owner" class="control-label"><?= UOJLocale::get('problems::owner') ?>:</label>
-			<input type="text" class="form-control input-sm" name="owner" id="input-owner" value="<?= $q_owner ?>" maxlength="100" style="width:10em" />
+		<div id="form-group-owner" class="col-auto">
+			<label for="input-owner" class="form-label">
+				<?= UOJLocale::get('problems::owner') ?>:
+			</label>
+			<div class="input-group">
+				<input type="text" class="form-control form-control-sm" name="owner" id="input-owner" value="<?= $q_owner ?>" maxlength="20" style="width:10em" />
+				<?php if (Auth::check()): ?>
+				<a href="/hacks?owner=<?= Auth::id() ?>" class="btn btn-outline-secondary btn-sm">
+					我的
+				</a>
+				<?php endif ?>
+			</div>
 		</div>
-		<div id="form-group-status" class="form-group d-inline-block">
-			<label for="input-status" class="control-label"><?= UOJLocale::get('problems::result') ?>:</label>
-			<select class="input-sm form-select" id="input-status" name="status">
+		<div id="form-group-status" class="col-auto">
+			<label for="input-status" class="form-label">
+				<?= UOJLocale::get('problems::result') ?>:
+			</label>
+			<select class="form-select form-select-sm" id="input-status" name="status">
 				<option value=""<?= $selected_all?>>All</option>
 				<option value="1"<?= $selected_succ ?>>Success!</option>
 				<option value="2"<?= $selected_fail ?>>Failed.</option>
 			</select>
 		</div>
-		<button type="submit" id="submit-search" class="btn btn-secondary btn-sm ml-2"><?= UOJLocale::get('search') ?></button>
+		<div class="col-auto">
+			<button type="submit" id="submit-search" class="btn btn-secondary btn-sm ml-2">
+				<?= UOJLocale::get('search') ?>
+			</button>
+		</div>
 	</form>
-	<script type="text/javascript">
-		$('#form-search').submit(function(e) {
-			e.preventDefault();
-			
-			url = '/hacks';
-			qs = [];
-			$(['submission_id', 'problem_id', 'hacker', 'owner', 'status']).each(function () {
-				if ($('#input-' + this).val()) {
-					qs.push(this + '=' + encodeURIComponent($('#input-' + this).val()));
-				}
-			});
-			if (qs.length > 0) {
-				url += '?' + qs.join('&');
-			}
-			location.href = url;
-		});
-	</script>
-
-	<div class="mt-3"></div>
 </div>
 
 <?php echoHacksList($cond,
