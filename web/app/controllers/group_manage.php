@@ -332,6 +332,8 @@ EOD);
 			<div class="tab-pane active" id="assignments">
 				<?php
 						$now = new DateTime();
+	$hidden_time = new DateTime();
+	$hidden_time->sub(new DateInterval('P7D'));
 	echoLongTable(
 		['*'],
 		'groups_assignments',
@@ -346,21 +348,23 @@ EOD);
 		<th style="width:8em">操作</th>
 	</tr>
 EOD,
-		function($row) use ($group, $now) {
+		function($row) use ($group, $now, $hidden_time) {
 			$list = queryProblemList($row['list_id']);
 			$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['end_time']);
 
 			echo '<tr>';
 			echo '<td class="text-center">', $list['id'], '</td>';
 			echo '<td>', '<a class="text-decoration-none" href="/group/', $group['id'], '/assignment/', $list['id'],'">', HTML::escape($list['title']), '</a>', '</td>';
-			if ($end_time < $now) {
+			if ($end_time < $hidden_time) {
+				echo '<td class="text-secondary">已隐藏</td>';
+			} elseif ($end_time < $now) {
 				echo '<td class="text-danger">已结束</td>';
 			} else {
 				echo '<td class="text-success">进行中</td>';
 			}
 			echo '<td>', $end_time->format('Y-m-d H:i:s'), '</td>';
 			echo '<td>';
-			echo '<a class="text-decoration-none d-inline-block align-middle" href="/problem_list/', $list['id'], '/edit">编辑</a> ';
+			echo '<a class="text-decoration-none d-inline-block align-middle" href="/problem_list/', $list['id'], '/manage">编辑</a> ';
 			echo ' <form class="d-inline-block" method="POST" onsubmit=\'return confirm("你真的要移除这份作业吗？移除作业不会删除题单。")\'>'
 					. '<input type="hidden" name="_token" value="' . crsf_token() . '">'
 					. '<input type="hidden" name="list_id" value="' . $list['id'] . '">'
@@ -390,6 +394,7 @@ EOD,
 							<li>请为学生预留合理的完成作业的时间。</li>
 							<li>排行榜将在结束后停止更新。</li>
 							<li>如需延长结束时间请删除后再次添加，排行数据不会丢失。</li>
+							<li>作业结束七天后将会自动在小组主页中隐藏，但仍可直接通过 URL 访问。</li>
 						</ul>
 					</div>
 				</div>

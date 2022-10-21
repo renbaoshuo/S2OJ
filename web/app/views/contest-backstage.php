@@ -21,8 +21,16 @@
 		</div>
 	<?php endif ?>
 	<?php if ($standings_data): ?>
-		<div class="tab-pane card-body" id="tab-standings">
-			<?php uojIncludeView('contest-standings', array_merge($standings_data, ['no_bs5_card' => ''])) ?>
+		<div class="tab-pane" id="tab-standings">
+			<?php 
+			uojIncludeView('contest-standings', array_merge(
+				$standings_data,
+				[
+					'standings_config' => [
+						'div_classes' => ['table-responsive', 'mb-3']
+					]
+				]
+			)); ?>
 		</div>
 	<?php endif ?>
 </div>

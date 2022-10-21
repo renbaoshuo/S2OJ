@@ -52,6 +52,7 @@
 	$usernames = [];
 	$n_users = count($users);
 	$n_problems = count($problems);
+	$submission_end_time = min(new DateTime(), DateTime::createFromFormat('Y-m-d H:i:s', $assignment['end_time']))->format('Y-m-d H:i:s');
 
 	foreach ($problems as $problem) {
 		$problem_ids[] = $problem['problem_id'];
@@ -76,7 +77,7 @@
 		];
 
 		foreach ($problem_ids as $problem_id) {
-			$cond = "submitter = '{$user['username']}' AND problem_id = $problem_id";
+			$cond = "submitter = '{$user['username']}' AND problem_id = $problem_id AND submit_time <= '$submission_end_time'";
 			$submission = DB::selectFirst("SELECT id, score FROM submissions INNER JOIN (SELECT MAX(score) AS score FROM submissions WHERE $cond) AS max USING (score) WHERE $cond ORDER BY submit_time DESC");
 
 			if ($submission) {
@@ -156,14 +157,23 @@ $('#standings').long_table(
 	},
 	{
 		div_classes: ['card', 'my-3', 'table-responsive', 'text-center'],
-		table_classes: ['table', 'uoj-table', 'mb-0'],
+		table_classes: ['table', 'uoj-table', 'table-bordered', 'mb-0'],
 		page_len: 20,
+		print_before_table: function() {
+			var html = '';
+
+			html += '<div class="card-header bg-transparent text-muted text-start small">' +
+					'成绩统计截止时间：<?= $submission_end_time ?>' +
+				'</div>';
+
+			return html;
+		}
 	}
 );
 </script>
 
-<!-- end left col -->
 </div>
+<!-- end left col -->
 
 <aside class="col-lg-3 mt-3 mt-lg-0">
 <!-- right col -->

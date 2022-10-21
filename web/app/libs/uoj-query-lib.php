@@ -149,7 +149,7 @@ function queryGroupAssignments($group_id) {
 	return DB::selectAll("select a.id as id, a.list_id as list_id, a.end_time as end_time, b.title from groups_assignments a left join lists b on a.list_id = b.id where a.group_id = $group_id order by a.end_time asc", MYSQLI_ASSOC);
 }
 function queryGroupActiveAssignments($group_id) {
-	return DB::selectAll("select a.id as id, a.group_id as group_id, a.list_id as list_id, a.end_time as end_time, b.title from groups_assignments a left join lists b on a.list_id = b.id where a.group_id = $group_id and a.end_time > addtime(now(), '-168:00:00') order by a.end_time asc", MYSQLI_ASSOC);
+	return DB::selectAll("select a.id as id, a.group_id as group_id, a.list_id as list_id, a.end_time as end_time, b.title from groups_assignments a left join lists b on a.list_id = b.id where a.group_id = $group_id and a.end_time >= addtime(now(), '-168:00:00') order by a.end_time asc", MYSQLI_ASSOC);
 }
 function queryAssignmentByGroupListID($group_id, $list_id) {
 	return DB::selectFirst("select * from groups_assignments where list_id='$list_id' and group_id='$group_id'", MYSQLI_ASSOC);

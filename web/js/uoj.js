@@ -541,17 +541,15 @@ $.fn.long_table = function(data, cur_page, header_row, get_row_str, config) {
 		
 		$(table_div).append(
 			$('<div class="' + div_classes.join(' ') + '" />').append(
+				(typeof config.print_before_table === 'function' ? config.print_before_table() : ''),
 				$('<table class="' + table_classes.join(' ') + '" />').append(
 					$('<thead>' + header_row + '</thead>')
 				).append(
 					tbody
-				)
+				),
+				(typeof config.print_after_table === 'function' ? config.print_after_table() : '')
 			)
 		);
-		
-		if (config.print_after_table != undefined) {
-			$(table_div).append(config.print_after_table());
-		}
 		
 		var get_page_li = function(p, h) {
 			if (p == -1) {
@@ -1129,7 +1127,7 @@ function showCommentReplies(id, replies) {
 }
 
 // standings
-function showStandings() {
+function showStandings(config) {
 	$("#standings").long_table(
 		standings,
 		1,
@@ -1178,9 +1176,9 @@ function showStandings() {
 			col_tr += '</tr>';
 			return col_tr;
 		}, {
-			div_classes: ['table-responsive'],
-			table_classes: ['table', 'table-bordered', 'text-center', 'align-middle', 'uoj-table', 'uoj-standings-table', 'mb-0'],
-			page_len: 100,
+			div_classes: config.div_classes ? config.div_classes : ['table-responsive', 'card', 'my-3'],
+			table_classes: config.table_classes ? config.table_classes : ['table', 'table-bordered', 'text-center', 'align-middle', 'uoj-table', 'uoj-standings-table', 'mb-0'],
+			page_len: config.page_len ? config.page_len : 50,
 			print_after_table: function() {
 				return '<div class="card-footer bg-transparent text-end text-muted">' + uojLocale("contests::n participants", standings.length) + '</div><script>if (window.MathJax) window.MathJax.typeset();</scr' + 'ipt>';
 			}
