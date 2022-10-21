@@ -666,7 +666,7 @@ EOD);
 							col_tr += '<td>' + row['level'] + '</td>';
 							col_tr += '<td>' +
 										'<a class="text-decoration-none d-inline-block align-middle" href="/post/' + row['id'] + '/write">编辑</a>' +
-										'<form class="d-inline-block ms-2" method="POST" onsubmit=\'return confirm("你真的要移除这条公告吗？")\'>' +
+										'<form class="d-inline-block ms-2" method="POST" onsubmit=\'return confirm("你真的要移除这条公告吗？移除公告不会删除这篇博客。")\'>' +
 											'<input type="hidden" name="_token" value="<?= crsf_token() ?>">' +
 											'<input type="hidden" name="blog_id" value="' + row['id'] + '">' +
 											'<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-delete_announcement" value="delete_announcement">移除</button>' +
@@ -1128,7 +1128,7 @@ EOD,
 		<td>$size</td>
 		<td>{$row['upload_time']}</td>
 		<td>
-			<form class="d-inline-block" method="POST" onsubmit="return confirm('你真的要删除这张图片吗？')">
+			<form class="d-inline-block" method="POST" onsubmit="return confirm('你真的要删除这张图片吗？删除后无法恢复。')">
 				<input type="hidden" name="_token" value="$token">
 				<input type="hidden" name="image_id" value="{$row['id']}">
 				<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-delete_image" value="delete_image">删除</button>
