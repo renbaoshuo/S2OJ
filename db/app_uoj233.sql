@@ -455,11 +455,10 @@ CREATE TABLE `groups` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `groups_assignments` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `list_id` int(11) NOT NULL,
   `group_id` int(11) NOT NULL,
+  `list_id` int(11) NOT NULL,
   `end_time` datetime NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`group_id`, `list_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
