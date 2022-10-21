@@ -105,7 +105,7 @@ if (isSuperUser($myUser)) {
 		$table_config['div_classes'] = array('card', 'mb-3');
 		$table_config['table_classes'] = array('table', 'uoj-table', 'mb-0', 'text-center');
 	}
-	echoLongTable(array('*'), 'contests', "status != 'finished'", 'order by start_time desc, id desc', $table_header,
+	echoLongTable(array('*'), 'contests', "status != 'finished'", 'order by start_time asc, id asc', $table_header,
 		echoContest,
 		$table_config
 	);
