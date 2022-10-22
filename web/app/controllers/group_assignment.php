@@ -78,23 +78,16 @@
 		];
 
 		$cond = "submitter = '{$user['username']}' AND unix_timestamp(submit_time) <= " . $submission_end_time->getTimestamp();
-		$cond_problem = "problem_id IN (".implode(',', $problem_ids).")";
-		$query = DB::query("SELECT MAX(id) as id, problem_id, MAX(score) as score FROM submissions WHERE (problem_id, score) IN (SELECT problem_id, MAX(score) FROM submissions WHERE $cond AND $cond_problem GROUP BY problem_id) AND $cond GROUP BY problem_id");
-
-		while ($_row = DB::fetch($query)) {
-			$scores[$_row['problem_id']] = [
-				'submission_id' => $_row['id'],
-				'score' => $_row['score'],
-			];
-		}
 
 		foreach ($problem_ids as $problem_id) {
-			if ($scores[$problem_id]) {
+			$submission = DB::selectFirst("SELECT id, score FROM submissions WHERE problem_id = $problem_id AND $cond ORDER BY score DESC, id DESC");
+
+			if ($submission) {
 				$row['scores'][] = [
-					'submission_id' => $scores[$problem_id]['submission_id'],
-					'score' => intval($scores[$problem_id]['score']),
+					'submission_id' => $submission['id'],
+					'score' => intval($submission['score']),
 				];
-				$row['total_score'] += $scores[$problem_id]['score'];
+				$row['total_score'] += $submission['score'];
 			} else {
 				$row['scores'][] = null;
 			}
