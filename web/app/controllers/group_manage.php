@@ -152,7 +152,7 @@ EOD);
 			null
 		);
 		$default_end_time = new DateTime();
-		$default_end_time->setTime(17, 0, 0);
+		$default_end_time->setTime(22, 30, 0);
 		$default_end_time->add(new DateInterval("P7D"));
 		$add_new_assignment_form->addVInput('new_assignment_end_time', 'text', '截止时间', $default_end_time->format('Y-m-d H:i'), 
 			function ($end_time, &$vdata) {
