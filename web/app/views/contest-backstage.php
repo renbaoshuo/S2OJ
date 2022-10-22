@@ -35,3 +35,19 @@
 	<?php endif ?>
 </div>
 </div>
+
+
+<script>
+$(document).ready(function() {
+	// Javascript to enable link to tab
+	var hash = location.hash.replace(/^#/, '');
+	if (hash) {
+		bootstrap.Tab.jQueryInterface.call($('.nav-tabs a[href="#' + hash + '"]'), 'show').blur();
+	}
+
+	// Change hash for page-reload
+	$('.nav-tabs a').on('shown.bs.tab', function(e) {
+		window.location.hash = e.target.hash;
+	});
+});
+</script>
