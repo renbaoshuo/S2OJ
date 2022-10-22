@@ -207,6 +207,12 @@ function echoLongTable($col_names, $table_name, $cond, $tail, $header_row, $prin
 	}
 
 	echo '<div class="', join($div_classes, ' '), '">';
+
+	if (isset($config['print_before_table'])) {
+		$fun = $config['print_before_table'];
+		$fun();
+	}
+
 	echo '<table class="', join($table_classes, ' '), '">';
 	echo '<thead>';
 	echo $header_row;
@@ -226,12 +232,13 @@ function echoLongTable($col_names, $table_name, $cond, $tail, $header_row, $prin
 
 	echo '</tbody>';
 	echo '</table>';
-	echo '</div>';
-	
+
 	if (isset($config['print_after_table'])) {
 		$fun = $config['print_after_table'];
 		$fun();
 	}
+
+	echo '</div>';
 		
 	echo $pag->pagination();
 }

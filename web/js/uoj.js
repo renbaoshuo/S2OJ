@@ -249,7 +249,7 @@ $.fn.uoj_problem_tag = function() {
 }
 $.fn.uoj_list_tag = function() {
 	return this.each(function() {
-		$(this).attr('href', uojHome + '/problem_lists?tag=' + encodeURIComponent($(this).text()));
+		$(this).attr('href', uojHome + '/lists?tag=' + encodeURIComponent($(this).text()));
 	});
 }
 $.fn.uoj_blog_tag = function() {

@@ -97,7 +97,7 @@ function queryProblemListTags($id) {
 	return $tags;
 }
 function queryProblemInList($list_id, $problem_id) {
-	return DB::selectFirst("select * from lists_problems where list_id='$blog_id' and problem_id='$problem_id'", MYSQLI_ASSOC);
+	return DB::selectFirst("SELECT * FROM lists_problems WHERE list_id = '$list_id' AND problem_id = '$problem_id'", MYSQLI_ASSOC);
 }
 
 function querySolution($problem_id, $blog_id) {
@@ -184,6 +184,9 @@ function queryBlogComment($id) {
 
 function isProblemVisibleToUser($problem, $user) {
 	return !$problem['is_hidden'] || hasProblemPermission($user, $problem);
+}
+function isListVisibleToUser($list, $user) {
+	return !$list['is_hidden'] || isSuperUser($user);
 }
 function isContestProblemVisibleToUser($problem, $contest, $user) {
 	if (isProblemVisibleToUser($problem, $user)) {

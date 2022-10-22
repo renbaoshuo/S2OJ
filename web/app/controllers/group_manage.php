@@ -81,7 +81,7 @@
 		$update_profile_form->handle = function($vdata) use ($group) {
 			$esc_title = DB::escape($vdata['title']);
 			$is_hidden = $_POST['is_hidden'];
-			$esc_announcement = $vdata['announcement'];
+			$esc_announcement = DB::escape($vdata['announcement']);
 
 			DB::update("UPDATE `groups` SET title = '$esc_title', is_hidden = '$is_hidden', announcement = '$esc_announcement' WHERE id = {$group['id']}");
 
@@ -198,6 +198,10 @@ function(res) {
 }
 EOD);
 		$add_new_assignment_form->runAtServer();
+
+		$now = new DateTime();
+		$hidden_time = new DateTime();
+		$hidden_time->sub(new DateInterval('P7D'));
 	} elseif ($cur_tab == 'users') {
 		if (isset($_POST['submit-remove_user']) && $_POST['submit-remove_user'] == 'remove_user') {
 			$username = $_POST['remove_username'];
@@ -331,54 +335,56 @@ EOD);
 		<div class="tab-content">
 			<div class="tab-pane active" id="assignments">
 				<?php
-						$now = new DateTime();
-	$hidden_time = new DateTime();
-	$hidden_time->sub(new DateInterval('P7D'));
-	echoLongTable(
-		['*'],
-		'groups_assignments',
-		"group_id = {$group['id']}",
-		'order by end_time desc, list_id desc',
-		<<<EOD
+					echoLongTable(
+						['*'],
+						'groups_assignments',
+						"group_id = {$group['id']}",
+						'order by end_time desc, list_id desc',
+						<<<EOD
 	<tr>
-		<th style="width:3em" class="text-center">ID</th>
+		<th style="width:4em" class="text-center">题单 ID</th>
 		<th style="width:12em">标题</th>
 		<th style="width:4em">状态</th>
 		<th style="width:8em">结束时间</th>
 		<th style="width:8em">操作</th>
 	</tr>
 EOD,
-		function($row) use ($group, $now, $hidden_time) {
-			$list = queryProblemList($row['list_id']);
-			$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['end_time']);
+						function($row) use ($group, $now, $hidden_time) {
+							$list = queryProblemList($row['list_id']);
+							$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['end_time']);
 
-			echo '<tr>';
-			echo '<td class="text-center">', $list['id'], '</td>';
-			echo '<td>', '<a class="text-decoration-none" href="/group/', $group['id'], '/assignment/', $list['id'],'">', HTML::escape($list['title']), '</a>', '</td>';
-			if ($end_time < $hidden_time) {
-				echo '<td class="text-secondary">已隐藏</td>';
-			} elseif ($end_time < $now) {
-				echo '<td class="text-danger">已结束</td>';
-			} else {
-				echo '<td class="text-success">进行中</td>';
-			}
-			echo '<td>', $end_time->format('Y-m-d H:i:s'), '</td>';
-			echo '<td>';
-			echo '<a class="text-decoration-none d-inline-block align-middle" href="/problem_list/', $list['id'], '/manage">编辑</a> ';
-			echo ' <form class="d-inline-block" method="POST" onsubmit=\'return confirm("你真的要移除这份作业吗？移除作业不会删除题单。")\'>'
-					. '<input type="hidden" name="_token" value="' . crsf_token() . '">'
-					. '<input type="hidden" name="list_id" value="' . $list['id'] . '">'
-					. '<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-remove_assignment" value="remove_assignment">移除</button>'
-				. '</form>';
-			echo '</td>';
-			echo '</tr>';
-		},
-		[
-			'page_len' => 20,
-			'div_classes' => ['table-responsive'],
-			'table_classes' => ['table', 'align-middle'],
-		]
-	);
+							echo '<tr>';
+							echo '<td class="text-center">', $list['id'], '</td>';
+							echo '<td>';
+							echo '<a class="text-decoration-none" href="/group/', $group['id'], '/assignment/', $list['id'],'">', HTML::escape($list['title']), '</a>';
+							if ($list['is_hidden']) {
+								echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
+							}
+							echo '</td>';
+							if ($end_time < $hidden_time) {
+								echo '<td class="text-secondary">已隐藏</td>';
+							} elseif ($end_time < $now) {
+								echo '<td class="text-danger">已结束</td>';
+							} else {
+								echo '<td class="text-success">进行中</td>';
+							}
+							echo '<td>', $end_time->format('Y-m-d H:i:s'), '</td>';
+							echo '<td>';
+							echo ' <a class="text-decoration-none d-inline-block align-middle" href="/list/', $list['id'], '/edit">编辑</a> ';
+							echo ' <form class="d-inline-block" method="POST" onsubmit=\'return confirm("你真的要移除这份作业（题单 #', $row['id'], '）吗？移除作业不会删除题单。")\'>'
+									. '<input type="hidden" name="_token" value="' . crsf_token() . '">'
+									. '<input type="hidden" name="list_id" value="' . $list['id'] . '">'
+									. '<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-remove_assignment" value="remove_assignment">移除</button>'
+								. '</form>';
+							echo '</td>';
+							echo '</tr>';
+						},
+						[
+							'page_len' => 20,
+							'div_classes' => ['table-responsive'],
+							'table_classes' => ['table', 'align-middle'],
+						]
+					);
 	?>
 			</div>
 			<div class="tab-pane" id="add-assignment">

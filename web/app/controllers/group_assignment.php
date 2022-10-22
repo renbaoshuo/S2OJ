@@ -28,6 +28,10 @@
 
 	$group = queryGroup($assignment['group_id']);
 	$list = queryProblemList($assignment['list_id']);
+
+	if (($group['is_hidden'] || $list['is_hidden']) && !isSuperUser($myUser)) {
+		become403Page();
+	}
 	?>
 
 <?php echoUOJPageHeader(UOJLocale::get('assignments')) ?>
@@ -40,7 +44,7 @@
 	<small class="fs-4">作业：</small><?= $list['title'] ?>
 </h1>
 <ul class="mt-3">
-	<li>对应题单：<a class="text-decoration-none" href="<?= HTML::url('/problem_list/'.$list['id']) ?>">#<?= $list['id'] ?></a></li>
+	<li>对应题单：<a class="text-decoration-none" href="<?= HTML::url('/list/'.$list['id']) ?>">#<?= $list['id'] ?></a></li>
 	<li>所属小组：<a class="text-decoration-none" href="<?= HTML::url('/group/'.$group['id']) ?>"><?= $group['title'] ?></a></li>
 	<li>结束时间：<?= $assignment['end_time'] ?></li>
 </ul>

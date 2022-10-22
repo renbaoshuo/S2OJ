@@ -686,6 +686,7 @@ UNLOCK TABLES;
 CREATE TABLE `lists` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` text NOT NULL,
+  `description` text NOT NULL DEFAULT '',
   `is_hidden` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

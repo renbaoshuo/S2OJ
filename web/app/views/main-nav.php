@@ -64,7 +64,7 @@ mb-4" role="navigation">
 					</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="<?= HTML::url('/problem_lists') ?>">
+					<a class="nav-link" href="<?= HTML::url('/lists') ?>">
 						<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 							<i class="bi bi-card-list"></i>
 						<?php else: ?>
