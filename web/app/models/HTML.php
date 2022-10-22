@@ -167,9 +167,6 @@ class HTML {
 	
 	public static function purifier() {
 		$config = HTMLPurifier_Config::createDefault();
-		// $config->set('Cache.DefinitionImpl', null);
-		$config->set('HTML.DefinitionID', 'UOJ__HTML::purifier()');
-		$config->set('HTML.DefinitionRev', 1);
 		$config->set('Output.Newline', true);
 		$def = $config->getHTMLDefinition(true);
 		
@@ -209,12 +206,10 @@ class HTML {
 			'br' => [],
 			'span' => ['data-realname' => 'Text', 'data-uoj-username' => 'Number'],
 		];
-
-		$config = HTMLPurifier_Config::createDefault();
 		
 		$allowed_elements = [];
 		$allowed_attributes = [];
-
+		
 		foreach ($allowed_html as $element => $attributes) {
 			$allowed_elements[$element] = true;
 			foreach ($attributes as $attribute => $type) {
@@ -222,12 +217,9 @@ class HTML {
 			}
 		}
 
+		$config = HTMLPurifier_Config::createDefault();
 		$config->set('HTML.AllowedElements', $allowed_elements);
 		$config->set('HTML.AllowedAttributes', $allowed_attributes);
-
-		// $config->set('Cache.DefinitionImpl', null);
-		$config->set('HTML.DefinitionID', 'UOJ__HTML::purifier_inline()');
-		$config->set('HTML.DefinitionRev', 1);
 		$def = $config->getHTMLDefinition(true);
 
 		foreach ($allowed_html as $element => $attributes) {
