@@ -1,4 +1,5 @@
 <?php
+	requireLib('bootstrap5');
 	requirePHPLib('form');
 	requirePHPLib('judger');
 	requirePHPLib('data');
@@ -11,7 +12,6 @@
 		become403Page();
 	}
 
-	requireLib('bootstrap5');
 	
 	if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)) {
 		$new_problem_form = new UOJForm('new_problem');
@@ -83,7 +83,7 @@ EOD;
 					echo "<td>{$extra_config['difficulty']}</td>";
 				}
 			}
-			echo '<td class="text-center">', getClickZanBlock('P', $problem['id'], $problem['zan'], null, false), '</td>';
+			echo '<td class="text-start">', getClickZanBlock('P', $problem['id'], $problem['zan'], null, false), '</td>';
 			echo '</tr>';
 		}
 	}
