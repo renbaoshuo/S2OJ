@@ -1,8 +1,7 @@
 <?php
+	requireLib('bootstrap5');
+	requireLib('mathjax');
 	requirePHPLib('form');
-
-	$REQUIRE_LIB['bootstrap5'] = '';
-	$REQUIRE_LIB['mathjax'] = '';
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
@@ -354,7 +353,7 @@ EOD;
 	}
 	
 	function echoDashboard() {
-		global $contest, $post_notice, $post_question, $reply_question, $REQUIRE_LIB;
+		global $contest, $post_notice, $post_question, $reply_question;
 		
 		$myname = Auth::id();
 		$contest_problems = DB::selectAll("select contests_problems.problem_id, best_ac_submissions.submission_id from contests_problems left join best_ac_submissions on contests_problems.problem_id = best_ac_submissions.problem_id and submitter = '{$myname}' where contest_id = {$contest['id']} order by contests_problems.dfn, contests_problems.problem_id");
@@ -389,7 +388,6 @@ EOD;
 			'post_question' => $post_question,
 			'my_questions_pag' => $my_questions_pag,
 			'others_questions_pag' => $others_questions_pag,
-			'REQUIRE_LIB' => $REQUIRE_LIB,
 		]);
 	}
 	

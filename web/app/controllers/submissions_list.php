@@ -103,16 +103,13 @@
 <?php
 	echoSubmissionsList($cond,
 		'order by id desc',
-		array(
+		[
 			'judge_time_hidden' => '',
-			'table_config' => (isset($REQUIRE_LIB['bootstrap5']) 
-				? array(
-					'div_classes' => array('card', 'mb-3', 'table-responsive'),
-					'table_classes' => array('table', 'mb-0', 'uoj-table', 'text-center')
-				)
-				: array()
-			),
-		),
+			'table_config' => [
+				'div_classes' => ['card', 'mb-3', 'table-responsive'],
+				'table_classes' => ['table', 'mb-0', 'uoj-table', 'text-center'],
+			]
+		],
 		$myUser);
 	?>
 

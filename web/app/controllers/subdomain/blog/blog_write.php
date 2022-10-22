@@ -1,4 +1,5 @@
 <?php
+	requireLib('bootstrap5');
 	requirePHPLib('form');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
@@ -17,8 +18,6 @@
 			become404Page();
 		}
 	}
-
-	requireLib('bootstrap5');
 	
 	$blog_editor = new UOJBlogEditor();
 	$blog_editor->name = 'blog';

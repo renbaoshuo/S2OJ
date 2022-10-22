@@ -1,4 +1,7 @@
 <?php
+	requireLib('bootstrap5');
+	requireLib('hljs');
+	requireLib('mathjax');
 	requirePHPLib('form');
 	requirePHPLib('judger');	
 
@@ -8,10 +11,6 @@
 
 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
 		become404Page();
-	}
-	
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
 	}
 
 	$problem_content = queryProblemContent($problem['id']);
@@ -220,16 +219,6 @@ EOD
 	}
 	?>
 
-<?php
-	requireLib('mathjax');
-
-	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		requireLib('hljs');
-	} else {
-		$REQUIRE_LIB['shjs'] = '';
-	}
-	?>
-
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::problem')) ?>
 <?php
 	$limit = getUOJConf("/var/uoj_data/{$problem['id']}/problem.conf");
@@ -239,14 +228,12 @@ EOD
 	$problem_uploader = $problem['uploader'];
 	?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="row">
 
 <!-- Left col -->
 <div class="col-lg-9">
-<?php endif ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5']) && $contest): ?>
+<?php if ($contest): ?>
 <!-- 比赛导航 -->
 <?php
 	$tabs_info = array(
@@ -287,65 +274,17 @@ EOD
 	</div>
 <?php endif ?>
 
-<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-<div class="row d-flex justify-content-center">
-	<span class="badge badge-secondary mr-1">时间限制:<?=$time_limit!=null?"$time_limit s":"N/A"?></span>
-	<span class="badge badge-secondary mr-1">空间限制:<?=$memory_limit!=null?"$memory_limit MB":"N/A"?></span>
-	<span class="badge badge-secondary mr-1">上传者:<?= $problem_uploader ?: "root" ?></span>
-</div>
-<div class="float-right">
-	<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
-</div>
-<?php endif ?>
-
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="card card-default mb-2">
 <div class="card-body">
-<?php endif ?>
 
+<h1 class="h2 card-title text-center">
 <?php if ($contest): ?>
-
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-<h1 class="h2 card-title text-center">
 	<?= $problem_letter ?>. <?= $problem['title'] ?>
-</h1>
 <?php else: ?>
-<div class="page-header row">
-	<h1 class="col-md-3 text-left"><small><?= $contest['name'] ?></small></h1>
-	<h1 class="col-md-7 text-center"><?= $problem_letter ?>. <?= $problem['title'] ?></h1>
-	<div class="col-md-2 text-right" id="contest-countdown"></div>
-</div>
-<div class="btn-group float-right" role="group">
-<a role="button" class="btn btn-primary" href="<?= HTML::url("/download.php?type=attachment&id={$problem['id']}") ?>"><span class="glyphicon glyphicon-download-alt"></span> 附件下载</a>
-<a role="button" class="btn btn-info" href="/contest/<?= $contest['id'] ?>/problem/<?= $problem['id'] ?>/statistics"><span class="glyphicon glyphicon-stats"></span> <?= UOJLocale::get('problems::statistics') ?></a>
-</div>
-<?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
-<script type="text/javascript">
-$('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJTime::$time_now->getTimestamp() ?>);
-</script>
-<?php endif ?>
-<?php endif ?>
-
-<?php else: ?>
-
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-<h1 class="h2 card-title text-center">
-<?php else: ?>
-<h1 class="page-header text-center">
-<?php endif ?>
 	#<?= $problem['id']?>. <?= $problem['title'] ?>
+<?php endif ?>
 </h1>
 
-<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-<div class="btn-group float-right" role="group">
-<a role="button" class="btn btn-primary" href="<?= HTML::url("/download.php?type=problem&id={$problem['id']}") ?>"><span class="glyphicon glyphicon-tasks"></span> 测试数据</a>
-<a role="button" class="btn btn-primary" href="<?= HTML::url("/download.php?type=attachment&id={$problem['id']}") ?>"><span class="glyphicon glyphicon-download-alt"></span> 附件下载</a>
-<a role="button" class="btn btn-info" href="/problem/<?= $problem['id'] ?>/statistics"><span class="glyphicon glyphicon-stats"></span> <?= UOJLocale::get('problems::statistics') ?></a>
-</div>
-<?php endif ?>
-<?php endif ?>
-
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="text-center small">
 	时间限制: <?= $time_limit != null ? "$time_limit s" : "N/A" ?>
 	&emsp;
@@ -355,34 +294,12 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 </div>
 
 <hr>
-<?php endif ?>
-
-<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-<ul class="nav nav-tabs" role="tablist">
-	<li class="nav-item"><a class="nav-link active" href="#statement" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-book"></span> <?= UOJLocale::get('problems::statement') ?></a></li>
-	<li class="nav-item"><a class="nav-link" href="#submit" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-upload"></span> <?= UOJLocale::get('problems::submit') ?></a></li>
-	<?php if ($custom_test_requirement): ?>
-	<li class="nav-item"><a class="nav-link" href="#custom-test" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-console"></span> <?= UOJLocale::get('problems::custom test') ?></a></li>
-	<?php endif ?>
-	<?php if (!$contest || $contest['cur_progress'] >= CONTEST_FINISHED): ?>
-	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/solutions" role="tab"><?= UOJLocale::get('problems::solutions') ?></a></li>
-	<?php endif ?>
-	<?php if (hasProblemPermission($myUser, $problem)): ?>
-	<li class="nav-item"><a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab"><?= UOJLocale::get('problems::manage') ?></a></li>
-	<?php endif ?>
-	<?php if ($contest): ?>
-	<li class="nav-item"><a class="nav-link" href="/contest/<?= $contest['id'] ?>" role="tab"><?= UOJLocale::get('contests::back to the contest') ?></a></li>
-	<?php endif ?>
-</ul>
-<?php endif ?>
-
-<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-<link rel="stylesheet" type="text/css" href="<?= HTML::url('/css/markdown.css') ?>">
-<?php endif ?>
 
 <div class="tab-content">
 	<div class="tab-pane active" id="statement">
-		<article class="mt-3 markdown-body"><?= $problem_content['statement'] ?></article>
+		<article class="mt-3 markdown-body">
+			<?= $problem_content['statement'] ?>
+		</article>
 	</div>
 	<div class="tab-pane" id="submit">
 		<div class="top-buffer-sm"></div>
@@ -401,13 +318,9 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 	<?php endif ?>
 </div>
 
-
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 </div>
-<?php endif ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 <!-- End left col -->
 
@@ -547,7 +460,6 @@ $(document).ready(function() {
 	});
 });
 </script>
-<?php endif ?>
 
 <?php if ($contest && $contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
 <script type="text/javascript">

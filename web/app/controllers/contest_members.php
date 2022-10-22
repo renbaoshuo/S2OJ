@@ -1,4 +1,5 @@
 <?php
+	requireLib('bootstrap5');
 	requirePHPLib('form');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
@@ -11,10 +12,6 @@
 
 	if (!validateUInt($_GET['id']) || !($contest = queryContest($_GET['id']))) {
 		become404Page();
-	}
-
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
 	}
 
 	genMoreContestInfo($contest);
@@ -178,26 +175,24 @@
 	?>
 <?php echoUOJPageHeader(HTML::stripTags($contest['name']) . ' - ' . UOJLocale::get('contests::contest registrants')) ?>
 
-<h1 class="h2 text-center"><?= $contest['name'] ?></h1>
+<h1 class="h2 text-center">
+	<?= $contest['name'] ?>
+</h1>
+
 <?php if ($contest['cur_progress'] == CONTEST_NOT_STARTED): ?>
 	<?php if ($iHasRegistered): ?>
 		<div class="row">
 			<div class="col-6">
 				<a style="color:green">已报名</a>
 			</div>
-			<div class="col-6
-	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-		text-end
-	<?php else: ?>
-		text-right
-	<?php endif ?>">
+			<div class="col-6 text-end">
 				<?php $unregister_form->printHTML(); ?>
 			</div>
 		</div>
 	<?php else: ?>
-		<div>当前尚未报名，您可以<a style="color:red" href="/contest/<?= $contest['id'] ?>/register">报名</a>。</div>
+		<div>当前尚未报名，您可以 <a class="text-decoration-none text-danger" href="/contest/<?= $contest['id'] ?>/register">报名</a>。</div>
 	<?php endif ?>
-<div class="top-buffer-sm"></div>
+<div class="mt-2"></div>
 <?php endif ?>
 
 <?php
@@ -220,63 +215,56 @@
 	}
 	$header_row .= '</tr>';
 
-	$config = array('page_len' => 100,
-		'get_row_index' => '',
-		'print_after_table' => function() {
-			global $add_new_contestant_form,
-			$add_group_to_contest_form,
-			$remove_user_from_contest_form,
-			$force_set_user_participated_form;
-
-			if (isset($add_new_contestant_form)) {
-				$add_new_contestant_form->printHTML();
-			}
-			if (isset($add_group_to_contest_form)) {
-				$add_group_to_contest_form->printHTML();
-			}
-			if (isset($remove_user_from_contest_form)) {
-				$remove_user_from_contest_form->printHTML();
-			}
-			if (isset($force_set_user_participated_form)) {
-				$force_set_user_participated_form->printHTML();
-			}
-		}
-	);
-
-	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		$config['div_classes'] = array('card', 'mb-3');
-		$config['table_classes'] = array('table', 'uoj-table', 'mb-0', 'text-center');
-	}
-	
-	echoLongTable(array('*'), 'contests_registrants', "contest_id = {$contest['id']}", 'order by username desc',
+	echoLongTable(
+		['*'],
+		'contests_registrants',
+		"contest_id = {$contest['id']}",
+		'order by username desc',
 		$header_row,
-		function($contest, $num) {
-			global $myUser;
-			global $has_contest_permission, $show_ip, $ip_owner, $has_participated;
-			
-			$user = queryUser($contest['username']);
-			$user_link = getUserLink($contest['username']);
+		function($contestant, $num) use ($myUser, $has_contest_permission, $show_ip, $ip_owner, $has_participated) {
+			$user = queryUser($contestant['username']);
+
 			if (!$show_ip) {
 				echo '<tr>';
 			} else {
 				if ($ip_owner[$user['remote_addr']] != $user['username'] || $forwarded_ip_owner[$user['http_x_forwarded_for']] != $user['username']) {
-					echo '<tr class="danger">';
+					echo '<tr class="table-danger">';
 				} else {
 					echo '<tr>';
 				}
 			}
 			echo '<td>'.$num.'</td>';
-			echo '<td>'.$user_link.'</td>';
+			echo '<td>'.getUserLink($contestant['username']).'</td>';
 			if ($show_ip) {
 				echo '<td>'.$user['remote_addr'].'</td>';
 				echo '<td>'.$user['http_x_forwarded_for'].'</td>';
 			}
 			if ($has_contest_permission) {
-				echo '<td>'.($has_participated[$user['username']] ? 'Yes' : 'No').'</td>';
+				echo '<td>'.($contestant['has_participated'] ? 'Yes' : 'No').'</td>';
 			}
 			echo '</tr>';
 		},
-		$config
+		[
+			'page_len' => 50,
+			'get_row_index' => '',
+			'div_classes' => ['table-responsive', 'card', 'mb-3'],
+			'table_classes' => ['table', 'uoj-table', 'mb-0', 'text-center'],
+		]
 	);
+	?>
+
+<?php
+	if (isset($add_new_contestant_form)) {
+		$add_new_contestant_form->printHTML();
+	}
+	if (isset($add_group_to_contest_form)) {
+		$add_group_to_contest_form->printHTML();
+	}
+	if (isset($remove_user_from_contest_form)) {
+		$remove_user_from_contest_form->printHTML();
+	}
+	if (isset($force_set_user_participated_form)) {
+		$force_set_user_participated_form->printHTML();
+	}
 	?>
 <?php echoUOJPageFooter() ?>

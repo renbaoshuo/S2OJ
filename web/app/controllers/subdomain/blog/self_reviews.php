@@ -7,12 +7,11 @@
 		become403Page();
 	}
 
+	requireLib('bootstrap5');
+	requireLib('mathjax');
 	requirePHPLib('form');
 	
 	$username = UOJContext::userid();
-
-	$REQUIRE_LIB['bootstrap5'] = '';
-	$REQUIRE_LIB['mathjax'] = '';
 	?>
 
 <?php echoUOJPageHeader(UOJLocale::get('contests::contest self reviews')) ?>

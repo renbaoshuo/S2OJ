@@ -1,4 +1,5 @@
 <?php
+	requireLib('bootstrap5');
 	requirePHPLib('form');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
@@ -10,10 +11,6 @@
 	}
 	if (!hasProblemPermission($myUser, $problem)) {
 		become403Page();
-	}
-
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
 	}
 
 	$managers_form = newAddDelCmdForm('managers',
@@ -67,25 +64,15 @@
 	?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - 管理者 - 题目管理') ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="row">
+<!-- left col -->
 <div class="col-lg-9">
-<?php endif ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <h1 class="h2">
-<?php else: ?>
-<h1 class="page-header text-center">
-<?php endif ?>
-	#<?=$problem['id']?>. <?=$problem['title']?> 管理
+	#<?= $problem['id'] ?>. <?= $problem['title'] ?> 管理
 </h1>
 
-<ul class="nav
-	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	nav-pills my-3
-	<?php else: ?>
-	nav-tabs
-	<?php endif ?>" role="tablist">
+<ul class="nav nav-pills my-3" role="tablist">
 	<li class="nav-item">
 		<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
 			题面
@@ -101,25 +88,12 @@
 			数据
 		</a>
 	</li>
-
-<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-	<li class="nav-item">
-		<a class="nav-link" href="/problem/<?=$problem['id']?>" role="tab">
-			返回
-		</a>
-	</li>
-<?php endif ?>
 </ul>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="card card-default">
 <div class="card-body">
-<?php endif ?>
 
-<table class="table
-<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-table-hover
-<?php endif ?>">
+<table class="table">
 	<thead>
 		<tr>
 			<th>#</th>
@@ -146,12 +120,9 @@ table-hover
 <?php $update_uploader_form->printHTML(); ?>
 <?php endif ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 </div>
-<?php endif ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <!-- end left col -->
 </div>
 
@@ -192,8 +163,8 @@ table-hover
 
 <?php uojIncludeView('sidebar', array()) ?>
 </aside>
+<!-- end right col -->
 
 </div>
-<?php endif ?>
 
 <?php echoUOJPageFooter() ?>

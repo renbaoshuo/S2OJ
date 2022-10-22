@@ -1,4 +1,7 @@
 <?php
+	requireLib('bootstrap5');
+	requireLib('mathjax');
+	requireLib('hljs');
 	requirePHPLib('form');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
@@ -25,10 +28,6 @@
 				become403Page();
 			}
 		}
-	}
-
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
 	}
 	
 	$comment_form = new UOJForm('comment');
@@ -161,23 +160,11 @@
 		'page_len' => 20
 	));
 	?>
-<?php
-	$REQUIRE_LIB['mathjax'] = '';
-	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		$REQUIRE_LIB['hljs'] = '';
-	} else {
-		$REQUIRE_LIB['shjs'] = '';
-	}
-	?>
 <?php echoUOJPageHeader(HTML::stripTags($blog['title']) . ' - 博客') ?>
 <?php echoBlog($blog, array('show_title_only' => isset($_GET['page']) && $_GET['page'] != 1)) ?>
 <h2>
 	评论
-	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 	<i class="bi bi-chat-fill"></i>
-	<?php else: ?>
-	<span class="glyphicon glyphicon-comment"></span>
-	<?php endif ?>
 </h2>
 <div class="list-group">
 <?php if ($comments_pag->isEmpty()): ?>
@@ -195,59 +182,26 @@
 		$replies_json = json_encode($replies);
 		?>
 	<div id="comment-<?= $comment['id'] ?>" class="list-group-item">
-		<div class="
-		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-		d-flex
-		<?php else: ?>
-		media
-		<?php endif ?>
-		">
-			<div class="comtposterbox mr-3
-				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-				flex-shrink-0
-				<?php else: ?>
-				media-left
-				<?php endif ?>">
-				<a href="<?= HTML::url('/user/'.$poster['username']) ?>" class="d-none d-sm-block
-					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-					text-decoration-none
-					<?php endif ?>">
+		<div class="d-flex">
+			<div class="comtposterbox mr-3 flex-shrink-0">
+				<a href="<?= HTML::url('/user/'.$poster['username']) ?>" class="d-none d-sm-block text-decoration-none">
 					<img class="media-object img-rounded" src="<?= $asrc ?>" alt="avatar" />
 				</a>
 			</div>
-			<div id="comment-body-<?= $comment['id'] ?>" class="comtbox
-				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-				flex-grow-1 ms-3
-				<?php else: ?>
-				media-body
-				<?php endif ?>">
+			<div id="comment-body-<?= $comment['id'] ?>" class="comtbox flex-grow-1 ms-3">
 				<div class="row">
 					<div class="col-sm-6"><?= getUserLink($poster['username']) ?></div>
-					<div class="col-sm-6 
-				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-				text-end
-				<?php else: ?>
-				text-right
-				<?php endif ?>"><?= getClickZanBlock('BC', $comment['id'], $comment['zan']) ?></div>
+					<div class="col-sm-6 text-end"><?= getClickZanBlock('BC', $comment['id'], $comment['zan']) ?></div>
 				</div>
 				<div class="comtbox1"><?= $comment['content'] ?></div>
-				<ul class="list-inline bot-buffer-no
-					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-					text-end
-					<?php else: ?>
-					text-right
-					<?php endif ?>">
+				<ul class="list-inline mb-0 text-end">
 					<li>
 						<small class="text-muted">
 							<?= $comment['post_time'] ?>
 						</small>
 					</li>
 					<li>
-						<a class="
-							<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-							text-decoration-none
-							<?php endif ?>"
-							id="reply-to-<?= $comment['id'] ?>" href="#">
+						<a class="text-decoration-none" id="reply-to-<?= $comment['id'] ?>" href="#">
 							回复
 						</a>
 					</li>

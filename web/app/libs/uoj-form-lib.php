@@ -263,8 +263,7 @@ EOD;
 		}
 		public function addCKEditor($name, $label_text, $default_value, $validator_php, $validator_js) {
 			$default_value = htmlspecialchars($default_value);
-			global $REQUIRE_LIB;
-			$REQUIRE_LIB['ckeditor'] = '';
+			$GLOBALS['REQUIRE_LIB']['ckeditor'] = '';
 			
 			$this->is_big = true;
 			
@@ -279,8 +278,7 @@ EOD;
 		}
 		
 		public function addBlogEditor(UOJBlogEditor $editor) {
-			global $REQUIRE_LIB;
-			$REQUIRE_LIB['blog-editor'] = '';
+			$GLOBALS['REQUIRE_LIB']['blog-editor'] = '';
 			
 			$this->is_big = true;
 			
@@ -325,9 +323,8 @@ EOD
 			};
 		}
 		public function addSlideEditor($name, $label_text, $default_value, $validator_php, $validator_js) {
+			$GLOBALS['REQUIRE_LIB']['slide-editor'] = '';
 			$default_value = htmlspecialchars($default_value);
-			global $REQUIRE_LIB;
-			$REQUIRE_LIB['slide-editor'] = '';
 			
 			$this->is_big = true;
 			

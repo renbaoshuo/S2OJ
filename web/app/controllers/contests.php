@@ -1,28 +1,19 @@
 <?php
+	requireLib('bootstrap5');
 	requirePHPLib('form');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
 	}
 
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
-	}
-
 	$upcoming_contest_name = null;
 	$upcoming_contest_href = null;
 	$rest_second = 1000000;
 	function echoContest($contest) {
-		global $myUser, $upcoming_contest_name, $upcoming_contest_href, $rest_second, $REQUIRE_LIB;
+		global $myUser, $upcoming_contest_name, $upcoming_contest_href, $rest_second;
 
-		$a_class = ' ';
-
-		if (isset($REQUIRE_LIB['bootstrap5'])) {
-			$a_class = ' class="text-decoration-none" ';
-		}
-		
 		$contest_name_link = <<<EOD
-<a $a_class href="/contest/{$contest['id']}">{$contest['name']}</a>
+<a class="text-decoration-none" href="/contest/{$contest['id']}">{$contest['name']}</a>
 EOD;
 		genMoreContestInfo($contest);
 		if ($contest['cur_progress'] == CONTEST_NOT_STARTED) {
@@ -33,18 +24,18 @@ EOD;
 				$rest_second = $cur_rest_second;
 			}
 			if ($myUser != null && hasRegistered($myUser, $contest)) {
-				$contest_name_link .= '<sup><a '.$a_class.' style="color:green">'.UOJLocale::get('contests::registered').'</a></sup>';
+				$contest_name_link .= '<sup><a class="text-decoration-none"  style="color:green">'.UOJLocale::get('contests::registered').'</a></sup>';
 			} else {
-				$contest_name_link .= '<sup><a '.$a_class.' style="color:red" href="/contest/'.$contest['id'].'/register">'.UOJLocale::get('contests::register').'</a></sup>';
+				$contest_name_link .= '<sup><a class="text-decoration-none"  style="color:red" href="/contest/'.$contest['id'].'/register">'.UOJLocale::get('contests::register').'</a></sup>';
 			}
 		} elseif ($contest['cur_progress'] == CONTEST_IN_PROGRESS) {
-			$contest_name_link .= '<sup><a '.$a_class.' style="color:blue" href="/contest/'.$contest['id'].'">'.UOJLocale::get('contests::in progress').'</a></sup>';
+			$contest_name_link .= '<sup><a class="text-decoration-none"  style="color:blue" href="/contest/'.$contest['id'].'">'.UOJLocale::get('contests::in progress').'</a></sup>';
 		} elseif ($contest['cur_progress'] == CONTEST_PENDING_FINAL_TEST) {
-			$contest_name_link .= '<sup><a '.$a_class.' style="color:blue" href="/contest/'.$contest['id'].'">'.UOJLocale::get('contests::pending final test').'</a></sup>';
+			$contest_name_link .= '<sup><a class="text-decoration-none"  style="color:blue" href="/contest/'.$contest['id'].'">'.UOJLocale::get('contests::pending final test').'</a></sup>';
 		} elseif ($contest['cur_progress'] == CONTEST_TESTING) {
-			$contest_name_link .= '<sup><a '.$a_class.' style="color:blue" href="/contest/'.$contest['id'].'">'.UOJLocale::get('contests::final testing').'</a></sup>';
+			$contest_name_link .= '<sup><a class="text-decoration-none"  style="color:blue" href="/contest/'.$contest['id'].'">'.UOJLocale::get('contests::final testing').'</a></sup>';
 		} elseif ($contest['cur_progress'] == CONTEST_FINISHED) {
-			$contest_name_link .= '<sup><a '.$a_class.'style="color:grey" href="/contest/'.$contest['id'].'/standings">'.UOJLocale::get('contests::ended').'</a></sup>';
+			$contest_name_link .= '<sup><a class="text-decoration-none"  style="color:grey" href="/contest/'.$contest['id'].'/standings">'.UOJLocale::get('contests::ended').'</a></sup>';
 		}
 		
 		$last_hour = round($contest['last_min'] / 60, 2);
@@ -52,44 +43,33 @@ EOD;
 		$click_zan_block = getClickZanBlock('C', $contest['id'], $contest['zan']);
 		echo '<tr>';
 		echo '<td>', $contest_name_link, '</td>';
-		echo '<td>', '<a'.$a_class.'href="'.HTML::timeanddate_url($contest['start_time'], array('duration' => $contest['last_min'])).'">'.$contest['start_time_str'].'</a>', '</td>';
+		echo '<td>', '<a class="text-decoration-none"  href="'.HTML::timeanddate_url($contest['start_time'], array('duration' => $contest['last_min'])).'">'.$contest['start_time_str'].'</a>', '</td>';
 		echo '<td>', UOJLocale::get('hours', $last_hour), '</td>';
-		echo '<td>', '<a'.$a_class.'href="/contest/'.$contest['id'].'/registrants">';
-		
-		if (isset($REQUIRE_LIB['bootstrap5'])) {
-			echo '<i class="bi bi-person-fill"></i>';
-		} else {
-			echo '<span class="glyphicon glyphicon-user"></span>';
-		}
-
-		echo ' &times;'.$contest['player_num'].'</a>', '</td>';
+		echo '<td>', '<a class="text-decoration-none"  href="/contest/'.$contest['id'].'/registrants">', '<i class="bi bi-person-fill"></i>', ' &times;'.$contest['player_num'].'</a>', '</td>';
 		echo '<td>', '<div class="text-left">'.$click_zan_block.'</div>', '</td>';
 		echo '</tr>';
 	}
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('contests')) ?>
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+
+<!-- title container -->
 <div class="d-flex justify-content-between">
-<?php endif ?>
 <h1 class="h2">
 	<?= UOJLocale::get('contests') ?>
 </h1>
-<?php
-if (isSuperUser($myUser)) {
-	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		echo '<div class="text-end">';
-	} else {
-		echo '<div class="text-right">';
-	}
-	echo '<a href="/contest/new" class="btn btn-primary">'.UOJLocale::get('contests::add new contest').'</a>';
-	echo '</div>';
-}
-	?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+<?php if (isSuperUser($myUser)): ?>
+<div class="text-end">
+	<a href="/contest/new" class="btn btn-primary"><?= UOJLocale::get('contests::add new contest') ?></a>
 </div>
 <?php endif ?>
-<h4><?= UOJLocale::get('contests::current or upcoming contests') ?></h4>
+
+</div>
+<!-- end title container -->
+
+<h2 class="h4">
+	<?= UOJLocale::get('contests::current or upcoming contests') ?>
+</h2>
 <?php
 			$table_header = '';
 	$table_header .= '<tr>';
@@ -100,12 +80,18 @@ if (isSuperUser($myUser)) {
 	$table_header .= '<th style="width:180px;">'.UOJLocale::get('appraisal').'</th>';
 	$table_header .= '</tr>';
 
-	$table_config = array('page_len' => 40);
-	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		$table_config['div_classes'] = array('card', 'mb-3');
-		$table_config['table_classes'] = array('table', 'uoj-table', 'mb-0', 'text-center');
-	}
-	echoLongTable(array('*'), 'contests', "status != 'finished'", 'order by start_time asc, id asc', $table_header,
+	$table_config = [
+		'page_len' => 40,
+		'div_classes' => ['card', 'mb-3'],
+		'table_classes' => ['table', 'uoj-table', 'mb-0', 'text-center'],
+	];
+
+	echoLongTable(
+		['*'],
+		'contests',
+		"status != 'finished'",
+		'order by start_time asc, id asc',
+		$table_header,
 		echoContest,
 		$table_config
 	);
@@ -128,9 +114,16 @@ EOD;
 	}
 	?>
 
-<h4><?= UOJLocale::get('contests::ended contests') ?></h4>
+<h2 class="h4">
+	<?= UOJLocale::get('contests::ended contests') ?>
+</h2>
 <?php
-	echoLongTable(array('*'), 'contests', "status = 'finished'", 'order by start_time desc, id desc', $table_header,
+	echoLongTable(
+		['*'],
+		'contests',
+		"status = 'finished'",
+		'order by start_time desc, id desc',
+		$table_header,
 		echoContest,
 		$table_config
 	);

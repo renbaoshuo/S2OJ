@@ -1,5 +1,6 @@
 <?php
 	requirePHPLib('form');
+	requireLib('bootstrap5');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
 		redirectToLogin();
@@ -16,10 +17,6 @@
 		if (!validateUInt($_GET['id']) || !($blog = queryBlog($_GET['id'])) || !UOJContext::isHisSlide($blog)) {
 			become404Page();
 		}
-	}
-
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
 	}
 	
 	$blog_editor = new UOJBlogEditor();
@@ -78,17 +75,8 @@
 	$blog_editor->runAtServer();
 	?>
 <?php echoUOJPageHeader('写幻灯片') ?>
-<div class="
-	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	text-end
-	<?php else: ?>
-	text-right
-	<?php endif ?>">
-<a class="
-	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-	text-decoration-none
-	<?php endif ?>
-	" href="http://uoj.ac/blog/75">这玩意儿怎么用？</a>
+<div class="text-end">
+<a class="text-decoration-none" href="http://uoj.ac/blog/75">这玩意儿怎么用？</a>
 </div>
 <?php $blog_editor->printHTML() ?>
 <?php echoUOJPageFooter() ?>

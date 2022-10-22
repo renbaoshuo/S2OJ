@@ -1,4 +1,7 @@
 <?php
+	requireLib('bootstrap5');
+	requireLib('mathjax');
+	requireLib('hljs');
 	requirePHPLib('form');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
@@ -9,8 +12,6 @@
 		become403Page();
 	}
 
-	$REQUIRE_LIB['bootstrap5'] = '';
-	
 	$blogs_cond = "poster = '".UOJContext::userid()."'";
 	if (!UOJContext::hasBlogPermission()) {
 		$blogs_cond .= " and is_hidden = false";
@@ -34,9 +35,6 @@
 	));
 	
 	$all_tags = DB::selectAll("select distinct tag from blogs_tags where blog_id in (select id from blogs where $blogs_cond)");
-	
-	requireLib('mathjax');
-	requireLib('hljs');
 	?>
 <?php echoUOJPageHeader('日志') ?>
 

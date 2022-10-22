@@ -1,6 +1,9 @@
 <?php
 	use Gregwar\Captcha\PhraseBuilder;
 	use Gregwar\Captcha\CaptchaBuilder;
+	
+	requireLib('md5');
+	requireLib('bootstrap5');
 
 	if (Auth::check()) {
 		redirectTo('/');
@@ -49,10 +52,6 @@
 		unset($_SESSION['phrase']);
 		die();
 	}
-	?>
-<?php
-	$REQUIRE_LIB['bootstrap5'] = '';
-	$REQUIRE_LIB['md5'] = '';
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('login')) ?>
 

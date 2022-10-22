@@ -1,5 +1,7 @@
 <?php
 	requireLib('bootstrap5');
+	requireLib('hljs');
+	requireLib('mathjax');
 	requirePHPLib('form');
 	requirePHPLib('judger');
 
@@ -160,10 +162,6 @@ EOD;
 			$rows[$idx]['removeForm'] = $removeForm;
 		}
 	}
-	?>
-<?php
-	$REQUIRE_LIB['mathjax'] = '';
-	$REQUIRE_LIB['hljs'] = '';
 	?>
 
 <?php echoUOJPageHeader(UOJLocale::get('problems::solutions') . ' - ' . HTML::stripTags($problem['title'])) ?>

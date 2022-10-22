@@ -6,7 +6,6 @@ if (!isset($can_reply)) {
 }
 
 ?>
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="table-responsive mb-3
 	<?php if (!isset($no_bs5_card)): ?>
 		card card-default
@@ -15,10 +14,6 @@ if (!isset($can_reply)) {
 	<?php if (!isset($no_bs5_card)): ?>
 	uoj-table
 	<?php endif ?>">
-<?php else: ?>
-<div class="table-responsive">
-	<table class="table table-bordered table-hover table-vertical-middle table-text-center">
-<?php endif ?>
 		<thead>
 			<tr>
 				<th style="width:10em">提问者</th>

@@ -1,4 +1,5 @@
 <?php
+	requireLib('bootstrap5');
 	requirePHPLib('form');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
@@ -8,62 +9,21 @@
 	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
 		become403Page();
 	}
-
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
-	}
-
-	function echoBlogCell($blog) {
-		global $REQUIRE_LIB;
-
-		echo '<tr>';
-		if ($blog['is_hidden']) {
-			echo '<td><span class="text-danger">[已隐藏]</span> ' . getBlogLink($blog['id']) . '</td>';
-		} else {
-			echo '<td>' . getBlogLink($blog['id']) . '</td>';
-		}
-		echo '<td>' . getUserLink($blog['poster']) . '</td>';
-		echo '<td>' . $blog['post_time'] . '</td>';
-		echo '</tr>';
-	}
-	$header = <<<EOD
-	<tr>
-		<th width="60%">标题</th>
-		<th width="20%">发表者</th>
-		<th width="20%">发表日期</th>
-	</tr>
-EOD;
-	$config = array();
-	$config['table_classes'] = array('table', 'table-hover');
-
-	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		$config['div_classes'] = array('card', 'my-3', 'table-responsive');
-		$config['table_classes'] = array('table', 'uoj-table', 'mb-0');
-	}
 	?>
 <?php echoUOJPageHeader(UOJLocale::get('blogs')) ?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <div class="row">
+
+<!-- left col -->
 <div class="col-lg-9">
-<div class="d-flex flex-wrap justify-content-between">
-<?php endif ?>
 
-<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-<?php if (Auth::check()): ?>
-<div class="float-right">
-	<div class="btn-group">
-		<a href="<?= HTML::blog_url(Auth::id(), '/') ?>" class="btn btn-secondary btn-sm">我的博客首页</a>
-		<a href="<?= HTML::blog_url(Auth::id(), '/post/new/write')?>" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-edit"></span> 写新博客</a>
-	</div>
-</div>
-<?php endif ?>
-<?php endif ?>
+<!-- title container -->
+<div class="d-flex flex-wrap justify-content-between align-items-center">
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 <h1 class="h2">
 	<?= UOJLocale::get("blogs overview") ?>
 </h1>
+
 <div class="text-end">
 	<div class="btn-group">
 		<a href="<?= HTML::blog_url(Auth::id(), '/') ?>" class="btn btn-secondary btn-sm">
@@ -75,24 +35,50 @@ EOD;
 		</a>
 	</div>
 </div>
-<?php else: ?>
-<h3>博客总览</h3>
-<?php endif ?>
-
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
-<?php endif ?>
+<!-- end title container -->
 
-<?php echoLongTable(array('id', 'poster', 'title', 'post_time', 'zan', 'is_hidden'), 'blogs', isSuperUser($myUser) ? "1" : "is_hidden = 0 or poster = '{$myUser['username']}'", 'order by post_time desc', $header, 'echoBlogCell', $config); ?>
+<?php
+echoLongTable(
+	['id', 'poster', 'title', 'post_time', 'zan', 'is_hidden'],
+	'blogs',
+	isSuperUser($myUser) ? "1" : "is_hidden = 0 or poster = '{$myUser['username']}'",
+	'order by post_time desc',
+	<<<EOD
+	<tr>
+		<th width="60%">标题</th>
+		<th width="20%">发表者</th>
+		<th width="20%">发表日期</th>
+	</tr>
+EOD,
+	function($blog) {
+		echo '<tr>';
+		echo '<td>';
+		echo getBlogLink($blog['id']);
+		if ($blog['is_hidden']) {
+			echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
+		}
+		echo '</td>';
+		echo '<td>' . getUserLink($blog['poster']) . '</td>';
+		echo '<td>' . $blog['post_time'] . '</td>';
+		echo '</tr>';
+	},
+	[
+		'page_len' => 10,
+		'div_classes' => ['card', 'my-3', 'table-responsive'],
+		'table_classes' => ['table', 'uoj-table', 'mb-0'],
+	]
+);
+	?>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 </div>
 
+<!-- right col -->
 <aside class="col-lg-3 mt-3 mt-lg-0">
-<?php uojIncludeView('sidebar', array()) ?>
+<?php uojIncludeView('sidebar') ?>
 </aside>
+<!-- end right col -->
 
 </div>
-<?php endif ?>
 
 <?php echoUOJPageFooter() ?>

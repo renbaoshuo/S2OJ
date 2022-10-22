@@ -3,28 +3,20 @@
 	$countdowns = DB::selectAll("select * from countdowns order by end_time asc");
 	$friend_links = DB::selectAll("select * from friend_links order by level desc, id asc");
 
-	if (!isset($_COOKIE['bootstrap4'])) {
-		$REQUIRE_LIB['bootstrap5'] = '';
-	}
+	requireLib('bootstrap5');
 	?>
 <?php echoUOJPageHeader(UOJConfig::$data['profile']['oj-name-short']) ?>
 <div class="row">
 	<div class="col-lg-9">
 		<div class="card card-default">
 			<div class="card-body">
-				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-					<h4 class="card-title">
-						<?= UOJLocale::get('announcements') ?>
-					</h4>
-				<?php endif ?>
+				<h4 class="card-title">
+					<?= UOJLocale::get('announcements') ?>
+				</h4>
 				<table class="table table-sm">
 					<thead>
 						<tr>
-							<th style="width:60%">
-								<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-									<?= UOJLocale::get('announcements') ?>
-								<?php endif ?>
-							</th>
+							<th style="width:60%"></th>
 							<th style="width:20%"></th>
 							<th style="width:20%"></th>
 						</tr>
@@ -41,11 +33,7 @@
 							?>
 							<tr>
 								<td>
-									<a href="/blogs/<?= $blog['id'] ?>"
-										<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-										class="text-decoration-none"
-										<?php endif ?>
-										><?= $blog['title'] ?></a>
+									<a href="/blogs/<?= $blog['id'] ?>" class="text-decoration-none"><?= $blog['title'] ?></a>
 									<?= $new_tag ?>
 								</td>
 								<td>by <?= getUserLink($blog['poster']) ?></td>
@@ -55,51 +43,33 @@
 						<?php for ($i = $now_cnt + 1; $i <= 5; $i++): ?>
 							<tr><td colspan="233">&nbsp;</td></tr>
 						<?php endfor ?>
-						<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-							<tr><td class="text-right" colspan="233"><a href="/announcements"><?= UOJLocale::get('all the announcements') ?></a></td></tr>
-						<?php endif ?>
 					</tbody>
 				</table>
-				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-					<div class="text-end">
-						<a class="text-decoration-none" href="/announcements"><?= UOJLocale::get('all the announcements') ?></a>
-					</div>
-				<?php endif ?>
+				<div class="text-end">
+					<a class="text-decoration-none" href="/announcements">
+						<?= UOJLocale::get('all the announcements') ?>
+					</a>
+				</div>
 			</div>
 		</div>
 		<?php if (!UOJConfig::$data['switch']['force-login'] || Auth::check()): ?>
 			<?php if (!UOJConfig::$data['switch']['force-login'] || isNormalUser($myUser)): ?>
 			
-			<div class="mt-4
-				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-				card
-				<?php endif ?>
-				">
-				
-				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+			<div class="mt-4 card">
 				<div class="card-body">
 					<h4 class="card-title"><?= UOJLocale::get('top solver') ?></h4>
-				<?php else: ?>
-					<h3><?= UOJLocale::get('top solver') ?></h3>
-				<?php endif ?>
-					<?php echoRanklist(array(
+					<?php echoRanklist([
 						'echo_full' => true,
 						'top10' => true,
 						'by_accepted' => true,
-						'table_classes' => isset($REQUIRE_LIB['bootstrap5'])
-							? array('table', 'text-center')
-							: array('table', 'table-bordered', 'table-hover', 'table-striped', 'table-text-center'),
-					)) ?>
+						'table_classes' => ['table', 'text-center'],
+					]) ?>
 					<div class="text-center">
-						<a href="/solverlist"
-							<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-							class="text-decoration-none"
-							<?php endif ?>
-							><?= UOJLocale::get('view all') ?></a>
+						<a href="/solverlist" class="text-decoration-none">
+							<?= UOJLocale::get('view all') ?>
+						</a>
 					</div>
-				<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 				</div>
-				<?php endif ?>
 			</div>
 			<?php endif ?>
 		<?php else: ?>
@@ -115,23 +85,11 @@
 			<img class="media-object img-thumbnail" src="/images/logo.png" alt="Logo" />
 		</div>
 		<div class="card card-default mb-2">
-			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 			<div class="card-header bg-white">
 				<b><?= UOJLocale::get('countdowns') ?></b>
 			</div>
-			<?php endif ?>
 			<div class="card-body">
-				<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-					<h4 class="card-title" style="font-size: 1.25rem">
-						<?= UOJLocale::get('countdowns') ?>
-					</h4>
-				<?php endif ?>
-				<ul class="
-					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-						list-unstyled
-					<?php else: ?>
-						pl-4
-					<?php endif ?> mb-0">
+				<ul class="list-unstyled mb-0">
 					<?php foreach ($countdowns as $countdown): ?>
 						<?php
 							$enddate = strtotime($countdown['end_time']);
@@ -156,37 +114,20 @@
 		</div>
 
 		<?php if (Auth::check()): ?>
-			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-				<?php uojIncludeView('sidebar', ['assignments_hidden' => '', 'groups_hidden' => '']) ?>
-			<?php endif ?>
+			<?php uojIncludeView('sidebar', ['assignments_hidden' => '', 'groups_hidden' => '']) ?>
 		<?php endif ?>
 
 		<div class="card card-default mb-2">
-			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-				<div class="card-header bg-white">
-					<b><?= UOJLocale::get('friend links') ?></b>
-				</div>
-			<?php endif ?>
+			<div class="card-header bg-white">
+				<b><?= UOJLocale::get('friend links') ?></b>
+			</div>
 			<div class="card-body">
-				<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-				<h4 class="card-title" style="font-size: 1.25rem">
-					<?= UOJLocale::get('friend links') ?>
-				</h4>
-				<?php endif ?>
-				<ul class="
-					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-						ps-3
-					<?php else: ?>
-						pl-4
-					<?php endif ?>
-					mb-0">
+				<ul class="ps-3 mb-0">
 					<?php foreach ($friend_links as $friend_link): ?>
 						<li>
-							<a
-							<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-							class="text-decoration-none"
-							<?php endif ?>
-							href="<?= $friend_link['url'] ?>" target="_blank"><?= $friend_link['title'] ?></a>
+							<a class="text-decoration-none"	href="<?= $friend_link['url'] ?>" target="_blank">
+								<?= $friend_link['title'] ?>
+							</a>
 						</li>
 					<?php endforeach ?>
 				</ul>

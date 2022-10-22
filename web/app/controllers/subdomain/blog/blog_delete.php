@@ -1,4 +1,5 @@
 <?php
+	requireLib('bootstrap5');
 	requirePHPLib('form');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
@@ -9,8 +10,6 @@
 		become403Page();
 	}
 
-	$REQUIRE_LIB['bootstrap5'] = '';
-	
 	if (!UOJContext::hasBlogPermission()) {
 		become403Page();
 	}

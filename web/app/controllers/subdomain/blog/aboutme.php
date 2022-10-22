@@ -1,4 +1,6 @@
 <?php
+	requireLib('bootstrap5');
+	requireLib('calendar_heatmap');
 	requirePHPLib('form');
 
 	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
@@ -8,9 +10,6 @@
 	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
 		become403Page();
 	}
-
-	$REQUIRE_LIB['bootstrap5'] = '';
-	$REQUIRE_LIB['calendar_heatmap'] = '';
 	?>
 <?php echoUOJPageHeader('关于我') ?>
 
