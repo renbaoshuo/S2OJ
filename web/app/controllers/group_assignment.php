@@ -165,7 +165,7 @@ $('#standings').long_table(
 			var html = '';
 
 			html += '<div class="card-header bg-transparent text-muted text-start small">' +
-					'成绩统计截止时间：<?= $submission_end_time->format('Y-m-d H:m:s') ?>' +
+					'成绩统计截止时间：<?= $submission_end_time->format('Y-m-d H:i:s') ?>' +
 				'</div>';
 
 			return html;
