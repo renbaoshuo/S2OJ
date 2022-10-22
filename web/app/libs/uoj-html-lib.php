@@ -1389,10 +1389,13 @@ function echoRanklist($config = array()) {
 	$col_names = array('b.username as username', 'count(*) as ac_num', 'b.motto as motto');
 	$cond = '1';
 	$tail = 'group by username order by ac_num desc, username asc';
+	$config['pagination_table'] = 'user_info';
 
 	if (isset($config['group_id'])) {
 		$group_id = $config['group_id'];
 		$from = "best_ac_submissions a inner join user_info b on a.submitter = b.username inner join groups_users c on (a.submitter = c.username and c.group_id = {$group_id})";
+		$config['pagination_table'] = 'groups_users';
+		$config['pagination_cond'] = "group_id = {$group_id}";
 	}
 
 	if (isset($config['top10'])) {
@@ -1400,6 +1403,5 @@ function echoRanklist($config = array()) {
 	}
 
 	$config['get_row_index'] = '';
-	$config['pagination_table'] = 'user_info';
 	echoLongTable($col_names, $from, $cond, $tail, $header_row, $print_row, $config);
 }

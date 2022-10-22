@@ -143,6 +143,7 @@ EOD,
 			'page_len' => 50,
 			'group_id' => $group_id,
 			'by_accepted' => true,
+			'div_classes' => ['table-responsive', 'mb-3'],
 			'table_classes' => ['table', 'text-center', 'mb-0'],
 			]) ?>
 	</div>

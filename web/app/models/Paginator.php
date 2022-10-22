@@ -17,10 +17,12 @@ class Paginator {
 			$this->table = $config['data'];
 		} elseif (!isset($config['echo_full'])) {
 			$table = $config['table_name'];
+			$cond = isset($config['cond']) ? $config['cond'] : '1';
 			if (isset($config['pagination_table'])) {
 				$table = $config['pagination_table'];
+				$cond = isset($config['pagination_cond']) ? $config['pagination_cond'] : $cond;
 			}
-			$this->n_rows = DB::selectCount("select count(*) from {$table} where {$config['cond']}");
+			$this->n_rows = DB::selectCount("select count(*) from {$table} where {$cond}");
 			
 			$this->page_len = isset($config['page_len']) ? $config['page_len'] : 10;
 			
