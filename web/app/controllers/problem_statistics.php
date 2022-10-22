@@ -163,7 +163,7 @@
 
 <?php
 $table_config = [
-	'div_classes' => 'mb-3',
+	'div_classes' => ['table-responsive', 'mb-3'],
 	'table_classes' => ['table', 'mb-0', 'text-center'],
 ];
 	?>
