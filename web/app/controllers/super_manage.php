@@ -746,9 +746,10 @@ EOD);
 						links,
 						1,
 						'<tr>' +
-							'<th style="width:18em">标题</th>' +
-							'<th style="width:26em">链接</th>' +
-							'<th style="width:14em">操作</th>' +
+							'<th style="width:16em">标题</th>' +
+							'<th style="width:16em">链接</th>' +
+							'<th style="width:6em">权重</th>' +
+							'<th style="width:8em">操作</th>' +
 						'</tr>',
 						function(row) {
 							var col_tr = '';
@@ -757,6 +758,7 @@ EOD);
 
 							col_tr += '<td>' + row['title'] + '</td>';
 							col_tr += '<td>' + row['url'] + '</td>';
+							col_tr += '<td>' + row['level'] + '</td>';
 							col_tr += '<td>' +
 									'<form method="POST" onsubmit=\'return confirm("你真的要删除这条链接吗？")\'>' +
 										'<input type="hidden" name="_token" value="<?= crsf_token() ?>">' +
