@@ -33,19 +33,31 @@
 			if ($contest['cur_progress'] == CONTEST_NOT_STARTED) {
 				become404Page();
 			} elseif ($contest['cur_progress'] == CONTEST_IN_PROGRESS) {
-				if ($myUser == null || !hasRegistered($myUser, $contest)) {
-					becomeMsgPage("<h1>比赛正在进行中</h1><p>很遗憾，您尚未报名。比赛结束后再来看吧～</p>");
+				if (Auth::check()) {
+					if (hasParticipated($myUser, $contest)) {
+						$is_in_contest = true;
+					} else {
+						redirectTo("/contest/{$contest['id']}/confirm");
+					}
 				} else {
-					$is_in_contest = true;
-					DB::update("update contests_registrants set has_participated = 1 where username = '{$myUser['username']}' and contest_id = {$contest['id']}");
+					redirectToLogin();
 				}
 			} else {
 				$ban_in_contest = !isProblemVisibleToUser($problem, $myUser);
+
+				if (!hasRegistered($myUser, $contest) && !isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
+					become403Page();
+				}
 			}
 		} else {
 			if ($contest['cur_progress'] == CONTEST_IN_PROGRESS) {
-				$is_in_contest = true;
-				DB::update("update contests_registrants set has_participated = 1 where username = '{$myUser['username']}' and contest_id = {$contest['id']}");
+				if (hasRegistered($myUser, $contest)) {
+					if (hasParticipated($myUser, $contest)) {
+						$is_in_contest = true;
+					} else {
+						redirectTo("/contest/{$contest['id']}/confirm");
+					}
+				}
 			}
 		}
 	} else {

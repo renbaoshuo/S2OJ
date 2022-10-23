@@ -183,7 +183,7 @@
 	<?php if ($iHasRegistered): ?>
 		<div class="row">
 			<div class="col-6">
-				<a style="color:green">已报名</a>
+				<a class="text-decoration-none text-success">已报名</a>
 			</div>
 			<div class="col-6 text-end">
 				<?php $unregister_form->printHTML(); ?>
@@ -199,16 +199,6 @@
 		$header_row = '<tr><th>#</th><th>'.UOJLocale::get('username').'</th>';
 	if ($show_ip) {
 		$header_row .= '<th>remote_addr</th><th>http_x_forwarded_for</th>';
-	
-		$ip_owner = array();
-		$forwarded_ip_owner = array();
-		$has_participated = array();
-		foreach (DB::selectAll("select * from contests_registrants where contest_id = {$contest['id']} order by username desc") as $reg) {
-			$user = queryUser($reg['username']);
-			$ip_owner[$user['remote_addr']] = $reg['username'];
-			$forwarded_ip_owner[$user['http_x_forwarded_for']] = $reg['username'];
-			$has_participated[$reg['username']] = $reg['has_participated'];
-		}
 	}
 	if ($has_contest_permission) {
 		$header_row .= '<th>是否参赛</th>';
@@ -221,18 +211,10 @@
 		"contest_id = {$contest['id']}",
 		'order by username desc',
 		$header_row,
-		function($contestant, $num) use ($myUser, $has_contest_permission, $show_ip, $ip_owner, $has_participated) {
+		function($contestant, $num) use ($myUser, $has_contest_permission, $show_ip, $has_participated) {
 			$user = queryUser($contestant['username']);
 
-			if (!$show_ip) {
-				echo '<tr>';
-			} else {
-				if ($ip_owner[$user['remote_addr']] != $user['username'] || $forwarded_ip_owner[$user['http_x_forwarded_for']] != $user['username']) {
-					echo '<tr class="table-danger">';
-				} else {
-					echo '<tr>';
-				}
-			}
+			echo '<tr>';
 			echo '<td>'.$num.'</td>';
 			echo '<td>'.getUserLink($contestant['username']).'</td>';
 			if ($show_ip) {

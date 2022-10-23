@@ -407,7 +407,7 @@ EOD,
 						echo '<tr>';
 
 						echo '<td class="text-center">', $row['id'], '</td>';
-						echo '<td>', '<a class="text-decoration-none" href="', HTML::url('/problem/' . $row['id']),'">', $row['title'], '</a>';
+						echo '<td>', getProblemLink($row);
 						if ($row['is_hidden']) {
 							echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
 						}

@@ -12,21 +12,32 @@
 	}
 	genMoreContestInfo($contest);
 
-	if (!hasContestPermission(Auth::user(), $contest)) {
+	if (!hasContestPermission($myUser, $contest)) {
 		if ($contest['cur_progress'] == CONTEST_NOT_STARTED) {
-			header("Location: /contest/{$contest['id']}/register");
-			die();
+			redirectTo("/contest/{$contest['id']}/register");
 		} elseif ($contest['cur_progress'] == CONTEST_IN_PROGRESS) {
-			if ($myUser == null || !hasRegistered(Auth::user(), $contest)) {
-				becomeMsgPage("<h1>比赛正在进行中</h1><p>很遗憾，您尚未报名。比赛结束后再来看吧～</p>");
+			if (Auth::check()) {
+				if (!hasParticipated($myUser, $contest)) {
+					redirectTo("/contest/{$contest['id']}/confirm");
+				}
+			} else {
+				redirectToLogin();
 			}
 		} else {
-			if (!isNormalUser($myUser)) {
+			if (!hasRegistered($myUser, $contest) && !isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
 				become403Page();
 			}
 		}
+	} else {
+		if ($contest['cur_progress'] == CONTEST_IN_PROGRESS) {
+			if (hasRegistered($myUser, $contest)) {
+				if (!hasParticipated($myUser, $contest)) {
+					redirectTo("/contest/{$contest['id']}/confirm");
+				}
+			}
+		}
 	}
-	
+
 	if (isset($_GET['tab'])) {
 		$cur_tab = $_GET['tab'];
 	} else {

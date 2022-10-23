@@ -31,7 +31,8 @@ Route::group([
 		Route::any('/contest/{id}', '/contest_inside.php');
 		Route::any('/contest/{id}/registrants', '/contest_members.php');
 		Route::any('/contest/{id}/register', '/contest_registration.php');
-		Route::any('/contest/{id}/manage', '/contest_manage.php');
+		Route::any('/contest/{id}/confirm', '/contest_confirmation.php');
+		Route::any('/contest/{id}/manage(?:/{tab})?', '/contest_manage.php');
 		Route::any('/contest/{id}/submissions', '/contest_inside.php?tab=submissions');
 		Route::any('/contest/{id}/standings', '/contest_inside.php?tab=standings');
 		Route::any('/contest/{id}/after_contest_standings', '/contest_inside.php?tab=after_contest_standings');

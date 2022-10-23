@@ -24,18 +24,22 @@ EOD;
 				$rest_second = $cur_rest_second;
 			}
 			if ($myUser != null && hasRegistered($myUser, $contest)) {
-				$contest_name_link .= '<sup><a class="text-decoration-none"  style="color:green">'.UOJLocale::get('contests::registered').'</a></sup>';
+				$contest_name_link .= '<sup><a class="text-decoration-none" style="color:green">'.UOJLocale::get('contests::registered').'</a></sup>';
 			} else {
-				$contest_name_link .= '<sup><a class="text-decoration-none"  style="color:red" href="/contest/'.$contest['id'].'/register">'.UOJLocale::get('contests::register').'</a></sup>';
+				$contest_name_link .= '<sup><a class="text-decoration-none" style="color:red" href="/contest/'.$contest['id'].'/register">'.UOJLocale::get('contests::register').'</a></sup>';
 			}
 		} elseif ($contest['cur_progress'] == CONTEST_IN_PROGRESS) {
-			$contest_name_link .= '<sup><a class="text-decoration-none"  style="color:blue" href="/contest/'.$contest['id'].'">'.UOJLocale::get('contests::in progress').'</a></sup>';
+			if (hasRegistered($myUser, $contest)) {
+				$contest_name_link .= '<sup><a class="text-decoration-none" style="color:blue" href="/contest/'.$contest['id'].'">'.UOJLocale::get('contests::in progress').'</a></sup>';
+			} else {
+				$contest_name_link .= '<sup><a class="text-decoration-none" style="color:blue" href="/contest/'.$contest['id'].'/register">'.UOJLocale::get('contests::in progress').'</a></sup>';
+			}
 		} elseif ($contest['cur_progress'] == CONTEST_PENDING_FINAL_TEST) {
-			$contest_name_link .= '<sup><a class="text-decoration-none"  style="color:blue" href="/contest/'.$contest['id'].'">'.UOJLocale::get('contests::pending final test').'</a></sup>';
+			$contest_name_link .= '<sup><a class="text-decoration-none" style="color:blue" href="/contest/'.$contest['id'].'">'.UOJLocale::get('contests::pending final test').'</a></sup>';
 		} elseif ($contest['cur_progress'] == CONTEST_TESTING) {
-			$contest_name_link .= '<sup><a class="text-decoration-none"  style="color:blue" href="/contest/'.$contest['id'].'">'.UOJLocale::get('contests::final testing').'</a></sup>';
+			$contest_name_link .= '<sup><a class="text-decoration-none" style="color:blue" href="/contest/'.$contest['id'].'">'.UOJLocale::get('contests::final testing').'</a></sup>';
 		} elseif ($contest['cur_progress'] == CONTEST_FINISHED) {
-			$contest_name_link .= '<sup><a class="text-decoration-none"  style="color:grey" href="/contest/'.$contest['id'].'/standings">'.UOJLocale::get('contests::ended').'</a></sup>';
+			$contest_name_link .= '<sup><a class="text-decoration-none" style="color:grey" href="/contest/'.$contest['id'].'/standings">'.UOJLocale::get('contests::ended').'</a></sup>';
 		}
 		
 		$last_hour = round($contest['last_min'] / 60, 2);

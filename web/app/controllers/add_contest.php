@@ -16,7 +16,23 @@
 	$time_form = new UOJForm('time');
 	$time_form->addVInput(
 		'name', 'text', '比赛标题', 'New Contest',
-		function($str) {
+		function($name, &$vdata) {
+			if ($name == '') {
+				return '标题不能为空';
+			}
+			
+			if (strlen($name) > 100) {
+				return '标题过长';
+			}
+
+			$name = HTML::escape($name);
+
+			if ($name === '') {
+				return '无效编码';
+			}
+
+			$vdata['name'] = $name;
+
 			return '';
 		},
 		null
@@ -35,23 +51,25 @@
 	);
 	$time_form->addVInput(
 		'last_min', 'text', '时长（单位：分钟）', 180,
-		function($str) {
-			return !validateUInt($str) ? '必须为一个整数' : '';
+		function($str, &$vdata) {
+			if (!validateUInt($str)) {
+				return '必须为一个整数';
+			}
+
+			$vdata['last_min'] = $str;
+
+			return '';
 		},
 		null
 	);
 	$time_form->handle = function(&$vdata) {
 		$start_time_str = $vdata['start_time']->format('Y-m-d H:i:s');
-				
-		$purifier = HTML::purifier_inline();
+		$esc_name = DB::escape($vdata['name']);
+		$esc_last_min = DB::escape($vdata['last_min']);
 		
-		$esc_name = $_POST['name'];
-		$esc_name = $purifier->purify($esc_name);
-		$esc_name = DB::escape($esc_name);
-		
-		DB::query("insert into contests (name, start_time, last_min, status) values ('$esc_name', '$start_time_str', ${_POST['last_min']}, 'unfinished')");
+		DB::query("insert into contests (name, start_time, last_min, status) values ('$esc_name', '$start_time_str', $esc_last_min, 'unfinished')");
 	};
-	$time_form->succ_href="/contests";
+	$time_form->succ_href = "/contests";
 	$time_form->runAtServer();
 	?>
 <?php echoUOJPageHeader('添加比赛') ?>
