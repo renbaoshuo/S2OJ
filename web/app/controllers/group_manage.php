@@ -54,7 +54,8 @@
 					return '名称过长';
 				}
 
-				if (HTML::escape($title) === '') {
+				$title = HTML::escape($title);
+				if ($title === '') {
 					return '无效编码';
 				}
 
@@ -199,7 +200,6 @@ function(res) {
 EOD);
 		$add_new_assignment_form->runAtServer();
 
-		$now = new DateTime();
 		$hidden_time = new DateTime();
 		$hidden_time->sub(new DateInterval('P7D'));
 	} elseif ($cur_tab == 'users') {
@@ -349,7 +349,7 @@ EOD);
 		<th style="width:8em">操作</th>
 	</tr>
 EOD,
-						function($row) use ($group, $now, $hidden_time) {
+						function($row) use ($group, $hidden_time) {
 							$list = queryProblemList($row['list_id']);
 							$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['end_time']);
 
@@ -363,7 +363,7 @@ EOD,
 							echo '</td>';
 							if ($end_time < $hidden_time) {
 								echo '<td class="text-secondary">已隐藏</td>';
-							} elseif ($end_time < $now) {
+							} elseif ($end_time < UOJTime::$time_now) {
 								echo '<td class="text-danger">已结束</td>';
 							} else {
 								echo '<td class="text-success">进行中</td>';

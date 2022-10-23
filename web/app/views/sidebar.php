@@ -56,15 +56,12 @@
 	<ul class="list-group list-group-flush">
 		<?php foreach ($assignments as $assignment): ?>
 			<li class="list-group-item">
-				<?php
-				$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $assignment['end_time']);
-			$now = new DateTime();
-			?>
+				<?php $end_time = DateTime::createFromFormat('Y-m-d H:i:s', $assignment['end_time']); ?>
 				<a href="<?= HTML::url('/group/'.$assignment['group_id'].'/assignment/'.$assignment['list_id']) ?>" class="fw-bold text-decoration-none">
 					<?= $assignment['title'] ?>
-					<?php if ($end_time < $now): ?>
+					<?php if ($end_time < UOJTime::$time_now): ?>
 						<sup class="fw-normal text-danger">overdue</sup>
-					<?php elseif ($end_time->getTimestamp() - $now->getTimestamp() < 86400): ?>
+					<?php elseif ($end_time->getTimestamp() - UOJTime::$time_now->getTimestamp() < 86400): ?>
 						<sup class="fw-normal text-danger">soon</sup>
 					<?php endif ?>
 				</a>

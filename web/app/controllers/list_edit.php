@@ -55,7 +55,8 @@
 					return '标题过长';
 				}
 
-				if (HTML::escape($title) === '') {
+				$title = HTML::escape($title);
+				if ($title === '') {
 					return '无效编码';
 				}
 
@@ -80,18 +81,18 @@
 				}
 
 				foreach ($tags_raw as $tag) {
-					$tag = trim($tag);
+					$tag = HTML::escape(trim($tag));
 
 					if (strlen($tag) == 0) {
 						continue;
 					}
 
 					if (strlen($tag) > 30) {
-						return '标签 “' . HTML::escape($tag) .'” 太长';
+						return '标签 “' . $tag .'” 太长';
 					}
 					
 					if (in_array($tag, $tags, true)) {
-						return '标签 “' . HTML::escape($tag) .'” 重复出现';
+						return '标签 “' . $tag .'” 重复出现';
 					}
 
 					$tags[] = $tag;
@@ -322,7 +323,6 @@ function(res) {
 EOD);
 		$add_new_assignment_form->runAtServer();
 		
-		$now = new DateTime();
 		$hidden_time = new DateTime();
 		$hidden_time->sub(new DateInterval('P7D'));
 	}
@@ -480,7 +480,7 @@ EOD,
 		<th style="width:8em">操作</th>
 	</tr>
 EOD,
-				function($row) use ($list, $now, $hidden_time) {
+				function($row) use ($list, $hidden_time) {
 					$group = queryGroup($row['group_id']);
 					$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['end_time']);
 
@@ -489,7 +489,7 @@ EOD,
 					echo '<td>', '<a class="text-decoration-none" href="/group/', $group['id'], '">', HTML::escape($group['title']), '</a>', '</td>';
 					if ($end_time < $hidden_time) {
 						echo '<td class="text-secondary">已隐藏</td>';
-					} elseif ($end_time < $now) {
+					} elseif ($end_time < UOJTime::$time_now) {
 						echo '<td class="text-danger">已结束</td>';
 					} else {
 						echo '<td class="text-success">进行中</td>';

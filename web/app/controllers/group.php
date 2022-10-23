@@ -95,41 +95,44 @@
 		<h2 class="card-title h4">
 			<?= UOJLocale::get('assignments') ?>
 		</h5>
-				<?php
-						$now = new DateTime();
-	echoLongTable(
-		['groups_assignments.list_id as list_id', 'lists.title as title', 'groups_assignments.end_time as end_time'],
-		'groups_assignments left join lists on lists.id = groups_assignments.list_id',
-		"groups_assignments.group_id = {$group['id']} and groups_assignments.end_time > addtime(now(), '-168:00:00')",
-		'order by end_time desc, list_id desc',
-		<<<EOD
-	<tr>
-		<th style="width:3em" class="text-center">ID</th>
-		<th style="width:12em">标题</th>
-		<th style="width:4em">状态</th>
-		<th style="width:8em">结束时间</th>
-	</tr>
+		<?php
+			echoLongTable(
+				[
+					'groups_assignments.list_id as list_id',
+					'lists.title as title',
+					'groups_assignments.end_time as end_time'
+				],
+				'groups_assignments left join lists on lists.id = groups_assignments.list_id',
+				"groups_assignments.group_id = {$group['id']} and groups_assignments.end_time > addtime(now(), '-168:00:00')",
+				'order by end_time desc, list_id desc',
+				<<<EOD
+			<tr>
+				<th style="width:3em" class="text-center">ID</th>
+				<th style="width:12em">标题</th>
+				<th style="width:4em">状态</th>
+				<th style="width:8em">结束时间</th>
+			</tr>
 EOD,
-		function($row) use ($group, $now) {
-			$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['end_time']);
+				function($row) use ($group) {
+					$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['end_time']);
 
-			echo '<tr>';
-			echo '<td class="text-center">', $row['list_id'], '</td>';
-			echo '<td>', '<a class="text-decoration-none" href="/group/', $group['id'], '/assignment/', $row['list_id'],'">', HTML::escape($row['title']), '</a>', '</td>';
-			if ($end_time < $now) {
-				echo '<td class="text-danger">已结束</td>';
-			} else {
-				echo '<td class="text-success">进行中</td>';
-			}
-			echo '<td>', $end_time->format('Y-m-d H:i:s'), '</td>';
-			echo '</tr>';
-		},
-		[
-			'echo_full' => true,
-			'div_classes' => ['table-responsive'],
-			'table_classes' => ['table', 'align-middle', 'mb-0'],
-		]
-	);
+					echo '<tr>';
+					echo '<td class="text-center">', $row['list_id'], '</td>';
+					echo '<td>', '<a class="text-decoration-none" href="/group/', $group['id'], '/assignment/', $row['list_id'],'">', HTML::escape($row['title']), '</a>', '</td>';
+					if ($end_time < UOJTime::$time_now) {
+						echo '<td class="text-danger">已结束</td>';
+					} else {
+						echo '<td class="text-success">进行中</td>';
+					}
+					echo '<td>', $end_time->format('Y-m-d H:i:s'), '</td>';
+					echo '</tr>';
+				},
+				[
+					'echo_full' => true,
+					'div_classes' => ['table-responsive'],
+					'table_classes' => ['table', 'align-middle', 'mb-0'],
+				]
+			);
 	?>
 	</div>
 </div>
