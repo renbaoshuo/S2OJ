@@ -19,6 +19,8 @@
 		} else {
 			redirectTo("/contest/{$contest['id']}");
 		}
+	} elseif ($contest['cur_progress'] == CONTEST_IN_PROGRESS && !(isset($contest['extra_config']['extra_registration']) ? $contest['extra_config']['extra_registration'] : '1')) {
+		becomeMsgPage('比赛已经开始，不允许报名。');
 	} elseif ($contest['cur_progress'] > CONTEST_IN_PROGRESS) {
 		redirectTo("/contest/{$contest['id']}");
 	}

@@ -282,7 +282,7 @@ EOD);
 		$version_form->addVSelect('standings_version', [
 				'1' => '1',
 				'2' => '2',
-			], '比赛排名版本', $contest['extra_config']['standings_version']);
+			], '比赛排名版本', $contest['extra_config']['standings_version'] ?: '2');
 		$version_form->handle = function() use ($contest) {
 			$contest['extra_config']['standings_version'] = $_POST['standings_version'];
 			$esc_extra_config = json_encode($contest['extra_config']);
@@ -316,7 +316,7 @@ EOD);
 		$contest_type_form->addVSelect('contest_type', [
 				'OI' => 'OI',
 				'IOI' => 'IOI'
-			], '比赛类型', $contest['extra_config']['contest_type']);
+			], '比赛类型', $contest['extra_config']['contest_type'] ?: 'OI');
 		$contest_type_form->handle = function() use ($contest) {
 			$contest['extra_config']['contest_type'] = $_POST['contest_type'];
 			$esc_extra_config = json_encode($contest['extra_config']);
@@ -436,6 +436,39 @@ function(res) {
 }
 EOD);
 		$blog_link_contests->runAtServer();
+
+		$extra_registration_form = new UOJForm('extra_registration_form');
+		$extra_registration_form->addVCheckboxes('extra_registration', [
+			'0' => '禁止',
+			'1' => '允许'
+		], '是否允许额外报名', isset($contest['extra_config']['extra_registration']) ? $contest['extra_config']['extra_registration'] : '1');
+		$extra_registration_form->handle = function() use ($contest) {
+			$contest['extra_config']['extra_registration'] = $_POST['extra_registration'];
+			$esc_extra_config = DB::escape(json_encode($contest['extra_config']));
+			DB::update("UPDATE contests SET extra_config = '$esc_extra_config' WHERE id = {$contest['id']}");
+
+			dieWithJsonData(['status' => 'success', 'message' => $_POST['extra_registration'] ? '已允许额外报名' : '已禁止额外报名']);
+		};
+		$extra_registration_form->setAjaxSubmit(<<<EOD
+function(res) {
+	if (res.status === 'success') {
+		$('#extra-registration-result-alert')
+			.html('操作成功！' + (res.message || ''))
+			.addClass('alert-success')
+			.removeClass('alert-danger')
+			.show();
+	} else {
+		$('#extra-registration-result-alert')
+			.html('操作失败。' + (res.message || ''))
+			.removeClass('alert-success')
+			.addClass('alert-danger')
+			.show();
+	}
+
+	$(window).scrollTop(0);
+}
+EOD);
+		$extra_registration_form->runAtServer();
 	}
 
 	?>
@@ -626,6 +659,9 @@ EOD,
 			<li class="nav-item">
 				<a class="nav-link" href="#blogs" data-bs-toggle="tab" data-bs-target="#blogs">比赛资料</a>
 			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="#extra-registration" data-bs-toggle="tab" data-bs-target="#extra-registration">额外报名</a>
+			</li>
 		</ul>
 	</div>
 	<div class="card-body tab-content">
@@ -667,6 +703,20 @@ EOD,
 					<h5>注意事项</h5>
 					<ul class="mb-0">
 						<li>添加比赛资料前请确认博客是否处于公开状态。</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" id="extra-registration">
+			<div id="extra-registration-result-alert" class="alert" role="alert" style="display: none"></div>
+			<div class="row row-cols-1 row-cols-md-2">
+				<div class="col">
+					<?php $extra_registration_form->printHTML(); ?>
+				</div>
+				<div class="col mt-3 mt-md-0">
+					<h5>注意事项</h5>
+					<ul class="mb-0">
+						<li>如果允许额外报名，则比赛开始后选手也可以报名参赛。</li>
 					</ul>
 				</div>
 			</div>
