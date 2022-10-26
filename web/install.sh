@@ -18,7 +18,8 @@ getAptPackage(){
     # Update apt sources and install
     export DEBIAN_FRONTEND=noninteractive
     dpkg -s gnupg 2>/dev/null || (apt-get update && apt-get install -y gnupg)
-	echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu jammy main" | tee /etc/apt/sources.list.d/ondrej-php.list && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C
+	sudo apt-get update && sudo apt-get install software-properties-common && add-apt-repository ppa:ondrej/php &&\
+	apt-key adv --keyserver http://keyserver.ubuntu.com --recv 4F4EA0AAE5267A6C &&\
     apt-get update --allow-unauthenticated
     apt-get install -y --allow-unauthenticated -o Dpkg::Options::="--force-overwrite" php7.4 php7.4-yaml php7.4-xml php7.4-dev php7.4-zip php7.4-mysql php7.4-mbstring php7.4-gd php7.4-imagick libseccomp-dev git vim ntp zip unzip curl wget libapache2-mod-xsendfile mysql-server php-pear cmake fp-compiler re2c libyaml-dev python2.7 python3.10 python3-requests openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk
 }
