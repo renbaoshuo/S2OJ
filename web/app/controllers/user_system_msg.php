@@ -64,10 +64,6 @@
 			$system_msgs[$idx]['delete_form'] = $delete_form;
 		}
 	}
-
-	if (Auth::id() == $user['username']) {
-		DB::update("update user_system_msg set read_time = now() where receiver = '" . $user['username'] . "'");
-	}
 	?>
 
 <?php echoUOJPageHeader('系统消息') ?>
@@ -83,7 +79,9 @@
 <div class="card mb-3">
 	<ul class="list-group list-group-flush">
 	<?php foreach ($system_msgs as $msg): ?>
-		<li class="list-group-item">
+		<li class="list-group-item
+			<?= $msg['read_time'] ? '' : 'bg-warning bg-opacity-25' ?>
+			">
 			<div class="mb-2 d-flex justify-content-between">
 				<div>
 					<?php if ($msg['title']): ?>
@@ -112,6 +110,12 @@
 </div>
 
 <?= $pag->pagination() ?>
+
+<?php
+	if (Auth::id() == $user['username']) {
+		DB::update("update user_system_msg set read_time = now() where receiver = '" . $user['username'] . "'");
+	}
+	?>
 
 </div>
 <!-- end left col -->
