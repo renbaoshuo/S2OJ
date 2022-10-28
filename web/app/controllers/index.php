@@ -94,7 +94,7 @@
 						<?php
 							$enddate = strtotime($countdown['end_time']);
 						$nowdate = time();
-						$diff = floor(($enddate - $nowdate) / (24 * 60 * 60));
+						$diff = ceil(($enddate - $nowdate) / (24 * 60 * 60));
 						?>
 						<li>
 							<?php if ($diff > 0): ?>
