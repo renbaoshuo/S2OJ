@@ -41,8 +41,8 @@
 				become404Page();
 			}
 
-			if (!isProblemVisibleToUser($problem, $myUser)) {
-				become404Page();
+			if (!hasProblemPermission($myUser, $problem)) {
+				become403Page();
 			}
 
 			$id = $_GET['id'];
@@ -56,7 +56,7 @@
 				become404Page();
 			}
 
-			if (!isProblemVisibleToUser($problem, $myUser)) {
+			if (!hasProblemPermission($myUser, $problem)) {
 				become404Page();
 			}
 
