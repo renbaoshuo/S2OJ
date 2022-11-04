@@ -51,7 +51,7 @@
 		}
 
 		list($width, $height, $type) = $size;
-		$hash = hash_file("sha256", $_FILES['image_upload_file']['tmp_name']);
+		$hash = hash_file("sha256", $_FILES['image_upload_file']['tmp_name']) . Auth::id();
 		$scale = ceil($height / 600.0);
 
 		$watermark_text = UOJConfig::$data['profile']['oj-name-short'];
@@ -60,7 +60,7 @@
 			$hash .= "__no_watermark";
 		} elseif ($_POST['watermark'] == 'site_shortname_and_username') {
 			$watermark_text .= ' @'.Auth::id();
-			$hash .= "__id_".Auth::id();
+			$hash .= "__id";
 		}
 
 		$existing_image = DB::selectFirst("SELECT * FROM users_images WHERE `hash` = '$hash'");
