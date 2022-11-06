@@ -168,13 +168,15 @@ $.fn.uoj_honor = function() {
 
 function showErrorHelp(name, err) {
 	if (err) {
-		$('#div-' + name).addClass(isBootstrap5Page ? 'has-validation' : 'has-error');
-		if (isBootstrap5Page) $('#div-' + name + ' .form-floating, #input-' + name).addClass('is-invalid');
+		$('#div-' + name).addClass('has-validation has-error');
+		$('#div-' + name).addClass('is-invalid');
+		$('#input-' + name).addClass('is-invalid');
 		$('#help-' + name).text(err);
 		return false;
 	} else {
-		$('#div-' + name).removeClass(isBootstrap5Page ? 'has-validation' : 'has-error');
-		if (isBootstrap5Page) $('#div-' + name+ ' .form-floating, #input-' + name).removeClass('is-invalid');
+		$('#div-' + name).removeClass('has-validation has-error');
+		$('#div-' + name).removeClass('is-invalid');
+		$('#input-' + name).removeClass('is-invalid');
 		$('#help-' + name).text('');
 		return true;
 	}
@@ -375,27 +377,6 @@ $.fn.countdown = function(rest, callback, font_size = '30px', color = true) {
 	});
 };
 
-$.fn.uoj_testcase = function() {
-	return this.each(function() {
-		var id = parseInt($(this).data('test'));
-
-		var download_html = isBootstrap5Page
-			? '<i class="bi bi-download"></i> 下载'
-			: '<span class="glyphicon glyphicon-download-alt"></span> 下载';
-
-		if (id > 0 && typeof problem_id !== 'undefined' && problem_id) {
-			$('.uoj-testcase-download-input', this)
-				.html(download_html)
-				.attr('href', '/download.php?type=testcase&id=' + problem_id + '&testcase_id=' + id + '&testcase_type=input')
-				.addClass('btn btn-secondary btn-sm float-right');
-			$('.uoj-testcase-download-output', this)
-				.html(download_html)
-				.attr('href', '/download.php?type=testcase&id=' + problem_id + '&testcase_id=' + id + '&testcase_type=output')
-				.addClass('btn btn-secondary btn-sm float-right');
-		}
-	});
-}
-
 // update_judgement_status
 update_judgement_status_list = []
 function update_judgement_status_details(id) {
@@ -430,7 +411,6 @@ $.fn.uoj_highlight = function() {
 	return $(this).each(function() {
 		$(this).find("span.uoj-username, span[data-uoj-username]").each(replaceWithHighlightUsername);
 		$(this).find(".uoj-honor").uoj_honor();
-		$(this).find(".uoj-testcase").uoj_testcase();
 		$(this).find(".uoj-score").each(function() {
 			var score = parseInt($(this).text());
 			var maxscore = parseInt($(this).data('max'));
@@ -472,24 +452,25 @@ $(document).ready(function() {
 });
 
 // contest notice
-function checkContestNotice(id, lastTime) {
-	$.post('/contest/' + id.toString(), {
-			check_notice : '',
+function checkNotice(lastTime) {
+	$.post(uojHome + '/check-notice', {
 			last_time : lastTime
 		},
 		function(data) {
+            if (data === null) {
+                return;
+            }
 			setTimeout(function() {
-				checkContestNotice(id, data.time);
+				checkNotice(data.time);
 			}, 60000);
-			if (data.msg != undefined) {
-				var len=data.msg.length;
-				for (var i=0;i<len;i++) alert(data.msg[i]);
-			}
+            for (var i = 0; i < data.msg.length; i++) {
+                alert(data.msg[i]);
+            }
 		},
 		'json'
 	).fail(function() {
 		setTimeout(function() {
-			checkContestNotice(id, lastTime);
+			checkNotice(lastTime);
 		}, 60000);
 	});
 }
@@ -1122,66 +1103,6 @@ function showCommentReplies(id, replies) {
 			table_classes: ['table', 'table-condensed'],
 			page_len: 5,
 			prevent_focus_on_click: true
-		}
-	);
-}
-
-// standings
-function showStandings(config) {
-	$("#standings").long_table(
-		standings,
-		1,
-		'<tr>' +
-			'<th style="width:' + (show_self_reviews ? '2' : '5') + 'em">#</th>' +
-			'<th style="width:' + (show_self_reviews ? '8' : '14') + 'em">'+uojLocale('username')+'</th>' +
-			'<th style="width:5em">'+uojLocale('contests::total score')+'</th>' +
-			$.map(problems, function(col, idx) {
-				return '<th style="width:' + (show_self_reviews ? '10' : '8') + 'em;">' + '<a href="/contest/' + contest_id + '/problem/' + col + '" class="text-decoration-none">' + String.fromCharCode('A'.charCodeAt(0) + idx) + '</a>' + '</th>';
-			}).join('') +
-			(show_self_reviews ? '<th style="width:16em;">赛后总结</th>' : '') +
-		'</tr>',
-		function(row) {
-			var col_tr = '<tr>';
-			col_tr += '<td>' + row[3] + '</td>';
-			col_tr += '<td>' + getUserLink(row[2][0], row[2][1]) + '</td>';
-			col_tr += '<td>' + '<div><span class="uoj-score" data-max="' + problems.length * 100 + '" style="color:' + getColOfScore(row[0] / problems.length) + '">' + row[0] + '</span></div>' + '<div>' + getPenaltyTimeStr(row[1]) + '</div></td>';
-			for (var i = 0; i < problems.length; i++) {
-				col_tr += '<td' + (show_self_reviews ? ' style="vertical-align: text-top"' : '') + '>';
-				col = score[row[2][0]][i];
-				if (col != undefined) {
-					col_tr += '<div>';
-					
-					if (col[2]) col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score" style="color:' + getColOfScore(col[0]) + '">' + col[0] + '</a>';
-					else col_tr += '<span class="uoj-score" style="color:' + getColOfScore(col[0]) + '">' + col[0] + '</span>';
-
-					col_tr += '</div>';
-					if (show_self_reviews) {
-						col_tr += col[3] ? '<div class="mt-2 pt-2 border-top">' + col[3] + '</div>' : '';
-					} else {
-						if (standings_version < 2) {
-							col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';
-						} else {
-							if (col[0] > 0) {
-								col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';
-							}
-						}
-					}
-				}
-				col_tr += '</td>';
-			}
-
-			if (show_self_reviews) {
-				col_tr += '<td>' + (row[4] || '') + '</td>';
-			}
-			col_tr += '</tr>';
-			return col_tr;
-		}, {
-			div_classes: config.div_classes ? config.div_classes : ['table-responsive', 'card', 'my-3'],
-			table_classes: config.table_classes ? config.table_classes : ['table', 'table-bordered', 'text-center', 'align-middle', 'uoj-table', 'uoj-standings-table', 'mb-0'],
-			page_len: config.page_len ? config.page_len : 50,
-			print_after_table: function() {
-				return '<div class="card-footer bg-transparent text-end text-muted">' + uojLocale("contests::n participants", standings.length) + '</div><script>if (window.MathJax) window.MathJax.typeset();</scr' + 'ipt>';
-			}
 		}
 	);
 }

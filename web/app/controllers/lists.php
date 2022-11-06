@@ -1,10 +1,6 @@
 <?php
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
+	if (!Auth::check()) {
 		redirectToLogin();
-	}
-
-	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-		become403Page();
 	}
 
 	requireLib('bootstrap5');
@@ -13,7 +9,7 @@
 	requirePHPLib('data');
 
 	if (isSuperUser($myUser)) {
-		$new_list_form = new UOJForm('new_list');
+		$new_list_form = new UOJBs4Form('new_list');
 		$new_list_form->handle = function() {
 			DB::query("insert into lists (title, is_hidden) values ('未命名题单', 1)");
 		};
@@ -66,7 +62,7 @@
 <!-- title container -->
 <div class="d-flex justify-content-between">
 
-<h1 class="h2">
+<h1>
 	<?= UOJLocale::get('problems lists') ?>
 </h1>
 
@@ -147,7 +143,6 @@ EOD;
 			'page_len' => 40,
 			'table_classes' => ['table', 'table-bordered', 'table-hover', 'table-striped'],
 			'head_pagination' => true,
-			'pagination_table' => 'lists',
 			'div_classes' => ['card', 'my-3'],
 			'table_classes' => ['table', 'uoj-table', 'mb-0'],
 		]

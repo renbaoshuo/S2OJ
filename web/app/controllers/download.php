@@ -1,140 +1,61 @@
 <?php
-	requirePHPLib('judger');
+requirePHPLib('judger');
 
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
-		redirectToLogin();
-	}
+$auth = false;
+if (UOJRequest::get('auth') === 'judger') {
+	authenticateJudger() || UOJResponse::page403();
+	$auth = true;
+} else {
+	Auth::check() || redirectToLogin();
+}
 
-	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login'] && $_GET['type'] != 'attachment') {
-		become403Page();
-	}
+switch (UOJRequest::get('type')) {
+	case 'attachment':
+		UOJProblem::init(UOJRequest::get('id')) || UOJResponse::page404();
+		if (!$auth) {
+			UOJProblem::cur()->userCanDownloadAttachments(Auth::user()) || UOJResponse::page404();
+		}
 
-	switch ($_GET['type']) {
-		case 'attachment':
-			if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
-				become404Page();
-			}
-			
-			$visible = isProblemVisibleToUser($problem, $myUser);
-			if (!$visible && $myUser != null) {
-				$result = DB::query("select contest_id from contests_problems where problem_id = {$_GET['id']}");
-				while (list($contest_id) = DB::fetch($result, MYSQLI_NUM)) {
-					$contest = queryContest($contest_id);
-					genMoreContestInfo($contest);
-					if ($contest['cur_progress'] != CONTEST_NOT_STARTED && hasRegistered($myUser, $contest) && queryContestProblemRank($contest, $problem)) {
-						$visible = true;
-					}
-				}
-			}
-			if (!$visible) {
-				become404Page();
-			}
+		$file_name = UOJProblem::cur()->getDataFolderPath() . '/download.zip';
+		$download_name = 'problem_' . UOJProblem::info('id') . '_attachment.zip';
 
-			$id = $_GET['id'];
-			
-			$file_name = "/var/uoj_data/$id/download.zip";
-			$download_name = "problem_{$id}_attachment.zip";
-			break;
+		break;
 
-		case 'problem':
-			if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
-				become404Page();
-			}
+	case 'problem':
+		UOJProblem::init(UOJRequest::get('id')) || UOJResponse::page404();
 
-			if (!hasProblemPermission($myUser, $problem)) {
-				become403Page();
-			}
+		if (!$auth) {
+			UOJProblem::cur()->userCanDownloadTestData(Auth::user()) || UOJResponse::page404();
+		}
 
-			$id = $_GET['id'];
-			$file_name = "/var/uoj_data/$id.zip";
-			$download_name = "problem_$id.zip";
+		$file_name = UOJProblem::cur()->getDataZipPath();
+		$download_name = 'problem_' . UOJProblem::info('id') . '.zip';
 
-			break;
+		break;
 
-		case 'testcase':
-			if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
-				become404Page();
-			}
+	case 'submission':
+		if (!$auth) {
+			isSuperUser(Auth::user()) || UOJResponse::page404();
+		}
+		$file_name = UOJContext::storagePath() . "/submission/{$_GET['id']}/{$_GET['rand_str_id']}";
+		$download_name = "submission.zip";
+		break;
 
-			if (!hasProblemPermission($myUser, $problem)) {
-				become404Page();
-			}
+	case 'tmp':
+		if (!$auth) {
+			isSuperUser(Auth::user()) || UOJResponse::page404();
+		}
+		$file_name = UOJContext::storagePath() . "/tmp/{$_GET['rand_str_id']}";
+		$download_name = "tmp";
+		break;
 
-			$id = $_GET['id'];
-			$problem_conf = getUOJConf("/var/uoj_data/$id/problem.conf");
+	case 'testlib.h':
+		$file_name = UOJLocalRun::$judger_include_path . '/testlib.h';
+		$download_name = 'testlib.h';
+		break;
 
-			if ($problem_conf == -1 || $problem_conf == -2) {
-				become404Page();
-			}
+	default:
+		UOJResponse::page404();
+}
 
-			if (!validateUInt($_GET['testcase_id'])) {
-				become404Page();
-			}
-
-			$testcase_id = $_GET['testcase_id'];
-			$testcase_group = isset($_GET['testcase_group']) && $_GET['testcase_group'] == 'extra' ? 'extra' : 'normal';
-
-			if ($testcase_group == 'extra') {
-				$n_ex_tests = getUOJConfVal($problem_conf, 'n_ex_tests', 0);
-
-				if ($testcase_id < 1 || $testcase_id > $n_ex_tests) {
-					become404Page();
-				}
-
-				switch ($_GET['testcase_type']) {
-					case 'input':
-						$file_name = "/var/uoj_data/$id/" . getUOJProblemExtraInputFileName($problem_conf, $testcase_id);
-						$download_name = getUOJProblemExtraInputFileName($problem_conf, $testcase_id);
-						break;
-
-					case 'output':
-						$file_name = "/var/uoj_data/$id/" . getUOJProblemExtraOutputFileName($problem_conf, $testcase_id);
-						$download_name = getUOJProblemExtraOutputFileName($problem_conf, $testcase_id);
-						break;
-
-					default:
-						become404Page();
-				}
-			} else {
-				$n_tests = getUOJConfVal($problem_conf, 'n_tests', 10);
-
-				if ($testcase_id < 1 || $testcase_id > $n_tests) {
-					become404Page();
-				}
-
-				switch ($_GET['testcase_type']) {
-					case 'input':
-						$file_name = "/var/uoj_data/$id/" . getUOJProblemInputFileName($problem_conf, $testcase_id);
-						$download_name = getUOJProblemInputFileName($problem_conf, $testcase_id);
-						break;
-					case 'output':
-						$file_name = "/var/uoj_data/$id/" . getUOJProblemOutputFileName($problem_conf, $testcase_id);
-						$download_name = getUOJProblemOutputFileName($problem_conf, $testcase_id);
-						break;
-					default:
-						become404Page();
-				}
-			}
-
-			break;
-
-		case 'testlib.h':
-			$file_name = "/opt/uoj/judger/uoj_judger/include/testlib.h";
-			$download_name = "testlib.h";
-			break;
-
-		default:
-			become404Page();
-	}
-	
-	$finfo = finfo_open(FILEINFO_MIME);
-	$mimetype = finfo_file($finfo, $file_name);
-	if ($mimetype === false) {
-		become404Page();
-	}
-	finfo_close($finfo);
-	
-	header("X-Sendfile: $file_name");
-	header("Content-type: $mimetype");
-	header("Content-Disposition: attachment; filename=$download_name");
-	?>
+UOJResponse::xsendfile($file_name, ['attachment' => $download_name]);

@@ -24,6 +24,8 @@ services:
     build:
       context: ./judger/
       dockerfile: Dockerfile
+      args:
+        - USE_MIRROR=1
     container_name: uoj-judger
     restart: always
     stdin_open: true
@@ -44,6 +46,8 @@ services:
     build:
       context: ./
       dockerfile: web/Dockerfile
+      args:
+        - USE_MIRROR=1
     container_name: uoj-web
     restart: always
     stdin_open: true

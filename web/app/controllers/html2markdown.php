@@ -1,19 +1,18 @@
-<?php
-	requireLib('bootstrap5');
-	?>
+<?php requireLib('bootstrap5') ?>
 
 <?php echoUOJPageHeader(UOJLocale::get('html to markdown')) ?>
 
-<h1 class="h2">
+<h1>
 	<?= UOJLocale::get('html to markdown') ?>
 </h1>
 
 <style>
-#html, #markdown {
-	font-family: Cascadia Mono, Ubuntu Mono, Roboto Mono, Jetbrains Mono, Fira Code, Consolas, '思源黑体 Regular', '思源宋体 Light', '宋体', 'Courier New', monospace;
-	width: 100%;
-	min-height: 300px;
-}
+	#html,
+	#markdown {
+		font-family: Cascadia Mono, Ubuntu Mono, Roboto Mono, Jetbrains Mono, Fira Code, Consolas, '思源黑体 Regular', '思源宋体 Light', '宋体', 'Courier New', monospace;
+		width: 100%;
+		min-height: 300px;
+	}
 </style>
 
 <div class="card">
@@ -35,11 +34,13 @@
 <?= HTML::js_src('/js/h2m.js') ?>
 
 <script>
-$(document).ready(function() {
-	$('#html').on('input', function() {
-		$('#markdown').val(h2m($('#html').val(), { converter: 'Gfm' }));
+	$(document).ready(function() {
+		$('#html').on('input', function() {
+			$('#markdown').val(h2m($('#html').val(), {
+				converter: 'Gfm'
+			}));
+		});
 	});
-});
 </script>
 
 <?php echoUOJPageFooter() ?>

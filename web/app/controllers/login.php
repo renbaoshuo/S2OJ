@@ -1,58 +1,57 @@
 <?php
-	use Gregwar\Captcha\PhraseBuilder;
-	use Gregwar\Captcha\CaptchaBuilder;
-	
-	requireLib('md5');
-	requireLib('bootstrap5');
 
-	if (Auth::check()) {
-		redirectTo('/');
+use Gregwar\Captcha\PhraseBuilder;
+
+requireLib('md5');
+requireLib('bootstrap5');
+
+Auth::check() && redirectTo('/');
+
+function handleLoginPost() {
+	if (!crsf_check()) {
+		return 'expired';
+	}
+	if (!isset($_POST['username'])) {
+		return "failed";
+	}
+	if (!isset($_POST['password'])) {
+		return "failed";
+	}
+	$username = $_POST['username'];
+	$password = $_POST['password'];
+	$captcha = $_POST['captcha'];
+
+	if (!isset($_SESSION['phrase']) || !PhraseBuilder::comparePhrases($_SESSION['phrase'], $captcha)) {
+		return "bad_captcha";
 	}
 
-	function handleLoginPost() {
-		if (!crsf_check()) {
-			return 'expired';
-		}
-		if (!isset($_POST['username'])) {
-			return "failed";
-		}
-		if (!isset($_POST['password'])) {
-			return "failed";
-		}
-		$username = $_POST['username'];
-		$password = $_POST['password'];
-		$captcha = $_POST['captcha'];
+	if (!validateUsername($username)) {
+		return "failed";
+	}
+	if (!validatePassword($password)) {
+		return "failed";
+	}
 
-		if (!isset($_SESSION['phrase']) || !PhraseBuilder::comparePhrases($_SESSION['phrase'], $captcha)) {
-			return "bad_captcha";
-		}
-		
-		if (!validateUsername($username)) {
-			return "failed";
-		}
-		if (!validatePassword($password)) {
-			return "failed";
-		}
-		
-		$user = queryUser($username);
-		if (!$user || !checkPassword($user, $password)) {
-			return "failed";
-		}
-		
-		if ($user['usergroup'] == 'B') {
-			return "banned";
-		}
-		
-		Auth::login($user['username']);
-		return "ok";
+	$user = UOJUser::query($username);
+	if (!$user || !checkPassword($user, $password)) {
+		return "failed";
 	}
-	
-	if (isset($_POST['login'])) {
-		echo handleLoginPost();
-		unset($_SESSION['phrase']);
-		die();
+
+	$account_status = UOJUser::getAccountStatus($user);
+	if ($account_status != 'ok') {
+		return 'account:' . $account_status;
 	}
-	?>
+
+	Auth::login($user['username']);
+	return "ok";
+}
+
+if (isset($_POST['login'])) {
+	echo handleLoginPost();
+	unset($_SESSION['phrase']);
+	die();
+}
+?>
 <?php echoUOJPageHeader(UOJLocale::get('login')) ?>
 
 <style>
@@ -107,79 +106,78 @@
 </main>
 
 <script type="text/javascript">
-function validateLoginPost() {
-	var ok = true;
-	ok &= getFormErrorAndShowHelp('username', validateUsername);
-	ok &= getFormErrorAndShowHelp('password', validatePassword);
-	return ok;
-}
-
-function refreshCaptcha() {
-	var timestamp = new Date().getTime();
-	$("#captcha").attr("src", "/captcha" + '?' + timestamp);
-}
-
-function submitLoginPost() {
-	if (!validateLoginPost()) {
-		return false;
+	function validateLoginPost() {
+		var ok = true;
+		ok &= getFormErrorAndShowHelp('username', validateUsername);
+		ok &= getFormErrorAndShowHelp('password', validatePassword);
+		return ok;
 	}
-	
-	$.post('/login', {
-		_token : "<?= crsf_token() ?>",
-		login : '',
-		username : $('#input-username').val(),
-		password : md5($('#input-password').val(), "<?= getPasswordClientSalt() ?>"),
-		captcha: $('#input-captcha').val(),
-	}, function(msg) {
-		$('#div-username, #div-password, #div-captcha').removeClass('has-validation');
-		$('#input-username, #input-password, #input-captcha').removeClass('is-invalid');
-		$('#help-username, #help-passwor, #help-captcha').html('');
 
-		if (msg == 'ok') {
-			var prevUrl = document.referrer;
-			if (prevUrl == '' || /.*\/login.*/.test(prevUrl) || /.*\/logout.*/.test(prevUrl) || /.*\/register.*/.test(prevUrl) || /.*\/reset-password.*/.test(prevUrl)) {
-				prevUrl = '/';
-			};
-			window.location.href = prevUrl;
-		} else if (msg == 'bad_captcha') {
-			$('#div-captcha').addClass('has-validation');
-			$('#div-captcha > .form-floating, #input-captcha').addClass('is-invalid');
-			$('#help-captcha').html('验证码错误。');
-			refreshCaptcha();
-		} else if (msg == 'banned') {
-			$('#div-username').addClass('has-validation');
-			$('#div-username > .form-floating, #input-username').addClass('is-invalid');
-			$('#help-username').html('该用户已被封停，请联系管理员。');
-			refreshCaptcha();
-		} else if (msg == 'expired') {
-			$('#div-username').addClass('has-validation');
-			$('#div-username > .form-floating, #input-username').addClass('is-invalid');
-			$('#help-username').html('页面会话已过期。');
-			refreshCaptcha();
-		} else {
-			$('#div-username').addClass('has-validation');
-			$('#div-username > .form-floating, #input-username').addClass('is-invalid');
-			$('#div-password').addClass('has-validation');
-			$('#div-password > .form-floating, #input-password').addClass('is-invalid');
-			$('#help-password').html('用户名或密码错误。<a href="/forgot-password">忘记密码？</a>');
-			refreshCaptcha();
+	function refreshCaptcha() {
+		var timestamp = new Date().getTime();
+		$("#captcha").attr("src", "/captcha" + '?' + timestamp);
+	}
+
+	function submitLoginPost() {
+		if (!validateLoginPost()) {
+			return false;
 		}
-	});
-	return true;
-}
 
-$(document).ready(function() {
-	refreshCaptcha();
+		$.post('/login', {
+			_token: "<?= crsf_token() ?>",
+			login: '',
+			username: $('#input-username').val(),
+			password: md5($('#input-password').val(), "<?= getPasswordClientSalt() ?>"),
+			captcha: $('#input-captcha').val(),
+		}, function(msg) {
+			$('#div-username, #div-password, #div-captcha').removeClass('has-validation');
+			$('#input-username, #input-password, #input-captcha').removeClass('is-invalid');
+			$('#help-username, #help-passwor, #help-captcha').html('');
 
-	$('#form-login').submit(function(e) {
-		e.preventDefault();
-		submitLoginPost();
-	});
-	$("#captcha").click(function(e) {
+			if (msg == 'ok') {
+				var prevUrl = document.referrer;
+				if (prevUrl == '' || /.*\/login.*/.test(prevUrl) || /.*\/logout.*/.test(prevUrl) || /.*\/register.*/.test(prevUrl) || /.*\/reset-password.*/.test(prevUrl)) {
+					prevUrl = '/';
+				};
+				window.location.href = prevUrl;
+			} else if (msg == 'bad_captcha') {
+				$('#div-captcha').addClass('has-validation');
+				$('#div-captcha > .form-floating, #input-captcha').addClass('is-invalid');
+				$('#help-captcha').html('验证码错误。');
+				refreshCaptcha();
+			} else if (msg == 'banned') {
+				$('#div-username').addClass('has-validation');
+				$('#div-username > .form-floating, #input-username').addClass('is-invalid');
+				$('#help-username').html('该用户已被封停，请联系管理员。');
+				refreshCaptcha();
+			} else if (msg == 'expired') {
+				$('#div-username').addClass('has-validation');
+				$('#div-username > .form-floating, #input-username').addClass('is-invalid');
+				$('#help-username').html('页面会话已过期。');
+				refreshCaptcha();
+			} else {
+				$('#div-username').addClass('has-validation');
+				$('#div-username > .form-floating, #input-username').addClass('is-invalid');
+				$('#div-password').addClass('has-validation');
+				$('#div-password > .form-floating, #input-password').addClass('is-invalid');
+				$('#help-password').html('用户名或密码错误。<a href="/forgot-password">忘记密码？</a>');
+				refreshCaptcha();
+			}
+		});
+		return true;
+	}
+
+	$(document).ready(function() {
 		refreshCaptcha();
-	});
-});
 
+		$('#form-login').submit(function(e) {
+			e.preventDefault();
+			submitLoginPost();
+		});
+		$("#captcha").click(function(e) {
+			refreshCaptcha();
+		});
+	});
 </script>
 
 <?php echoUOJPageFooter() ?>

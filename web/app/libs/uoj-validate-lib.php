@@ -59,3 +59,19 @@ function validateString($str) {
 function validateGitHubUsername($username) {
 	return is_string($username) && preg_match('/^[a-zA-Z0-9_-]{1,20}$/', $username);
 }
+
+function validateUserAndStoreByUsername($username, &$vdata) {
+	if (!isset($vdata['user'])) {
+		$vdata['user'] = [];
+	}
+	$user = UOJUser::query($username);
+	if (!$user) {
+		return "不存在名为{$username}的用户";
+	}
+	$vdata['user'][$username] = $user;
+	return '';
+}
+
+function is_short_string($str) {
+	return is_string($str) && strlen($str) <= 256;
+}

@@ -21,12 +21,12 @@ return [
 		'main' => [
 			'protocol' => 'http',
 			'host' => '_httpHost_',
-			'port' => 80
+			'port' => '80/443'
 		],
 		'blog' => [
 			'protocol' => 'http',
 			'host' => '_httpHost_',
-			'port' => 80
+			'port' => '80/443'
 		]
 	],
 	'security' => [
@@ -54,7 +54,6 @@ return [
 	],
 	'switch' => [
 		'blog-domain-mode' => 3,
-		'force-login' => true,
 		'open-register' => false
 	]
 ];

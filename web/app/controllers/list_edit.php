@@ -44,7 +44,7 @@
 	if ($cur_tab == 'profile') {
 		$list_tags = queryProblemListTags($list_id);
 		
-		$update_profile_form = new UOJForm('update_profile');
+		$update_profile_form = new UOJBs4Form('update_profile');
 		$update_profile_form->addVInput('name', 'text', '标题', $list['title'],
 			function($title, &$vdata) {
 				if ($title == '') {
@@ -151,7 +151,7 @@ function(res) {
 	$(window).scrollTop(0);
 }
 EOD);
-		$update_profile_form->submit_button_config['margin_class'] = 'mt-3';
+		$update_profile_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
 		$update_profile_form->submit_button_config['text'] = '更新';
 		$update_profile_form->runAtServer();
 	} elseif ($cur_tab == 'problems') {
@@ -179,7 +179,7 @@ EOD);
 
 		$n_problems = DB::selectCount("SELECT count(*) FROM `lists_problems` WHERE `list_id` = {$list['id']}");
 
-		$add_new_problem_form = new UOJForm('add_new_problem');
+		$add_new_problem_form = new UOJBs4Form('add_new_problem');
 		$add_new_problem_form->addVInput('problem_id', 'text', '题目 ID', '', 
 			function ($problem_id, &$vdata) use ($list) {
 				if (!validateUInt($problem_id)) {
@@ -200,7 +200,7 @@ EOD);
 			},
 			null
 		);
-		$add_new_problem_form->submit_button_config['margin_class'] = 'mt-3';
+		$add_new_problem_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
 		$add_new_problem_form->submit_button_config['text'] = '添加';
 		$add_new_problem_form->handle = function($vdata) use ($list) {
 			DB::insert("INSERT INTO `lists_problems` (`list_id`, `problem_id`) values ({$list['id']}, {$vdata['problem_id']})");
@@ -250,7 +250,7 @@ EOD);
 			dieWithAlert('移除成功！');
 		}
 
-		$add_new_assignment_form = new UOJForm('add_new_assignment');
+		$add_new_assignment_form = new UOJBs4Form('add_new_assignment');
 		$add_new_assignment_form->addVInput('new_assignment_group_id', 'text', '小组 ID', '', 
 			function ($group_id, &$vdata) use ($list) {
 				if (!validateUInt($group_id)) {
@@ -300,7 +300,7 @@ EOD);
 				'message' => '题单 #' . $list['id'] . ' 已经被添加到小组 #' . $vdata['group_id'] . ' 的作业列表中，结束时间为 ' . $vdata['end_time']->format('Y-m-d H:i:s') . '。'
 			]);
 		};
-		$add_new_assignment_form->submit_button_config['margin_class'] = 'mt-3';
+		$add_new_assignment_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
 		$add_new_assignment_form->submit_button_config['text'] = '添加';
 		$add_new_assignment_form->setAjaxSubmit(<<<EOD
 function(res) {
@@ -330,7 +330,7 @@ EOD);
 
 <?php echoUOJPageHeader('管理 - ' . $list['title']) ?>
 
-<h1 class="h2">
+<h1>
 	<?= $list['title'] ?>
 	<small class="fs-5">(ID: #<?= $list['id'] ?>)</small>
 	管理

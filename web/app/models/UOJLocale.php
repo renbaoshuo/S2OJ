@@ -1,11 +1,20 @@
 <?php
 
 class UOJLocale {
-	public static $supported_locales = array('zh-cn', 'en');
-	public static $supported_modules = array('basic', 'contests', 'problems', 'time', 'user');
-	public static $data = array();
-	public static $required = array();
-	
+	public static $supported_locales = ['zh-cn', 'en'];
+	public static $supported_modules = ['basic', 'contests', 'problems', 'time', 'user'];
+	public static $data = [];
+	public static $required = [];
+
+	public static function init() {
+		if (UOJRequest::get('locale')) {
+			UOJLocale::setLocale(UOJRequest::get('locale'));
+			redirectTo(UOJContext::requestURI());
+		}
+
+		self::requireModule('basic');
+	}
+
 	public static function locale() {
 		$locale = Cookie::get('uoj_locale');
 		if ($locale != null && !in_array($locale, self::$supported_locales)) {
@@ -28,11 +37,11 @@ class UOJLocale {
 			return;
 		}
 		$required[] = $name;
-		$data = include($_SERVER['DOCUMENT_ROOT'].'/app/locale/'.$name.'/'.self::locale().'.php');
-		
+		$data = include($_SERVER['DOCUMENT_ROOT'] . '/app/locale/' . $name . '/' . self::locale() . '.php');
+
 		$pre = $name == 'basic' ? '' : "$name::";
 		foreach ($data as $key => $val) {
-			self::$data[$pre.$key] = $val;
+			self::$data[$pre . $key] = $val;
 		}
 	}
 	public static function get($name) {

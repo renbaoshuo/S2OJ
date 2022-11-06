@@ -1,160 +1,183 @@
 <?php
-	requireLib('bootstrap5');
-	requireLib('hljs');
-	requirePHPLib('form');
-	requirePHPLib('judger');
+requireLib('bootstrap5');
+requireLib('hljs');
+requirePHPLib('form');
+requirePHPLib('judger');
 
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
-		redirectToLogin();
-	}
-	
-	if (!validateUInt($_GET['id']) || !($submission = querySubmission($_GET['id']))) {
-		become404Page();
-	}
+Auth::check() || redirectToLogin();
+UOJSubmission::init(UOJRequest::get('id')) || UOJResponse::page404();
+UOJSubmission::initProblemAndContest() || UOJResponse::page404();
+UOJSubmission::cur()->userCanView(Auth::user(), ['ensure' => true]);
 
-	$submission_result = json_decode($submission['result'], true);
-	
-	$problem = queryProblemBrief($submission['problem_id']);
-	$problem_extra_config = getProblemExtraConfig($problem);
-	
-	if ($submission['contest_id']) {
-		$contest = queryContest($submission['contest_id']);
-		genMoreContestInfo($contest);
-	} else {
-		$contest = null;
+$perm = UOJSubmission::cur()->viewerCanSeeComponents(Auth::user());
 
-		if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-			become403Page();
-		}
+$can_see_minor = false;
+if ($perm['score']) {
+	$can_see_minor = UOJSubmission::cur()->userCanSeeMinorVersions(Auth::user());
+	UOJSubmissionHistory::init(UOJSubmission::cur(), ['minor' => $can_see_minor]) || UOJResponse::page404();
+	if (isset($_GET['time'])) {
+		$history_time = UOJRequest::get('time', 'is_short_string');
+		!empty($history_time) || UOJResponse::page404();
+		UOJSubmission::cur()->loadHistoryByTime($history_time) || UOJResponse::page404();
+		UOJSubmission::cur()->isMajor() || UOJResponse::page404();
+	} elseif (isset($_GET['tid'])) {
+		$can_see_minor || UOJResponse::page404();
+		UOJSubmission::cur()->loadHistoryByTID(UOJRequest::get('tid', 'validateUInt')) || UOJResponse::page404();
+		!UOJSubmission::cur()->isMajor() || UOJResponse::page404();
 	}
+}
 
-	if (!isSubmissionVisibleToUser($submission, $problem, $myUser)) {
-		become403Page();
-	}
+$submission = UOJSubmission::info();
+$submission_result = UOJSubmission::cur()->getResult();
+$problem = UOJProblem::info();
 
-	$out_status = explode(', ', $submission['status'])[0];
-	
-	if ($_GET['get'] == 'status-details' && Auth::check() && $submission['submitter'] === Auth::id()) {
-		echo json_encode(array(
-			'judged' => $out_status == 'Judged',
-			'html' => getSubmissionStatusDetails($submission)
-		));
-		die();
-	}
-	
-	$hackable = $submission['score'] == 100 && $problem['hackable'] == 1;
-	if ($hackable) {
-		$hack_form = new UOJForm('hack');	
-		
+if ($can_see_minor) {
+	$minor_rejudge_form = new UOJBs4Form('minor_rejudge');
+	$minor_rejudge_form->handle = function () {
+		UOJSubmission::rejudgeById(UOJSubmission::info('id'), [
+			'reason_text' => '管理员偷偷重测该提交记录',
+			'major' => false
+		]);
+		$tid = DB::insert_id();
+		redirectTo(UOJSubmission::cur()->getUriForNewTID($tid));
+	};
+	$minor_rejudge_form->submit_button_config['class_str'] = 'btn btn-sm btn-primary';
+	$minor_rejudge_form->submit_button_config['text'] = '偷偷重新测试';
+	$minor_rejudge_form->submit_button_config['align'] = 'right';
+	$minor_rejudge_form->runAtServer();
+}
+
+if (UOJSubmission::cur()->isLatest()) {
+	if (UOJSubmission::cur()->preHackCheck()) {
+		$hack_form = new UOJBs4Form('hack');
+
 		$hack_form->addTextFileInput('input', '输入数据');
 		$hack_form->addCheckBox('use_formatter', '帮我整理文末回车、行末空格、换行符', true);
-		$hack_form->handle = function(&$vdata) {
-			global $myUser, $problem, $submission;
-			if ($myUser == null) {
-				redirectToLogin();
-			}
-			
+		$hack_form->handle = function (&$vdata) {
+			global $problem, $submission;
+			Auth::check() || redirectToLogin();
+
 			if ($_POST["input_upload_type"] == 'file') {
-				$tmp_name = UOJForm::uploadedFileTmpName("input_file");
+				$tmp_name = UOJBs4Form::uploadedFileTmpName("input_file");
 				if ($tmp_name == null) {
-					becomeMsgPage('你在干啥……怎么什么都没交过来……？');
+					UOJResponse::message('你在干啥……怎么什么都没交过来……？');
 				}
 			}
-			
-			$fileName = uojRandAvaiableTmpFileName();
-			$fileFullName = UOJContext::storagePath().$fileName;
+
+			$fileName = FS::randomAvailableTmpFileName();
+			$fileFullName = UOJContext::storagePath() . $fileName;
 			if ($_POST["input_upload_type"] == 'editor') {
 				file_put_contents($fileFullName, $_POST['input_editor']);
 			} else {
 				move_uploaded_file($_FILES["input_file"]['tmp_name'], $fileFullName);
 			}
 			$input_type = isset($_POST['use_formatter']) ? "USE_FORMATTER" : "DONT_USE_FORMATTER";
-			DB::insert("insert into hacks (problem_id, submission_id, hacker, owner, input, input_type, submit_time, details, is_hidden) values ({$problem['id']}, {$submission['id']}, '{$myUser['username']}', '{$submission['submitter']}', '$fileName', '$input_type', now(), '', {$problem['is_hidden']})");
+			DB::insert([
+				"insert into hacks",
+				"(problem_id, submission_id, hacker, owner, input, input_type, submit_time, status, details, is_hidden)",
+				"values", DB::tuple([
+					$problem['id'], $submission['id'], Auth::id(), $submission['submitter'],
+					$fileName, $input_type, DB::now(), 'Waiting', '', $problem['is_hidden']
+				])
+			]);
 		};
+		$hack_form->max_post_size = 25 * 1024 * 1024;
+		$hack_form->max_file_size_mb = 20;
 		$hack_form->succ_href = "/hacks";
-		
+
 		$hack_form->runAtServer();
 	}
 
-	if ($submission['status'] == 'Judged' && hasProblemPermission($myUser, $problem)) {
-		$rejudge_form = new UOJForm('rejudge');
-		$rejudge_form->handle = function() {
-			global $submission;
-			rejudgeSubmission($submission);
+	if (UOJSubmission::cur()->userCanRejudge(Auth::user())) {
+		$rejudge_form = new UOJBs4Form('rejudge');
+		$rejudge_form->handle = function () {
+			UOJSubmission::rejudgeById(UOJSubmission::info('id'));
 		};
-		$rejudge_form->submit_button_config['class_str'] = 'btn btn-primary';
+		$rejudge_form->submit_button_config['class_str'] = 'btn btn-sm btn-primary';
 		$rejudge_form->submit_button_config['text'] = '重新测试';
-		$rejudge_form->submit_button_config['align'] = 'right';
+		$rejudge_form->submit_button_config['align'] = 'end';
 		$rejudge_form->runAtServer();
 	}
-	
-	if (isSuperUser($myUser)) {
-		$delete_form = new UOJForm('delete');
-		$delete_form->handle = function() {
-			global $submission;
-			$content = json_decode($submission['content'], true);
-			unlink(UOJContext::storagePath().$content['file_name']);
-			DB::delete("delete from submissions where id = {$submission['id']}");
-			updateBestACSubmissions($submission['submitter'], $submission['problem_id']);
+
+	if (UOJSubmission::cur()->userCanDelete(Auth::user())) {
+		$delete_form = new UOJBs4Form('delete');
+		$delete_form->handle = function () {
+			UOJSubmission::cur()->delete();
 		};
-		$delete_form->submit_button_config['class_str'] = 'btn btn-danger';
+		$delete_form->submit_button_config['class_str'] = 'btn btn-sm btn-danger';
 		$delete_form->submit_button_config['text'] = '删除此提交记录';
-		$delete_form->submit_button_config['align'] = 'right';
+		$delete_form->submit_button_config['align'] = 'end';
 		$delete_form->submit_button_config['smart_confirm'] = '';
 		$delete_form->succ_href = "/submissions";
 		$delete_form->runAtServer();
 	}
-	
-	$should_show_content = hasViewPermission($problem_extra_config['view_content_type'], $myUser, $problem, $submission);
-	$should_show_all_details = hasViewPermission($problem_extra_config['view_all_details_type'], $myUser, $problem, $submission);
-	$should_show_details = hasViewPermission($problem_extra_config['view_details_type'], $myUser, $problem, $submission);
-	$should_show_details_to_me = isSuperUser($myUser);
-	if (explode(', ', $submission['status'])[0] != 'Judged') {
-		$should_show_all_details = false;
+} else {
+	if (UOJSubmission::cur()->userCanDelete(Auth::user()) && !UOJSubmission::cur()->isMajor()) {
+		$delete_form = new UOJBs4Form('delete');
+		$delete_form->handle = function () {
+			UOJSubmission::cur()->deleteThisMinorVersion();
+		};
+		$delete_form->submit_button_config['class_str'] = 'btn btn-sm btn-danger';
+		$delete_form->submit_button_config['text'] = '删除当前历史记录（保留其他历史记录）';
+		$delete_form->submit_button_config['align'] = 'end';
+		$delete_form->submit_button_config['smart_confirm'] = '';
+		$delete_form->succ_href = UOJSubmission::cur()->getUriForLatest();
+		$delete_form->runAtServer();
 	}
-	if ($contest != null && $contest['cur_progress'] == CONTEST_IN_PROGRESS) {
-		if ($contest['extra_config']["problem_{$submission['problem_id']}"] === 'no-details') {
-			$should_show_details = false;
-		}
-	}
-	if (!isSubmissionFullVisibleToUser($submission, $contest, $problem, $myUser)) {
-		$should_show_content = $should_show_all_details = false;
-	}
-	if ($contest != null && hasContestPermission($myUser, $contest)) {
-		$should_show_details_to_me = true;
-		$should_show_content = true;
-		$should_show_all_details = true;
-	}
-	
-	if ($should_show_all_details) {
-		$styler = new SubmissionDetailsStyler();
-		if ((!$should_show_details || ($contest['extra_config']['contest_type']=='IOI' && $contest['cur_progress'] == CONTEST_IN_PROGRESS)) && !hasContestPermission($myUser, $contest)) {
-			$styler->fade_all_details = true;
-			$styler->show_small_tip = false;
-			if ($contest['extra_config']['contest_type']=='IOI' && $contest['cur_progress'] == CONTEST_IN_PROGRESS) {
-				$styler->ioi_contest_is_running = true;
-			}
-		}
-	}
-	?>
+}
+?>
 <script>
 	var problem_id = parseInt('<?= $submission['problem_id'] ?>');
 </script>
-<?php echoUOJPageHeader(UOJLocale::get('problems::submission').' #'.$submission['id']) ?>
+<?php echoUOJPageHeader(UOJLocale::get('problems::submission') . ' #' . $submission['id']) ?>
 
-<h1 class="h3">
-	<?= UOJLocale::get('problems::submission').' #'.$submission['id'] ?>
+<h1>
+	<?= UOJLocale::get('problems::submission') . ' #' . $submission['id'] ?>
 </h1>
 
-<?php echoSubmissionsListOnlyOne($submission, array('id_hidden' => ''), $myUser) ?>
+<?php UOJSubmission::cur()->echoStatusTable(['show_actual_score' => $perm['score'], 'id_hidden' => true], Auth::user()) ?>
 
-<?php if ($should_show_content): ?>
-	<?php echoSubmissionContent($submission, getProblemSubmissionRequirement($problem)) ?>
-	<?php if ($hackable): ?>
+<?php
+if ($perm['score']) {
+	HTML::echoPanel('mb-3', '测评历史', function () {
+		UOJSubmissionHistory::cur()->echoTimeline();
+	});
+}
+?>
+
+<?php
+if ($perm['manager_view']) {
+	HTML::echoPanel('mb-3', '测评机信息（管理员可见）', function () {
+		if (empty(UOJSubmission::info('judger'))) {
+			echo '暂无';
+		} else {
+			$judger = DB::selectFirst([
+				"select * from judger_info",
+				"where", [
+					"judger_name" => UOJSubmission::info('judger')
+				]
+			]);
+			if (!$judger) {
+				echo '测评机信息损坏';
+			} else {
+				echo '<strong>', $judger['display_name'], ': </strong>', $judger['description'];
+			}
+		}
+	});
+}
+?>
+
+<?php if ($perm['content'] || $perm['manager_view']) : ?>
+	<?php UOJSubmission::cur()->echoContent() ?>
+
+	<?php if (isset($hack_form)) : ?>
 		<p class="text-center">
 			这程序好像有点Bug，我给组数据试试？ <button id="button-display-hack" type="button" class="btn btn-danger btn-xs">Hack!</button>
 		</p>
-		<div id="div-form-hack" style="display:none" class="bot-buffer-md">
+		<div id="div-form-hack" style="display:none" class="mb-3">
+			<p class="text-center text-danger">
+				Hack 功能是给大家互相查错用的。请勿故意提交错误代码，然后自己 Hack 自己、贼喊捉贼哦（故意贼喊捉贼会予以封禁处理）
+			</p>
 			<?php $hack_form->printHTML() ?>
 		</div>
 		<script type="text/javascript">
@@ -167,36 +190,48 @@
 	<?php endif ?>
 <?php endif ?>
 
-<?php if ($should_show_all_details): ?>
-	<div class="card border-info mb-3">
-		<div class="card-header bg-info">
-			<h4 class="card-title"><?= UOJLocale::get('details') ?></h4>
-		</div>
-		
-		<?php echoJudgementDetails($submission_result['details'], $styler, 'details') ?>
-		<?php if ($should_show_details_to_me): ?>
-			<?php if (isset($submission_result['final_result'])): ?>
-				<hr />
-				<?php echoSubmissionDetails($submission_result['final_result']['details'], 'final_details') ?>
-			<?php endif ?>
-			<?php if ($styler->fade_all_details): ?>
-				<hr />
-				<?php echoSubmissionDetails($submission_result['details'], 'final_details') ?>
-			<?php endif ?>
-		<?php endif ?>
-	</div>
+<?php
+if (UOJSubmission::cur()->hasJudged()) {
+	if ($perm['high_level_details']) {
+		HTML::echoPanel(['card' => 'mb-3', 'body' => 'p-0'], UOJLocale::get('details'), function () use ($perm, $submission_result) {
+			$styler = new SubmissionDetailsStyler();
+			if (!$perm['low_level_details']) {
+				$styler->fade_all_details = true;
+				$styler->show_small_tip = false;
+			}
+			echoJudgmentDetails($submission_result['details'], $styler, 'details');
+
+			if ($perm['manager_view'] && !$perm['low_level_details']) {
+				echo '<hr />';
+				echo '<h4 class="text-info">全部详细信息（管理员可见）</h4>';
+				echoSubmissionDetails($submission_result['details'], 'all_details');
+			}
+		});
+	} else if ($perm['manager_view']) {
+		HTML::echoPanel(['card' => 'mb-3', 'body' => 'p-0'], '详细（管理员可见）', function () use ($submission_result) {
+			echoSubmissionDetails($submission_result['details'], 'details');
+		});
+	}
+	if ($perm['manager_view'] && isset($submission_result['final_result'])) {
+		HTML::echoPanel(['card' => 'mb-3', 'body' => 'p-0'], '终测结果预测（管理员可见）', function () use ($submission_result) {
+			echoSubmissionDetails($submission_result['final_result']['details'], 'final_details');
+		});
+	}
+}
+?>
+
+<div class="d-flex gap-2 justify-content-end">
+<?php if (isset($minor_rejudge_form)) : ?>
+	<?php $minor_rejudge_form->printHTML() ?>
 <?php endif ?>
 
-<?php if (isset($rejudge_form)): ?>
-<div class="text-end">
+<?php if (isset($rejudge_form)) : ?>
 	<?php $rejudge_form->printHTML() ?>
-</div>
 <?php endif ?>
 
-<?php if (isset($delete_form)): ?>
-<div class="text-end">
+<?php if (isset($delete_form)) : ?>
 	<?php $delete_form->printHTML() ?>
-</div>
 <?php endif ?>
+</div>
 
 <?php echoUOJPageFooter() ?>

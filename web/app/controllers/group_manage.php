@@ -43,7 +43,7 @@
 	}
 
 	if ($cur_tab == 'profile') {
-		$update_profile_form = new UOJForm('update_profile');
+		$update_profile_form = new UOJBs4Form('update_profile');
 		$update_profile_form->addVInput('name', 'text', '名称', $group['title'],
 			function($title, &$vdata) {
 				if ($title == '') {
@@ -107,7 +107,7 @@ function(res) {
 	$(window).scrollTop(0);
 }
 EOD);
-		$update_profile_form->submit_button_config['margin_class'] = 'mt-3';
+		$update_profile_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
 		$update_profile_form->submit_button_config['text'] = '更新';
 		$update_profile_form->runAtServer();
 	} elseif ($cur_tab == 'assignments') {
@@ -127,7 +127,7 @@ EOD);
 			dieWithAlert('移除成功！');
 		}
 
-		$add_new_assignment_form = new UOJForm('add_new_assignment');
+		$add_new_assignment_form = new UOJBs4Form('add_new_assignment');
 		$add_new_assignment_form->addVInput('new_assignment_list_id', 'text', '题单 ID', '', 
 			function ($list_id, &$vdata) use ($group) {
 				if (!validateUInt($list_id)) {
@@ -177,7 +177,7 @@ EOD);
 				'message' => '题单 #' . $vdata['list_id'] . ' 已经被添加到作业列表中，结束时间为 ' . $vdata['end_time']->format('Y-m-d H:i:s') . '。'
 			]);
 		};
-		$add_new_assignment_form->submit_button_config['margin_class'] = 'mt-3';
+		$add_new_assignment_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
 		$add_new_assignment_form->submit_button_config['text'] = '添加';
 		$add_new_assignment_form->setAjaxSubmit(<<<EOD
 function(res) {
@@ -223,7 +223,7 @@ EOD);
 			dieWithAlert('移除成功！');
 		}
 
-		$add_new_user_form = new UOJForm('add_new_user');
+		$add_new_user_form = new UOJBs4Form('add_new_user');
 		$add_new_user_form->addVInput('new_username', 'text', '用户名', '', 
 			function ($username, &$vdata) {
 				global $group_id;
@@ -246,7 +246,7 @@ EOD);
 			},
 			null
 		);
-		$add_new_user_form->submit_button_config['margin_class'] = 'mt-3';
+		$add_new_user_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
 		$add_new_user_form->submit_button_config['text'] = '添加';
 		$add_new_user_form->handle = function(&$vdata) use ($group) {
 			DB::insert("insert into groups_users (group_id, username) values ({$group['id']}, '{$vdata['username']}')");
@@ -277,7 +277,7 @@ EOD);
 	?>
 <?php echoUOJPageHeader('管理 - ' . $group['title']); ?>
 
-<h1 class="h2 d-block d-md-inline-block">
+<h1 class="d-block d-md-inline-block">
 	<?= $group['title'] ?>
 	<small class="fs-5">(ID: #<?= $group['id'] ?>)</small>
 	管理

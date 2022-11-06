@@ -5,12 +5,12 @@ class UOJBlogEditor {
 	public $name;
 	public $blog_url;
 	public $save;
-	public $cur_data = array();
-	public $post_data = array();
+	public $cur_data = [];
+	public $post_data = [];
 	public $show_editor = true;
 	public $show_tags = true;
 	
-	public $label_text = array(
+	public $label_text = [
 		'title' => '标题',
 		'tags' => '标签（多个标签用逗号隔开）',
 		'content' => '内容',
@@ -18,7 +18,7 @@ class UOJBlogEditor {
 		'blog visibility' => '博客可见性',
 		'private' => '未公开',
 		'public' => '公开'
-	);
+	];
 	
 	public $validator = array();
 	
@@ -26,7 +26,7 @@ class UOJBlogEditor {
 		global $REQUIRE_LIB;
 		$REQUIRE_LIB['blog-editor'] = '';
 		
-		$this->validator = array(
+		$this->validator = [
 			'title' => function(&$title) {
 				if ($title == '') {
 					return '标题不能为空';
@@ -67,7 +67,7 @@ class UOJBlogEditor {
 				}
 				return '';
 			}
-		);
+		];
 	}
 	
 	public function validate($name) {
@@ -201,10 +201,10 @@ class UOJBlogEditor {
 			} elseif ($this->type == 'slide') {
 				uojIncludeView('slide', array_merge(
 					UOJContext::pageConfig(),
-					array(
+					[
 						'PageTitle' => '幻灯片预览',
 						'content' => $this->post_data['content']
-					)
+					]
 				));
 			}
 			$ret['html'] = ob_get_contents();
@@ -222,6 +222,6 @@ class UOJBlogEditor {
 	public function printHTML() {
 		global $REQUIRE_LIB;
 		
-		uojIncludeView('blog-editor', array('editor' => $this, 'REQUIRE_LIB' => $REQUIRE_LIB));
+		uojIncludeView('blog-editor', ['editor' => $this, 'REQUIRE_LIB' => $REQUIRE_LIB]);
 	}
 }

@@ -10,11 +10,11 @@ mb-4" role="navigation">
 	<div class="container">
 	<?php endif ?>
 
-	<a class="navbar-brand" href="<?= HTML::blog_url(UOJContext::userid(), '/')?>">
+	<a class="navbar-brand" href="<?= HTML::blog_url(UOJUserBlog::id(), '/')?>">
 		<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-			<img src="<?= HTML::avatar_addr(UOJContext::user(), 48) ?>" alt="Logo" width="24" height="24" class="d-inline-block align-text-top"/>
+			<img src="<?= HTML::avatar_addr(UOJUserBlog::user(), 48) ?>" alt="Logo" width="24" height="24" class="d-inline-block align-text-top"/>
 		<?php endif ?>
-		<?= UOJContext::userid() ?>
+		<?= UOJUserBlog::id() ?>
 	</a>
 
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
@@ -28,7 +28,7 @@ mb-4" role="navigation">
 	<div class="navbar-collapse collapse" id="navbarSupportedContent">
 		<ul class="nav navbar-nav">
 			<li class="nav-item">
-				<a class="nav-link" href="<?= HTML::blog_url(UOJContext::userid(), '/archive')?>">
+				<a class="nav-link" href="<?= HTML::blog_url(UOJUserBlog::id(), '/archive')?>">
 					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 						<i class="bi bi-inbox-fill"></i>
 					<?php else: ?>
@@ -38,7 +38,7 @@ mb-4" role="navigation">
 				</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" href="<?= HTML::blog_url(UOJContext::userid(), '/self_reviews')?>">
+				<a class="nav-link" href="<?= HTML::blog_url(UOJUserBlog::id(), '/self_reviews')?>">
 					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 						<i class="bi bi-sunglasses"></i>
 					<?php else: ?>
@@ -48,7 +48,7 @@ mb-4" role="navigation">
 				</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" href="<?= HTML::blog_url(UOJContext::userid(), '/aboutme')?>">
+				<a class="nav-link" href="<?= HTML::blog_url(UOJUserBlog::id(), '/aboutme')?>">
 					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 						<i class="bi bi-person-lines-fill"></i>
 					<?php else: ?>
@@ -186,6 +186,6 @@ mb-4" role="navigation">
 </div>
 
 <script type="text/javascript">
-	var uojBlogUrl = '<?= HTML::blog_url(UOJContext::userid(), '')?>';
+	var uojBlogUrl = '<?= HTML::blog_url(UOJUserBlog::id(), '')?>';
 	var zan_link = uojBlogUrl;
 </script>

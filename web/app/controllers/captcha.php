@@ -9,5 +9,3 @@ $_SESSION['phrase'] = $builder->getPhrase();
 
 header('Content-Type: image/jpeg');
 $builder->build()->output();
-
-?>

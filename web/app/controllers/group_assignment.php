@@ -1,10 +1,6 @@
 <?php
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
+	if (!Auth::check()) {
 		redirectToLogin();
-	}
-
-	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-		become403Page();
 	}
 
 	requirePHPLib('form');
@@ -40,7 +36,7 @@
 <!-- left col -->
 <div class="col-lg-9">
 
-<h1 class="h2">
+<h1>
 	<small class="fs-4">作业：</small><?= $list['title'] ?>
 </h1>
 <ul class="mt-3">

@@ -11,10 +11,10 @@
 				<tr>
 					<?php
 						echo $contest_problems[$i]['submission_id'] ? '<td class="table-success">' : '<td>';
-				echo chr(ord('A') + $i);
-				echo '</td>';
-				?>
-					<td><?= getContestProblemLink($contest_problems[$i]['problem'], $contest['id']) ?></td>
+						echo $contest_problems[$i]['problem']->getLetter();
+						echo '</td>';
+					?>
+					<td><?= $contest_problems[$i]['problem']->getLink(['with' => null, 'simplify' => true]) ?></td>
 				</tr>
 			<?php endfor ?>
 		</tbody>

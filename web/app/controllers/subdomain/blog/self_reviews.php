@@ -1,84 +1,86 @@
 <?php
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
-		redirectToLogin();
-	}
+requireLib('bootstrap5');
+requireLib('mathjax');
+requirePHPLib('form');
 
-	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-		become403Page();
-	}
-
-	requireLib('bootstrap5');
-	requireLib('mathjax');
-	requirePHPLib('form');
-	
-	$username = UOJContext::userid();
-	?>
+Auth::check() || redirectToLogin();
+?>
 
 <?php echoUOJPageHeader(UOJLocale::get('contests::contest self reviews')) ?>
 
-<h1 class="h2">
-	<?= $username ?> 的所有赛后总结
+<h1>
+	<?= UOJUserBlog::id() ?> 的所有赛后总结
 </h1>
 
 <?php
-$col_names = array('contest_id');
-	$from = 'contests_registrants a left join contests b on a.contest_id = b.id';
-	$cond = "username = '$username' and has_participated = 1";
-	$tail = 'order by start_time desc, id desc';
-	$config = array(
-		'pagination_table' => 'contests_registrants',
-		'page_len' => 10,
-		'div_classes' => ['card', 'card-default', 'table-responsive'],
-		'table_classes' => ['table', 'table-bordered', 'text-center', 'align-middle', 'uoj-table', 'mb-0'],
-	);
+$col_names = ['contest_id'];
+$from = 'contests_registrants inner join contests on contests_registrants.contest_id = contests.id';
+$cond = ["username" =>  UOJUserBlog::id(), "has_participated" =>  1];
+$tail = 'order by start_time desc, id desc';
+$config = [
+	'page_len' => 10,
+	'div_classes' => ['card', 'card-default', 'table-responsive'],
+	'table_classes' => ['table', 'table-bordered', 'text-center', 'align-middle', 'uoj-table', 'mb-0'],
+];
 
-	$header_row = '';
-	$header_row .= '<tr>';
-	$header_row .= '<th style="width: 28em;">'.UOJLocale::get('contests::contest name').'</th>';
-	$header_row .= '<th style="width: 14em;">'.UOJLocale::get('problems::problem').'</th>';
-	$header_row .= '<th style="width: 35em;">'.UOJLocale::get('contests::problem self review').'</th>';
-	$header_row .= '<th style="width: 35em;">'.UOJLocale::get('contests::contest self review').'</th>';
-	$header_row .= '</tr>';
+$header_row = '';
+$header_row .= '<tr>';
+$header_row .= '<th style="width:28em">' . UOJLocale::get('contests::contest name') . '</th>';
+$header_row .= '<th style="width:14em">' . UOJLocale::get('problems::problem') . '</th>';
+$header_row .= '<th style="width:35em">' . UOJLocale::get('contests::problem self review') . '</th>';
+$header_row .= '<th style="width:35em">' . UOJLocale::get('contests::contest self review') . '</th>';
+$header_row .= '</tr>';
 
-	$parsedown = HTML::parsedown();
-	$purifier = HTML::purifier_inline();
+$parsedown = HTML::parsedown();
+$purifier = HTML::purifier_inline();
 
-	$print_row =  function($row) use ($parsedown, $purifier) {
-		global $username;
+$print_row = function ($row) use ($parsedown, $purifier) {
+	$contest = UOJContest::query($row['contest_id']);
+	$problems = $contest->getProblemIDs();
+	$result = '';
 
-		$contest_id = $row['contest_id'];
-		$contest = queryContest($contest_id);
-		$contest_problems = queryContestProblems($contest_id);
-		$n_contest_problems = count($contest_problems);
+	for ($i = 0; $i < count($problems); $i++) {
+		$problem = UOJContestProblem::query($problems[$i], $contest);
+		$review = DB::selectSingle([
+			"select content",
+			"from contests_reviews",
+			"where", [
+				"contest_id" => $contest->info['id'],
+				"problem_id" => $problem->info['id'],
+				"poster" => UOJUserBlog::id(),
+			]
+		]);
 
-		for ($i = 0; $i < $n_contest_problems; $i++) {
-			$problem_id = $contest_problems[$i]['problem_id'];
-			$problem = queryProblemBrief($problem_id);
-			$problem_self_review = DB::selectFirst("select content from contests_reviews where contest_id = $contest_id and problem_id = $problem_id and poster = '$username'");
+		$result .= '<tr>';
 
-			$result .= '<tr>';
-
-			if ($i == 0) {
-				$result .= '<td rowspan="' . $n_contest_problems . '"><a href="' . HTML::url("/contest/$contest_id") . '">' . $contest['name'] . '</a></td>';
-			}
-
-			$problem_review_id = "review-$contest_id-$i";
-			$result .= '<td>' . chr(ord('A') + $i) . '. <a href="/problem/' . $problem_id . '">' . $problem['title'] . '</a></td>';
-			$result .= '<td>' . $purifier->purify($problem_self_review != null ? $parsedown->line($problem_self_review['content']) : '') . '</td>';
-
-			if ($i == 0) {
-				$contest_review_id = "review-$contest_id-overall";
-				$contest_self_review = DB::selectFirst("select content from contests_reviews where contest_id = $contest_id and problem_id = -1 and poster = '$username'");
-				$result .= '<td rowspan="' . $n_contest_problems . '">' . $purifier->purify($contest_self_review != null ? $parsedown->line($contest_self_review['content']) : '') . '</td>';
-			}
-
-			$result .= '</tr>';
+		if ($i == 0) {
+			$result .= '<td rowspan="' . count($problems) . '"><a href="' . $contest->getUri() . '">' . $contest->info['name'] . '</a></td>';
 		}
 
-		echo $result;
-	};
+		$result .= '<td>' . $problem->getLink(['with' => 'letter', 'simplify' => true]) . '</td>';
+		$result .= '<td>' . $purifier->purify($review ? $parsedown->line($review) : '') . '</td>';
 
-	echoLongTable($col_names, $from, $cond, $tail, $header_row, $print_row, $config);
-	?>
+		if ($i == 0) {
+			$review = DB::selectSingle([
+				"select content",
+				"from contests_reviews",
+				"where", [
+					"contest_id" => $contest->info['id'],
+					"problem_id" => -1,
+					"poster" => UOJUserBlog::id(),
+				]
+			]);
+
+			$result .= '<td rowspan="' . count($problems) . '">' . $purifier->purify($review ? $parsedown->line($review) : '') . '</td>';
+		}
+
+		$result .= '</tr>';
+	}
+
+	echo $result;
+};
+
+echoLongTable($col_names, $from, $cond, $tail, $header_row, $print_row, $config);
+?>
 
 <?php echoUOJPageFooter() ?>

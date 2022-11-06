@@ -1,7 +1,9 @@
 #!/bin/bash
+
 genRandStr(){
     cat /dev/urandom | tr -dc [:alnum:] | head -c $1
 }
+
 #Set some vars
 _database_host_="${DATABASE_HOST:-uoj-db}"
 _database_password_="${DATABASE_PASSWORD:-root}"
@@ -20,7 +22,7 @@ getAptPackage(){
     dpkg -s gnupg 2>/dev/null || (apt-get update && apt-get install -y gnupg)
 	echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu jammy main" | tee /etc/apt/sources.list.d/ondrej-php.list && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C
     apt-get update --allow-unauthenticated
-    apt-get install -y --allow-unauthenticated -o Dpkg::Options::="--force-overwrite" php7.4 php7.4-yaml php7.4-xml php7.4-dev php7.4-zip php7.4-mysql php7.4-mbstring php7.4-gd php7.4-imagick libseccomp-dev git vim ntp zip unzip curl wget libapache2-mod-xsendfile mysql-server php-pear cmake fp-compiler re2c libyaml-dev python2.7 python3.10 python3-requests openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk
+    apt-get install -y --allow-unauthenticated -o Dpkg::Options::="--force-overwrite" php7.4 php7.4-yaml php7.4-xml php7.4-dev php7.4-zip php7.4-mysql php7.4-mbstring php7.4-gd php7.4-imagick libseccomp-dev git vim ntp zip unzip curl wget make apache2 libapache2-mod-xsendfile php-pear cmake fp-compiler re2c libyaml-dev python2.7 python3.10 python3-requests openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk
 }
 
 setLAMPConf(){
@@ -41,6 +43,7 @@ setLAMPConf(){
     XSendFile On
     XSendFilePath /var/uoj_data
     XSendFilePath /var/www/uoj/app/storage
+	XSendFilePath /opt/uoj/web/app/storage
     XSendFilePath /opt/uoj/judger/uoj_judger/include
 </VirtualHost>
 UOJEOF
@@ -92,7 +95,7 @@ initProgress(){
 	mkdir -p /opt/uoj/web/app/storage/image_hosting
 	chmod -R 777 /opt/uoj/web/app/storage
 	#Using cli upgrade to latest
-    php7.4 /var/www/uoj/app/cli.php upgrade:latest
+    php7.4 /opt/uoj/web/app/cli.php upgrade:latest
     touch /var/uoj_data/.UOJSetupDone
     #Touch SetupDone flag file
     printf "\n\n***Installation complete. Enjoy!***\n"

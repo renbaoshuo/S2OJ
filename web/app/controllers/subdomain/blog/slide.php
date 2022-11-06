@@ -1,23 +1,16 @@
 <?php
-	requirePHPLib('form');
+requirePHPLib('form');
 
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
-		redirectToLogin();
-	}
+Auth::check() || redirectToLogin();
+UOJBlog::init(UOJRequest::get('id')) || UOJResponse::page404();
+UOJBlog::cur()->belongsToUserBlog() || UOJResponse::page404();
+UOJBlog::cur()->userCanView(Auth::user()) || UOJResponse::page403();
+UOJBlog::cur()->isTypeS() || UOJResponse::page404();
 
-	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-		become403Page();
-	}
-	
-	if (!isset($_GET['id']) || !validateUInt($_GET['id']) || !($blog = queryBlog($_GET['id'])) || !UOJContext::isHisSlide($blog)) {
-		become404Page();
-	}
-	if ($blog['is_hidden'] && !UOJContext::hasBlogPermission()) {
-		become403Page();
-	}
-	
-	$page_config = UOJContext::pageConfig();
-	$page_config['PageTitle'] = HTML::stripTags($blog['title']) . ' - 幻灯片';
-	$page_config['content'] = $blog['content'];
-	uojIncludeView('slide', $page_config);
-	?>
+
+$page_config = UOJContext::pageConfig();
+$page_config += [
+	'PageTitle' => HTML::stripTags(UOJBlog::info('title')) . ' - 幻灯片',
+	'content' => UOJBlog::cur()->queryContent()['content']
+];
+uojIncludeView('slide', $page_config);
