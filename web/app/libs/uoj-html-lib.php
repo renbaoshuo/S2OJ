@@ -362,7 +362,7 @@ function echoSubmissionsList($cond, $tail, $config, $user) {
 		$col_names[] = 'submissions.submitter';
 	}
 	if (!isset($config['result_hidden'])) {
-		$header_row .= '<th>' . UOJLocale::get('problems::result') . '</th>';
+		$header_row .= '<th style="min-width:3em">' . UOJLocale::get('problems::result') . '</th>';
 	}
 	if (!isset($config['used_time_hidden'])) {
 		$header_row .= '<th>' . UOJLocale::get('problems::used time') . '</th>';
@@ -372,9 +372,9 @@ function echoSubmissionsList($cond, $tail, $config, $user) {
 		$header_row .= '<th>' . UOJLocale::get('problems::used memory') . '</th>';
 		$col_names[] = 'submissions.used_memory';
 	}
-	$header_row .= '<th>' . UOJLocale::get('problems::language') . '</th>';
+	$header_row .= '<th style="min-width:5em">' . UOJLocale::get('problems::language') . '</th>';
 	$col_names[] = 'submissions.language';
-	$header_row .= '<th>' . UOJLocale::get('problems::file size') . '</th>';
+	$header_row .= '<th style="min-width:5em">' . UOJLocale::get('problems::file size') . '</th>';
 	$col_names[] = 'submissions.tot_size';
 
 	if (!isset($config['submit_time_hidden'])) {

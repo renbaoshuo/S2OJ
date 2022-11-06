@@ -59,7 +59,7 @@ if (!$conds) {
 			<input type="text" class="form-control form-control-sm" name="problem_id" id="input-problem_id" value="<?= $q_problem_id ?>" style="width:4em" />
 		</div>
 		<div id="form-group-submitter" class="col-auto">
-			<label for="input-submitter" class="control-label">
+			<label for="input-submitter" class="form-label">
 				<?= UOJLocale::get('username') ?>:
 			</label>
 			<div class="input-group input-group-sm">
@@ -79,7 +79,7 @@ if (!$conds) {
 			</script>
 		</div>
 		<div id="form-group-score" class="col-auto">
-			<label for="input-min_score" class="control-label">
+			<label for="input-min_score" class="form-label">
 				<?= UOJLocale::get('score range') ?>:
 			</label>
 			<div class="input-group input-group-sm">
@@ -89,7 +89,9 @@ if (!$conds) {
 			</div>
 		</div>
 		<div id="form-group-language" class="col-auto">
-			<label for="input-language" class="control-label"><?= UOJLocale::get('problems::language') ?>:</label>
+			<label for="input-language" class="form-label">
+				<?= UOJLocale::get('problems::language') ?>:
+			</label>
 			<select class="form-select form-select-sm" id="input-language" name="language">
 				<option value="">All</option>
 				<?php foreach (UOJLang::$supported_languages as $name => $lang) : ?>
