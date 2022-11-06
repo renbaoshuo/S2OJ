@@ -19,7 +19,7 @@ CREATE TABLE `submissions_history` (
   `submission_id` int UNSIGNED NOT NULL,
   `judge_reason` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `judge_time` datetime DEFAULT NULL,
-  `judger` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `judger` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `result` mediumblob NOT NULL,
   `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `status_details` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -153,7 +153,7 @@ ALTER TABLE `search_requests`
 
 ALTER TABLE `submissions`
   ADD `judge_reason` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' AFTER `tot_size`,
-  ADD `judger` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' AFTER `judge_time`,
+  ADD `judger` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' AFTER `judge_time`,
   ADD `hide_score_to_others` tinyint(1) NOT NULL DEFAULT '0' AFTER `score`,
   ADD `hidden_score` int DEFAULT NULL AFTER `hide_score_to_others`;
 ALTER TABLE `submissions`
