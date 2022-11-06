@@ -73,7 +73,7 @@ $blog_editor->save = function ($data) {
 	} else {
 		insertBlog($data);
 		$blog_id = DB::insert_id();
-		(new UOJBlog(['id' => $blog_id, 'type' => 'B']))->setAsCur();
+		UOJBlog::query(strval($blog_id))->setAsCur();
 		$ret['blog_id'] = $blog_id;
 		$ret['blog_write_url'] = UOJBlog::cur()->getUriForWrite();
 		$ret['blog_url'] = UOJBlog::cur()->getBlogUri();

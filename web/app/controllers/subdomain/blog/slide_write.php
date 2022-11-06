@@ -62,7 +62,7 @@ $blog_editor->save = function ($data) {
 	} else {
 		insertSlide($data);
 		$blog_id = DB::insert_id();
-		(new UOJBlog(['id' => $blog_id, 'type' => 'S']))->setAsCur();
+		UOJBlog::query(strval($blog_id))->setAsCur();
 		$ret['blog_id'] = $blog_id;
 		$ret['blog_write_url'] = UOJBlog::cur()->getUriForWrite();
 		$ret['blog_url'] = UOJBlog::cur()->getBlogUri();
