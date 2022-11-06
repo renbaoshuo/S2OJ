@@ -15,7 +15,7 @@
 				var person = score[key];
 
 				if (person[i] === undefined) return;
-				if (person[i][0] === 100 && (first_accepted[i] === undefined || first_accepted[i][0] === person[i][1] && first_accepted[i][1] > person[i][2])) {
+				if (person[i][0] === 100 && (first_accepted[i] === undefined || first_accepted[i][1] > person[i][2])) {
 					first_accepted[i] = [person[i][1], person[i][2]];
 				}
 			});
