@@ -303,7 +303,7 @@ class UOJContest {
 		];
 
 		if ($this->userCanManage($user)) {
-			if ($this->userHasRegistered($user) && $this->progress() == CONTEST_IN_PROGRESS) {
+			if ($this->userHasRegistered($user) && $this->progress() == CONTEST_IN_PROGRESS && !$this->userHasMarkedParticipated($user)) {
 				$cfg['ensure'] && redirectTo($this->getUri('/confirm'));
 				return false;
 			}
