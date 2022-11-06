@@ -42,7 +42,7 @@ $register_form->runAtServer();
 			<?php elseif (UOJContest::cur()->basicRule() == 'IOI') : ?>
 				<li>本场比赛为 IOI 赛制。比赛时的提交会测试题目的全部数据，但无法查看数据点详情。</li>
 			<?php elseif (UOJContest::cur()->basicRule() == 'ACM') : ?>
-				<li>本场比赛为 ACM 赛制。</li>
+				<li>本场比赛为 ACM 赛制。比赛时的每次失败提交将会带来 20 分钟的罚时。</li>
 			<?php endif ?>
 			<li>若选手在比赛中多次提交了同一题，则最后按照 <b>最后一次不是 Compile Error 的提交</b> 计算排行。</li>
 			<li>比赛结束后会进行最终测试，最终测试后的排名为最终排名。</li>
