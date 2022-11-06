@@ -153,6 +153,13 @@ function queryOIorIOIContestSubmissionData($contest, $problems, $prob_pos, $conf
 				"select id, submit_time, submitter, problem_id, score from submissions",
 				"where", [
 					["problem_id", "in", DB::rawtuple($problems)],
+					["submitter", "in", DB::rawbracket([
+						"select username from contests_registrants",
+						"where", [
+							"contest_id" => $contest['id'],
+							"has_participated" => 1,
+						],
+					])],
 				], "order by score",
 			], DB::NUM);
 		} else {

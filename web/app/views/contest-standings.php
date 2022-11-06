@@ -15,8 +15,8 @@
 				var person = score[key];
 
 				if (person[i] === undefined) return;
-				if (person[i][0] === 100 && (first_accepted[i] === undefined || first_accepted[i][1] > person[i][2])) {
-					first_accepted[i] = [person[i][1], person[i][2]];
+				if (person[i][0] === 100 && (!first_accepted[i] || first_accepted[i] > person[i][2])) {
+					first_accepted[i] = person[i][2];
 				}
 			});
 		}
@@ -40,7 +40,7 @@
 				for (var i = 0; i < problems.length; i++) {
 					col = score[row[2][0]][i];
 					if (col != undefined) {
-						col_tr += first_accepted[i] !== undefined && col[2] === first_accepted[i][1] ? '<td class="table-success"' : '<td>';
+						col_tr += col[2] === first_accepted[i] ? '<td class="table-success">' : '<td>';
 						col_tr += '<div>';
 
 						if (col[2]) col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score" style="color:' + getColOfScore(col[0]) + '">' + col[0] + '</a>';
