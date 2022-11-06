@@ -302,7 +302,12 @@ class UOJContest {
 			'check-register' => false
 		];
 
-		if ($this->userCanManage($user) && !$this->userHasRegistered($user)) {
+		if ($this->userCanManage($user)) {
+			if ($this->userHasRegistered($user) && $this->progress() == CONTEST_IN_PROGRESS) {
+				$cfg['ensure'] && redirectTo($this->getUri('/confirm'));
+				return false;
+			}
+
 			return true;
 		}
 		if ($this->progress() == CONTEST_NOT_STARTED) {
