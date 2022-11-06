@@ -290,7 +290,7 @@ class HTML {
 					case 1: // shows minutes and seconds if granularity is not set higher
 						break;
 				}
-				if ($i === $stopat) {
+				if ($i <= $stopat) {
 					break;
 				}
 			}
