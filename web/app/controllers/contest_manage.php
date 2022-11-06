@@ -796,27 +796,25 @@ EOD,
 							</div>
 						</div>
 					</div>
+					<div class="tab-pane" id="extra-registration">
+						<div id="extra-registration-result-alert" class="alert" role="alert" style="display: none"></div>
+						<div class="row row-cols-1 row-cols-md-2">
+							<div class="col">
+								<?php $extra_registration_form->printHTML(); ?>
+							</div>
+							<div class="col mt-3 mt-md-0">
+								<h5>注意事项</h5>
+								<ul class="mb-0">
+									<li>如果允许额外报名，则比赛开始后选手也可以报名参赛。</li>
+								</ul>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
+		<?php endif ?>
 	</div>
-	<div class="tab-pane" id="extra-registration">
-		<div id="extra-registration-result-alert" class="alert" role="alert" style="display: none"></div>
-		<div class="row row-cols-1 row-cols-md-2">
-			<div class="col">
-				<?php $extra_registration_form->printHTML(); ?>
-			</div>
-			<div class="col mt-3 mt-md-0">
-				<h5>注意事项</h5>
-				<ul class="mb-0">
-					<li>如果允许额外报名，则比赛开始后选手也可以报名参赛。</li>
-				</ul>
-			</div>
-		</div>
-	</div>
-</div>
-<?php endif ?>
-</div>
-<!-- end right col -->
+	<!-- end right col -->
 </div>
 
 <?php echoUOJPageFooter() ?>
