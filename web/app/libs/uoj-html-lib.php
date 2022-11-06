@@ -310,7 +310,7 @@ function echoSubmissionsListOnlyOne($submission, $config, $user) {
 		echo '<th>' . UOJLocale::get('problems::submitter') . '</th>';
 	}
 	if (!isset($config['result_hidden'])) {
-		echo '<th>' . UOJLocale::get('problems::result') . '</th>';
+		echo '<th style="min-width:3em">' . UOJLocale::get('problems::result') . '</th>';
 	}
 	if (!isset($config['used_time_hidden'])) {
 		echo '<th>' . UOJLocale::get('problems::used time') . '</th>';
@@ -318,8 +318,8 @@ function echoSubmissionsListOnlyOne($submission, $config, $user) {
 	if (!isset($config['used_memory_hidden'])) {
 		echo '<th>' . UOJLocale::get('problems::used memory') . '</th>';
 	}
-	echo '<th>' . UOJLocale::get('problems::language') . '</th>';
-	echo '<th>' . UOJLocale::get('problems::file size') . '</th>';
+	echo '<th style="min-width:5em">' . UOJLocale::get('problems::language') . '</th>';
+	echo '<th style="min-width:5em">' . UOJLocale::get('problems::file size') . '</th>';
 	if (!isset($config['submit_time_hidden'])) {
 		echo '<th>' . UOJLocale::get('problems::submit time') . '</th>';
 	}
