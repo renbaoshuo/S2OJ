@@ -579,13 +579,13 @@ class JudgmentDetailsPrinter {
 			}
 
 			if ($subtask_time >= 0) {
-				echo '<div class="col-sm-3">';
+				echo '<div class="col-sm-2">';
 				echo '<i class="bi bi-hourglass-split"></i> ', $subtask_time, ' ms';
 				echo '</div>';
 			}
 
 			if ($subtask_memory >= 0) {
-				echo '<div class="col-sm-3">';
+				echo '<div class="col-sm-2">';
 				echo '<i class="bi bi-memory"></i> ', $subtask_memory, ' kB';
 				echo '</div>';
 			}
