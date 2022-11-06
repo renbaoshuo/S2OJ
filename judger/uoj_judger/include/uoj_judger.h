@@ -620,7 +620,7 @@ int conf_int(const string &key, const int &val) {
 	if (config.count(key) == 0) {
 		return val;
 	}
-	return atoi(config[key].c_str());
+	return stoi(config[key]);
 }
 int conf_int(const string &key, int num, const int &val) {
 	ostringstream sout;
@@ -628,7 +628,7 @@ int conf_int(const string &key, int num, const int &val) {
 	if (config.count(sout.str()) == 0) {
 		return conf_int(key, val);
 	}
-	return atoi(config[sout.str()].c_str());
+	return stoi(config[sout.str()]);
 }
 int conf_int(const string &key)  {
 	return conf_int(key, 0);
