@@ -107,18 +107,14 @@ if ($search_content !== '') {
 }
 
 if (isset($_GET['is_hidden'])) {
-	$cond[] = [
-		'is_hidden' => '1',
-	];
+	$cond['problems.is_hidden'] = true;
 }
 
 if (Auth::check() && isset($_GET['my'])) {
-	$cond[] = [
-		'uploader' => Auth::id(),
-	];
+	$cond['problems.uploader'] = Auth::id();
 }
 
-if (!$cond) {
+if (empty($cond)) {
 	$cond = '1';
 }
 
