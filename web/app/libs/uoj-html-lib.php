@@ -392,13 +392,13 @@ function echoSubmissionsList($cond, $tail, $config, $user) {
 	if (!isProblemManager($user)) {
 		if ($user != null) {
 			$permission_cond = DB::lor([
-				"submissions.is_hidden" => "false",
+				"submissions.is_hidden" => false,
 				"submissions.submitter" => $user['username'],
 				DB::land([
 					"submissions.is_hidden" => true,
 					DB::lor([
 						"submissions.problem_id in (select problem_id from problems_permissions where username = '{$user['username']}')",
-						"submissions.problem_id in (select id from problems where uploader = '{$user['username']}'))",
+						"submissions.problem_id in (select id from problems where uploader = '{$user['username']}')",
 					]),
 				]),
 			]);
