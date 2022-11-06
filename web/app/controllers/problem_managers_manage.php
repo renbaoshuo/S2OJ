@@ -37,7 +37,7 @@ if (isSuperUser($myUser)) {
 		'new_uploader_username',
 		'text',
 		'用户名',
-		$problem['uploader'] ?: 'root',
+		UOJProblem::info('uploader') ?: 'root',
 		function ($username, &$vdata) {
 			if (!UOJUser::query($username)) {
 				return '用户不存在';
@@ -62,7 +62,7 @@ if (isSuperUser($myUser)) {
 	$update_uploader_form->runAtServer();
 }
 ?>
-<?php echoUOJPageHeader('管理者 - ' . HTML::stripTags($problem['title'])) ?>
+<?php echoUOJPageHeader('管理者 - ' . HTML::stripTags(UOJProblem::info('title'))) ?>
 
 <div class="row">
 	<!-- left col -->
@@ -159,7 +159,7 @@ if (isSuperUser($myUser)) {
 				</li>
 			</ul>
 			<div class="card-footer bg-transparent">
-				评价：<?= ClickZans::getBlock('P', $problem['id'], $problem['zan']) ?>
+				评价：<?= ClickZans::getBlock('P', UOJProblem::info('id'), UOJProblem::info('zan')) ?>
 			</div>
 		</div>
 
