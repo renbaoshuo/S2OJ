@@ -38,7 +38,8 @@
     	$conds, 'order by id desc', [
     	    'judge_time_hidden' => '',
     	    'problem_title' => [
-    	        'with' => 'letter'
+    	        'with' => 'letter',
+				'simplify' => true
 			],
 			'table_config' => [
 				'div_classes' => ['card', 'mb-3', 'table-responsive'],
