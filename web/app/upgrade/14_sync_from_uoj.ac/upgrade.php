@@ -15,7 +15,7 @@ return function (string $type) {
 			$extra['social']['codeforces'] = $user['codeforces_handle'];
 			$extra['social']['github'] = $user['github'];
 			$extra['social']['website'] = $user['website'];
-			$extra['image_hosting']['total_size_limit'] = $user['images_size_limit'];
+			$extra['image_hosting']['total_size_limit'] = (int)$user['images_size_limit'];
 
 			DB::update([
 				"update user_info",

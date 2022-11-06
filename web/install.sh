@@ -66,7 +66,7 @@ setWebConf(){
 \$config['database']['host']='$_database_host_';
 \$config['database']['password']='$_database_password_';
 \$config['judger']['socket']['port']='$_judger_socket_port_';
-file_put_contents('/var/www/uoj/app/.config.php', "<?php\nreturn ".str_replace('\'_httpHost_\'','UOJContext::httpHost()',var_export(\$config, true)).";\n");
+file_put_contents('/var/www/uoj/app/.config.php', "<?php\nreturn ".str_replace('\'_httpHost_\'','UOJContext::requestDomain()',var_export(\$config, true)).";\n");
 UOJEOF
     # Prepare local sandbox
     cd /opt/uoj/judger/uoj_judger
