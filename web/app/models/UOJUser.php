@@ -57,7 +57,7 @@ class UOJUser {
 		$info = [
 			'username' => $user['username'],
 			'email' => $user['email'],
-			'school' => $user['school'],
+			'school' => $user['school'] ?: '',
 			'password' => $password,
 			'svn_password' => uojRandString(20),
 			'register_time' => DB::now(),
