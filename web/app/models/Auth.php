@@ -3,26 +3,43 @@
 class Auth {
 	public static function check() {
 		global $myUser;
-		return $myUser != null;
+		return $myUser !== null;
 	}
 	public static function id() {
 		global $myUser;
+		if ($myUser === null) {
+			return null;
+		}
 		return $myUser['username'];
 	}
 	public static function user() {
 		global $myUser;
 		return $myUser;
 	}
+    public static function property($name) {
+    	global $myUser;
+    	if (!$myUser) {
+    		return false;
+    	}
+    	return $myUser[$name];
+    }
 	public static function login($username, $remember = true) {
 		if (!validateUsername($username)) {
 			return;
 		}
 		$_SESSION['username'] = $username;
 		if ($remember) {
-			$remember_token = DB::selectFirst("select remember_token from user_info where username = '$username'")['remember_token'];
+			$remember_token = DB::selectSingle([
+                "select remember_token from user_info",
+                "where", ["username" => $username]
+            ]);
 			if ($remember_token == '') {
 				$remember_token = uojRandString(60);
-				DB::update("update user_info set remember_token = '$remember_token', last_login = now() where username = '$username'");
+				DB::update([
+                    "update user_info",
+                    "set", ["remember_token" => $remember_token],
+                    "where", ["username" => $username]
+                ]);
 			}
 
 			$_SESSION['last_login'] = time();
@@ -30,6 +47,12 @@ class Auth {
 			Cookie::safeSet('uoj_username', $username, $expire, '/', array('httponly' => true));
 			Cookie::safeSet('uoj_remember_token', $remember_token, $expire, '/', array('httponly' => true));
 		}
+
+		DB::update([
+			"update user_info",
+			"set", ["last_login_time" => UOJTime::$time_now_str],
+			"where", ["username" => $username]
+		]);
 	}
 	public static function logout() {
 		unset($_SESSION['username']);
@@ -37,7 +60,11 @@ class Auth {
 		unset($_SESSION['last_visited']);
 		Cookie::safeUnset('uoj_username', '/');
 		Cookie::safeUnset('uoj_remember_token', '/');
-		DB::update("update user_info set remember_token = '' where username = '".Auth::id()."'");
+		DB::update([
+            "update user_info",
+            "set", ["remember_token" => ''],
+            "where", ["username" => Auth::id()]
+        ]);
 	}
 
 	private static function initMyUser() {
@@ -51,7 +78,7 @@ class Auth {
 			if (!validateUsername($_SESSION['username'])) {
 				return;
 			}
-			$myUser = queryUser($_SESSION['username']);
+			$myUser = UOJUser::query($_SESSION['username']);
 			return;
 		}
 
@@ -61,7 +88,7 @@ class Auth {
 			if (!validateUsername($username)) {
 				return;
 			}
-			$myUser = queryUser($username);
+			$myUser = UOJUser::query($username);
 			if ($myUser['remember_token'] !== $remember_token) {
 				$myUser = null;
 			}
@@ -72,24 +99,19 @@ class Auth {
 		global $myUser;
 		
 		Auth::initMyUser();
-
-		if ($myUser) {
-			if ($myUser['usergroup'] == 'B') {
-				$myUser = null;
-			}
+		if ($myUser && UOJUser::getAccountStatus($myUser) != 'ok') {
+			$myUser = null;
 		}
-
 		if ($myUser) {
 			if (!isset($_SESSION['last_login'])) {
-				$_SESSION['last_login'] = strtotime($myUser['last_login']);
+				$_SESSION['last_login'] = strtotime($myUser['last_login_time']);
 			}
-			if ((time() - $_SESSION['last_login']) > 60 * 60 * 24 * 7) {  // 1 week
-				Auth::logout();
-				$myUser = null;
-			}
-			
-			$_SESSION["last_visited"] = time();
-			DB::update("update user_info set remote_addr = '".DB::escape($_SERVER['REMOTE_ADDR'])."', http_x_forwarded_for = '".DB::escape($_SERVER['HTTP_X_FORWARDED_FOR'])."', last_visited = now() where username = '".DB::escape($myUser['username'])."'");
+			$myUser = UOJUser::updateVisitHistory($myUser, [
+				'remote_addr' => UOJContext::remoteAddr(),
+                'http_x_forwarded_for' => UOJContext::httpXForwardedFor(),
+                'http_user_agent' => UOJContext::httpUserAgent()
+            ]);
+			$_SESSION['last_visited'] = time();
 		}
 	}
 }

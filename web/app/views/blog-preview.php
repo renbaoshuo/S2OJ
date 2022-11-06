@@ -1,39 +1,30 @@
 <?php
 	if ($is_preview) {
-		$readmore_pos = strpos($blog['content'], '<!-- readmore -->');
+		$readmore_pos = strpos($blog->content['content'], '<!-- readmore -->');
 		if ($readmore_pos !== false) {
-			$content = substr($blog['content'], 0, $readmore_pos).'<p><a href="'.HTML::blog_url(UOJContext::userid(), '/post/'.$blog['id']).'">阅读更多……</a></p>';
+			$content = substr($blog->content['content'], 0, $readmore_pos).'<p><a href="/blog/'.$blog->info['id'].'">阅读更多……</a></p>';
 		} else {
-			$content = $blog['content'];
+			$content = $blog->content['content'];
 		}
 	} else {
-		$content = $blog['content'];
+		$content = $blog->content['content'];
 	}
 	
-	$extra_text = $blog['is_hidden'] ? '<span class="text-muted">[已隐藏]</span> ' : '';
-	
-	$blog_type = $blog['type'] == 'B' ? 'post' : 'slide';
+	$extra_text = $blog->info['is_hidden'] ? '<span class="text-muted">[已隐藏]</span> ' : '';
 	?>
-<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-<link rel="stylesheet" type="text/css" href="<?= HTML::url('/css/markdown.css') ?>">
-<?php endif ?>
 
-<h1 class="h2">
+<h1>
 	<?= $extra_text ?>
-	<a class="header-a
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-text-decoration-none text-body
-<?php endif ?>
-	" href="<?= HTML::blog_url(UOJContext::userid(), '/post/'.$blog['id']) ?>">
-		<?= $blog['title'] ?>
+	<a class="header-a text-decoration-none text-body" href="<?= HTML::blog_url($blog->info['poster'], '/post/'.$blog->info['id']) ?>">
+		<?= $blog->info['title'] ?>
 	</a>
 </h1>
 
-<div><?= $blog['post_time'] ?> <strong>By</strong> <?= getUserLink($blog['poster']) ?> (<strong>博客 ID: </strong> <?= $blog['id'] ?>)</div>
+<div><?= $blog->info['post_time'] ?> <strong>By</strong> <?= getUserLink($blog->info['poster']) ?> (<strong>博客 ID: </strong> <?= $blog->info['id'] ?>)</div>
 <?php if (!$show_title_only): ?>
 <div class="card mb-4">
 	<div class="card-body">
-		<?php if ($blog_type == 'post'): ?>
+		<?php if ($blog->isTypeB()): ?>
 
 			<!-- content -->
 			<article class="markdown-body">
@@ -41,84 +32,51 @@ text-decoration-none text-body
 			</article>
 			<!-- content end -->
 
-		<?php elseif ($blog_type == 'slide'): ?>
+		<?php elseif ($blog->isTypeS()): ?>
+
+		<!-- slide -->
 		<article>
-			<div class="
-			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-			ratio ratio-16x9
-			<?php else: ?>
-			embed-responsive embed-responsive-16by9
-			<?php endif ?>
-			">
-				<iframe class="embed-responsive-item" src="<?= HTML::blog_url(UOJContext::userid(), '/slide/'.$blog['id']) ?>"></iframe>
+			<div class="ratio ratio-16x9">
+				<iframe class="embed-responsive-item" src="<?= HTML::blog_url($blog->info['poster'], '/slide/'.$blog->info['id']) ?>"></iframe>
 			</div>
-			<div class="
-			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-			text-end mt-2
-			<?php else: ?>
-			text-right top-buffer-sm
-			<?php endif ?>">
-				<a class="btn btn-secondary btn-md" href="<?= HTML::blog_url(UOJContext::userid(), '/slide/'.$blog['id']) ?>">
-					<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
+			<div class="text-end mt-2">
+				<a class="btn btn-secondary btn-md" href="<?= HTML::blog_url($blog->info['poster'], '/slide/'.$blog->info['id']) ?>">
 					<i class="bi bi-arrows-fullscreen"></i>
-					<?php else: ?>
-					<span class="glyphicon glyphicon-fullscreen"></span>
-					<?php endif ?>
 					全屏
 				</a>
 			</div>
 		</article>
+		<!-- slide end -->
+
 		<?php endif ?>
 	</div>
-	<div class="card-footer
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-text-end
-<?php else: ?>
-text-right
-<?php endif ?>">
-		<ul class="list-inline 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-mb-0
-<?php else: ?>
-bot-buffer-no
-<?php endif ?>">
+	<div class="card-footer text-end text-right">
+		<ul class="list-inline mb-0">
 			<li class="list-inline-item">
-			<?php foreach (queryBlogTags($blog['id']) as $tag): ?>
+			<?php foreach ($blog->tags as $tag): ?>
 				<?php echoBlogTag($tag) ?>
 			<?php endforeach ?>
 			</li>
 			<?php if ($is_preview): ?>
   			<li class="list-inline-item">
-				<a class="
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-text-decoration-none
-<?php endif ?>
-	" href="<?= HTML::blog_url(UOJContext::userid(), '/post/'.$blog['id']) ?>">
+				<a class="text-decoration-none" href="<?= HTML::blog_url($blog->info['poster'], '/post/'.$blog->info['id']) ?>">
 					阅读全文
 				</a>
 			</li>
   			<?php endif ?>
-  			<?php if (Auth::check() && (isSuperUser(Auth::user()) || Auth::id() == $blog['poster'])): ?>
+  			<?php if (Auth::check() && (isSuperUser(Auth::user()) || Auth::id() == $blog->info['poster'])): ?>
 			<li class="list-inline-item">
-				<a class="
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-text-decoration-none
-<?php endif ?>
-	" href="<?=HTML::blog_url(UOJContext::userid(), '/'.$blog_type.'/'.$blog['id'].'/write')?>">
+				<a class="text-decoration-none" href="<?= HTML::blog_url($blog->info['poster'], '/'.($blog->info['type'] == 'B' ? 'post' : 'slide').'/'.$blog->info['id'].'/write') ?>">
 					修改
 				</a>
 			</li>
 			<li class="list-inline-item">
-				<a class="
-<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
-text-decoration-none
-<?php endif ?>
-	" href="<?=HTML::blog_url(UOJContext::userid(), '/post/'.$blog['id'].'/delete')?>">
+				<a class="text-decoration-none" href="<?= HTML::blog_url($blog->info['poster'], '/post/'.$blog->info['id'].'/delete') ?>">
 					删除
 				</a>
 			</li>
 			<?php endif ?>
-  			<li class="list-inline-item"><?= getClickZanBlock('B', $blog['id'], $blog['zan']) ?></li>
+  			<li class="list-inline-item"><?= ClickZans::getBlock('B', $blog->info['id'], $blog->info['zan']) ?></li>
 		</ul>
 	</div>
 </div>

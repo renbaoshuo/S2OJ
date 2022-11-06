@@ -1,60 +1,54 @@
 <?php
-	requireLib('bootstrap5');
+requireLib('bootstrap5');
 
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
-		redirectToLogin();
-	}
+Auth::check() || redirectToLogin();
 
-	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-		become403Page();
-	}
+$q_problem_id = isset($_GET['problem_id']) && validateUInt($_GET['problem_id']) ? $_GET['problem_id'] : null;
+$q_submission_id = isset($_GET['submission_id']) && validateUInt($_GET['submission_id']) ? $_GET['submission_id'] : null;
+$q_hacker = isset($_GET['hacker']) && validateUsername($_GET['hacker']) ? $_GET['hacker'] : null;
+$q_owner = isset($_GET['owner']) && validateUsername($_GET['owner']) ? $_GET['owner'] : null;
 
-	$conds = array();
+$conds = [];
+if ($q_problem_id != null) {
+	$conds[] = ["problem_id" => $q_problem_id];
+}
+if ($q_submission_id != null) {
+	$conds[] = ["submission_id" => $q_submission_id];
+}
+if ($q_hacker != null) {
+	$conds[] = ["hacker" => $q_hacker];
+}
+if ($q_owner != null) {
+	$conds[] = ["owner" => $q_owner];
+}
 
-	$q_problem_id = isset($_GET['problem_id']) && validateUInt($_GET['problem_id']) ? $_GET['problem_id'] : null;
-	$q_submission_id = isset($_GET['submission_id']) && validateUInt($_GET['submission_id']) ? $_GET['submission_id'] : null;
-	$q_hacker = isset($_GET['hacker']) && validateUsername($_GET['hacker']) ? $_GET['hacker'] : null;
-	$q_owner = isset($_GET['owner']) && validateUsername($_GET['owner']) ? $_GET['owner'] : null;
-	if ($q_problem_id != null) {
-		$conds[] = "problem_id = $q_problem_id";
+$selected_all = ' selected="selected"';
+$selected_succ = '';
+$selected_fail = '';
+if (isset($_GET['status']) && validateUInt($_GET['status'])) {
+	if ($_GET['status'] == 1) {
+		$selected_all = '';
+		$selected_succ = ' selected="selected"';
+		$conds[] = 'success = 1';
 	}
-	if ($q_submission_id != null) {
-		$conds[] = "submission_id = $q_submission_id";
+	if ($_GET['status'] == 2) {
+		$selected_all = '';
+		$selected_fail = ' selected="selected"';
+		$conds[] = 'success = 0';
 	}
-	if ($q_hacker != null) {
-		$conds[] = "hacker = '$q_hacker'";
-	}
-	if ($q_owner != null) {
-		$conds[] = "owner = '$q_owner'";
-	}
-	
-	$selected_all = ' selected="selected"';
-	$selected_succ ='';
-	$selected_fail ='';
-	if (isset($_GET['status']) && validateUInt($_GET['status'])) {
-		if ($_GET['status'] == 1) {
-			$selected_all = '';
-			$selected_succ =' selected="selected"';
-			$conds[] = 'success = 1';
-		}
-		if ($_GET['status'] == 2) {
-			$selected_all = '';
-			$selected_fail = ' selected="selected"';
-			$conds[] = 'success = 0';
-		}
-	}
-	
-	if ($conds) {
-		$cond = join($conds, ' and ');
-	} else {
-		$cond = '1';
-	}
-	
-	?>
+}
+
+if ($conds) {
+	$cond = $conds;
+} else {
+	$cond = '1';
+}
+
+?>
 <?php echoUOJPageHeader(UOJLocale::get('hacks')) ?>
 
-<h1 class="h2">
-<?= UOJLocale::get('hacks') ?>
+<h1>
+	<?= UOJLocale::get('hacks') ?>
 </h1>
 
 <div class="d-none d-sm-block mb-3">
@@ -77,10 +71,10 @@
 			</label>
 			<div class="input-group">
 				<input type="text" class="form-control form-control-sm" name="hacker" id="input-hacker" value="<?= $q_hacker ?>" maxlength="20" style="width:10em" />
-				<?php if (Auth::check()): ?>
-				<a id="my-hacks" href="/hacks?hacker=<?= Auth::id() ?>" class="btn btn-outline-secondary btn-sm">
-					我的
-				</a>
+				<?php if (Auth::check()) : ?>
+					<a id="my-hacks" href="/hacks?hacker=<?= Auth::id() ?>" class="btn btn-outline-secondary btn-sm">
+						我的
+					</a>
 				<?php endif ?>
 			</div>
 			<script>
@@ -97,10 +91,10 @@
 			</label>
 			<div class="input-group">
 				<input type="text" class="form-control form-control-sm" name="owner" id="input-owner" value="<?= $q_owner ?>" maxlength="20" style="width:10em" />
-				<?php if (Auth::check()): ?>
-				<a id="my-owners" href="/hacks?owner=<?= Auth::id() ?>" class="btn btn-outline-secondary btn-sm">
-					我的
-				</a>
+				<?php if (Auth::check()) : ?>
+					<a id="my-owners" href="/hacks?owner=<?= Auth::id() ?>" class="btn btn-outline-secondary btn-sm">
+						我的
+					</a>
 				<?php endif ?>
 			</div>
 			<script>
@@ -116,9 +110,9 @@
 				<?= UOJLocale::get('problems::result') ?>:
 			</label>
 			<select class="form-select form-select-sm" id="input-status" name="status">
-				<option value=""<?= $selected_all?>>All</option>
-				<option value="1"<?= $selected_succ ?>>Success!</option>
-				<option value="2"<?= $selected_fail ?>>Failed.</option>
+				<option value="" <?= $selected_all ?>>All</option>
+				<option value="1" <?= $selected_succ ?>>Success!</option>
+				<option value="2" <?= $selected_fail ?>>Failed.</option>
 			</select>
 		</div>
 		<div class="col-auto">
@@ -129,7 +123,9 @@
 	</form>
 </div>
 
-<?php echoHacksList($cond,
+<?php
+echoHacksList(
+	$cond,
 	'order by id desc',
 	[
 		'judge_time_hidden' => '',
@@ -138,7 +134,8 @@
 			'table_classes' => ['table', 'mb-0', 'uoj-table', 'text-center'],
 		],
 	],
-	$myUser);
-	?>
+	Auth::user()
+);
+?>
 
 <?php echoUOJPageFooter() ?>

@@ -1,18 +1,11 @@
 <?php
-	requireLib('bootstrap5');
-	requireLib('calendar_heatmap');
-	requirePHPLib('form');
+requireLib('bootstrap5');
+requireLib('calendar_heatmap');
 
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
-		redirectToLogin();
-	}
-
-	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-		become403Page();
-	}
-	?>
+Auth::check() || redirectToLogin();
+?>
 <?php echoUOJPageHeader('关于我') ?>
 
-<?php uojIncludeView('user-info', array('user' => UOJContext::user(), 'is_blog_aboutme' => '')) ?>
+<?php uojIncludeView('user-info', ['user' => UOJUserBlog::user(), 'is_blog_aboutme' => true]) ?>
 
 <?php echoUOJPageFooter() ?>

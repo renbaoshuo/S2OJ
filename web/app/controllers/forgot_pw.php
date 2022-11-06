@@ -1,7 +1,7 @@
 <?php
 	requirePHPLib('form');
 	
-	$forgot_form = new UOJForm('forgot');
+	$forgot_form = new UOJBs4Form('forgot');
 	$forgot_form->addInput('username', 'text', '用户名', '',
 		function($username, &$vdata) {
 			if (!validateUsername($username)) {

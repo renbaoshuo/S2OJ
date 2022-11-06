@@ -1,10 +1,21 @@
+<?php requireLib('bootstrap5'); ?>
 <?php
-	$blogs = DB::selectAll("select blogs.id, title, poster, post_time from important_blogs, blogs where is_hidden = 0 and important_blogs.blog_id = blogs.id order by level desc, important_blogs.blog_id desc limit 5");
-	$countdowns = DB::selectAll("select * from countdowns order by end_time asc");
-	$friend_links = DB::selectAll("select * from friend_links order by level desc, id asc");
-
-	requireLib('bootstrap5');
-	?>
+$blogs = DB::selectAll([
+	"select blogs.id, title, poster, post_time from important_blogs inner join blogs on important_blogs.blog_id = blogs.id",
+	"where", [
+		"is_hidden" => 0,
+	], "order by level desc, important_blogs.blog_id desc",
+	DB::limit(5)
+]);
+$countdowns = DB::selectAll([
+	"select title, end_time from countdowns",
+	"order by end_time asc",
+]);
+$friend_links = DB::selectAll([
+	"select title, url from friend_links",
+	"order by level desc, id asc",
+]);
+?>
 <?php echoUOJPageHeader(UOJConfig::$data['profile']['oj-name-short']) ?>
 <div class="row">
 	<div class="col-lg-9">
@@ -21,27 +32,23 @@
 							<th style="width:20%"></th>
 						</tr>
 					</thead>
-						<tbody>
+					<tbody>
 						<?php $now_cnt = 0; ?>
-						<?php foreach ($blogs as $blog): ?>
+						<?php foreach ($blogs as $blog_info) : ?>
 							<?php
-									$now_cnt++;
-							$new_tag = '';
-							if ((time() - strtotime($blog['post_time'])) / 3600 / 24 <= 7) {
-								$new_tag = '<sup style="color:red">&nbsp;new</sup>';
-							}
+							$blog = new UOJBlog($blog_info);
+							$now_cnt++;
 							?>
 							<tr>
-								<td>
-									<a href="/blogs/<?= $blog['id'] ?>" class="text-decoration-none"><?= $blog['title'] ?></a>
-									<?= $new_tag ?>
-								</td>
-								<td>by <?= getUserLink($blog['poster']) ?></td>
-								<td><small><?= $blog['post_time'] ?></small></td>
+								<td><?= $blog->getLink(['show_new_tag' => true]) ?></td>
+								<td>by <?= getUserLink($blog->info['poster']) ?></td>
+								<td><small><?= $blog->info['post_time'] ?></small></td>
 							</tr>
 						<?php endforeach ?>
-						<?php for ($i = $now_cnt + 1; $i <= 5; $i++): ?>
-							<tr><td colspan="233">&nbsp;</td></tr>
+						<?php for ($i = $now_cnt + 1; $i <= 5; $i++) : ?>
+							<tr>
+								<td colspan="233">&nbsp;</td>
+							</tr>
 						<?php endfor ?>
 					</tbody>
 				</table>
@@ -52,27 +59,19 @@
 				</div>
 			</div>
 		</div>
-		<?php if (!UOJConfig::$data['switch']['force-login'] || Auth::check()): ?>
-			<?php if (!UOJConfig::$data['switch']['force-login'] || isNormalUser($myUser)): ?>
-			
+		<?php if (Auth::check()) : ?>
 			<div class="mt-4 card">
 				<div class="card-body">
-					<h4 class="card-title"><?= UOJLocale::get('top solver') ?></h4>
-					<?php echoRanklist([
-						'echo_full' => true,
-						'top10' => true,
-						'by_accepted' => true,
-						'table_classes' => ['table', 'text-center'],
-					]) ?>
-					<div class="text-center">
+					<h4 class="card-title mb-2"><?= UOJLocale::get('top solver') ?></h4>
+					<?php UOJRanklist::printHTML(['top10' => true]) ?>
+					<div class="text-center mt-2">
 						<a href="/solverlist" class="text-decoration-none">
 							<?= UOJLocale::get('view all') ?>
 						</a>
 					</div>
 				</div>
 			</div>
-			<?php endif ?>
-		<?php else: ?>
+		<?php else : ?>
 			<div class="mt-4 card card-default">
 				<div class="card-body text-center">
 					请 <a role="button" class="btn btn-outline-primary" href="<?= HTML::url('/login') ?>">登录</a> 以查看更多内容。
@@ -90,22 +89,22 @@
 			</div>
 			<div class="card-body">
 				<ul class="list-unstyled mb-0">
-					<?php foreach ($countdowns as $countdown): ?>
+					<?php foreach ($countdowns as $countdown) : ?>
 						<?php
-							$enddate = strtotime($countdown['end_time']);
+						$enddate = strtotime($countdown['end_time']);
 						$nowdate = time();
-						$diff = floor(($enddate - $nowdate) / (24 * 60 * 60));
+						$diff = ceil(($enddate - $nowdate) / (24 * 60 * 60));
 						?>
 						<li>
-							<?php if ($diff > 0): ?>
+							<?php if ($diff > 0) : ?>
 								<?= UOJLocale::get('x days until countdown title', $countdown['title'], $diff) ?>
-							<?php else: ?>
+							<?php else : ?>
 								<?= UOJLocale::get("countdown title has begun", $countdown['title']) ?>
 							<?php endif ?>
 						</li>
 					<?php endforeach ?>
 				</ul>
-				<?php if (count($countdowns) == 0): ?>
+				<?php if (count($countdowns) == 0) : ?>
 					<div class="text-center">
 						<?= UOJLocale::get('none') ?>
 					</div>
@@ -113,7 +112,7 @@
 			</div>
 		</div>
 
-		<?php if (Auth::check()): ?>
+		<?php if (Auth::check()) : ?>
 			<?php uojIncludeView('sidebar', ['assignments_hidden' => '', 'groups_hidden' => '']) ?>
 		<?php endif ?>
 
@@ -123,15 +122,15 @@
 			</div>
 			<div class="card-body">
 				<ul class="ps-3 mb-0">
-					<?php foreach ($friend_links as $friend_link): ?>
+					<?php foreach ($friend_links as $friend_link) : ?>
 						<li>
-							<a class="text-decoration-none"	href="<?= $friend_link['url'] ?>" target="_blank">
+							<a class="text-decoration-none" href="<?= $friend_link['url'] ?>" target="_blank">
 								<?= $friend_link['title'] ?>
 							</a>
 						</li>
 					<?php endforeach ?>
 				</ul>
-				<?php if (count($friend_links) == 0): ?>
+				<?php if (count($friend_links) == 0) : ?>
 					<div class="text-center">
 						<?= UOJLocale::get('none') ?>
 					</div>

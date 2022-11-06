@@ -1,12 +1,12 @@
 <?php
 
-call_user_func(function() { // to prevent variable scope leak
+call_user_func(function () { // to prevent variable scope leak
 	Route::pattern('id', '[1-9][0-9]{0,9}');
 	Route::pattern('blog_username', '[a-zA-Z0-9_\-]{1,20}');
 
 	switch (UOJConfig::$data['switch']['blog-domain-mode']) {
 		case 1:
-			$domain = '{blog_username}.'.UOJConfig::$data['web']['blog']['host'];
+			$domain = '{blog_username}.' . UOJConfig::$data['web']['blog']['host'];
 			$prefix = '';
 			break;
 		case 2:
@@ -19,20 +19,24 @@ call_user_func(function() { // to prevent variable scope leak
 			break;
 	}
 
-	Route::group([
+	Route::group(
+		[
 			'domain' => UOJConfig::$data['web']['blog']['host']
-		], function() {
+		],
+		function () {
 			Route::any("/", '/blogs.php');
 			Route::any("/blogs/{id}", '/blog_show.php');
 			Route::any("/post/{id}", '/blog_show.php');
 		}
 	);
-	Route::group([
+	Route::group(
+		[
 			'domain' => $domain,
-			'onload' => function() {
+			'onload' => function () {
 				UOJContext::setupBlog();
 			}
-		], function() use ($prefix) {
+		],
+		function () use ($prefix) {
 			Route::any("$prefix/", '/subdomain/blog/index.php');
 			Route::any("$prefix/archive", '/subdomain/blog/archive.php');
 			Route::any("$prefix/aboutme", '/subdomain/blog/aboutme.php');

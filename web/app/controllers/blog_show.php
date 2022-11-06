@@ -1,15 +1,6 @@
 <?php
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
-		redirectToLogin();
-	}
 
-	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-		become403Page();
-	}
+Auth::check() || redirectToLogin();
+UOJBlog::init(UOJRequest::get('id')) || UOJResponse::page404();
 
-	if (!validateUInt($_GET['id']) || !($blog = queryBlog($_GET['id']))) {
-		become404Page();
-	}
-	
-	redirectTo(HTML::blog_url($blog['poster'], '/post/'.$_GET['id'] . ($_GET['sub'] ?: '')));
-	?>
+redirectTo(HTML::blog_url(UOJBlog::info('poster'), '/post/' . UOJBlog::info('id'), ['escape' => false]));

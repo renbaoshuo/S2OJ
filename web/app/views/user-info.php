@@ -1,65 +1,4 @@
-<?php
-function fTime($time, $gran = -1) {
-	$d[0] = array(1, "seconds");
-	$d[1] = array(60, "minutes");
-	$d[2] = array(3600, "hours");
-	$d[3] = array(86400, "days");
-	$d[4] = array(604800, "weeks");
-	$d[5] = array(2592000, "months");
-	$d[6] = array(31104000, "years");
-
-	$w = array();
-
-	$return = "";
-	$now = time();
-	$diff = $now - $time;
-	$secondsLeft = $diff;
-	$stopat = 0;
-	for ($i = 6; $i > $gran; $i--) {
-		$w[$i] = intval($secondsLeft / $d[$i][0]);
-		$secondsLeft -= ($w[$i] * $d[$i][0]);
-		if ($w[$i] != 0) {
-			$return .= UOJLocale::get('time::x ' . $d[$i][1], abs($w[$i])) . " ";
-			switch ($i) {
-				case 6: // shows years and months
-					if ($stopat == 0) {
-						$stopat = 5;
-					}
-					break;
-				case 5: // shows months and weeks
-					if ($stopat == 0) {
-						$stopat = 4;
-					}
-					break;
-				case 4: // shows weeks and days
-					if ($stopat == 0) {
-						$stopat = 3;
-					}
-					break;
-				case 3: // shows days and hours
-					if ($stopat == 0) {
-						$stopat = 2;
-					}
-					break;
-				case 2: // shows hours and minutes
-					if ($stopat == 0) {
-						$stopat = 1;
-					}
-					break;
-				case 1: // shows minutes and seconds if granularity is not set higher
-					break;
-			}
-			if ($i === $stopat) {
-				break;
-			}
-		}
-	}
-
-	$return .= ($diff > 0) ? UOJLocale::get('time::ago') : UOJLocale::get('time::left');
-
-	return $return;
-}
-?>
+<?php $extra = UOJUser::getExtra($user); ?>
 
 <div class="row">
 	<div class="col-md-3">
@@ -125,20 +64,20 @@ function fTime($time, $gran = -1) {
 					</a>
 				</li>
 				<?php endif ?>
-				<?php if ($user['github']): ?>
+				<?php if ($extra['social']['github']): ?>
 				<li class="list-group-item">
 					<i class="bi bi-github me-1"></i>
-					<a class="text-decoration-none text-body" href="https://github.com/<?= HTML::escape($user['github']) ?>" target="_blank">
-						<?= HTML::escape($user['github']) ?>
+					<a class="text-decoration-none text-body" href="https://github.com/<?= HTML::escape($extra['social']['github']) ?>" target="_blank">
+						<?= HTML::escape($extra['social']['github']) ?>
 					</a>
 				</li>
 				<?php endif ?>
-				<?php if ($user['codeforces_handle']): ?>
+				<?php if ($extra['social']['codeforces']): ?>
 				<li class="list-group-item d-flex align-items-center">
 					<div class="flex-shrink-0"><i class="align-text-bottom me-1"><svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 24 24" width="16" height="16"><title>Codeforces</title><path d="M4.5 7.5C5.328 7.5 6 8.172 6 9v10.5c0 .828-.672 1.5-1.5 1.5h-3C.673 21 0 20.328 0 19.5V9c0-.828.673-1.5 1.5-1.5h3zm9-4.5c.828 0 1.5.672 1.5 1.5v15c0 .828-.672 1.5-1.5 1.5h-3c-.827 0-1.5-.672-1.5-1.5v-15c0-.828.673-1.5 1.5-1.5h3zm9 7.5c.828 0 1.5.672 1.5 1.5v7.5c0 .828-.672 1.5-1.5 1.5h-3c-.828 0-1.5-.672-1.5-1.5V12c0-.828.672-1.5 1.5-1.5h3z" fill="currentColor"/></svg></i>&nbsp;</div>
 					<div>
-						<a id="codeforces-profile-link" class="text-decoration-none" href="https://codeforces.com/profile/<?= $user['codeforces_handle'] ?>" target="_blank" style="color: rgba(var(--bs-body-color-rgb), var(--bs-text-opacity)) !important;">
-							<?= $user['codeforces_handle'] ?>
+						<a id="codeforces-profile-link" class="text-decoration-none" href="https://codeforces.com/profile/<?= $extra['social']['codeforces'] ?>" target="_blank" style="color: rgba(var(--bs-body-color-rgb), var(--bs-text-opacity)) !important;">
+							<?= $extra['social']['codeforces'] ?>
 						</a>
 						<div id="codeforces-rating" style="font-family: verdana, arial, sans-serif; line-height: 1.2em; text-transform: capitalize;"></div>
 					</div>
@@ -180,37 +119,25 @@ function fTime($time, $gran = -1) {
 						}
 
 						$(document).ready(function() {
-							if (('Promise' in window) && ('any' in Promise)) {
-								// race
-								Promise.any([
-									fetch('https://codeforces.com/api/user.info?handles=<?= $user['codeforces_handle'] ?>'),
-									fetch('https://codeforc.es/api/user.info?handles=<?= $user['codeforces_handle'] ?>')
-								]).then(function(res) {
-									return res.json();
-								}).then(function(data) {
-									processCodeforcesInfoData(data);
-								});
-							} else {
-								$.get('https://codeforces.com/api/user.info?handles=<?= $user['codeforces_handle'] ?>', function(data) {
-									processCodeforcesInfoData(data);
-								});
-							}
+							$.get('https://codeforces.com/api/user.info?handles=<?= $extra['social']['codeforces'] ?>', function(data) {
+								processCodeforcesInfoData(data);
+							});
 						});
 					</script>
 				</li>
 				<?php endif ?>
-				<?php if ($user['website']): ?>
+				<?php if ($extra['social']['website']): ?>
 				<li class="list-group-item">
 					<i class="bi bi-link-45deg me-1"></i>
-					<a class="text-decoration-none text-body text-break" href="<?= HTML::escape($user['website']) ?>" target="_blank">
-						<?= HTML::escape($user['website']) ?>
+					<a class="text-decoration-none text-body text-break" href="<?= HTML::escape($extra['social']['website']) ?>" target="_blank">
+						<?= HTML::escape($extra['social']['website']) ?>
 					</a>
 				</li>
 				<?php endif ?>
 			</ul>
 			<div class="card-footer bg-transparent">
-				<?php $last_visited = strtotime($user['last_visited']) ?>
-				<?php if (time() - $last_visited < 60 * 15): // 15 mins ?>
+				<?php $last_visit_time = strtotime($user['last_visit_time']) ?>
+				<?php if (time() - $last_visit_time < 60 * 15): // 15 mins ?>
 					<span class="text-success">
 						<i class="bi bi-circle-fill me-1"></i>
 						<?= UOJLocale::get('user::online') ?>
@@ -220,10 +147,10 @@ function fTime($time, $gran = -1) {
 						<i class="bi bi-circle-fill me-1"></i>
 						<?= UOJLocale::get('user::offline') ?>
 					</span>
-					<?php if ($last_visited > 0): ?>
+					<?php if ($last_visit_time > 0): ?>
 						<span class="text-muted small">
 							, <?= UOJLocale::get('user::last active at') ?>
-							<?= fTime($last_visited, 0) ?>
+							<?= HTML::relative_time_str($last_visit_time, 0) ?>
 						</span>
 					<?php endif ?>
 				<?php endif ?>
@@ -252,19 +179,19 @@ function fTime($time, $gran = -1) {
 				<i class="bi bi-arrow-right-square"></i>
 				<?= UOJLocale::get('visit his blog', $user['username']) ?>
 			</a>
-			<?php endif ?>
 
 			<a class="nav-link" href="<?= HTML::blog_url($user['username'], '/self_reviews') ?>">
 				<i class="bi bi-arrow-right-square"></i>
 				<?= UOJLocale::get('contests::contest self reviews') ?>
 			</a>
+			<?php endif ?>
 		</nav>
 		
 		<?php if (!isset($is_blog_aboutme)): ?>
 		<?php $groups = queryGroupsOfUser($user['username']) ?>
 		<div class="card mb-2">
 		<div class="card-body">
-			<h4 class="card-title h5">
+			<h4 class="card-title">
 				<?= UOJLocale::get('user::belongs to these groups') ?>
 			</h4>
 			<ul class="mb-0">
@@ -275,7 +202,7 @@ function fTime($time, $gran = -1) {
 					</a>
 				</li>
 				<?php endforeach ?>
-				<?php if (!count($groups)): ?>
+				<?php if (empty($groups)): ?>
 				<?= UOJLocale::get('none') ?>
 				<?php endif ?>
 			</ul>
@@ -295,7 +222,7 @@ while ($row = DB::fetch($_result)) {
 	$result[$row["date_format(submit_time, '%Y-%m-%d')"]]++;
 }
 ?>
-				<h4 class="card-title h5">
+				<h4 class="card-title">
 					<?= UOJLocale::get('n accepted in last year', $cnt) ?>
 				</h4>
 				<div id="accepted-graph" style="font-size: 14px"></div>
@@ -315,7 +242,7 @@ while ($row = DB::fetch($_result)) {
 		<div class="card mb-2">
 		<div class="card-body">
 			<?php $ac_problems = DB::selectAll("select a.problem_id as problem_id, b.title as title from best_ac_submissions a inner join problems b on a.problem_id = b.id where submitter = '{$user['username']}' order by id") ?>
-			<h4 class="card-title h5">
+			<h4 class="card-title">
 				<?= UOJLocale::get('accepted problems').': '.UOJLocale::get('n problems in total', count($ac_problems))?>
 			</h4>
 			<ul class="nav uoj-ac-problems-list">
@@ -334,7 +261,7 @@ while ($row = DB::fetch($_result)) {
 		</div>
 		</div>
 
-		<?php if (isSuperUser($myUser)): ?>
+		<?php if (isSuperUser(Auth::user())): ?>
 			<div class="card card-default">
 				<ul class="list-group list-group-flush">
 					<li class="list-group-item">
@@ -350,12 +277,12 @@ while ($row = DB::fetch($_result)) {
 						<p class="list-group-item-text"><?= $user['http_x_forwarded_for'] ?></p>
 					</li>
 					<li class="list-group-item">
-						<h5 class="list-group-item-heading">last_login</h5>
-						<p class="list-group-item-text"><?= $user['last_login'] ?></p>
+						<h5 class="list-group-item-heading">last_login_time</h5>
+						<p class="list-group-item-text"><?= $user['last_login_time'] ?></p>
 					</li>
 					<li class="list-group-item">
-						<h5 class="list-group-item-heading">last_visited</h5>
-						<p class="list-group-item-text"><?= $user['last_visited'] ?></p>
+						<h5 class="list-group-item-heading">last_visit_time</h5>
+						<p class="list-group-item-text"><?= $user['last_visit_time'] ?></p>
 					</li>
 				</ul>
 			</div>

@@ -1,19 +1,26 @@
 <?php
 
 class UOJContext {
-	public static $data = array();
+	public static $meta_default = [
+		'active_duration_M' => 12,
+	];
+
+	public static $data = [
+		'type' => 'main'
+	];
 	
 	public static function pageConfig() {
-		if (!isset(self::$data['type'])) {
-			return array(
-				'PageNav' => 'main-nav'
-			);
-		} elseif (self::$data['type'] == 'blog') {
-			return array(
-				'PageNav' => 'blog-nav',
-				'PageMainTitle' => UOJContext::$data['user']['username'] . '的博客',
-				'PageMainTitleOnSmall' => '博客',
-			);
+		switch (self::$data['type']) {
+			case 'main':
+				return [
+					'PageNav' => 'main-nav'
+				];
+			case 'blog':
+				return [
+					'PageNav' => 'blog-nav',
+					'PageMainTitle' => UOJUserBlog::id() . '的博客',
+					'PageMainTitleOnSmall' => '博客',
+				];
 		}
 	}
 	
@@ -37,6 +44,12 @@ class UOJContext {
 	public static function remoteAddr() {
 		return $_SERVER['REMOTE_ADDR'];
 	}
+	public static function httpXForwardedFor() {
+		return isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
+	}
+	public static function httpUserAgent() {
+		return isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+	}
 	public static function requestURI() {
 		return $_SERVER['REQUEST_URI'];
 	}
@@ -53,70 +66,76 @@ class UOJContext {
 		return $_SERVER['REQUEST_METHOD'];
 	}
 	public static function httpHost() {
-		if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
-			return $_SERVER['HTTP_X_FORWARDED_HOST'];
-		} elseif (isset($_SERVER['HTTP_HOST'])) {
-			return $_SERVER['HTTP_HOST'];
-		} else {
-			return $_SERVER['SERVER_NAME'].($_SERVER['SERVER_PORT'] == '80' ? '' : ':'.$_SERVER['SERVER_PORT']);
+		return isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
+	}
+	public static function requestDomain() {
+		$http_host = UOJContext::httpHost();
+		$ret = explode(':', $http_host);
+		if (!is_array($ret) || count($ret) > 2) {
+			return '';
 		}
+		return $ret[0];
+	}
+	public static function isUsingHttps() {
+		return (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' ||  $_SERVER['HTTPS'] == 1))
+			|| (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+			|| $_SERVER['SERVER_PORT'] == 443;
+	}
+	public static function requestPort() {
+		$http_host = UOJContext::httpHost();
+		$ret = explode(':', $http_host);
+		if (!is_array($ret) || count($ret) > 2) {
+			return -1;
+		}
+		if (count($ret) == 1) {
+			return UOJContext::isUsingHttps() ? 443 : 80;
+		}
+		return validateUInt($ret[1]) ? (int)$ret[1] : -1;
 	}
 	public static function cookieDomain() {
 		$domain = UOJConfig::$data['web']['domain'];
 		if ($domain === null) {
 			$domain = UOJConfig::$data['web']['main']['host'];
 		}
-		$domain = explode(':', $domain);
-		$domain = array_shift($domain);
-		if (validateIP($domain) || $domain === 'localhost') {
+		if (validateIP($domain) || strpos($domain, '.') === false) {
 			$domain = '';
 		} else {
 			$domain = '.'.$domain;
 		}
 		return $domain;
 	}
-	
-	public static function setupBlog() {
-		$username = blog_name_decode($_GET['blog_username']);
-		if (!validateUsername($username) || !(self::$data['user'] = queryUser($username))) {
-			become404Page();
-		}
-		if ($_GET['blog_username'] !== blog_name_encode(self::$data['user']['username'])) {
-			permanentlyRedirectTo(HTML::blog_url(self::$data['user']['username'], '/'));
-		}
-		self::$data['type'] = 'blog';
+
+	public static function hasCDN() {
+		return isset(UOJConfig::$data['web']['cdn']);
+	}
+
+	public static function type() {
+		return self::$data['type'];
 	}
 	
-	public static function __callStatic($name, array $args) {
-		switch (self::$data['type']) {
-			case 'blog':
-				switch ($name) {
-					case 'user':
-						return self::$data['user'];
-					case 'userid':
-						return self::$data['user']['username'];
-					case 'hasBlogPermission':
-						return Auth::check() && (isSuperUser(Auth::user()) || Auth::id() == self::$data['user']['username']);
-					case 'isHis':
-						if (!isset($args[0])) {
-							return false;
-						}
-						$blog = $args[0];
-						return $blog['poster'] == self::$data['user']['username'];
-					case 'isHisBlog':
-						if (!isset($args[0])) {
-							return false;
-						}
-						$blog = $args[0];
-						return $blog['poster'] == self::$data['user']['username'] && $blog['type'] == 'B';
-					case 'isHisSlide':
-						if (!isset($args[0])) {
-							return false;
-						}
-						$blog = $args[0];
-						return $blog['poster'] == self::$data['user']['username'] && $blog['type'] == 'S';
-				}
-				break;
+	public static function setupBlog() {
+		UOJUserBlog::init();
+		self::$data['type'] = 'blog';
+	}
+
+	public static function getMeta($name) {
+		$value = DB::selectFirst([
+			"select value from meta",
+			"where", ['name' => $name]
+		]);
+		if ($value === null) {
+			return self::$meta_default[$name];
+		} else {
+			return json_decode($value['value'], true);
 		}
+	}
+
+	public static function setMeta($name, $value) {
+		$value = json_encode($value);
+		return DB::update([
+			"insert into meta", DB::bracketed_fields(['name', 'value', 'updated_at']),
+			"values", DB::tuple([$name, $value, DB::now()]),
+			"on duplicate key update", ['value' => $value]
+		]);
 	}
 }

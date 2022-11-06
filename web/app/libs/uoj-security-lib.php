@@ -28,6 +28,68 @@ function crsf_check() {
 }
 function crsf_defend() {
 	if (!crsf_check()) {
-		becomeMsgPage('This page has expired.');
+		UOJResponse::page403('页面已过期（可能页面真的过期了，也可能是刚才你访问的网页没有完全加载，也可能是你的浏览器版本太老）');
 	}
+}
+
+function submission_frequency_check() {
+	$recent = clone UOJTime::$time_now;
+	$recent->sub(new DateInterval("PT1S"));
+	$num = DB::selectCount([
+		"select count(*) from submissions",
+		"where", [
+			"submitter" => Auth::id(),
+			["submit_time", ">=", $recent->format('Y-m-d H:i:s')]
+		]
+	]);
+	if ($num >= 1) {
+		return false;
+	}
+
+	// use the implementation below if OJ is under attack
+	/*
+	// 1
+	$recent = clone UOJTime::$time_now;
+	$recent->sub(new DateInterval("PT3S"));
+	$num = DB::selectCount([
+		"select count(*) from submissions",
+		"where", [
+			"submitter" => Auth::id(),
+			["submit_time", ">=", $recent->format('Y-m-d H:i:s')]
+		]
+	]);
+	if ($num >= 1) {
+		return false;
+	}
+	
+	// 2
+	$recent = clone UOJTime::$time_now;
+	$recent->sub(new DateInterval("PT1M"));
+	$num = DB::selectCount([
+		"select count(*) from submissions",
+		"where", [
+			"submitter" => Auth::id(),
+			["submit_time", ">=", $recent->format('Y-m-d H:i:s')]
+		]
+	]);
+	if ($num >= 6) {
+		return false;
+	}
+	
+	// 3
+	$recent = clone UOJTime::$time_now;
+	$recent->sub(new DateInterval("PT30M"));
+	$num = DB::selectCount([
+		"select count(*) from submissions",
+		"where", [
+			"submitter" => Auth::id(),
+			["submit_time", ">=", $recent->format('Y-m-d H:i:s')]
+		]
+	]);
+	if ($num >= 30) {
+		return false;
+	}
+	*/
+	
+	return true;
 }

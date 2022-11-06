@@ -10,6 +10,18 @@ function mergeConfig(&$config, $default_config) {
 	}
 }
 
+function is_assoc($arr) {
+	if (!is_array($arr)) {
+		return false;
+	}
+	foreach (array_keys($arr) as $key) {
+		if (!is_int($key)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function strStartWith($str, $pre) {
 	return substr($str, 0, strlen($pre)) === $pre;
 }
@@ -31,7 +43,7 @@ function uojTextEncode($str, $config = array()) {
 		'allow_CR' => false,
 		'html_escape' => false
 	]);
-	
+
 	$allow = array();
 	for ($c = 32; $c <= 126; $c++) {
 		$allow[chr($c)] = true;
@@ -39,11 +51,11 @@ function uojTextEncode($str, $config = array()) {
 	$allow["\n"] = true;
 	$allow[" "] = true;
 	$allow["\t"] = true;
-	
+
 	if ($config['allow_CR']) {
 		$allow["\r"] = true;
 	}
-	
+
 	$len = strlen($str);
 	$ok = true;
 	for ($i = 0; $i < $len; $i++) {
@@ -129,6 +141,15 @@ function blog_name_decode($name) {
 	return $name;
 }
 
+
+function camelize($str, $delimiters = '-_') {
+	$str = ucwords($str, $delimiters);
+	foreach (str_split($delimiters) as $c) {
+		$str = str_replace($c, '', $str);
+	}
+	return $str;
+}
+
 function addUserType(&$user, $type) {
 	$usertype = explode(',', $user['usertype']);
 	if (!in_array($type, $usertype)) {
@@ -150,9 +171,6 @@ function hasUserType($user, $type) {
 	return in_array($type, $usertype);
 }
 
-function isNormalUser($user) {
-	return $user != null && !hasUserType($user, 'contest_only');
-}
 function isProblemUploader($user) {
 	if ($user == null) {
 		return false;
@@ -178,9 +196,12 @@ function isContestJudger($user) {
 function isSuperUser($user) {
 	return $user != null && $user['usergroup'] == 'S';
 }
+function isTmpUser($user) {
+	return $user != null && $user['usergroup'] == 'T';
+}
 function getProblemExtraConfig($problem) {
 	$extra_config = json_decode($problem['extra_config'], true);
-	
+
 	$default_extra_config = array(
 		'view_content_type' => 'ALL',
 		'view_all_details_type' => 'ALL',
@@ -188,9 +209,9 @@ function getProblemExtraConfig($problem) {
 		'view_solution_type' => 'ALL',
 		'submit_solution_type' => 'ALL_AFTER_AC',
 	);
-	
+
 	mergeConfig($extra_config, $default_extra_config);
-	
+
 	return $extra_config;
 }
 function getProblemSubmissionRequirement($problem) {
@@ -223,7 +244,20 @@ function getProblemCustomTestRequirement($problem) {
 }
 
 function sendSystemMsg($username, $title, $content) {
-	$content = DB::escape($content);
-	$title = DB::escape($title);
-	DB::insert("insert into user_system_msg (receiver, title, content, send_time) values ('$username', '$title', '$content', now())");
+	DB::insert([
+        "insert into user_system_msg",
+        "(receiver, title, content, send_time)",
+        "values", DB::tuple([$username, $title, $content, DB::now()])
+    ]);
+}
+
+function retry_loop(callable $f, $retry = 5, $ms = 10) {
+	for ($i = 0; $i < $retry; $i++) {
+		$ret = $f();
+		if ($ret !== false) {
+			return $ret;
+		}
+		usleep($ms * 1000);
+	}
+	return $ret;
 }

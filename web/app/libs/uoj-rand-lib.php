@@ -16,8 +16,8 @@ function uojRandString($len, $charset = '0123456789abcdefghijklmnopqrstuvwxyz') 
 function uojRandAvaiableFileName($dir, $length = 20, $suffix = '') {
 	do {
 		$fileName = $dir . uojRandString($length);
-	} while (file_exists(UOJContext::storagePath().$fileName.$suffix));
-	return $fileName.$suffix;
+	} while (file_exists(UOJContext::storagePath() . $fileName . $suffix));
+	return $fileName . $suffix;
 }
 
 function uojRandAvaiableTmpFileName() {
@@ -26,8 +26,8 @@ function uojRandAvaiableTmpFileName() {
 
 function uojRandAvaiableSubmissionFileName() {
 	$num = uojRand(1, 10000);
-	if (!file_exists(UOJContext::storagePath()."/submission/$num")) {
-		mkdir(UOJContext::storagePath()."/submission/$num", 0777, true);
+	if (!file_exists(UOJContext::storagePath() . "/submission/$num")) {
+		mkdir(UOJContext::storagePath() . "/submission/$num", 0777, true);
 	}
 	return uojRandAvaiableFileName("/submission/$num/");
 }

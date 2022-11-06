@@ -4,12 +4,8 @@
 	requirePHPLib('judger');
 	requirePHPLib('data');
 
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
+	if (!Auth::check()) {
 		redirectToLogin();
-	}
-
-	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-		become403Page();
 	}
 
 	$group_id = $_GET['id'];
@@ -30,7 +26,7 @@
 
 <!-- title -->
 <div class="d-flex justify-content-between">
-<h1 class="h2">
+<h1>
 	<?php if ($group['is_hidden']): ?>
 		<span class="fs-5 text-danger">[隐藏]</span>
 	<?php endif ?>
@@ -51,7 +47,7 @@
 <!-- main content -->
 <div class="card mb-3">
 	<div class="card-body">
-		<h2 class="h4">
+		<h2 class="h3">
 			<?= UOJLocale::get('group announcement') ?>
 		</h2>
 		<?php if ($group['announcement']): ?>
@@ -68,7 +64,7 @@
 
 <div class="card mb-3">
 	<div class="card-body">
-		<h2 class="card-title h4">
+		<h2 class="card-title h3">
 			<?= UOJLocale::get('news') ?>
 		</h5>
 		<ul class="mb-0">
@@ -92,7 +88,7 @@
 
 <div class="card card-default mb-3">
 	<div class="card-body">
-		<h2 class="card-title h4">
+		<h2 class="card-title h3">
 			<?= UOJLocale::get('assignments') ?>
 		</h5>
 		<?php
@@ -139,7 +135,7 @@ EOD,
 
 <div class="card card-default mb-3">
 	<div class="card-body">
-		<h2 class="card-title h4">
+		<h2 class="card-title h3">
 			<?= UOJLocale::get('top solver') ?>
 		</h5>
 		<?php echoRanklist([

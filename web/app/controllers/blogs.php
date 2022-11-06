@@ -1,83 +1,80 @@
 <?php
-	requireLib('bootstrap5');
-	requirePHPLib('form');
+requireLib('bootstrap5');
+requirePHPLib('form');
 
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
-		redirectToLogin();
-	}
-
-	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-		become403Page();
-	}
-	?>
+Auth::check() || redirectToLogin();
+?>
 <?php echoUOJPageHeader(UOJLocale::get('blogs')) ?>
 
 <div class="row">
+	<!-- left col -->
+	<div class="col-lg-9">
+		<!-- title container -->
+		<div class="d-flex flex-wrap justify-content-between align-items-center">
+			<h1>
+				<?= UOJLocale::get("blogs overview") ?>
+			</h1>
 
-<!-- left col -->
-<div class="col-lg-9">
+			<?php if (Auth::check()) : ?>
+				<div class="text-end">
+					<div class="btn-group">
+						<a href="<?= HTML::blog_url(Auth::id(), '/') ?>" class="btn btn-secondary btn-sm">
+							我的博客首页
+						</a>
+						<a href="<?= HTML::blog_url(Auth::id(), '/post/new/write') ?>" class="btn btn-primary btn-sm">
+							<i class="bi bi-pencil"></i>
+							写新博客
+						</a>
+					</div>
+				</div>
+			<?php endif ?>
+		</div>
+		<!-- end title container -->
 
-<!-- title container -->
-<div class="d-flex flex-wrap justify-content-between align-items-center">
-
-<h1 class="h2">
-	<?= UOJLocale::get("blogs overview") ?>
-</h1>
-
-<div class="text-end">
-	<div class="btn-group">
-		<a href="<?= HTML::blog_url(Auth::id(), '/') ?>" class="btn btn-secondary btn-sm">
-			我的博客首页
-		</a>
-		<a href="<?= HTML::blog_url(Auth::id(), '/post/new/write')?>" class="btn btn-primary btn-sm">
-			<i class="bi bi-pencil"></i>
-			写新博客
-		</a>
-	</div>
-</div>
-</div>
-<!-- end title container -->
-
-<?php
-echoLongTable(
-	['id', 'poster', 'title', 'post_time', 'zan', 'is_hidden'],
-	'blogs',
-	isSuperUser($myUser) ? "1" : "is_hidden = 0 or poster = '{$myUser['username']}'",
-	'order by post_time desc',
-	<<<EOD
+		<?php
+		echoLongTable(
+			['id', 'poster', 'title', 'post_time', 'zan', 'is_hidden'],
+			'blogs',
+			isSuperUser($myUser) ? "1" : "is_hidden = 0 or poster = '{$myUser['username']}'",
+			'order by post_time desc',
+			<<<EOD
 	<tr>
-		<th width="60%">标题</th>
-		<th width="20%">发表者</th>
-		<th width="20%">发表日期</th>
+		<th>标题</th>
+		<th style="width:200px">发表者</th>
+		<th style="width:200px">发表日期</th>
+		<th style="width:50px" class="text-center">评价</th>
 	</tr>
 EOD,
-	function($blog) {
-		echo '<tr>';
-		echo '<td>';
-		echo getBlogLink($blog['id']);
-		if ($blog['is_hidden']) {
-			echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
-		}
-		echo '</td>';
-		echo '<td>' . getUserLink($blog['poster']) . '</td>';
-		echo '<td>' . $blog['post_time'] . '</td>';
-		echo '</tr>';
-	},
-	[
-		'page_len' => 10,
-		'div_classes' => ['card', 'my-3', 'table-responsive'],
-		'table_classes' => ['table', 'uoj-table', 'mb-0'],
-	]
-);
-	?>
+			function ($info) {
+				$blog = new UOJBlog($info);
 
-</div>
+				echo '<tr>';
+				echo '<td>';
+				echo $blog->getLink();
+				if ($blog->info['is_hidden']) {
+					echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
+				}
+				echo '</td>';
+				echo '<td>' . getUserLink($blog->info['poster']) . '</td>';
+				echo '<td>' . $blog->info['post_time'] . '</td>';
+				echo '<td class="text-center">' . ClickZans::getCntBlock($blog->info['zan']) . '</td>';
+				echo '</tr>';
+			},
+			[
+				'page_len' => 10,
+				'div_classes' => ['card', 'my-3', 'table-responsive'],
+				'table_classes' => ['table', 'uoj-table', 'mb-0'],
+			]
+		);
+		?>
 
-<!-- right col -->
-<aside class="col-lg-3 mt-3 mt-lg-0">
-<?php uojIncludeView('sidebar') ?>
-</aside>
-<!-- end right col -->
+	</div>
+
+	<!-- right col -->
+	<aside class="col-lg-3 mt-3 mt-lg-0">
+		<?php uojIncludeView('sidebar') ?>
+	</aside>
+	<!-- end right col -->
 
 </div>
 

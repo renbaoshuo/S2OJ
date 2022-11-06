@@ -1,10 +1,6 @@
 <?php
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
+	if (!Auth::check()) {
 		redirectToLogin();
-	}
-
-	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-		become403Page();
 	}
 
 	requireLib('bootstrap5');
@@ -73,7 +69,7 @@ EOD;
 					echo "<td>{$extra_config['difficulty']}</td>";
 				}
 			}
-			echo '<td class="text-start">', getClickZanBlock('P', $problem['id'], $problem['zan'], null, false), '</td>';
+			echo '<td class="text-start">', ClickZans::getBlock('P', $problem['id'], $problem['zan'], null, false), '</td>';
 			echo '</tr>';
 		}
 	}
@@ -121,7 +117,7 @@ EOD;
 <!-- title container -->
 <div class="d-flex justify-content-between">
 
-<h1 class="h2">
+<h1>
 	<?= $list['title'] ?>
 	<span class="fs-5">(ID: #<?= $list['id'] ?>)</span>
 	<?php if ($list['is_hidden']): ?>
@@ -146,7 +142,7 @@ EOD;
 <!-- description -->
 <div class="card my-2">
 	<div class="card-body">
-		<h2 class="h5 mb-3">题单简介</h2>
+		<h2 class="h4 mb-3">题单简介</h2>
 		<?php $description = HTML::purifier()->purify(HTML::parsedown()->text($list['description'])) ?>
 		<?php if ($description): ?>
 			<?= $description ?>
@@ -224,7 +220,7 @@ $('#input-show_difficulty').click(function() {
 </thead>
 <tbody>
 <?php foreach ($pag->get() as $idx => $row): ?>
-		<?php echoProblem($row) ?>
+	<?php echoProblem($row) ?>
 <?php endforeach ?>
 <?php if ($pag->isEmpty()): ?>
 	<tr>

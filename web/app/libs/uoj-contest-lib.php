@@ -3,7 +3,7 @@ define("CONTEST_NOT_STARTED", 0);
 define("CONTEST_IN_PROGRESS", 1);
 define("CONTEST_PENDING_FINAL_TEST", 2);
 define("CONTEST_TESTING", 10);
-define("CONTEST_FINISHED", 20);	
+define("CONTEST_FINISHED", 20);
 
 function genMoreContestInfo(&$contest) {
 	$contest['start_time_str'] = $contest['start_time'];
@@ -11,7 +11,7 @@ function genMoreContestInfo(&$contest) {
 	$contest['end_time'] = clone $contest['start_time'];
 	$contest['end_time']->add(new DateInterval("PT${contest['last_min']}M"));
 	$contest['end_time_str'] = $contest['end_time']->format('Y-m-d H:i:s');
-	
+
 	if ($contest['status'] == 'unfinished') {
 		if (UOJTime::$time_now < $contest['start_time']) {
 			$contest['cur_progress'] = CONTEST_NOT_STARTED;
@@ -26,37 +26,110 @@ function genMoreContestInfo(&$contest) {
 		$contest['cur_progress'] = CONTEST_FINISHED;
 	}
 	$contest['extra_config'] = json_decode($contest['extra_config'], true);
-	
+
 	if (!isset($contest['extra_config']['standings_version'])) {
 		$contest['extra_config']['standings_version'] = 2;
 	}
 }
 
 function updateContestPlayerNum($contest) {
-	DB::update("update contests set player_num = (select count(*) from contests_registrants where contest_id = {$contest['id']}) where id = {$contest['id']}");
+	DB::update([
+		"update contests",
+		"set", [
+			"player_num" => DB::rawbracket([
+				"select count(*) from contests_registrants",
+				"where", ["contest_id" => $contest['id']]
+			])
+		], "where", ["id" => $contest['id']]
+	]);
 }
 
+// return value: ['problems' => $problems, 'data' => $data, 'people' => $people]
 // problems: pos => id
-// data    : id, submit_time, submitter, problem_pos, score
-// people  : username
-function queryContestData($contest, $config = array(), $is_after_contest_query = false) {
+//
+// for individual competition:
+//	 people  : username, realname
+// for team competition:
+//	 people  : username, null, ['team_name' => team_name, 'members' => members]
+//
+// for OI/IOI contest:
+//	 data	: id, submit_time, submitter, problem_pos, score
+// for ACM contest:
+//	 data	: id, submit_time (plus penalty), submitter, problem_pos, score, cnt, n_failures
+//	 if the contest is not finished, then cnt = null, n_failures = null;
+//	 otherwise, cnt is the total number of submission of this subitter for this problem
+//				(by the time of getting 100, including the first submission with score 100)
+//				n_failures is the number of failure attempts of this submitter for this problem
+function queryContestData($contest, $config = []) {
 	mergeConfig($config, [
-		'pre_final' => false
+		'pre_final' => false,
+		'after_contest' => false,
 	]);
-	
+
 	$problems = [];
 	$prob_pos = [];
 	$n_problems = 0;
-	$result = DB::query("select problem_id from contests_problems where contest_id = {$contest['id']} order by dfn, problem_id");
-	while ($row = DB::fetch($result, MYSQLI_NUM)) {
+	$res = DB::selectAll([
+		"select problem_id from contests_problems",
+		"where", ["contest_id" => $contest['id']],
+		"order by level, problem_id"
+	], DB::NUM);
+	foreach ($res as $row) {
 		$prob_pos[$problems[] = (int)$row[0]] = $n_problems++;
 	}
 
+	if ($contest['extra_config']['basic_rule'] == 'OI' || $contest['extra_config']['basic_rule'] == 'IOI') {
+		$data = queryOIorIOIContestSubmissionData($contest, $problems, $prob_pos, $config);
+	} elseif ($contest['extra_config']['basic_rule'] == 'ACM') {
+		$data = queryACMContestSubmissionData($contest, $problems, $prob_pos, $config);
+	}
+
+	$people = [];
+
+	if ($contest['extra_config']['individual_or_team'] == 'individual') {
+		$people = DB::selectAll([
+			"select contests_registrants.username, user_info.realname from contests_registrants",
+			"inner join user_info on contests_registrants.username = user_info.username",
+			"where", [
+				"contest_id" => $contest['id'],
+				"has_participated" => 1
+			]
+		], DB::NUM);
+	} elseif ($contest['extra_config']['individual_or_team'] == 'team') {
+		$res = DB::selectAll([
+			"select user_info.username, null, user_info.extra from contests_registrants, user_info",
+			"where", [
+				"contest_id" => $contest['id'],
+				"has_participated" => 1,
+				"contests_registrants.username = user_info.username"
+			]
+		], DB::NUM);
+		foreach ($res as $row) {
+			$extra = json_decode($row[2], true);
+			$row[2] = [
+				'team_name' => $extra['acm']['team_name'],
+				'members' => $extra['acm']['members']
+			];
+			$people[] = $row;
+		}
+	}
+
+	return ['problems' => $problems, 'data' => $data, 'people' => $people];
+}
+function queryOIorIOIContestSubmissionData($contest, $problems, $prob_pos, $config = []) {
 	$data = [];
-	if ($config['pre_final']) {
-		$result = DB::query("select id, submit_time, submitter, problem_id, result from submissions"
-				." where contest_id = {$contest['id']} and score is not null order by id");
-		while ($row = DB::fetch($result, MYSQLI_NUM)) {
+
+	$use_final_res = $config['pre_final'] && $contest['extra_config']['basic_rule'] == 'OI';
+
+	if ($use_final_res) {
+		$res = DB::selectAll([
+			"select id, submit_time, submitter, problem_id, result from submissions",
+			"where", [
+				"contest_id" => $contest['id'],
+				["score", "is not", null]
+			], "order by id"
+		], DB::NUM);
+		foreach ($res as $row) {
 			$r = json_decode($row[4], true);
 			if (!isset($r['final_result'])) {
 				continue;
@@ -68,71 +141,233 @@ function queryContestData($contest, $config = array(), $is_after_contest_query =
 		}
 	} else {
 		if ($contest['cur_progress'] < CONTEST_FINISHED) {
-			$result = DB::query("select id, submit_time, submitter, problem_id, score from submissions"
-				." where contest_id = {$contest['id']} and score is not null order by id");
-		} elseif ($is_after_contest_query == true) {
-			$result = DB::query("select id, submit_time, submitter, problem_id, score from submissions order by score");
+			$res = DB::selectAll([
+				"select id, submit_time, submitter, problem_id, score from submissions",
+				"where", [
+					"contest_id" => $contest['id'],
+					["score", "is not", null]
+				], "order by id"
+			], DB::NUM);
+		} elseif ($config['after_contest']) {
+			$res = DB::selectAll([
+				"select id, submit_time, submitter, problem_id, score from submissions",
+				"where", [
+					["problem_id", "in", DB::rawtuple($problems)],
+				], "order by score",
+			], DB::NUM);
 		} else {
-			$result = DB::query("select submission_id, date_add('{$contest['start_time_str']}', interval penalty second),"
-				." submitter, problem_id, score from contests_submissions where contest_id = {$contest['id']}");
+			$esc_start_time_str = DB::escape($contest['start_time_str']);
+			$res = DB::selectAll([
+				"select submission_id, date_add('{$esc_start_time_str}', interval penalty second), submitter, problem_id, score from contests_submissions",
+				"where", ["contest_id" => $contest['id']],
+			], DB::NUM);
 		}
-		while ($row = DB::fetch($result, MYSQLI_NUM)) {
+		foreach ($res as $row) {
 			$row[0] = (int)$row[0];
 			$row[3] = $prob_pos[$row[3]];
 			$row[4] = (int)$row[4];
 			$data[] = $row;
 		}
 	}
-
-	$people = [];
-	$result = DB::query("select a.username, b.realname from contests_registrants a inner join user_info b on a.username = b.username where a.contest_id = {$contest['id']} and a.has_participated = 1");
-	while ($row = DB::fetch($result, MYSQLI_NUM)) {
-		$people[] = $row;
-	}
-
-	return ['problems' => $problems, 'data' => $data, 'people' => $people];
+	return $data;
 }
 
-function calcStandings($contest, $contest_data, &$score, &$standings, $update_contests_submissions = false, $show_reviews = false) {
-	// score: username, problem_pos => score, penalty, id, ?review
-	$score = array();
+function queryACMContestSubmissionData($contest, $problems, $prob_pos, $config = []) {
+	$data = [];
+
+	$username_or_empty = Auth::id();
+	if (!isset($username_or_empty)) {
+		$username_or_empty = '';
+	}
+
+	$actual_score = UOJSubmission::sqlForActualScore();
+	$visible_score = 'if(' . DB::land(['hide_score_to_others' => 1, 'submitter' => $username_or_empty]) . ', hidden_score, score)';
+
+	if ($config['pre_final']) {
+		$res = DB::selectAll([
+			"select id, submit_time, submitter, problem_id, $actual_score as actual_score, null, null from submissions",
+			"where", [
+				"contest_id" => $contest['id'],
+				[$actual_score, "is not", null]
+			], "order by id"
+		], DB::NUM);
+	} else {
+		if ($contest['cur_progress'] < CONTEST_FINISHED) {
+			$res = DB::selectAll([
+				"select id, submit_time, submitter, problem_id, $visible_score as visible_score, null, null from submissions",
+				"where", [
+					"contest_id" => $contest['id'],
+					DB::lor([
+						[$visible_score, "is not", null],
+						DB::land([
+							"hide_score_to_others" => 1,
+							["submitter", "!=", $username_or_empty]
+						])
+					])
+				], "order by id"
+			], DB::NUM);
+		} else {
+			$esc_start_time_str = DB::escape($contest['start_time_str']);
+			$res = DB::selectAll([
+				"select submission_id, date_add('{$esc_start_time_str}', interval penalty second), submitter, problem_id, score, cnt, n_failures from contests_submissions",
+				"where", ["contest_id" => $contest['id']],
+			], DB::NUM);
+		}
+	}
+	foreach ($res as $row) {
+		$row[0] = (int)$row[0];
+		$row[3] = $prob_pos[$row[3]];
+		if (isset($row[4])) {
+			$row[4] = (int)$row[4];
+		}
+		if (isset($row[5])) {
+			$row[5] = (int)$row[5];
+		}
+		if (isset($row[6])) {
+			$row[6] = (int)$row[6];
+		}
+		$data[] = $row;
+	}
+	return $data;
+}
+
+// standings: rank => score, penalty, [username, realname], virtual_rank
+function calcStandings($contest, $contest_data, &$score, &$standings, $cfg = []) {
+	$cfg += [
+		'update_contests_submissions' => false,
+	];
+
+	// score for OI: username, problem_pos => score, penalty, id
+	// score for ACM: username, problem_pos => score, penalty, id, cnt, n_failures, n_frozen
+	$score = [];
 	$n_people = count($contest_data['people']);
 	$n_problems = count($contest_data['problems']);
 	foreach ($contest_data['people'] as $person) {
-		$score[$person[0]] = array();
+		$score[$person[0]] = [];
 	}
-	foreach ($contest_data['data'] as $submission) {
-		$penalty = (new DateTime($submission[1]))->getTimestamp() - $contest['start_time']->getTimestamp();
-		if ($contest['extra_config']['standings_version'] >= 2) {
-			if ($submission[4] == 0) {
-				$penalty = 0;
+
+	if ($contest['extra_config']['basic_rule'] === 'OI') {
+		foreach ($contest_data['data'] as $sub) {
+			$penalty = (new DateTime($sub[1]))->getTimestamp() - $contest['start_time']->getTimestamp();
+			if ($contest['extra_config']['standings_version'] >= 2) {
+				if ($sub[4] == 0) {
+					$penalty = 0;
+				}
 			}
+			$score[$sub[2]][$sub[3]] = array($sub[4], $penalty, $sub[0]);
+		}
+	} else if ($contest['extra_config']['basic_rule'] === 'ACM') {
+		// sub: id, submit_time, submitter, problem_pos, score
+		//	  id, submit_time (plus penalty), submitter, problem_pos, score, cnt, n_failures
+		foreach ($contest_data['data'] as $sub) {
+			if (!isset($score[$sub[2]][$sub[3]])) {
+				$score[$sub[2]][$sub[3]] = [];
+			}
+			$score[$sub[2]][$sub[3]][] = $sub;
 		}
 
-		$score[$submission[2]][$submission[3]] = array($submission[4], $penalty, $submission[0]);
-	}
-
-	if ($show_reviews) {
-		$parsedown = HTML::parsedown();
-		$purifier = HTML::purifier_inline();
-
 		foreach ($contest_data['people'] as $person) {
-			foreach ($contest_data['problems'] as $key => $problem) {
-				$review_result = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = {$problem} and poster = '{$person[0]}'");
+			$uname = $person[0];
+			for ($pr = 0; $pr < $n_problems; $pr++) {
+				if (isset($score[$uname][$pr])) {
+					// username, problem_pos => score, penalty, id, cnt, n_failures, n_frozen
+					$final_scr = null;
+					$penalty = 0;
+					$key_sub = null;
+					$cnt = 0;
+					$n_failures = 0;
+					$n_frozen = 0;
 
-				if (!isset($score[$person[0]][$key])) {
-					$score[$person[0]][$key] = array(0, 0, 0);
-				}
+					if (isset($score[$uname][$pr][0][5])) { // the stored contest data is used
+						$sub = $score[$uname][$pr][0];
+						$final_scr = $sub[4];
+						$penalty = (new DateTime($sub[1]))->getTimestamp() - $contest['start_time']->getTimestamp();
+						$key_sub = $sub;
+						$cnt = $sub[5];
+						$n_failures = $sub[6];
+						$n_frozen = 0;
+					} else {
+						for ($i = 0; $i < count($score[$uname][$pr]); $i++) {
+							$sub = $score[$uname][$pr][$i];
+							$cnt++;
+							if (!isset($sub[4])) {
+								$n_frozen++;
+							} elseif (!isset($final_scr) || $final_scr < $sub[4]) {
+								$final_scr = $sub[4];
+								if ($final_scr == 100) {
+									break;
+								}
+							}
+						}
 
-				if ($review_result['content']) {
-					$score[$person[0]][$key][] = $purifier->purify($parsedown->line($review_result['content']));
+						if (!isset($final_scr)) {
+							$key_sub = end($score[$uname][$pr]);
+						} else if ($final_scr == 0) {
+							for ($i = 0; $i < count($score[$uname][$pr]); $i++) {
+								$sub = $score[$uname][$pr][$i];
+								if (!isset($sub[4])) {
+									break;
+								} else {
+									$n_failures++;
+									$key_sub = $sub;
+								}
+							}
+
+							list($final_scr, $penalty) = calcACMScoreAndPenaltyForOneProblem(
+								$contest,
+								$contest_data['problems'][$pr],
+								$key_sub,
+								$n_failures
+							);
+						} else {
+							$scr_set = [];
+							for ($i = 0; $i < count($score[$uname][$pr]); $i++) {
+								$sub = $score[$uname][$pr][$i];
+								if ($sub[4] > 0 && $sub[4] != 97 && !isset($scr_set[$sub[4]])) {
+									$scr_set[$sub[4]] = true;
+								} else {
+									$n_failures++;
+								}
+								if ($sub[4] === $final_scr) {
+									$key_sub = $sub;
+									break;
+								}
+							}
+
+							list($final_scr, $penalty) = calcACMScoreAndPenaltyForOneProblem(
+								$contest,
+								$contest_data['problems'][$pr],
+								$key_sub,
+								$n_failures
+							);
+						}
+					}
+
+					$score[$uname][$pr] = [
+						$final_scr,
+						$penalty,
+						$key_sub[0],
+						$cnt,
+						$n_failures,
+						$n_frozen
+					];
 				}
+			}
+		}
+	} else if ($contest['extra_config']['basic_rule'] === 'IOI') {
+		foreach ($contest_data['data'] as $sub) {
+			$penalty = (new DateTime($sub[1]))->getTimestamp() - $contest['start_time']->getTimestamp();
+			if ($sub[4] == 0) {
+				$penalty = 0;
+			}
+			if (!isset($score[$sub[2]][$sub[3]]) || $score[$sub[2]][$sub[3]][0] < $sub[4]) {
+				$score[$sub[2]][$sub[3]] = array($sub[4], $penalty, $sub[0]);
 			}
 		}
 	}
 
 	// standings: rank => score, penalty, [username, realname], virtual_rank, ?review
-	$standings = array();
+	$standings = [];
 	foreach ($contest_data['people'] as $person) {
 		$cur = array(0, 0, $person);
 		for ($i = 0; $i < $n_problems; $i++) {
@@ -140,52 +375,71 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $update_co
 				$cur_row = $score[$person[0]][$i];
 				$cur[0] += $cur_row[0];
 				$cur[1] += $cur_row[1];
-				if ($update_contests_submissions) {
-					DB::insert("replace into contests_submissions (contest_id, submitter, problem_id, submission_id, score, penalty) values ({$contest['id']}, '{$person[0]}', {$contest_data['problems'][$i]}, {$cur_row[2]}, {$cur_row[0]}, {$cur_row[1]})");
+				if ($cfg['update_contests_submissions']) {
+					DB::insert([
+						"replace into contests_submissions",
+						"(contest_id, submitter, problem_id, submission_id, score, penalty, cnt, n_failures)",
+						"values", DB::tuple([
+							$contest['id'], $person[0], $contest_data['problems'][$i], $cur_row[2],
+							$cur_row[0], $cur_row[1],
+							isset($cur_row[3]) ? $cur_row[3] : null,
+							isset($cur_row[4]) ? $cur_row[4] : null
+						])
+					]);
 				}
 			}
 		}
-
-		if ($show_reviews) {
-			$review_result = DB::selectFirst("select content from contests_reviews where contest_id = {$contest['id']} and problem_id = -1 and poster = '{$person[0]}'");
-
-			if ($review_result['content']) {
-				$cur[] = $purifier->purify($parsedown->line($review_result['content']));
-			}
-		}
-
 		$standings[] = $cur;
 	}
 
-	usort($standings, function($lhs, $rhs) {
+	usort($standings, function ($lhs, $rhs) {
 		if ($lhs[0] != $rhs[0]) {
 			return $rhs[0] - $lhs[0];
-		} elseif ($lhs[1] != $rhs[1]) {
+		} else if ($lhs[1] != $rhs[1]) {
 			return $lhs[1] - $rhs[1];
 		} else {
 			return strcmp($lhs[2][0], $rhs[2][0]);
 		}
 	});
 
-	$is_same_rank = function($lhs, $rhs) {
+	$is_same_rank = function ($lhs, $rhs) {
 		return $lhs[0] == $rhs[0] && $lhs[1] == $rhs[1];
 	};
 
 	for ($i = 0; $i < $n_people; $i++) {
 		if ($i == 0 || !$is_same_rank($standings[$i - 1], $standings[$i])) {
-			if ($show_reviews && count($standings[$i]) == 4) {
-				$standings[$i][] = $standings[$i][3];
-				$standings[$i][3] = $i + 1;
-			} else {
-				$standings[$i][] = $i + 1;
-			}
+			$standings[$i][] = $i + 1;
 		} else {
-			if ($show_reviews && count($standings[$i]) == 4) {
-				$standings[$i][] = $standings[$i][3];
-				$standings[$i][3] = $standings[$i - 1][3];
-			} else {
-				$standings[$i][] = $standings[$i - 1][3];
-			}
+			$standings[$i][] = $standings[$i - 1][3];
 		}
 	}
+}
+
+function calcACMScoreAndPenaltyForOneProblem($contest, $problem_id, $sub, $n_failures) {
+	if (isset($contest['extra_config']['bonus']["problem_{$problem_id}"])) {
+		if ($sub[4] === 100) {
+			return [0, -60 * 20];
+		} else {
+			return [0, 0];
+		}
+	} else {
+		$penalty = (new DateTime($sub[1]))->getTimestamp() - $contest['start_time']->getTimestamp();
+		$penalty += $n_failures * 60 * 20;
+		if ($sub[4] === 0) {
+			$penalty = 0;
+		}
+		return [$sub[4], $penalty];
+	}
+}
+
+function getContestBlogLink($contest, $title) {
+	if (!isset($contest['extra_config']['links'])) {
+		return null;
+	}
+	foreach ($contest['extra_config']['links'] as $link) {
+		if ($link[0] === $title) {
+			return '/blogs/' . $link[1];
+		}
+	}
+	return null;
 }

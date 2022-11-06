@@ -1,10 +1,6 @@
 <?php
-	if (!Auth::check() && UOJConfig::$data['switch']['force-login']) {
+	if (!Auth::check()) {
 		redirectToLogin();
-	}
-
-	if (!isNormalUser($myUser) && UOJConfig::$data['switch']['force-login']) {
-		become403Page();
 	}
 
 	function handleMsgPost() {
