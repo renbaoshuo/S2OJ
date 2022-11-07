@@ -7,8 +7,57 @@ requirePHPLib('data');
 Auth::check() || redirectToLogin();
 
 if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)) {
+	$default_statement = <<<'EOD'
+<!-- 题目中如有图片，请点击页面顶部的「应用」菜单，打开「图床」，上传至 S2OJ 图床中。 -->
+
+## 题目描述
+
+在此处填写题目描述。
+
+## 输入格式
+
+在此处约定输入数据的格式。
+
+## 输出格式
+
+在此处说明输入数据的格式要求。
+
+## 输入输出样例
+
+### 输入样例 #1
+
+```text
+样例 1 的输入内容
+```
+
+### 输出样例 #1
+
+```text
+样例 1 的输出内容
+```
+
+### 样例解释 #1
+
+样例 1 的解释与说明。
+
+### 样例 #2
+
+<!-- 大样例，如无大样例请删除本节。请根据实际情况修改下方的文件名。 -->
+
+见右侧「附件下载」中的 `ex_data2.in/out`。
+
+## 数据范围与约定
+
+<!-- 请根据实际情况修改下方的数据范围。 -->
+
+- 对于 $50\%$ 的数据，[满足条件（替换此处）]。
+- 对于 $100\%$ 的数据，[满足条件（替换此处）]。
+
+如有，在此处填写其他于题意或数据相关的说明。
+
+EOD;
 	$new_problem_form = new UOJBs4Form('new_problem');
-	$new_problem_form->handle = function () {
+	$new_problem_form->handle = function () use ($default_statement) {
 		DB::insert([
 			"insert into problems",
 			"(title, uploader, is_hidden, submission_requirement)",
@@ -18,7 +67,11 @@ if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUs
 		DB::insert([
 			"insert into problems_contents",
 			"(id, statement, statement_md)",
-			"values", DB::tuple([$id, "", "## 题目描述\n\n## 输入格式\n\n## 输出格式\n\n## 输入输出样例\n\n### 输入样例 #1\n\n<!-- 请将样例用代码块包裹起来 -->\n\n### 输出样例 #1\n\n<!-- 请将样例用代码块包裹起来 -->\n\n### 样例解释 #1\n\n<!--\n后续添加样例时格式类似，如果声明大样例的话可以使用这种格式：\n\n### 样例 #2\n\n见右侧「附件下载」中的 `ex_data2.in/out`。\n\n-->\n\n## 数据范围与约定\n\n<!-- 数据范围与一些其他提示 -->\n"])
+			"values", DB::tuple([
+				$id,
+				HTML::purifier()->purify(HTML::parsedown()->text($default_statement)),
+				$default_statement,
+			])
 		]);
 		dataNewProblem($id);
 	};
