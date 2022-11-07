@@ -543,7 +543,7 @@ $solution_view_type_form->handle = function () {
 	$config = $problem_extra_config;
 	$config['view_solution_type'] = $_POST['view_solution_type'];
 	$config['submit_solution_type'] = $_POST['submit_solution_type'];
-	$esc_config = DB::escape(json_encode($config));
+	$esc_config = json_encode($config);
 
 	DB::update([
 		"update problems",
@@ -919,7 +919,7 @@ $info_form->runAtServer();
 						<label for="time_limit" class="col-sm-5 control-label">time_limit</label>
 						<div class="col-sm-7">
 							<?php $time_limit_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'time_limit', 1) : ""; ?>
-							<input type="number" class="form-control" id="time_limit" name="time_limit" placeholder="时间限制（不能填写小数，默认为 1s）" value="<?= $time_limit_value ?>">
+							<input type="text" class="form-control" id="time_limit" name="time_limit" placeholder="时间限制（默认为 1s）" value="<?= $time_limit_value ?>">
 						</div>
 					</div>
 					<div class="form-group row">

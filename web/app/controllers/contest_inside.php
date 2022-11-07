@@ -259,7 +259,7 @@ if ($cur_tab == 'dashboard') {
 		}
 
 		for ($i = 0; $i < count($contest_problems); $i++) {
-			$content = DB::selectFirst([
+			$content = DB::selectSingle([
 				"select content",
 				"from", "contests_reviews",
 				"where", [
@@ -271,7 +271,7 @@ if ($cur_tab == 'dashboard') {
 			$self_reviews_update_form->addVTextArea(
 				'self_review_update__problem_' . $contest_problems[$i]['problem']->getLetter(),
 				'<b>' . $contest_problems[$i]['problem']->getLetter() . '</b>: ' . $contest_problems[$i]['problem']->info['title'],
-				$content['content'],
+				$content,
 				function ($content) {
 					if (strlen($content) > 200) {
 						return '总结不能超过200字';
@@ -284,7 +284,7 @@ if ($cur_tab == 'dashboard') {
 			);
 		}
 
-		$content = DB::selectFirst([
+		$content = DB::selectSingle([
 			"select content",
 			"from", "contests_reviews",
 			"where", [
@@ -296,7 +296,7 @@ if ($cur_tab == 'dashboard') {
 		$self_reviews_update_form->addVTextArea(
 			'self_review_update__overall',
 			'比赛总结',
-			$content['content'],
+			$content,
 			function ($content) {
 				if (strlen($content) > 200) {
 					return '总结不能超过200字';
@@ -309,27 +309,31 @@ if ($cur_tab == 'dashboard') {
 		);
 
 		$self_reviews_update_form->handle = function () use ($contest, $contest_problems) {
-			global $contest, $contest_problems, $myUser;
-
 			for ($i = 0; $i < count($contest_problems); $i++) {
 				if (isset($_POST['self_review_update__problem_' . $contest_problems[$i]['problem']->getLetter()])) {
-					$esc_content = DB::escape($_POST['self_review_update__problem_' . $contest_problems[$i]['problem']->getLetter()]);
-					$problem_id = $contest_problems[$i]['problem_id'];
-
 					DB::query([
 						"replace into contests_reviews",
 						"(contest_id, problem_id, poster, content)",
-						"values", DB::tuple([$contest['id'], $problem_id, Auth::id(), $esc_content]),
+						"values", DB::tuple([
+							$contest['id'],
+							$contest_problems[$i]['problem_id'],
+							Auth::id(),
+							$_POST['self_review_update__problem_' . $contest_problems[$i]['problem']->getLetter()],
+						]),
 					]);
 				}
 			}
 
 			if (isset($_POST['self_review_update__overall'])) {
-				$esc_content = DB::escape($_POST['self_review_update__overall']);
 				DB::query([
 					"replace into contests_reviews",
 					"(contest_id, problem_id, poster, content)",
-					"values", DB::tuple([$contest['id'], -1, Auth::id(), $esc_content]),
+					"values", DB::tuple([
+						$contest['id'],
+						-1,
+						Auth::id(),
+						$_POST['self_review_update__overall'],
+					]),
 				]);
 			}
 		};
