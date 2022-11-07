@@ -210,9 +210,15 @@ if ($pre_submit_check_ret === true && !$no_more_submission) {
 }
 
 $conf = UOJProblem::cur()->getProblemConf();
+
+if (UOJContest::cur()) {
+	$pageTitle = UOJProblem::cur()->getTitle(['with' => 'letter', 'simplify' => true]);
+} else {
+	$pageTitle = UOJProblem::cur()->getTitle(['with' => 'id']);
+}
 ?>
 
-<?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::problem')) ?>
+<?php echoUOJPageHeader(HTML::stripTags($pageTitle) . ' - ' . UOJLocale::get('problems::problem')) ?>
 
 <div class="row">
 	<!-- Left col -->

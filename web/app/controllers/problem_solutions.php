@@ -120,7 +120,7 @@ $pag_config['tail'] = "order by zan desc, post_time desc, id asc";
 $pag = new Paginator($pag_config);
 ?>
 
-<?php echoUOJPageHeader(UOJLocale::get('problems::solutions') . ' - ' . HTML::stripTags($problem['title'])) ?>
+<?php echoUOJPageHeader(UOJLocale::get('problems::solutions') . ' - ' . HTML::stripTags(UOJProblem::cur()->getTitle(['with' => 'id']))) ?>
 
 <div class="row">
 	<!-- Left col -->
