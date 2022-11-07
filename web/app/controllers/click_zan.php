@@ -21,4 +21,4 @@ if (!ClickZans::canClickZan($_POST['id'], $_POST['type'], Auth::user())) {
 	die('<div class="text-danger">no permission</div>');
 }
 
-die(ClickZans::click($_POST['id'], $_POST['type'], Auth::user(), $_POST['delta'], $_POST['show-text']));
+die(ClickZans::click($_POST['id'], $_POST['type'], Auth::user(), $_POST['delta'], $_POST['show-text'] !== 'false'));
