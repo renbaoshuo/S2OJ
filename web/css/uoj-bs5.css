@@ -453,3 +453,7 @@ form.uoj-bs4-form-compressed button {
 		z-index: 500;
 	}
 }
+
+.CodeMirror-linenumber {
+	font-size: 14px !important;
+}
