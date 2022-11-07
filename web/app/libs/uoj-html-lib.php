@@ -565,7 +565,7 @@ class JudgmentDetailsPrinter {
 
 			if ($this->styler->show_score) {
 				echo 		'<div class="col-sm-2">';
-				echo        '<i class="bi bi-clipboard-check"></i>: ', $subtask_score;
+				echo        '<i class="bi bi-clipboard-check"></i> ', $subtask_score, ' pts';
 				echo 		'</div>';
 				echo 		'<div class="col-sm-2 uoj-status-text">';
 				echo 		$this->styler->getTestInfoIcon($subtask_info);
