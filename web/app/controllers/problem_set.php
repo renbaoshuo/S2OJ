@@ -86,14 +86,9 @@ EOD;
 function getProblemTR($info) {
 	$problem = new UOJProblem($info);
 
-	$html = '<tr class="text-center">';
-	if ($info['submission_id']) {
-		$html .= '<td class="table-success">';
-	} else {
-		$html .= '<td>';
-	}
-	$html .= "#{$info['id']}</td>";
-	$html .= '<td class="text-start">';
+	$html = HTML::tag_begin('tr', ['class' => 'text-center']);
+	$html .= HTML::tag('td', ['class' => $info['submission_id'] ? 'table-success' : ''], "#{$info['id']}");
+	$html .= HTML::tag_begin('td', ['class' => 'text-start']);
 	$html .= $problem->getLink(['with' => 'none']);
 	if ($problem->isUserOwnProblem(Auth::user())) {
 		$html .= ' <span class="badge text-white bg-info">' . UOJLocale::get('problems::my problem') . '</span> ';
@@ -106,7 +101,7 @@ function getProblemTR($info) {
 			$html .= ' <a class="uoj-problem-tag">' . '<span class="badge bg-secondary">' . HTML::escape($tag) . '</span>' . '</a> ';
 		}
 	}
-	$html .= '</td>';
+	$html .= HTML::tag_end('td');
 	if (isset($_COOKIE['show_submit_mode'])) {
 		$perc = $info['submit_num'] > 0 ? round(100 * $info['ac_num'] / $info['submit_num']) : 0;
 		$html .= '<td><a href="/submissions?problem_id=' . $info['id'] . '&min_score=100&max_score=100">&times;' . $info['ac_num'] . '</a></td>';
@@ -119,8 +114,11 @@ function getProblemTR($info) {
 		$html .= '</div>';
 		$html .= '</td>';
 	}
-	$html .= '<td class="text-center">' . ClickZans::getCntBlock($problem->info['zan']) . '</td>';
-	$html .= '</tr>';
+	if (isset($_COOKIE['show_difficulty'])) {
+		$html .= HTML::tag('td', [], $problem->getExtraConfig('difficulty'));
+	}
+	$html .= HTML::tag('td', [], ClickZans::getCntBlock($problem->info['zan']));
+	$html .= HTML::tag_end('tr');
 	return $html;
 }
 
