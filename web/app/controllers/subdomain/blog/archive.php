@@ -64,7 +64,7 @@ $all_tags = DB::selectAll([
 								<tr>
 									<th>标题</th>
 									<th style="width: 20%">发表时间</th>
-									<th class="text-center" style="width: 100px">评价</th>
+									<th class="text-center" style="width: 50px">评价</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -85,7 +85,7 @@ $all_tags = DB::selectAll([
 											<?php endforeach ?>
 										</td>
 										<td><?= $blog->info['post_time'] ?></td>
-										<td><?= ClickZans::getBlock('B', $blog->info['id'], $blog->info['zan'], null, false) ?></td>
+										<td><?= ClickZans::getCntBlock($blog->info['zan']) ?></td>
 									</tr>
 								<?php endforeach ?>
 							</tbody>

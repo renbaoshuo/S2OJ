@@ -347,11 +347,6 @@ pre {
 	font-size: 0.9em;
 }
 
-.uoj-click-zan-block[data-show-text] {
-	min-width: 140px;
-	text-align: left;
-}
-
 .uoj-click-zan-up, .uoj-click-zan-down, .uoj-click-zan-cnt {
 	margin-left: 5px;
 	margin-right: 5px;

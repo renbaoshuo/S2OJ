@@ -107,8 +107,8 @@ class UOJProblem {
 		return false;
 	}
 
-	public function getZanBlock($show_text = true) {
-		return ClickZans::getBlock('P', $this->info['id'], $this->info['zan'], null, $show_text);
+	public function getZanBlock() {
+		return ClickZans::getBlock('P', $this->info['id'], $this->info['zan']);
 	}
 
 	public function getSubmissionRequirement() {

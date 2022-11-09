@@ -379,7 +379,7 @@ if (UOJContest::cur()) {
 				<?php endif ?>
 			</ul>
 			<div class="card-footer bg-transparent">
-				评价：<?= ClickZans::getBlock('P', $problem['id'], $problem['zan']) ?>
+				评价：<?= UOJProblem::cur()->getZanBlock() ?>
 			</div>
 		</div>
 

@@ -239,7 +239,7 @@ $pag = new Paginator($pag_config);
 				<?php endif ?>
 			</ul>
 			<div class="card-footer bg-transparent">
-				评价：<?= ClickZans::getBlock('P', UOJProblem::info('id'), UOJProblem::info('zan')) ?>
+				评价：<?= UOJProblem::cur()->getZanBlock() ?>
 			</div>
 		</div>
 

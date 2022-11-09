@@ -263,13 +263,11 @@ $.fn.uoj_blog_tag = function() {
 // click zan
 function click_zan(zan_id, zan_type, zan_delta, node) {
 	var loading_node = $('<div class="uoj-click-zan-block text-muted">loading...</div>');
-	var show_text = Boolean($(node).data('show-text'));
 	$(node).replaceWith(loading_node);
 	$.post(zan_link + '/click-zan', {
 		id : zan_id,
 		delta : zan_delta,
 		type : zan_type,
-		'show-text': show_text,
 	}, function(ret) {
 		$(loading_node).replaceWith($(ret).click_zan_block());
 	}).fail(function() {
@@ -283,7 +281,6 @@ $.fn.click_zan_block = function() {
 		var type = $(this).data('type');
 		var val = parseInt($(this).data('val'));
 		var cnt = parseInt($(this).data('cnt'));
-		var show_text = Boolean($(this).data('show-text'));
 		if (isNaN(cnt)) {
 			return;
 		}
@@ -315,11 +312,11 @@ $.fn.click_zan_block = function() {
 		}
 
 		var node = this;
-		var up_node = $('<a href="#" class="uoj-click-zan-up">'+up_icon_html+(show_text ? uojLocale('click-zan::good') : '')+'</a>').click(function(e) {
+		var up_node = $('<a href="#" class="uoj-click-zan-up">'+up_icon_html+uojLocale('click-zan::good')+'</a>').click(function(e) {
 			e.preventDefault();
 			click_zan(id, type, 1, node);
 		}).addClass(isBootstrap5Page ? 'text-decoration-none' : '');
-		var down_node = $('<a href="#" class="uoj-click-zan-down">'+down_icon_html+(show_text ? uojLocale('click-zan::bad') : '')+'</a>').click(function(e) {
+		var down_node = $('<a href="#" class="uoj-click-zan-down">'+down_icon_html+uojLocale('click-zan::bad')+'</a>').click(function(e) {
 			e.preventDefault();
 			click_zan(id, type, -1, node);
 		}).addClass(isBootstrap5Page ? 'text-decoration-none' : '');

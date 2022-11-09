@@ -42,7 +42,7 @@ class ClickZans {
 		return $row['val'];
 	}
 
-	public static function click($id, $type, $user, $delta, $show_text = true) {
+	public static function click($id, $type, $user, $delta) {
 		if (!DB::$in_transaction) {
 			return DB::transaction(fn() => ClickZans::click($id, $type, $user, $delta));
 		}
@@ -97,14 +97,14 @@ class ClickZans {
 			$cnt = $row['zan'];
 		}
 		
-		return ClickZans::getBlock($type, $id, $cnt, $cur, $show_text);
+		return ClickZans::getBlock($type, $id, $cnt, $cur);
 	}
 	
-	public static function getBlock($type, $id, $cnt, $val = null, $show_text = true) {
+	public static function getBlock($type, $id, $cnt, $val = null) {
 		if ($val === null) {
 			$val = ClickZans::query($id, $type, Auth::user());
 		}
-		return '<div class="uoj-click-zan-block" data-id="'.$id.'" data-type="'.$type.'" data-val="'.$val.'" data-cnt="'.$cnt.'" data-show-text="'.$show_text.'"></div>';
+		return '<div class="uoj-click-zan-block" data-id="'.$id.'" data-type="'.$type.'" data-val="'.$val.'" data-cnt="'.$cnt.'"></div>';
 	}
 	
 	public static function getCntBlock($cnt) {

@@ -315,7 +315,7 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 				<?php endif ?>
 			</ul>
 			<div class="card-footer bg-transparent">
-				评价：<?= ClickZans::getBlock('P', $problem['id'], $problem['zan']) ?>
+				评价：<?= UOJProblem::cur()->getZanBlock() ?>
 			</div>
 		</div>
 
