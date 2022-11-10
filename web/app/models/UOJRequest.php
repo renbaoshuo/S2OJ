@@ -4,7 +4,7 @@ class UOJRequest {
 	const GET = 'get';
 	const POST = 'post';
 
-	public static function get($name, $val=null, $default=null) {
+	public static function get($name, $val = null, $default = null) {
 		if (!isset($_GET[$name])) {
 			return $default;
 		}
@@ -14,7 +14,7 @@ class UOJRequest {
 		return $_GET[$name];
 	}
 
-	public static function post($name, $val=null, $default=null) {
+	public static function post($name, $val = null, $default = null) {
 		if (!isset($_POST[$name])) {
 			return $default;
 		}
@@ -24,7 +24,7 @@ class UOJRequest {
 		return $_POST[$name];
 	}
 
-	public static function data(string $method, string $name, callable $val=null, $default=null) {
+	public static function data(string $method, string $name, callable $val = null, $default = null) {
 		if ($method == self::GET) {
 			return self::get($name, $val, $default);
 		} elseif ($method == self::POST) {

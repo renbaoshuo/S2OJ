@@ -288,11 +288,11 @@ $pag = new Paginator([
 			$('#input-show_tags_mode').click(function() {
 				if (this.checked) {
 					$.cookie('show_tags_mode', '', {
-						path: '/problems'
+						path: '/'
 					});
 				} else {
 					$.removeCookie('show_tags_mode', {
-						path: '/problems'
+						path: '/'
 					});
 				}
 				location.reload();
@@ -300,11 +300,11 @@ $pag = new Paginator([
 			$('#input-show_submit_mode').click(function() {
 				if (this.checked) {
 					$.cookie('show_submit_mode', '', {
-						path: '/problems'
+						path: '/'
 					});
 				} else {
 					$.removeCookie('show_submit_mode', {
-						path: '/problems'
+						path: '/'
 					});
 				}
 				location.reload();
