@@ -1,94 +1,103 @@
 <?php
-	if (!Auth::check()) {
-		redirectToLogin();
-	}
-	
-	requireLib('bootstrap5');
-	requirePHPLib('form');
-	requirePHPLib('judger');
-	requirePHPLib('data');
+if (!Auth::check()) {
+	redirectToLogin();
+}
 
-	$group_id = $_GET['id'];
-	if (!validateUInt($group_id) || !($group = queryGroup($group_id))) {
-		become404Page();
-	}
+requireLib('bootstrap5');
+requirePHPLib('form');
+requirePHPLib('judger');
+requirePHPLib('data');
 
-	if (!isSuperUser($myUser)) {
-		become403Page();
-	}
+$group_id = $_GET['id'];
+if (!validateUInt($group_id) || !($group = queryGroup($group_id))) {
+	become404Page();
+}
 
-	if (isset($_GET['tab'])) {
-		$cur_tab = $_GET['tab'];
-	} else {
-		$cur_tab = 'profile';
-	}
-	
-	$tabs_info = [
-		'profile' => [
-			'name' => '基本信息',
-			'url' => "/group/{$group['id']}/manage/profile",
-		],
-		'assignments' => [
-			'name' => '作业管理',
-			'url' => "/group/{$group['id']}/manage/assignments",
-		],
-		'users' => [
-			'name' => '用户管理',
-			'url' => "/group/{$group['id']}/manage/users",
-		]
-	];
-	
-	if (!isset($tabs_info[$cur_tab])) {
-		become404Page();
-	}
+if (!isSuperUser($myUser)) {
+	become403Page();
+}
 
-	if ($cur_tab == 'profile') {
-		$update_profile_form = new UOJBs4Form('update_profile');
-		$update_profile_form->addVInput('name', 'text', '名称', $group['title'],
-			function($title, &$vdata) {
-				if ($title == '') {
-					return '名称不能为空';
-				}
-				
-				if (strlen($title) > 100) {
-					return '名称过长';
-				}
+if (isset($_GET['tab'])) {
+	$cur_tab = $_GET['tab'];
+} else {
+	$cur_tab = 'profile';
+}
 
-				$title = HTML::escape($title);
-				if ($title === '') {
-					return '无效编码';
-				}
+$tabs_info = [
+	'profile' => [
+		'name' => '基本信息',
+		'url' => "/group/{$group['id']}/manage/profile",
+	],
+	'assignments' => [
+		'name' => '作业管理',
+		'url' => "/group/{$group['id']}/manage/assignments",
+	],
+	'users' => [
+		'name' => '用户管理',
+		'url' => "/group/{$group['id']}/manage/users",
+	]
+];
 
-				$vdata['title'] = $title;
+if (!isset($tabs_info[$cur_tab])) {
+	become404Page();
+}
 
-				return '';
-			},
-			null
-		);
-		$update_profile_form->addVCheckboxes('is_hidden', [
-				'0' => '公开',
-				'1' => '隐藏',
-			], '可见性', $group['is_hidden']);
-		$update_profile_form->addVTextArea('announcement', '公告', $group['announcement'],
-			function($announcement, &$vdata) {
-				if (strlen($announcement) > 3000) {
-					return '公告过长';
-				}
+if ($cur_tab == 'profile') {
+	$update_profile_form = new UOJBs4Form('update_profile');
+	$update_profile_form->addVInput(
+		'name',
+		'text',
+		'名称',
+		$group['title'],
+		function ($title, &$vdata) {
+			if ($title == '') {
+				return '名称不能为空';
+			}
 
-				$vdata['announcement'] = $announcement;
+			if (strlen($title) > 100) {
+				return '名称过长';
+			}
 
-				return '';
-			}, null);
-		$update_profile_form->handle = function($vdata) use ($group) {
-			$esc_title = DB::escape($vdata['title']);
-			$is_hidden = $_POST['is_hidden'];
-			$esc_announcement = DB::escape($vdata['announcement']);
+			$title = HTML::escape($title);
+			if ($title === '') {
+				return '无效编码';
+			}
 
-			DB::update("UPDATE `groups` SET title = '$esc_title', is_hidden = '$is_hidden', announcement = '$esc_announcement' WHERE id = {$group['id']}");
+			$vdata['title'] = $title;
 
-			dieWithJsonData(['status' => 'success', 'message' => '修改成功']);
-		};
-		$update_profile_form->setAjaxSubmit(<<<EOD
+			return '';
+		},
+		null
+	);
+	$update_profile_form->addVCheckboxes('is_hidden', [
+		'0' => '公开',
+		'1' => '隐藏',
+	], '可见性', $group['is_hidden']);
+	$update_profile_form->addVTextArea(
+		'announcement',
+		'公告',
+		$group['announcement'],
+		function ($announcement, &$vdata) {
+			if (strlen($announcement) > 3000) {
+				return '公告过长';
+			}
+
+			$vdata['announcement'] = $announcement;
+
+			return '';
+		},
+		null
+	);
+	$update_profile_form->handle = function ($vdata) use ($group) {
+		$esc_title = DB::escape($vdata['title']);
+		$is_hidden = $_POST['is_hidden'];
+		$esc_announcement = DB::escape($vdata['announcement']);
+
+		DB::update("UPDATE `groups` SET title = '$esc_title', is_hidden = '$is_hidden', announcement = '$esc_announcement' WHERE id = {$group['id']}");
+
+		dieWithJsonData(['status' => 'success', 'message' => '修改成功']);
+	};
+	$update_profile_form->setAjaxSubmit(<<<EOD
 function(res) {
 	if (res.status === 'success') {
 		$('#result-alert')
@@ -107,79 +116,89 @@ function(res) {
 	$(window).scrollTop(0);
 }
 EOD);
-		$update_profile_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
-		$update_profile_form->submit_button_config['text'] = '更新';
-		$update_profile_form->runAtServer();
-	} elseif ($cur_tab == 'assignments') {
-		if (isset($_POST['submit-remove_assignment']) && $_POST['submit-remove_assignment'] == 'remove_assignment') {
-			$list_id = $_POST['list_id'];
+	$update_profile_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
+	$update_profile_form->submit_button_config['text'] = '更新';
+	$update_profile_form->runAtServer();
+} elseif ($cur_tab == 'assignments') {
+	if (isset($_POST['submit-remove_assignment']) && $_POST['submit-remove_assignment'] == 'remove_assignment') {
+		$list_id = $_POST['list_id'];
 
-			if (!validateUInt($list_id)) {
-				dieWithAlert('题单 ID 不合法。');
-			}
-
-			if (!queryAssignmentByGroupListID($group['id'], $list_id)) {
-				dieWithAlert('该题单不在作业中。');
-			}
-
-			DB::delete("DELETE FROM `groups_assignments` WHERE `list_id` = $list_id AND `group_id` = {$group['id']}");
-
-			dieWithAlert('移除成功！');
+		if (!validateUInt($list_id)) {
+			dieWithAlert('题单 ID 不合法。');
 		}
 
-		$add_new_assignment_form = new UOJBs4Form('add_new_assignment');
-		$add_new_assignment_form->addVInput('new_assignment_list_id', 'text', '题单 ID', '', 
-			function ($list_id, &$vdata) use ($group) {
-				if (!validateUInt($list_id)) {
-					return '题单 ID 不合法';
-				}
+		if (!queryAssignmentByGroupListID($group['id'], $list_id)) {
+			dieWithAlert('该题单不在作业中。');
+		}
 
-				if (!($list = queryProblemList($list_id))) {
-					return '题单不存在';
-				}
+		DB::delete("DELETE FROM `groups_assignments` WHERE `list_id` = $list_id AND `group_id` = {$group['id']}");
 
-				if ($list['is_hidden'] != 0) {
-					return '题单是隐藏的';
-				}
+		dieWithAlert('移除成功！');
+	}
 
-				if (queryAssignmentByGroupListID($group['id'], $list_id)) {
-					return '该题单已经在作业中';
-				}
+	$add_new_assignment_form = new UOJBs4Form('add_new_assignment');
+	$add_new_assignment_form->addVInput(
+		'new_assignment_list_id',
+		'text',
+		'题单 ID',
+		'',
+		function ($list_id, &$vdata) use ($group) {
+			if (!validateUInt($list_id)) {
+				return '题单 ID 不合法';
+			}
 
-				$vdata['list_id'] = $list_id;
+			$list = UOJList::query($list_id);
 
-				return '';
-			},
-			null
-		);
-		$default_end_time = new DateTime();
-		$default_end_time->setTime(22, 30, 0);
-		$default_end_time->add(new DateInterval("P7D"));
-		$add_new_assignment_form->addVInput('new_assignment_end_time', 'text', '截止时间', $default_end_time->format('Y-m-d H:i'), 
-			function ($end_time, &$vdata) {
-				try {
-					$vdata['end_time'] = new DateTime($end_time);
-				} catch (Exception $e) {
-					return '无效时间格式';
-				}
+			if (!$list) {
+				return '题单不存在';
+			}
 
-				return '';
-			},
-			null
-		);
-		$add_new_assignment_form->handle = function(&$vdata) use ($group) {
-			$esc_end_time = DB::escape($vdata['end_time']->format('Y-m-d H:i:s'));
+			if ($list->info['is_hidden']) {
+				return '题单是隐藏的';
+			}
 
-			DB::insert("insert into groups_assignments (group_id, list_id, end_time) values ({$group['id']}, '{$vdata['list_id']}', '{$esc_end_time}')");
+			if (queryAssignmentByGroupListID($group['id'], $list->info['id'])) {
+				return '该题单已经在作业中';
+			}
 
-			dieWithJsonData([
-				'status' => 'success',
-				'message' => '题单 #' . $vdata['list_id'] . ' 已经被添加到作业列表中，结束时间为 ' . $vdata['end_time']->format('Y-m-d H:i:s') . '。'
-			]);
-		};
-		$add_new_assignment_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
-		$add_new_assignment_form->submit_button_config['text'] = '添加';
-		$add_new_assignment_form->setAjaxSubmit(<<<EOD
+			$vdata['list_id'] = $list_id;
+
+			return '';
+		},
+		null
+	);
+	$default_end_time = new DateTime();
+	$default_end_time->setTime(22, 30, 0);
+	$default_end_time->add(new DateInterval("P7D"));
+	$add_new_assignment_form->addVInput(
+		'new_assignment_end_time',
+		'text',
+		'截止时间',
+		$default_end_time->format('Y-m-d H:i'),
+		function ($end_time, &$vdata) {
+			try {
+				$vdata['end_time'] = new DateTime($end_time);
+			} catch (Exception $e) {
+				return '无效时间格式';
+			}
+
+			return '';
+		},
+		null
+	);
+	$add_new_assignment_form->handle = function (&$vdata) use ($group) {
+		$esc_end_time = DB::escape($vdata['end_time']->format('Y-m-d H:i:s'));
+
+		DB::insert("insert into groups_assignments (group_id, list_id, end_time) values ({$group['id']}, '{$vdata['list_id']}', '{$esc_end_time}')");
+
+		dieWithJsonData([
+			'status' => 'success',
+			'message' => '题单 #' . $vdata['list_id'] . ' 已经被添加到作业列表中，结束时间为 ' . $vdata['end_time']->format('Y-m-d H:i:s') . '。'
+		]);
+	};
+	$add_new_assignment_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
+	$add_new_assignment_form->submit_button_config['text'] = '添加';
+	$add_new_assignment_form->setAjaxSubmit(<<<EOD
 function(res) {
 	if (res.status === 'success') {
 		$('#result-alert')
@@ -198,62 +217,66 @@ function(res) {
 	$(window).scrollTop(0);
 }
 EOD);
-		$add_new_assignment_form->runAtServer();
+	$add_new_assignment_form->runAtServer();
 
-		$hidden_time = new DateTime();
-		$hidden_time->sub(new DateInterval('P7D'));
-	} elseif ($cur_tab == 'users') {
-		if (isset($_POST['submit-remove_user']) && $_POST['submit-remove_user'] == 'remove_user') {
-			$username = $_POST['remove_username'];
+	$hidden_time = new DateTime();
+	$hidden_time->sub(new DateInterval('P7D'));
+} elseif ($cur_tab == 'users') {
+	if (isset($_POST['submit-remove_user']) && $_POST['submit-remove_user'] == 'remove_user') {
+		$username = $_POST['remove_username'];
+
+		if (!validateUsername($username)) {
+			dieWithAlert('用户名不合法。');
+		}
+
+		if (!queryUser($username)) {
+			dieWithAlert('用户不存在。');
+		}
+
+		if (!queryUserInGroup($group['id'], $username)) {
+			dieWithAlert('该用户不在小组中。');
+		}
+
+		DB::delete("DELETE FROM `groups_users` WHERE `username` = '$username' AND `group_id` = {$group['id']}");
+
+		dieWithAlert('移除成功！');
+	}
+
+	$add_new_user_form = new UOJBs4Form('add_new_user');
+	$add_new_user_form->addVInput(
+		'new_username',
+		'text',
+		'用户名',
+		'',
+		function ($username, &$vdata) {
+			global $group_id;
 
 			if (!validateUsername($username)) {
-				dieWithAlert('用户名不合法。');
+				return '用户名不合法';
 			}
 
 			if (!queryUser($username)) {
-				dieWithAlert('用户不存在。');
+				return '用户不存在';
 			}
 
-			if (!queryUserInGroup($group['id'], $username)) {
-				dieWithAlert('该用户不在小组中。');
+			if (queryUserInGroup($group_id, $username)) {
+				return '该用户已经在小组中';
 			}
 
-			DB::delete("DELETE FROM `groups_users` WHERE `username` = '$username' AND `group_id` = {$group['id']}");
+			$vdata['username'] = $username;
 
-			dieWithAlert('移除成功！');
-		}
+			return '';
+		},
+		null
+	);
+	$add_new_user_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
+	$add_new_user_form->submit_button_config['text'] = '添加';
+	$add_new_user_form->handle = function (&$vdata) use ($group) {
+		DB::insert("insert into groups_users (group_id, username) values ({$group['id']}, '{$vdata['username']}')");
 
-		$add_new_user_form = new UOJBs4Form('add_new_user');
-		$add_new_user_form->addVInput('new_username', 'text', '用户名', '', 
-			function ($username, &$vdata) {
-				global $group_id;
-
-				if (!validateUsername($username)) {
-					return '用户名不合法';
-				}
-
-				if (!queryUser($username)) {
-					return '用户不存在';
-				}
-
-				if (queryUserInGroup($group_id, $username)) {
-					return '该用户已经在小组中';
-				}
-
-				$vdata['username'] = $username;
-
-				return '';
-			},
-			null
-		);
-		$add_new_user_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
-		$add_new_user_form->submit_button_config['text'] = '添加';
-		$add_new_user_form->handle = function(&$vdata) use ($group) {
-			DB::insert("insert into groups_users (group_id, username) values ({$group['id']}, '{$vdata['username']}')");
-
-			dieWithJsonData(['status' => 'success', 'message' => '已将用户名为 ' . $vdata['username'] . ' 的用户添加到本小组。']);
-		};
-		$add_new_user_form->setAjaxSubmit(<<<EOD
+		dieWithJsonData(['status' => 'success', 'message' => '已将用户名为 ' . $vdata['username'] . ' 的用户添加到本小组。']);
+	};
+	$add_new_user_form->setAjaxSubmit(<<<EOD
 function(res) {
 	if (res.status === 'success') {
 		$('#result-alert')
@@ -272,9 +295,9 @@ function(res) {
 	$(window).scrollTop(0);
 }
 EOD);
-		$add_new_user_form->runAtServer();
-	}
-	?>
+	$add_new_user_form->runAtServer();
+}
+?>
 <?php echoUOJPageHeader('管理 - ' . $group['title']); ?>
 
 <h1 class="d-block d-md-inline-block">
@@ -284,63 +307,60 @@ EOD);
 </h1>
 
 <div class="row mt-4">
-<!-- left col -->
-<div class="col-md-3">
+	<!-- left col -->
+	<div class="col-md-3">
 
-<?= HTML::navListGroup($tabs_info, $cur_tab) ?>
+		<?= HTML::navListGroup($tabs_info, $cur_tab) ?>
 
-<a
-	class="btn btn-light d-block mt-2 w-100 text-start text-primary"
-	style="--bs-btn-hover-bg: #d3d4d570; --bs-btn-hover-border-color: transparent;"
-	href="<?= HTML::url("/group/{$group['id']}") ?>">
-	<i class="bi bi-arrow-left"></i> 返回
-</a>
+		<a class="btn btn-light d-block mt-2 w-100 text-start text-primary" style="--bs-btn-hover-bg: #d3d4d570; --bs-btn-hover-border-color: transparent;" href="<?= HTML::url("/group/{$group['id']}") ?>">
+			<i class="bi bi-arrow-left"></i> 返回
+		</a>
 
-</div>
-<!-- end left col -->
-
-<!-- right col -->
-<div class="col-md-9">
-<?php if ($cur_tab == 'profile'): ?>
-<div class="card mt-3 mt-md-0">
-	<div class="card-body">
-		<div id="result-alert" class="alert" role="alert" style="display: none"></div>
-		<div class="row row-cols-1 row-cols-md-2">
-			<div class="col">
-				<?= $update_profile_form->printHTML() ?>
-			</div>
-			<div class="col">
-				<h5>注意事项</h5>
-				<ul class="mb-0">
-					<li>隐藏的小组无法被普通用户查看，即使该用户属于本小组。</li>
-					<li>公告支持 Markdown 语法，但不支持添加数学公式。</li>
-				</ul>
-			</div>
-		</div>
 	</div>
-</div>
-<?php elseif ($cur_tab == 'assignments'): ?>
-<div class="card mt-3 mt-md-0">
-	<div class="card-header">
-		<ul class="nav nav-tabs card-header-tabs" role="tablist">
-			<li class="nav-item">
-				<a class="nav-link active" href="#assignments" data-bs-toggle="tab" data-bs-target="#assignments">作业列表</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="#add-assignment" data-bs-toggle="tab" data-bs-target="#add-assignment">添加作业</a>
-			</li>
-		</ul>
-	</div>
-	<div class="card-body">
-		<div class="tab-content">
-			<div class="tab-pane active" id="assignments">
-				<?php
-					echoLongTable(
-						['*'],
-						'groups_assignments',
-						"group_id = {$group['id']}",
-						'order by end_time desc, list_id desc',
-						<<<EOD
+	<!-- end left col -->
+
+	<!-- right col -->
+	<div class="col-md-9">
+		<?php if ($cur_tab == 'profile') : ?>
+			<div class="card mt-3 mt-md-0">
+				<div class="card-body">
+					<div id="result-alert" class="alert" role="alert" style="display: none"></div>
+					<div class="row row-cols-1 row-cols-md-2">
+						<div class="col">
+							<?= $update_profile_form->printHTML() ?>
+						</div>
+						<div class="col">
+							<h5>注意事项</h5>
+							<ul class="mb-0">
+								<li>隐藏的小组无法被普通用户查看，即使该用户属于本小组。</li>
+								<li>公告支持 Markdown 语法，但不支持添加数学公式。</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		<?php elseif ($cur_tab == 'assignments') : ?>
+			<div class="card mt-3 mt-md-0">
+				<div class="card-header">
+					<ul class="nav nav-tabs card-header-tabs" role="tablist">
+						<li class="nav-item">
+							<a class="nav-link active" href="#assignments" data-bs-toggle="tab" data-bs-target="#assignments">作业列表</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#add-assignment" data-bs-toggle="tab" data-bs-target="#add-assignment">添加作业</a>
+						</li>
+					</ul>
+				</div>
+				<div class="card-body">
+					<div class="tab-content">
+						<div class="tab-pane active" id="assignments">
+							<?php
+							echoLongTable(
+								['*'],
+								'groups_assignments',
+								"group_id = {$group['id']}",
+								'order by end_time desc, list_id desc',
+								<<<EOD
 	<tr>
 		<th style="width:4em" class="text-center">题单 ID</th>
 		<th style="width:12em">标题</th>
@@ -349,132 +369,132 @@ EOD);
 		<th style="width:8em">操作</th>
 	</tr>
 EOD,
-						function($row) use ($group, $hidden_time) {
-							$list = queryProblemList($row['list_id']);
-							$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['end_time']);
+								function ($row) use ($group, $hidden_time) {
+									$list = UOJList::query($row['list_id']);
+									$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['end_time']);
 
-							echo '<tr>';
-							echo '<td class="text-center">', $list['id'], '</td>';
-							echo '<td>';
-							echo '<a class="text-decoration-none" href="/group/', $group['id'], '/assignment/', $list['id'],'">', HTML::escape($list['title']), '</a>';
-							if ($list['is_hidden']) {
-								echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
-							}
-							echo '</td>';
-							if ($end_time < $hidden_time) {
-								echo '<td class="text-secondary">已隐藏</td>';
-							} elseif ($end_time < UOJTime::$time_now) {
-								echo '<td class="text-danger">已结束</td>';
-							} else {
-								echo '<td class="text-success">进行中</td>';
-							}
-							echo '<td>', $end_time->format('Y-m-d H:i:s'), '</td>';
-							echo '<td>';
-							echo ' <a class="text-decoration-none d-inline-block align-middle" href="/list/', $list['id'], '/edit">编辑</a> ';
-							echo ' <form class="d-inline-block" method="POST" onsubmit=\'return confirm("你真的要移除这份作业（题单 #', $row['id'], '）吗？移除作业不会删除题单。")\'>'
-									. '<input type="hidden" name="_token" value="' . crsf_token() . '">'
-									. '<input type="hidden" name="list_id" value="' . $list['id'] . '">'
-									. '<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-remove_assignment" value="remove_assignment">移除</button>'
-								. '</form>';
-							echo '</td>';
-							echo '</tr>';
-						},
-						[
-							'page_len' => 20,
-							'div_classes' => ['table-responsive'],
-							'table_classes' => ['table', 'align-middle'],
-						]
-					);
-	?>
-			</div>
-			<div class="tab-pane" id="add-assignment">
-				<div id="result-alert" class="alert" role="alert" style="display: none"></div>
-				<div class="row row-cols-1 row-cols-md-2">
-					<div class="col">
-						<?php $add_new_assignment_form->printHTML() ?>
-					</div>
-					<div class="col">
-						<h5>注意事项</h5>
-						<ul class="mt-0">
-							<li>要被添加为作业的题单必须是公开的。</li>
-							<li>请为学生预留合理的完成作业的时间。</li>
-							<li>排行榜将在结束后停止更新。</li>
-							<li>如需延长结束时间请删除后再次添加，排行数据不会丢失。</li>
-							<li>作业结束七天后将会自动在小组主页中隐藏，但仍可直接通过 URL 访问。</li>
-						</ul>
+									echo '<tr>';
+									echo '<td class="text-center">', $list->info['id'], '</td>';
+									echo '<td>';
+									echo '<a class="text-decoration-none" href="/group/', $group['id'], '/assignment/', $list->info['id'], '">', $list->info['title'], '</a>';
+									if ($list->info['is_hidden']) {
+										echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
+									}
+									echo '</td>';
+									if ($end_time < $hidden_time) {
+										echo '<td class="text-secondary">已隐藏</td>';
+									} elseif ($end_time < UOJTime::$time_now) {
+										echo '<td class="text-danger">已结束</td>';
+									} else {
+										echo '<td class="text-success">进行中</td>';
+									}
+									echo '<td>', $end_time->format('Y-m-d H:i:s'), '</td>';
+									echo '<td>';
+									echo ' <a class="text-decoration-none d-inline-block align-middle" href="/list/', $list->info['id'], '/manage">编辑</a> ';
+									echo ' <form class="d-inline-block" method="POST" onsubmit=\'return confirm("你真的要移除这份作业（题单 #', $list->info['id'], '）吗？移除作业不会删除题单。")\'>'
+										. '<input type="hidden" name="_token" value="' . crsf_token() . '">'
+										. '<input type="hidden" name="list_id" value="' . $list->info['id'] . '">'
+										. '<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-remove_assignment" value="remove_assignment">移除</button>'
+										. '</form>';
+									echo '</td>';
+									echo '</tr>';
+								},
+								[
+									'page_len' => 20,
+									'div_classes' => ['table-responsive'],
+									'table_classes' => ['table', 'align-middle'],
+								]
+							);
+							?>
+						</div>
+						<div class="tab-pane" id="add-assignment">
+							<div id="result-alert" class="alert" role="alert" style="display: none"></div>
+							<div class="row row-cols-1 row-cols-md-2">
+								<div class="col">
+									<?php $add_new_assignment_form->printHTML() ?>
+								</div>
+								<div class="col">
+									<h5>注意事项</h5>
+									<ul class="mt-0">
+										<li>要被添加为作业的题单必须是公开的。</li>
+										<li>请为学生预留合理的完成作业的时间。</li>
+										<li>排行榜将在结束后停止更新。</li>
+										<li>如需延长结束时间请删除后再次添加，排行数据不会丢失。</li>
+										<li>作业结束七天后将会自动在小组主页中隐藏，但仍可直接通过 URL 访问。</li>
+									</ul>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	</div>
-</div>
-<?php elseif ($cur_tab == 'users'): ?>
-<div class="card mt-3 mt-md-0">
-	<div class="card-header">
-		<ul class="nav nav-tabs card-header-tabs" role="tablist">
-			<li class="nav-item">
-				<a class="nav-link active" href="#users" data-bs-toggle="tab" data-bs-target="#users">用户列表</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="#add-user" data-bs-toggle="tab" data-bs-target="#add-user">添加用户</a>
-			</li>
-		</ul>
-	</div>
-	<div class="card-body">
-		<div class="tab-content">
-			<div class="tab-pane active" id="users">
-				<?php
-				echoLongTable(
-					['*'],
-					'groups_users',
-					"group_id = {$group['id']}",
-					'order by username asc',
-					<<<EOD
+		<?php elseif ($cur_tab == 'users') : ?>
+			<div class="card mt-3 mt-md-0">
+				<div class="card-header">
+					<ul class="nav nav-tabs card-header-tabs" role="tablist">
+						<li class="nav-item">
+							<a class="nav-link active" href="#users" data-bs-toggle="tab" data-bs-target="#users">用户列表</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#add-user" data-bs-toggle="tab" data-bs-target="#add-user">添加用户</a>
+						</li>
+					</ul>
+				</div>
+				<div class="card-body">
+					<div class="tab-content">
+						<div class="tab-pane active" id="users">
+							<?php
+							echoLongTable(
+								['*'],
+								'groups_users',
+								"group_id = {$group['id']}",
+								'order by username asc',
+								<<<EOD
 				<tr>
 					<th>用户名</th>
 					<th>操作</th>
 				</tr>
 			EOD,
-					function($row) use ($group) {
-						echo '<tr>';
-						echo '<td>', getUserLink($row['username']), '</td>';
-						echo '<td>';
-						echo '<form class="d-inline-block" method="POST" onsubmit=\'return confirm("你真的要从小组中移除这个用户吗？")\'>'
-								. '<input type="hidden" name="_token" value="' . crsf_token() . '">'
-								. '<input type="hidden" name="remove_username" value="' . $row['username'] . '">'
-								. '<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-remove_user" value="remove_user">移除</button>'
-							. '</form>';
-						echo '</td>';
-						echo '</tr>';
-					},
-					[
-						'page_len' => 20,
-						'div_classes' => ['table-responsive'],
-						'table_classes' => ['table', 'align-middle'],
-					]
-				);
-	?>
-			</div>
-			<div class="tab-pane" id="add-user">
-				<div id="result-alert" class="alert" role="alert" style="display: none"></div>
-				<div class="row row-cols-1 row-cols-md-2">
-					<div class="col">
-						<?php $add_new_user_form->printHTML() ?>
-					</div>
-					<div class="col">
-						<h5>注意事项</h5>
-						<ul class="mb-0">
-							<li>添加用户前请确认用户名是否正确以免带来不必要的麻烦。</li>
-							<li>用户被添加到小组后将自动被加入组内的所有作业排行中。</li>
-						</ul>
+								function ($row) use ($group) {
+									echo '<tr>';
+									echo '<td>', getUserLink($row['username']), '</td>';
+									echo '<td>';
+									echo '<form class="d-inline-block" method="POST" onsubmit=\'return confirm("你真的要从小组中移除这个用户吗？")\'>'
+										. '<input type="hidden" name="_token" value="' . crsf_token() . '">'
+										. '<input type="hidden" name="remove_username" value="' . $row['username'] . '">'
+										. '<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-remove_user" value="remove_user">移除</button>'
+										. '</form>';
+									echo '</td>';
+									echo '</tr>';
+								},
+								[
+									'page_len' => 20,
+									'div_classes' => ['table-responsive'],
+									'table_classes' => ['table', 'align-middle'],
+								]
+							);
+							?>
+						</div>
+						<div class="tab-pane" id="add-user">
+							<div id="result-alert" class="alert" role="alert" style="display: none"></div>
+							<div class="row row-cols-1 row-cols-md-2">
+								<div class="col">
+									<?php $add_new_user_form->printHTML() ?>
+								</div>
+								<div class="col">
+									<h5>注意事项</h5>
+									<ul class="mb-0">
+										<li>添加用户前请确认用户名是否正确以免带来不必要的麻烦。</li>
+										<li>用户被添加到小组后将自动被加入组内的所有作业排行中。</li>
+									</ul>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		<?php endif ?>
 	</div>
-</div>
-<?php endif ?>
-</div>
 </div>
 
 <?php echoUOJPageFooter() ?>

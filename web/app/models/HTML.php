@@ -60,7 +60,7 @@ class HTML {
 		return '</' . $name . '>';
 	}
 	public static function tag(string $name, array $attr, $content) {
-		return HTML::tag_begin($name, $attr) . $content . HTML::tag_end($name);
+		return HTML::tag_begin($name, $attr) . (is_array($content) ? implode('', $content) : $content) . HTML::tag_end($name);
 	}
 	public static function empty_tag(string $name, array $attr) {
 		return '<' . $name . HTML::attr($attr) . ' />';

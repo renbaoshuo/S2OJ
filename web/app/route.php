@@ -28,7 +28,7 @@ Route::group(
 
 		Route::any('/lists', '/lists.php');
 		Route::any('/list/{id}', '/list.php');
-		Route::any('/list/{id}/edit(?:/{tab})?', '/list_edit.php');
+		Route::any('/list/{id}/manage(?:/{tab})?', '/list_manage.php');
 
 		Route::any('/contests', '/contests.php');
 		Route::any('/contest/new', '/add_contest.php');
