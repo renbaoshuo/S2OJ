@@ -30,11 +30,17 @@ class UOJProblem {
 		if (!$user) {
 			return false;
 		}
+
 		return DB::selectFirst([
 			DB::lc(), "select 1 from problems_permissions",
 			"where", [
 				'username' => $user['username']
 			], DB::limit(1)
+		]) != null || DB::selectFirst([
+			DB::lc(), "select 1 from problems",
+			"where", [
+				"uploader" => $user['username'],
+			], DB::limit(1),
 		]) != null;
 	}
 

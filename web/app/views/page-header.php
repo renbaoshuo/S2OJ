@@ -313,34 +313,6 @@ if (!isset($ShowPageHeader)) {
 				<?php endif ?>
 
 				<?php uojIncludeView($PageNav, array('REQUIRE_LIB' => $REQUIRE_LIB)) ?>
-
-				<?php if (!isset($REQUIRE_LIB['bootstrap5'])) : ?>
-					<?php if (Auth::check()) : ?>
-						<?php $groups = queryGroupsOfUser(Auth::id()); ?>
-						<?php if (count($groups)) : ?>
-							<div class="card card-default mb-2" id="group-user-announcements">
-								<div class="card-header">
-									小组公告
-								</div>
-								<ul class="list-group list-group-flush">
-									<?php foreach ($groups as $group) : ?>
-										<?php $group_announcement = DB::selectSingle("select announcement from `groups` where id = {$group['id']}"); ?>
-										<li class="list-group-item">
-											<a href="<?= HTML::url('/group/' . $group['id']) ?>">
-												<b><?= $group['title'] ?></b>
-											</a>
-											<?php if ($group_announcement) : ?>
-												<div><?= HTML::purifier_inline()->purify($group_announcement) ?></div>
-											<?php else : ?>
-												<div>（暂无公告）</div>
-											<?php endif ?>
-										</li>
-									<?php endforeach ?>
-								</ul>
-							</div>
-						<?php endif ?>
-					<?php endif ?>
-				<?php endif ?>
 			<?php endif ?>
 
 

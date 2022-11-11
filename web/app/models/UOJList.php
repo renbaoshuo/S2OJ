@@ -22,6 +22,24 @@ class UOJList {
 		$this->info = $info;
 	}
 
+	public function getUri($where = '') {
+		return "/list/{$this->info['id']}{$where}";
+	}
+
+	public function getLink($cfg = []) {
+		$cfg += [
+			'where' => '',
+			'class' => '',
+			'text' => $this->info['title'],
+			'with' => 'id',
+		];
+
+		return HTML::tag('a', [
+			'href' => $this->getUri($cfg['where']),
+			'class' => $cfg['class'],
+		], $cfg['text']);
+	}
+
 	public function getProblemIDs() {
 		return array_map(fn ($x) => $x['problem_id'], DB::selectAll([
 			DB::lc(), "select problem_id from lists_problems",

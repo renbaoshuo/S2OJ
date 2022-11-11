@@ -11,23 +11,13 @@ if (!validateUInt($group_id)) {
 	become404Page();
 }
 
-UOJList::init(UOJRequest::get('list_id')) || UOJResponse::page404();
-
-$assignment = queryAssignmentByGroupListID($group_id, UOJList::info('id'));
-
-if (!$assignment) {
-	become404Page();
-}
-
-$group = queryGroup($assignment['group_id']);
-$list = UOJList::info();
-
-if (($group['is_hidden'] || $list['is_hidden']) && !isSuperUser($myUser)) {
-	become403Page();
-}
+UOJGroup::init(UOJRequest::get('id')) || UOJResponse::page404();
+UOJGroupAssignment::init(UOJRequest::get('list_id')) || UOJResponse::page404();
+UOJGroupAssignment::cur()->valid() || UOJResponse::page404();
+UOJGroupAssignment::cur()->userCanView(['ensure' => true]);
 ?>
 
-<?php echoUOJPageHeader(UOJLocale::get('assignments')) ?>
+<?php echoUOJPageHeader(UOJLocale::get('assignments') . ' ' . UOJGroupAssignment::info('title')) ?>
 
 <div class="row">
 	<!-- left col -->
@@ -36,48 +26,48 @@ if (($group['is_hidden'] || $list['is_hidden']) && !isSuperUser($myUser)) {
 			<small class="fs-4">作业：</small><?= UOJList::info('title') ?>
 		</h1>
 		<ul class="mt-3">
-			<li>对应题单：<a class="text-decoration-none" href="<?= HTML::url('/list/' . UOJList::info('id')) ?>">#<?= UOJList::info('id') ?></a></li>
-			<li>所属小组：<a class="text-decoration-none" href="<?= HTML::url('/group/' . $group['id']) ?>"><?= $group['title'] ?></a></li>
-			<li>结束时间：<?= $assignment['end_time'] ?></li>
+			<li>对应题单：<a href="<?= HTML::url('/list/' . UOJGroupAssignment::info('id')) ?>">#<?= UOJGroupAssignment::info('id') ?></a></li>
+			<li>所属小组：<?= UOJGroup::cur()->getLink() ?>
+			<li>结束时间：<?= UOJGroupAssignment::info('end_time_str') ?></li>
 		</ul>
 
 		<?php
-		$problems = UOJList::cur()->getProblemIDs();
-		$users = queryGroupUsers($group['id']);
-		$usernames = [];
+		$problems = UOJGroupAssignment::cur()->getProblemIDs();
+		$usernames = UOJGroup::cur()->getUsernames();
 		$n_users = count($users);
-		$submission_end_time = min(new DateTime(), DateTime::createFromFormat('Y-m-d H:i:s', $assignment['end_time']));
+		$submission_end_time = min(new DateTime(), UOJGroupAssignment::info('end_time'));
 
-		foreach ($users as $user) {
-			$usernames[] = $user['username'];
-		}
-
-		// standings: rank => [total_score, user => [username, realname], scores[]]
+		// standings: rank => [total_score, [username, realname], scores[]]
 		$standings = [];
 
 		foreach ($usernames as $username) {
 			$user = UOJUser::query($username);
-			$row = ['total_score' => 0];
-			$scores = [];
+			$row = [0, [$user['username'], $user['realname']], []];
 
-			$row['user'] = [
-				'username' => $user['username'],
-				'realname' => $user['realname'],
-			];
-
-			$cond = "submitter = '{$user['username']}' AND unix_timestamp(submit_time) <= " . $submission_end_time->getTimestamp();
+			$conds = DB::land([
+				"submitter" => $user['username'],
+				["unix_timestamp(submit_time)", "<=", $submission_end_time->getTimestamp()],
+			]);
 
 			foreach ($problems as $problem_id) {
-				$submission = DB::selectFirst("SELECT id, score FROM submissions WHERE problem_id = $problem_id AND $cond ORDER BY score DESC, id DESC");
+				$submission = DB::selectFirst([
+					"select", DB::fields(["id", "score"]),
+					"from submissions",
+					"where", [
+						"problem_id" => $problem_id,
+						$conds,
+					],
+					"order by score desc, id desc",
+				]);
 
 				if ($submission) {
-					$row['scores'][] = [
-						'submission_id' => (int)$submission['id'],
-						'score' => (int)$submission['score'],
+					$row[2][] = [
+						(int)$submission['id'],
+						(int)$submission['score'],
 					];
-					$row['total_score'] += $submission['score'];
+					$row[0] += $submission['score'];
 				} else {
-					$row['scores'][] = null;
+					$row[2][] = null;
 				}
 			}
 
@@ -85,11 +75,11 @@ if (($group['is_hidden'] || $list['is_hidden']) && !isSuperUser($myUser)) {
 		}
 
 		usort($standings, function ($lhs, $rhs) {
-			if ($lhs['total_score'] != $rhs['total_score']) {
-				return $rhs['total_score'] - $lhs['total_score'];
+			if ($lhs[0] != $rhs[0]) {
+				return $rhs[0] - $lhs[0];
 			}
 
-			return strcmp($lhs['user']['username'], $rhs['user']['username']);
+			return strcmp($lhs[1][0], $rhs[1][0]);
 		});
 		?>
 
@@ -112,26 +102,26 @@ if (($group['is_hidden'] || $list['is_hidden']) && !isSuperUser($myUser)) {
 				function(row) {
 					var col_tr = '';
 
-					if (row['total_score'] == problems.length * 100) {
+					if (row[0] == problems.length * 100) {
 						col_tr += '<tr class="table-success">';
 					} else {
 						col_tr += '<tr>';
 					}
 
-					col_tr += '<td>' + getUserLink(row['user']['username'], row['user']['realname']) + '</td>';
+					col_tr += '<td>' + getUserLink(row[1][0], row[1][1]) + '</td>';
 					col_tr += '<td>' +
-						'<span class="uoj-score" data-max="' + (problems.length * 100) + '" style="color:' + getColOfScore(row['total_score'] / problems.length) + '">' + row['total_score'] + '</span>' +
+						'<span class="uoj-score" data-max="' + (problems.length * 100) + '" style="color:' + getColOfScore(row[0] / problems.length) + '">' + row[0] + '</span>' +
 						'</td>';
-					for (var i = 0; i < row['scores'].length; i++) {
-						var col = row['scores'][i];
+					for (var i = 0; i < row[2].length; i++) {
+						var col = row[2][i];
 
 						if (col) {
-							if (col['score'] == 100) {
+							if (col[1] == 100) {
 								col_tr += '<td class="table-success">';
 							} else {
 								col_tr += '<td>';
 							}
-							col_tr += '<a class="text-decoration-none uoj-score" href="/submission/' + col['submission_id'] + '" style="color:' + getColOfScore(col['score']) + '">' + col['score'] + '</a>';
+							col_tr += '<a class="text-decoration-none uoj-score" href="/submission/' + col[0] + '" style="color:' + getColOfScore(col[1]) + '">' + col[1] + '</a>';
 							col_tr += '</td>';
 						} else {
 							col_tr += '<td></td>';

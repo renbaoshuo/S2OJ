@@ -48,15 +48,12 @@ if ($is_manager) {
 		'小组 ID',
 		'',
 		function ($group_id, &$vdata) {
-			if (!validateUInt($group_id)) {
-				return '小组 ID 不合法';
-			}
-			$group = queryGroup($group_id);
+			$group = UOJGroup::query($group_id);
 			if (!$group) {
 				return '小组不存在';
 			}
 
-			$vdata['group_id'] = $group_id;
+			$vdata['group'] = $group;
 
 			return '';
 		},
@@ -65,9 +62,11 @@ if ($is_manager) {
 	$add_group_to_contest_form->submit_button_config['align'] = 'compressed';
 	$add_group_to_contest_form->submit_button_config['text'] = '注册该小组中的用户';
 	$add_group_to_contest_form->handle = function (&$vdata) {
-		$users = queryGroupUsers($vdata['group_id']);
+		$usernames = $vdata['group']->getUsernames();
 
-		foreach ($users as $user) {
+		foreach ($usernames as $username) {
+			$user = UOJUser::query($username);
+
 			UOJContest::cur()->userRegister($user);
 		}
 	};
@@ -177,7 +176,8 @@ if ($contest['cur_progress'] == CONTEST_NOT_STARTED) {
 <?php endif ?>
 
 <?php
-$header_row = '<tr><th>#</th><th>' . UOJLocale::get('username') . '</th>';
+$header_row = '<tr>';
+$header_row .= '<th>#</th><th>' . UOJLocale::get('username') . '</th>';
 if ($show_ip) {
 	$header_row .= '<th>remote_addr</th><th>http_x_forwarded_for</th>';
 }

@@ -23,26 +23,30 @@ if (isSuperUser($myUser)) {
 function getListTR($info) {
 	$list = new UOJList($info);
 	$problems = $list->getProblemIDs();
-	$accepted = DB::selectCount([
-		"select count(*)",
-		"from best_ac_submissions",
-		"where", [
-			"submitter" => Auth::id(),
-			["problem_id", "in", DB::tuple($problems)],
-		],
-	]);
+	if (Auth::check() && !empty($problems)) {
+		$accepted = DB::selectCount([
+			"select count(*)",
+			"from best_ac_submissions",
+			"where", [
+				"submitter" => Auth::id(),
+				["problem_id", "in", DB::rawtuple($problems)],
+			],
+		]);
+	} else {
+		$accepted = -1;
+	}
 
 	$html = HTML::tag_begin('tr', ['class' => 'text-center']);
 	$html .= HTML::tag('td', ['class' => $accepted == count($problems) ? 'table-success' : ''], "#{$list->info['id']}");
 	$html .= HTML::tag_begin('td', ['class' => 'text-start']);
-	$html .= HTML::tag('a', ['href' => "/list/{$list->info['id']}"], $list->info['title']);
+	$html .= $list->getLink();
 	if ($list->info['is_hidden']) {
 		$html .= ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span> ';
 	}
 	foreach ($list->queryTags() as $tag) {
 		$html .= ' <a class="uoj-list-tag"><span class="badge text-bg-secondary">' . $tag['tag'] . '</span></a> ';
 	}
-	$html .= HTML::tag('td', [], $accepted);
+	$html .= HTML::tag('td', [], max(0, $accepted));
 	$html .= HTML::tag('td', [], count($problems));
 	$html .= HTML::tag_end('td');
 

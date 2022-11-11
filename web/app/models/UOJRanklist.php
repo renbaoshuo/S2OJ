@@ -5,9 +5,21 @@ class UOJRanklist {
 		$cfg += [
 			'top10' => false,
 			'card' => false,
+			'group_id' => null,
+			'page_len' => 50,
 		];
 
-		$conds = '1';
+		$conds = [];
+
+		if ($cfg['group_id']) {
+			$conds[] = [
+				"username", "in", DB::rawtuple(UOJGroup::query($cfg['group_id'])->getUsernames()),
+			];
+		}
+
+		if (empty($conds)) {
+			$conds = '1';
+		}
 
 		$last_user = null;
 		$parsedown = HTML::parsedown();
@@ -55,7 +67,6 @@ class UOJRanklist {
 			$last_user = $user;
 		};
 
-
 		$pag_config = [
 			'get_row_index' => '',
 			'table_name' => 'user_info',
@@ -68,7 +79,7 @@ class UOJRanklist {
 			$pag_config['tail'] .= ' limit 10';
 			$pag_config['echo_full'] = '';
 		} else {
-			$pag_config['page_len'] = 50;
+			$pag_config['page_len'] = $cfg['page_len'];
 		}
 
 		$pag = new Paginator($pag_config);
@@ -102,9 +113,21 @@ class UOJRanklist {
 	public static function printTableHTML($cfg = []) {
 		$cfg += [
 			'top10' => false,
+			'group_id' => null,
+			'page_len' => 100,
 		];
 
-		$conds = '1';
+		$conds = [];
+
+		if ($cfg['group_id']) {
+			$conds[] = [
+				"username", "in", DB::rawtuple(UOJGroup::query($cfg['group_id'])->getUsernames()),
+			];
+		}
+
+		if (empty($conds)) {
+			$conds = '1';
+		}
 
 		$header_row = '';
 		$header_row .= '<tr>';
@@ -157,7 +180,7 @@ class UOJRanklist {
 			$tail .= ' limit 10';
 			$table_config['echo_full'] = '';
 		} else {
-			$table_config['page_len'] = 100;
+			$table_config['page_len'] = $cfg['page_len'];
 		}
 
 		echoLongTable($col_names, 'user_info', $conds, $tail, $header_row, $print_row, $table_config);

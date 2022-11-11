@@ -17,6 +17,34 @@ class UOJContest {
 		return new UOJContest($info);
 	}
 
+	public static function queryUpcomingContestIds(array $user = null, $limit = -1) {
+		return array_map(fn ($x) => $x['id'], DB::selectAll([
+			"select id from contests",
+			"where", [
+				"status" => "unfinished",
+			],
+			"order by start_time asc, id asc",
+			$limit == -1 ? "" : DB::limit($limit),
+		]));
+	}
+
+	public static function userCanManageSomeContest(array $user = null) {
+		if (!$user) {
+			return false;
+		}
+
+		if (isSuperUser($user)) {
+			return true;
+		}
+
+		return DB::selectFirst([
+			DB::lc(), "select 1 from contests_permissions",
+			"where", [
+				'username' => $user['username']
+			], DB::limit(1)
+		]) != null;
+	}
+
 	public static function finalTest() {
 		$contest = self::info();
 
@@ -434,6 +462,15 @@ class UOJContest {
 
 	public function getUri($where = '') {
 		return "/contest/{$this->info['id']}{$where}";
+	}
+
+	public function getLink($cfg = []) {
+		$cfg += [
+			'where' => '',
+			'class' => '',
+		];
+
+		return HTML::tag('a', ['class' => $cfg['class'], 'href' => $this->getUri($cfg['where'])], $this->info['name']);
 	}
 
 	public function redirectToAnnouncementBlog() {

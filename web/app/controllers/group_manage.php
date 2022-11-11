@@ -1,45 +1,33 @@
 <?php
-if (!Auth::check()) {
-	redirectToLogin();
-}
 
 requireLib('bootstrap5');
 requirePHPLib('form');
 requirePHPLib('judger');
 requirePHPLib('data');
 
-$group_id = $_GET['id'];
-if (!validateUInt($group_id) || !($group = queryGroup($group_id))) {
-	become404Page();
-}
+Auth::check() || redirectToLogin();
+UOJGroup::init(UOJRequest::get('id')) || UOJResponse::page404();
+UOJGroup::cur()->userCanManage(Auth::user()) || UOJResponse::page403();
 
-if (!isSuperUser($myUser)) {
-	become403Page();
-}
-
-if (isset($_GET['tab'])) {
-	$cur_tab = $_GET['tab'];
-} else {
-	$cur_tab = 'profile';
-}
+$cur_tab = UOJRequest::get('tab', 'is_string', 'profile');
 
 $tabs_info = [
 	'profile' => [
 		'name' => '基本信息',
-		'url' => "/group/{$group['id']}/manage/profile",
+		'url' => '/group/' . UOJGroup::info('id') . '/manage/profile',
 	],
 	'assignments' => [
 		'name' => '作业管理',
-		'url' => "/group/{$group['id']}/manage/assignments",
+		'url' => '/group/' . UOJGroup::info('id') . '/manage/assignments',
 	],
 	'users' => [
 		'name' => '用户管理',
-		'url' => "/group/{$group['id']}/manage/users",
+		'url' => '/group/' . UOJGroup::info('id') . '/manage/users',
 	]
 ];
 
 if (!isset($tabs_info[$cur_tab])) {
-	become404Page();
+	UOJResponse::page404();
 }
 
 if ($cur_tab == 'profile') {
@@ -48,7 +36,7 @@ if ($cur_tab == 'profile') {
 		'name',
 		'text',
 		'名称',
-		$group['title'],
+		UOJGroup::info('title'),
 		function ($title, &$vdata) {
 			if ($title == '') {
 				return '名称不能为空';
@@ -72,11 +60,11 @@ if ($cur_tab == 'profile') {
 	$update_profile_form->addVCheckboxes('is_hidden', [
 		'0' => '公开',
 		'1' => '隐藏',
-	], '可见性', $group['is_hidden']);
+	], '可见性', UOJGroup::info('is_hidden'));
 	$update_profile_form->addVTextArea(
 		'announcement',
 		'公告',
-		$group['announcement'],
+		UOJGroup::info('announcement'),
 		function ($announcement, &$vdata) {
 			if (strlen($announcement) > 3000) {
 				return '公告过长';
@@ -88,12 +76,18 @@ if ($cur_tab == 'profile') {
 		},
 		null
 	);
-	$update_profile_form->handle = function ($vdata) use ($group) {
-		$esc_title = DB::escape($vdata['title']);
-		$is_hidden = $_POST['is_hidden'];
-		$esc_announcement = DB::escape($vdata['announcement']);
-
-		DB::update("UPDATE `groups` SET title = '$esc_title', is_hidden = '$is_hidden', announcement = '$esc_announcement' WHERE id = {$group['id']}");
+	$update_profile_form->handle = function ($vdata) {
+		DB::update([
+			"update `groups`",
+			"set", [
+				"title" => $vdata['title'],
+				"is_hidden" => $_POST['is_hidden'],
+				"announcement" => $vdata['announcement'],
+			],
+			"where", [
+				"id" => UOJGroup::info('id'),
+			],
+		]);
 
 		dieWithJsonData(['status' => 'success', 'message' => '修改成功']);
 	};
@@ -121,17 +115,20 @@ EOD);
 	$update_profile_form->runAtServer();
 } elseif ($cur_tab == 'assignments') {
 	if (isset($_POST['submit-remove_assignment']) && $_POST['submit-remove_assignment'] == 'remove_assignment') {
-		$list_id = $_POST['list_id'];
+		$list_id = UOJRequest::post('list_id');
 
-		if (!validateUInt($list_id)) {
-			dieWithAlert('题单 ID 不合法。');
+		$list = UOJGroupAssignment::query($list_id);
+		if (!$list || !$list->valid()) {
+			dieWithAlert('题单不合法。');
 		}
 
-		if (!queryAssignmentByGroupListID($group['id'], $list_id)) {
-			dieWithAlert('该题单不在作业中。');
-		}
-
-		DB::delete("DELETE FROM `groups_assignments` WHERE `list_id` = $list_id AND `group_id` = {$group['id']}");
+		DB::delete([
+			"delete from groups_assignments",
+			"where", [
+				"list_id" => $list->info['id'],
+				"group_id" => UOJGroup::info('id'),
+			],
+		]);
 
 		dieWithAlert('移除成功！');
 	}
@@ -142,7 +139,7 @@ EOD);
 		'text',
 		'题单 ID',
 		'',
-		function ($list_id, &$vdata) use ($group) {
+		function ($list_id, &$vdata) {
 			if (!validateUInt($list_id)) {
 				return '题单 ID 不合法';
 			}
@@ -157,7 +154,7 @@ EOD);
 				return '题单是隐藏的';
 			}
 
-			if (queryAssignmentByGroupListID($group['id'], $list->info['id'])) {
+			if (UOJGroup::cur()->hasAssignment($list)) {
 				return '该题单已经在作业中';
 			}
 
@@ -186,10 +183,16 @@ EOD);
 		},
 		null
 	);
-	$add_new_assignment_form->handle = function (&$vdata) use ($group) {
-		$esc_end_time = DB::escape($vdata['end_time']->format('Y-m-d H:i:s'));
-
-		DB::insert("insert into groups_assignments (group_id, list_id, end_time) values ({$group['id']}, '{$vdata['list_id']}', '{$esc_end_time}')");
+	$add_new_assignment_form->handle = function (&$vdata) {
+		DB::insert([
+			"insert into groups_assignments",
+			DB::bracketed_fields(["group_id", "list_id", "end_time"]),
+			"values", DB::tuple([
+				UOJGroup::info('id'),
+				$vdata['list_id'],
+				$vdata['end_time']->format('Y-m-d H:i:s'),
+			]),
+		]);
 
 		dieWithJsonData([
 			'status' => 'success',
@@ -220,24 +223,26 @@ EOD);
 	$add_new_assignment_form->runAtServer();
 
 	$hidden_time = new DateTime();
-	$hidden_time->sub(new DateInterval('P7D'));
+	$hidden_time->sub(new DateInterval('P3D'));
 } elseif ($cur_tab == 'users') {
 	if (isset($_POST['submit-remove_user']) && $_POST['submit-remove_user'] == 'remove_user') {
-		$username = $_POST['remove_username'];
+		$user = UOJUser::query(UOJRequest::post('remove_username'));
 
-		if (!validateUsername($username)) {
-			dieWithAlert('用户名不合法。');
-		}
-
-		if (!queryUser($username)) {
+		if (!$user) {
 			dieWithAlert('用户不存在。');
 		}
 
-		if (!queryUserInGroup($group['id'], $username)) {
+		if (!UOJGroup::cur()->hasUser($user)) {
 			dieWithAlert('该用户不在小组中。');
 		}
 
-		DB::delete("DELETE FROM `groups_users` WHERE `username` = '$username' AND `group_id` = {$group['id']}");
+		DB::delete([
+			"delete from groups_users",
+			"where", [
+				"username" => $user['username'],
+				"group_id" => UOJGroup::info('id'),
+			],
+		]);
 
 		dieWithAlert('移除成功！');
 	}
@@ -249,21 +254,17 @@ EOD);
 		'用户名',
 		'',
 		function ($username, &$vdata) {
-			global $group_id;
+			$user = UOJUser::query($username);
 
-			if (!validateUsername($username)) {
-				return '用户名不合法';
+			if (!$user) {
+				return '用户不存在。';
 			}
 
-			if (!queryUser($username)) {
-				return '用户不存在';
-			}
-
-			if (queryUserInGroup($group_id, $username)) {
+			if (UOJGroup::cur()->hasUser($user)) {
 				return '该用户已经在小组中';
 			}
 
-			$vdata['username'] = $username;
+			$vdata['username'] = $user['username'];
 
 			return '';
 		},
@@ -271,8 +272,16 @@ EOD);
 	);
 	$add_new_user_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
 	$add_new_user_form->submit_button_config['text'] = '添加';
-	$add_new_user_form->handle = function (&$vdata) use ($group) {
-		DB::insert("insert into groups_users (group_id, username) values ({$group['id']}, '{$vdata['username']}')");
+	$add_new_user_form->handle = function (&$vdata) {
+		DB::insert([
+			"insert into groups_users",
+			DB::bracketed_fields(["group_id", "username"]),
+			"values",
+			DB::tuple([
+				UOJGroup::info('id'),
+				$vdata['username']
+			]),
+		]);
 
 		dieWithJsonData(['status' => 'success', 'message' => '已将用户名为 ' . $vdata['username'] . ' 的用户添加到本小组。']);
 	};
@@ -298,24 +307,25 @@ EOD);
 	$add_new_user_form->runAtServer();
 }
 ?>
-<?php echoUOJPageHeader('管理 - ' . $group['title']); ?>
+<?php echoUOJPageHeader('管理 - ' . UOJGroup::info('title')); ?>
 
 <h1 class="d-block d-md-inline-block">
-	<?= $group['title'] ?>
-	<small class="fs-5">(ID: #<?= $group['id'] ?>)</small>
+	<?= UOJGroup::info('title') ?>
+	<small class="fs-5">(ID: #<?= UOJGroup::info('id') ?>)</small>
 	管理
 </h1>
 
 <div class="row mt-4">
 	<!-- left col -->
 	<div class="col-md-3">
-
 		<?= HTML::navListGroup($tabs_info, $cur_tab) ?>
 
-		<a class="btn btn-light d-block mt-2 w-100 text-start text-primary" style="--bs-btn-hover-bg: #d3d4d570; --bs-btn-hover-border-color: transparent;" href="<?= HTML::url("/group/{$group['id']}") ?>">
-			<i class="bi bi-arrow-left"></i> 返回
-		</a>
-
+		<?=
+		UOJGroup::cur()->getLink([
+			'class' => 'btn btn-light d-block mt-2 w-100 text-start text-primary uoj-back-btn',
+			'text' => '<i class="bi bi-arrow-left"></i> 返回',
+		]);
+		?>
 	</div>
 	<!-- end left col -->
 
@@ -358,42 +368,41 @@ EOD);
 							echoLongTable(
 								['*'],
 								'groups_assignments',
-								"group_id = {$group['id']}",
+								["group_id" => UOJGroup::info('id')],
 								'order by end_time desc, list_id desc',
 								<<<EOD
-	<tr>
-		<th style="width:4em" class="text-center">题单 ID</th>
-		<th style="width:12em">标题</th>
-		<th style="width:4em">状态</th>
-		<th style="width:8em">结束时间</th>
-		<th style="width:8em">操作</th>
-	</tr>
-EOD,
-								function ($row) use ($group, $hidden_time) {
-									$list = UOJList::query($row['list_id']);
-									$end_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['end_time']);
+									<tr>
+										<th style="width:4em" class="text-center">题单 ID</th>
+										<th style="width:12em">标题</th>
+										<th style="width:4em">状态</th>
+										<th style="width:8em">结束时间</th>
+										<th style="width:8em">操作</th>
+									</tr>
+								EOD,
+								function ($row) use ($hidden_time) {
+									$assignment = UOJGroupAssignment::query($row['list_id']);
 
-									echo '<tr>';
-									echo '<td class="text-center">', $list->info['id'], '</td>';
-									echo '<td>';
-									echo '<a class="text-decoration-none" href="/group/', $group['id'], '/assignment/', $list->info['id'], '">', $list->info['title'], '</a>';
-									if ($list->info['is_hidden']) {
+									echo HTML::tag_begin('tr');
+									echo HTML::tag('td', ['class' => 'text-center'], $assignment->info['id']);
+									echo HTML::tag_begin('td');
+									echo $assignment->getLink();
+									if ($assignment->info['is_hidden']) {
 										echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
 									}
-									echo '</td>';
-									if ($end_time < $hidden_time) {
-										echo '<td class="text-secondary">已隐藏</td>';
-									} elseif ($end_time < UOJTime::$time_now) {
-										echo '<td class="text-danger">已结束</td>';
+									echo HTML::tag_end('td');
+									if ($assignment->info['end_time'] < $hidden_time) {
+										echo HTML::tag('td', ['class' => 'text-secondary'], '已隐藏');
+									} elseif ($assignment->info['end_time'] < UOJTime::$time_now) {
+										echo HTML::tag('td', ['class' => 'text-danger'], '已结束');
 									} else {
-										echo '<td class="text-success">进行中</td>';
+										echo HTML::tag('td', ['class' => 'text-success'], '进行中');
 									}
-									echo '<td>', $end_time->format('Y-m-d H:i:s'), '</td>';
+									echo HTML::tag('td', [], $assignment->info['end_time_str']);
 									echo '<td>';
-									echo ' <a class="text-decoration-none d-inline-block align-middle" href="/list/', $list->info['id'], '/manage">编辑</a> ';
-									echo ' <form class="d-inline-block" method="POST" onsubmit=\'return confirm("你真的要移除这份作业（题单 #', $list->info['id'], '）吗？移除作业不会删除题单。")\'>'
-										. '<input type="hidden" name="_token" value="' . crsf_token() . '">'
-										. '<input type="hidden" name="list_id" value="' . $list->info['id'] . '">'
+									echo ' <a class="text-decoration-none d-inline-block align-middle" href="/list/', $assignment->info['id'], '/manage">编辑</a> ';
+									echo ' <form class="d-inline-block" method="POST" onsubmit=\'return confirm("你真的要移除这份作业（题单 #', $assignment->info['id'], '）吗？移除作业不会删除题单。")\'>'
+										. HTML::hiddenToken()
+										. '<input type="hidden" name="list_id" value="' . $assignment->info['id'] . '">'
 										. '<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-remove_assignment" value="remove_assignment">移除</button>'
 										. '</form>';
 									echo '</td>';
@@ -447,17 +456,17 @@ EOD,
 							echoLongTable(
 								['*'],
 								'groups_users',
-								"group_id = {$group['id']}",
+								["group_id" => UOJGroup::info('id')],
 								'order by username asc',
 								<<<EOD
-				<tr>
-					<th>用户名</th>
-					<th>操作</th>
-				</tr>
-			EOD,
-								function ($row) use ($group) {
-									echo '<tr>';
-									echo '<td>', getUserLink($row['username']), '</td>';
+									<tr>
+										<th>用户名</th>
+										<th>操作</th>
+									</tr>
+								EOD,
+								function ($row) {
+									echo HTML::tag_begin('tr');
+									echo HTML::tag('td', [], UOJUser::getLink($row['username']));
 									echo '<td>';
 									echo '<form class="d-inline-block" method="POST" onsubmit=\'return confirm("你真的要从小组中移除这个用户吗？")\'>'
 										. '<input type="hidden" name="_token" value="' . crsf_token() . '">'
@@ -465,7 +474,7 @@ EOD,
 										. '<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-remove_user" value="remove_user">移除</button>'
 										. '</form>';
 									echo '</td>';
-									echo '</tr>';
+									echo HTML::tag_end('tr');
 								},
 								[
 									'page_len' => 20,
