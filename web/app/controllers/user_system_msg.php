@@ -73,7 +73,11 @@ foreach ($pag->get() as $idx => $msg) {
 		<div class="card mb-3">
 			<ul class="list-group list-group-flush">
 				<?php foreach ($system_msgs as $msg) : ?>
-					<li class="list-group-item">
+					<li class="list-group-item
+						<?php if ($msg['read_time'] == null) : ?>
+							bg-warning bg-opacity-25
+						<?php endif ?>
+						">
 						<div class="mb-2 d-flex justify-content-between">
 							<div>
 								<?php if ($msg['title']) : ?>
