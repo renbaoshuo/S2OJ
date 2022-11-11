@@ -452,3 +452,8 @@ form.uoj-bs4-form-compressed button {
 .CodeMirror-linenumber {
 	font-size: 14px !important;
 }
+
+.uoj-back-btn {
+	--bs-btn-hover-bg: #d3d4d570;
+	--bs-btn-hover-border-color: transparent;
+}
