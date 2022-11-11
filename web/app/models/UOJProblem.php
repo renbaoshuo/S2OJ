@@ -95,7 +95,7 @@ class UOJProblem {
 	}
 
 	public function getUploaderLink() {
-		return getUserLink($this->info['uploader'] ?: "root");
+		return UOJUser::getLink($this->info['uploader'] ?: "root");
 	}
 
 	public function findInContests() {

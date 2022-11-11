@@ -687,22 +687,38 @@ EOD,
 							"contest_id = {$contest['id']}",
 							'ORDER BY username',
 							<<<EOD
-				<tr>
-					<th>用户名</th>
-					<th style="width:6em">操作</th>
-				</tr>
-			EOD,
+								<tr>
+									<th>用户名</th>
+									<th style="width:6em">操作</th>
+								</tr>
+							EOD,
 							function ($row) {
-								echo '<tr>';
-								echo '<td>', getUserLink($row['username']), '</td>';
-								echo '<td>';
-								echo '<form method="POST" target="_self" class="d-inline-block" onsubmit=\'return confirm("你确定要将 ', $row['username'], ' 从比赛管理员列表中移除吗？")\'>';
-								echo '<input type="hidden" name="_token" value="', crsf_token(), '">';
-								echo '<input type="hidden" name="username" value="', $row['username'], '">';
-								echo '<button type="submit" class="btn btn-link text-danger text-decoration-none p-0" name="submit-remove_manager" value="remove_manager">移除</button>';
-								echo '</form>';
-								echo '</td>';
-								echo '</tr>';
+								$user = UOJUser::query($row['username']);
+
+								echo HTML::tag_begin('tr');
+								echo HTML::tag('td', [], UOJUser::getLink($user));
+								echo HTML::tag('td', [], [
+									HTML::tag('form', [
+										'method' => 'POST',
+										'target' => '_self',
+										'class' => 'd-inline-block',
+										'onsubmit' => "return confirm('你确定要将 {$user['username']} 从比赛管理员列表中移除吗？');",
+									], [
+										HTML::hiddenToken(),
+										HTML::empty_tag('input', [
+											'type' => 'hidden',
+											'name' => 'username',
+											'value' => $user['username'],
+										]),
+										HTML::tag('button', [
+											'type' => 'submit',
+											'class' => 'btn btn-link text-danger text-decoration-none p-0',
+											'name' => 'submit-remove_manager',
+											'value' => 'remove_manager',
+										], '移除'),
+									]),
+								]);
+								echo HTML::tag_end('tr');
 							},
 							[
 								'echo_full' => true,

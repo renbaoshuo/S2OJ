@@ -135,7 +135,7 @@ class UOJContest {
 		calcStandings($contest, $data, $score, $standings, ['update_contests_submissions' => true]);
 
 		for ($i = 0; $i < count($standings); $i++) {
-			$user_link = getUserLink($standings[$i][2][0]);
+			$user_link = UOJUser::getLink($standings[$i][2][0]);
 			$tail = $standings[$i][0] == $total_score ? '，请继续保持。' : '，请继续努力！';
 
 			$content = '<p>' . $user_link . ' 您好：</p>';

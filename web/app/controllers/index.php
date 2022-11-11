@@ -41,7 +41,7 @@ $friend_links = DB::selectAll([
 							?>
 							<tr>
 								<td><?= $blog->getLink(['show_new_tag' => true]) ?></td>
-								<td>by <?= getUserLink($blog->info['poster']) ?></td>
+								<td>by <?= UOJUser::getLink($blog->info['poster']) ?></td>
 								<td><small><?= $blog->info['post_time'] ?></small></td>
 							</tr>
 						<?php endforeach ?>

@@ -108,7 +108,7 @@ if (isSuperUser(Auth::user())) {
 						]);
 						foreach ($res as $row) {
 							$row_id++;
-							echo '<tr>', '<td>', $row_id, '</td>', '<td>', getUserLink($row['username']), '</td>', '</tr>';
+							echo '<tr>', '<td>', $row_id, '</td>', '<td>', UOJUser::getLink($row['username']), '</td>', '</tr>';
 						}
 						?>
 					</tbody>

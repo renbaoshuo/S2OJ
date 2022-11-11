@@ -301,21 +301,10 @@ EOD);
 					<div class="tab-pane active" id="problems">
 						<?php
 						echoLongTable(
-							[
-								'problems.id as id',
-								'problems.title as title',
-								'problems.is_hidden as is_hidden',
-							],
-							[
-								"problems",
-								"inner join lists_problems",
-								"on", [
-									"lists_problems.list_id" => UOJList::info('id'),
-									"lists_problems.problem_id" => DB::raw("problems.id")
-								]
-							],
-							"1",
-							"order by id asc",
+							['problem_id'],
+							"lists_problems",
+							["list_id" => UOJList::info('id')],
+							"order by problem_id asc",
 							<<<EOD
 								<tr>
 									<th class="text-center" style="width:5em">ID</th>
@@ -324,23 +313,31 @@ EOD);
 								</tr>
 							EOD,
 							function ($row) {
-								echo HTML::tag_begin('tr');
+								$problem = UOJProblem::query($row['problem_id']);
 
-								echo HTML::tag('td', ['class' => 'text-center'], $row['id']);
+								echo HTML::tag_begin('tr');
+								echo HTML::tag('td', ['class' => 'text-center'], $problem->info['id']);
 								echo HTML::tag_begin('td');
-								echo getProblemLink($row);
-								if ($row['is_hidden']) {
+								echo $problem->getLink();
+								if ($problem->info['is_hidden']) {
 									echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
 								}
 								echo HTML::tag_end('td');
-								echo HTML::tag_begin('td');
-								echo '<form target="_self" method="POST" class="d-inline-block" onsubmit=\'return confirm("你确定要将题目 #', $row['id'], ' 从题单中移除吗？")\'>';
-								echo '<input type="hidden" name="_token" value="', crsf_token(), '">';
-								echo '<input type="hidden" name="problem_id" value="', $row['id'], '">';
-								echo '<button class="btn btn-link text-danger text-decoration-none p-0" name="submit-remove_problem" value="remove_problem">移除</button>';
-								echo '</form>';
-								echo HTML::tag_end('td');
-
+								echo HTML::tag('td', [], HTML::tag('form', [
+									'target' => '_self',
+									'method' => 'POST',
+									'class' => 'd-inline-block',
+									'onsubmit' => "return confirm('你确定要将 {$problem->info['id']} 从题单中移除吗？');",
+								], [
+									HTML::hiddenToken(),
+									HTML::empty_tag('input', ['type' => 'hidden', 'name' => 'problem_id', 'value' => $problem->info['id']]),
+									html::tag('button', [
+										'type' => 'submit',
+										'class' => 'btn btn-link text-danger text-decoration-none p-0',
+										'name' => 'submit-remove_problem',
+										'value' => 'remove_problem',
+									], '移除'),
+								]));
 								echo HTML::tag_end('tr');
 							},
 							[

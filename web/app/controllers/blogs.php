@@ -57,7 +57,7 @@ Auth::check() || redirectToLogin();
 					echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
 				}
 				echo '</td>';
-				echo '<td>' . getUserLink($blog->info['poster']) . '</td>';
+				echo '<td>' . UOJUser::getLink($blog->info['poster']) . '</td>';
 				echo '<td>' . $blog->info['post_time'] . '</td>';
 				echo '<td class="text-center">' . ClickZans::getCntBlock($blog->info['zan']) . '</td>';
 				echo '</tr>';

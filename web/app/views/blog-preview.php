@@ -20,7 +20,7 @@ $extra_text = $blog->info['is_hidden'] ? '<span class="text-muted">[已隐藏]</
 	</a>
 </h1>
 
-<div><?= $blog->info['post_time'] ?> <strong>By</strong> <?= getUserLink($blog->info['poster']) ?> (<strong>博客 ID: </strong> <?= $blog->info['id'] ?>)</div>
+<div><?= $blog->info['post_time'] ?> <strong>By</strong> <?= UOJUser::getLink($blog->info['poster']) ?> (<strong>博客 ID: </strong> <?= $blog->info['id'] ?>)</div>
 <?php if (!$show_title_only) : ?>
 	<div class="card mb-4">
 		<div class="card-body">

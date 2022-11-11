@@ -1387,7 +1387,7 @@ EOD,
 							<tr style="cursor: pointer" data-bs-toggle="collapse" data-bs-target="#custom_test__<?= $submission['id'] ?>">
 								<td class="text-center text-primary">#<?= $submission['id'] ?></td>
 								<td class="text-center">#<?= $submission['problem_id'] ?></td>
-								<td><?= getUserLink($submission['submitter']) ?></td>
+								<td><?= UOJUser::getLink($submission['submitter']) ?></td>
 								<td><?= $submission['submit_time'] ?></td>
 								<td><?= $submission['judge_time'] ?></td>
 							</tr>
@@ -1472,7 +1472,7 @@ EOD;
 	</tr>
 EOD,
 				function ($row) {
-					$user_link = getUserLink($row['uploader']);
+					$user_link = UOJUser::getLink($row['uploader']);
 					if ($row['size'] < 1024 * 512) {
 						$size = strval(round($row['size'] * 1.0 / 1024, 1)) . ' KB';
 					} else {

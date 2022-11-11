@@ -233,7 +233,7 @@ trait UOJSubmissionLikeTrait {
 			case 'submitter':
 			case 'owner':
 			case 'hacker':
-				echo getUserLink($this->info[$name]);
+				echo UOJUser::getLink($this->info[$name]);
 				break;
 			case 'used_time':
 				if ($cfg['show_actual_score']) {

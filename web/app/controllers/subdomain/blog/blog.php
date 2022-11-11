@@ -62,7 +62,7 @@ $comment_form->handle = function () {
 	$page = floor($rank / 20) + 1;
 
 	$uri = getLongTablePageUri($page) . '#' . "comment-{$comment_id}";
-	$user_link = getUserLink($myUser['username']);
+	$user_link = UOJUser::getLink(Auth::user());
 
 	foreach ($referrers as $referrer) {
 		$content = $user_link . ' 在博客 ' . $blog['title'] . ' 的评论里提到你：<a href="' . $uri . '">点击此处查看</a>';
@@ -142,7 +142,7 @@ $reply_form->handle = function (&$vdata) {
 	$page = floor($rank / 20) + 1;
 
 	$uri = getLongTablePageUri($page) . '#' . "comment-{$reply_id}";
-	$user_link = getUserLink($myUser['username']);
+	$user_link = UOJUser::getLink(Auth::user());
 
 	foreach ($referrers as $referrer) {
 		$content = $user_link . ' 在博客 ' . $blog['title'] . ' 的评论里提到你：<a href="' . $uri . '">点击此处查看</a>';
@@ -215,7 +215,7 @@ $comments_pag = new Paginator([
 					</div>
 					<div id="comment-body-<?= $comment['id'] ?>" class="comtbox flex-grow-1 ms-3">
 						<div class="row">
-							<div class="col-sm-6"><?= getUserLink($poster['username']) ?></div>
+							<div class="col-sm-6"><?= UOJUser::getLink($poster['username']) ?></div>
 							<div class="col-sm-6 text-end"><?= ClickZans::getBlock('BC', $comment['id'], $comment['zan']) ?></div>
 						</div>
 						<div class="comtbox1"><?= $comment['content'] ?></div>

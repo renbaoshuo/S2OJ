@@ -26,7 +26,7 @@ if (!isset($can_reply)) {
 				<tr><td colspan="233"><?= UOJLocale::get('none') ?></td></tr>
 			<?php else: foreach ($pag->get() as $question): ?>
 				<tr>
-					<td><?= getUserLink($question['username']) ?></td>
+					<td><?= UOJUser::getLink($question['username']) ?></td>
 					<td class="small"><?= $question['post_time'] ?></td>
 					<td style="text-align: left" class="question" data-qid="<?=$question['id']?>">
 						<div class="question-content uoj-readmore"><?= HTML::escape($question['question']) ?></div>

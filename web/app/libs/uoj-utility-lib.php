@@ -171,28 +171,6 @@ function hasUserType($user, $type) {
 	return in_array($type, $usertype);
 }
 
-function isProblemUploader($user) {
-	if ($user == null) {
-		return false;
-	}
-	return hasUserType($user, 'problem_uploader');
-}
-function isProblemManager($user) {
-	if ($user == null) {
-		return false;
-	}
-	if (isSuperUser($user)) {
-		return true;
-	}
-	return hasUserType($user, 'problem_manager');
-}
-function isContestJudger($user) {
-	if ($user == null) {
-		return false;
-	}
-	return hasUserType($user, 'contest_judger');
-}
-
 function isSuperUser($user) {
 	return $user != null && $user['usergroup'] == 'S';
 }

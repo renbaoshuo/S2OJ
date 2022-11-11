@@ -105,7 +105,7 @@ class HTML {
 	}
 
 	public static function hiddenToken() {
-		return '<input type="hidden" name="_token" value="' . crsf_token() . '" />';
+		return HTML::empty_tag('input', ['type' => 'hidden', 'name' => '_token', 'value' => crsf_token()]);
 	}
 	public static function div_vinput($name, $type, $label_text, $default_value) {
 		return '<div id="' . "div-$name" . '" class="mb-3">'
