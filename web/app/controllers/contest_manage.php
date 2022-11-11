@@ -4,7 +4,7 @@ requirePHPLib('form');
 
 Auth::check() || redirectToLogin();
 UOJContest::init(UOJRequest::get('id')) || UOJResponse::page404();
-isSuperUser(Auth::user()) || UOJResponse::page403();
+UOJContest::cur()->userCanManage(Auth::user()) || UOJResponse::page403();
 $contest = UOJContest::info();
 
 if (isset($_GET['tab'])) {

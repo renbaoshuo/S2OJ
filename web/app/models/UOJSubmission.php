@@ -38,7 +38,7 @@ class UOJSubmission {
 	 * Need to be consistent with the member function userCanView
 	 */
 	public static function sqlForUserCanView(array $user = null, UOJProblem $problem = null) {
-		if (isSuperUser($user) || isProblemManager($user)) {
+		if (isSuperUser($user) || UOJUser::checkPermission($user, 'problems.manage')) {
 			// MySQL can find appropriate keys to speed up the query if we write "true" in this way.
 			return "(submissions.is_hidden = true or submissions.is_hidden = false)";
 		} elseif ($problem) {

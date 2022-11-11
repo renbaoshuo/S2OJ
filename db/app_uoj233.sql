@@ -692,6 +692,7 @@ CREATE TABLE `problems_solutions` (
   `problem_id` int NOT NULL,
   `blog_id` int NOT NULL,
   PRIMARY KEY (`problem_id`, `blog_id`),
+  UNIQUE KEY `blog_id` (`blog_id`),
   KEY `problem_id` (`problem_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;

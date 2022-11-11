@@ -9,7 +9,7 @@ if (!Auth::check()) {
 	redirectToLogin();
 }
 
-if (!isSuperUser($myUser)) {
+if (!isSuperUser(Auth::user())) {
 	become403Page();
 }
 
@@ -346,7 +346,7 @@ if ($cur_tab == 'index') {
 				return '用户名不合法';
 			}
 
-			if (queryUser($username)) {
+			if (UOJUser::query($username)) {
 				return '该用户已存在';
 			}
 
@@ -453,7 +453,7 @@ EOD);
 				return '用户名不合法';
 			}
 
-			if (!queryUser($username)) {
+			if (!UOJUser::query($username)) {
 				return '用户不存在';
 			}
 
@@ -524,7 +524,7 @@ EOD);
 				return '用户名不合法';
 			}
 
-			if (!queryUser($username)) {
+			if (!UOJUser::query($username)) {
 				return '用户不存在';
 			}
 
@@ -580,6 +580,206 @@ EOD);
 		}
 EOD);
 	$change_usergroup_form->runAtServer();
+
+	$users_default_permissions = UOJContext::getMeta('users_default_permissions');
+	$update_users_default_permissions_form = new UOJForm('update_users_default_permissions');
+	$update_users_default_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5'], '题目'));
+	$update_users_default_permissions_form->addCheckbox('problems__view', [
+		'checked' => $users_default_permissions['problems']['view'],
+		'label' => '查看题目',
+		'role' => 'switch',
+		'help' => '',
+	]);
+	$update_users_default_permissions_form->addCheckbox('problems__download_testdata', [
+		'checked' => $users_default_permissions['problems']['download_testdata'],
+		'label' => '下载测试数据',
+		'role' => 'switch',
+		'help' => '请谨慎开启此权限，以防数据泄露。',
+	]);
+	$update_users_default_permissions_form->addCheckbox('problems__create', [
+		'checked' => $users_default_permissions['problems']['create'],
+		'label' => '新建题目',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => true,
+	]);
+	$update_users_default_permissions_form->addCheckbox('problems__manage', [
+		'checked' => $users_default_permissions['problems']['manage'],
+		'label' => '管理题目',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => true,
+	]);
+	$update_users_default_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '比赛'));
+	$update_users_default_permissions_form->addCheckbox('contests__view', [
+		'checked' => $users_default_permissions['contests']['view'],
+		'label' => '查看比赛',
+		'role' => 'switch',
+		'help' => '若用户不具有此权限，则只显示已报名过的比赛列表及详情。',
+	]);
+	$update_users_default_permissions_form->addCheckbox('contests__register', [
+		'checked' => $users_default_permissions['contests']['register'],
+		'label' => '报名比赛',
+		'role' => 'switch',
+		'help' => '',
+	]);
+	$update_users_default_permissions_form->addCheckbox('contests__create', [
+		'checked' => $users_default_permissions['contests']['create'],
+		'label' => '新建比赛',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => true,
+	]);
+	$update_users_default_permissions_form->addCheckbox('contests__start_final_test', [
+		'checked' => $users_default_permissions['contests']['start_final_test'],
+		'label' => '开始比赛最终测试',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => true,
+	]);
+	$update_users_default_permissions_form->addCheckbox('contests__manage', [
+		'checked' => $users_default_permissions['contests']['manage'],
+		'label' => '管理比赛',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => true,
+	]);
+	$update_users_default_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '题单'));
+	$update_users_default_permissions_form->addCheckbox('lists__view', [
+		'checked' => $users_default_permissions['lists']['view'],
+		'label' => '查看题单',
+		'role' => 'switch',
+		'help' => '',
+	]);
+	$update_users_default_permissions_form->addCheckbox('lists__create', [
+		'checked' => $users_default_permissions['lists']['create'],
+		'label' => '新建题单',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => true,
+	]);
+	$update_users_default_permissions_form->addCheckbox('lists__manage', [
+		'checked' => $users_default_permissions['lists']['manage'],
+		'label' => '管理题单',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => true,
+	]);
+	$update_users_default_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '小组'));
+	$update_users_default_permissions_form->addCheckbox('groups__view', [
+		'checked' => $users_default_permissions['groups']['view'],
+		'label' => '查看小组',
+		'role' => 'switch',
+		'help' => '',
+	]);
+	$update_users_default_permissions_form->addCheckbox('groups__create', [
+		'checked' => $users_default_permissions['groups']['create'],
+		'label' => '新建小组',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => true,
+	]);
+	$update_users_default_permissions_form->addCheckbox('groups__manage', [
+		'checked' => $users_default_permissions['groups']['manage'],
+		'label' => '管理小组',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => true,
+	]);
+	$update_users_default_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '博客'));
+	$update_users_default_permissions_form->addCheckbox('blogs__view', [
+		'checked' => $users_default_permissions['blogs']['view'],
+		'label' => '查看博客',
+		'role' => 'switch',
+		'help' => '',
+	]);
+	$update_users_default_permissions_form->addCheckbox('blogs__create', [
+		'checked' => $users_default_permissions['blogs']['create'],
+		'label' => '新建博客',
+		'role' => 'switch',
+		'help' => '',
+	]);
+	$update_users_default_permissions_form->addCheckbox('blogs__manage', [
+		'checked' => $users_default_permissions['blogs']['manage'],
+		'label' => '管理博客',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => true,
+	]);
+	$update_users_default_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '用户'));
+	$update_users_default_permissions_form->addCheckbox('users__view', [
+		'checked' => $users_default_permissions['users']['view'],
+		'label' => '查看用户',
+		'role' => 'switch',
+		'help' => '若用户不具有此权限，则不能查看他人的个人资料。',
+	]);
+	$update_users_default_permissions_form->addCheckbox('users__upload_image', [
+		'checked' => $users_default_permissions['users']['upload_image'],
+		'label' => '上传图片',
+		'role' => 'switch',
+		'help' => '若用户不具有此权限，则不能使用图床功能。',
+	]);
+	$update_users_default_permissions_form->setAjaxSubmit(<<<EOD
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert-update_users_default_permission')
+					.html('修改成功！' + (res.message || ''))
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert-update_users_default_permission')
+					.html('修改失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
+
+			$(window).scrollTop(0);
+		}
+EOD);
+	$update_users_default_permissions_form->config['confirm']['text'] = '你确定要修改所有用户的默认权限吗？';
+	$update_users_default_permissions_form->handle = function () {
+		$new_permissions = [
+			'problems' => [
+				'view' => isset($_POST['problems__view']),
+				'download_testdata' => isset($_POST['problems__download_testdata']),
+				'create' => false, // isset($_POST['problems__create']),
+				'manage' => false, // isset($_POST['problems__manage']),
+			],
+			'contests' => [
+				'view' => isset($_POST['contests__view']),
+				'register' => isset($_POST['contests__register']),
+				'create' => false, // isset($_POST['contests__create']),
+				'start_final_test' => false, // isset($_POST['contests__start_final_test']),
+				'manage' => false, // isset($_POST['contests__manage']),
+			],
+			'lists' => [
+				'view' => isset($_POST['lists__view']),
+				'create' => false, // isset($_POST['lists__create']),
+				'manage' => false, // isset($_POST['lists__manage']),
+			],
+			'groups' => [
+				'view' => isset($_POST['groups__view']),
+				'create' => false, // isset($_POST['groups__create']),
+				'manage' => false, // isset($_POST['groups__manage']),
+			],
+			'blogs' => [
+				'view' => isset($_POST['blogs__view']),
+				'create' => isset($_POST['blogs__create']),
+				'manage' => false, // isset($_POST['blogs__manage']),
+			],
+			'users' => [
+				'view' => isset($_POST['users__view']),
+				'upload_image' => isset($_POST['users__upload_image']),
+			],
+		];
+
+		UOJContext::setMeta('users_default_permissions', $new_permissions);
+
+		dieWithJsonData(['status' => 'success', 'message' => '']);
+	};
+	$update_users_default_permissions_form->runAtServer();
 } elseif ($cur_tab == 'submissions') {
 } elseif ($cur_tab == 'custom_test') {
 	requireLib('hljs');
@@ -698,7 +898,7 @@ EOD);
 				return '用户名不合法';
 			}
 
-			if (!queryUser($x)) {
+			if (!UOJUser::query($x)) {
 				return '用户不存在';
 			}
 
@@ -960,6 +1160,9 @@ EOD);
 						<li class="nav-item">
 							<a class="nav-link" href="#user-group" data-bs-toggle="tab" data-bs-target="#user-group">用户类别</a>
 						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#users-default-permissions" data-bs-toggle="tab" data-bs-target="#users-default-permissions">默认权限</a>
+						</li>
 					</ul>
 				</div>
 				<div class="card-body">
@@ -1107,6 +1310,24 @@ EOD,
 										<li>将当前用户移除权限后将无法再次访问本页面。</li>
 										<li>在修改用户类别前请仔细核对用户名以免产生不必要的麻烦。</li>
 										<li>如需为用户设置题目上传者、题目管理员等权限，请前往对应用户的个人资料编辑页面，点击「特权」选项卡修改。</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane" id="users-default-permissions">
+							<div id="result-alert-update_users_default_permission" class="alert" role="alert" style="display: none"></div>
+							<div class="row row-cols-1 row-cols-md-2">
+								<div class="col">
+									<?php $update_users_default_permissions_form->printHTML() ?>
+								</div>
+								<div class="col mt-3 mt-md-0">
+									<h5>注意事项</h5>
+									<ul class="mb-0">
+										<li>此处修改的是 <b>所有用户</b> 的默认权限。</li>
+										<li>如果某用户的 A 权限启闭状态与为该用户修改 A 权限时的默认权限状态不同，则在此处修改用户默认权限后该用户的 A 权限状态不会受到影响。</li>
+										<li>对于每一个权限分类，若用户不具有新建项目权限，则只能对现有内容进行管理。</li>
+										<li>如需为单个用户设置增加/移除特定权限，请前往对应用户的个人资料编辑页面，点击「特权」选项卡修改。</li>
+										<li>出于安全考虑，部分权限不能被设置为默认权限。</li>
 									</ul>
 								</div>
 							</div>

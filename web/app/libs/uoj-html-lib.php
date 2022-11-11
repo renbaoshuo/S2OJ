@@ -6,7 +6,7 @@ function uojHandleAtSign($str, $uri) {
 		if ($matches[1] === '@') {
 			return '@';
 		} else {
-			$user = queryUser($matches[1]);
+			$user = UOJUser::query($matches[1]);
 			if ($user == null) {
 				return $matches[0];
 			} else {
@@ -99,7 +99,7 @@ function become403Page($message = '访问被拒绝，您可能需要适当的权
 }
 
 function getUserLink($username) {
-	if (validateUsername($username) && ($user = queryUser($username)) && $user['usergroup'] != 'B') {
+	if (validateUsername($username) && ($user = UOJUser::query($username)) && $user['usergroup'] != 'B') {
 		$realname = $user['realname'];
 
 		if ($realname == "") {
@@ -115,7 +115,7 @@ function getUserLink($username) {
 
 function getUserName($username, $realname = null) {
 	if ($realname == null) {
-		if (validateUsername($username) && ($user = queryUser($username))) {
+		if (validateUsername($username) && ($user = UOJUser::query($username))) {
 			$realname = $user['realname'];
 		}
 	}
@@ -151,14 +151,6 @@ function getContestProblemLink($problem, $contest_id, $problem_title = '!title_o
 		$problem_title = "#{$problem['id']}. {$problem['title']}";
 	}
 	$result = '<a class="text-decoration-none" href="/contest/' . $contest_id . '/problem/' . $problem['id'] . '">' . $problem_title . '</a>';
-
-	return $result;
-}
-function getBlogLink($id) {
-	$result = '';
-	if (validateUInt($id) && $blog = queryBlog($id)) {
-		$result = '<a class="text-decoration-none" href="/blogs/' . $id . '">' . $blog['title'] . '</a>';
-	}
 
 	return $result;
 }
@@ -916,49 +908,13 @@ function echoHackDetails($hack_details, $name) {
 	echoJudgementDetails($hack_details, new HackDetailsStyler(), $name);
 }
 
-function echoHack($hack, $config, $user) {
-	$problem = queryProblemBrief($hack['problem_id']);
-	echo '<tr>';
-	if (!isset($config['id_hidden'])) {
-		echo '<td><a href="/hack/', $hack['id'], '">#', $hack['id'], '</a></td>';
-	}
-	if (!isset($config['submission_hidden'])) {
-		echo '<td><a href="/submission/', $hack['submission_id'], '">#', $hack['submission_id'], '</a></td>';
-	}
-	if (!isset($config['problem_hidden'])) {
-		if ($hack['contest_id']) {
-			echo '<td>', getContestProblemLink($problem, $hack['contest_id'], '!id_and_title'), '</td>';
-		} else {
-			echo '<td>', getProblemLink($problem, '!id_and_title'), '</td>';
-		}
-	}
-	if (!isset($config['hacker_hidden'])) {
-		echo '<td>', getUserLink($hack['hacker']), '</td>';
-	}
-	if (!isset($config['owner_hidden'])) {
-		echo '<td>', getUserLink($hack['owner']), '</td>';
-	}
-	if (!isset($config['result_hidden'])) {
-		if ($hack['judge_time'] == null) {
-			echo '<td><a href="/hack/', $hack['id'], '">Waiting</a></td>';
-		} elseif ($hack['success'] == null) {
-			echo '<td><a href="/hack/', $hack['id'], '">Judging</a></td>';
-		} elseif ($hack['success']) {
-			echo '<td><a href="/hack/', $hack['id'], '" class="uoj-status" data-success="1"><strong>Success!</strong></a></td>';
-		} else {
-			echo '<td><a href="/hack/', $hack['id'], '" class="uoj-status" data-success="0"><strong>Failed.</strong></a></td>';
-		}
-	} else {
-		echo '<td>Hidden</td>';
-	}
-	if (!isset($config['submit_time_hidden'])) {
-		echo '<td>', $hack['submit_time'], '</td>';
-	}
-	if (!isset($config['judge_time_hidden'])) {
-		echo '<td>', $hack['judge_time'], '</td>';
-	}
-	echo '</tr>';
+function echoHack($hack, $config, $viewer) {
+    $uhack = new UOJHack($hack);
+    $uhack->setProblem();
+    $uhack->setSubmission();
+    $uhack->echoStatusTableRow($config, $viewer);
 }
+
 function echoHackListOnlyOne($hack, $config, $user) {
 	echo '<div class="card mb-3 table-responsive">';
 	echo '<table class="table text-center uoj-table mb-0">';

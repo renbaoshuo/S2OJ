@@ -293,32 +293,363 @@ EOD);
 		dieWithJsonData(['status' => 'success', 'message' => '密码修改成功']);
 	}
 } elseif ($cur_tab == 'privilege') {
-	if (isset($_POST['submit-privilege']) && $_POST['submit-privilege'] == 'privilege' && isSuperUser(Auth::user())) {
-		$user['usertype'] = 'student';
-
-		if ($_POST['user_type'] == 'teacher') {
-			addUserType($user, 'teacher');
-			removeUserType($user, 'student');
-		} else {
-			addUserType($user, 'student');
-		}
-
-		if ($_POST['problem_uploader'] == 'yes') {
-			addUserType($user, 'problem_uploader');
-		}
-
-		if ($_POST['problem_manager'] == 'yes') {
-			addUserType($user, 'problem_manager');
-		}
-
-		if ($_POST['contest_judger'] == 'yes') {
-			addUserType($user, 'contest_judger');
-		}
-
-		DB::update("UPDATE `user_info` SET `usertype` = '{$user['usertype']}' where `username` = '{$user['username']}'");
-
-		dieWithJsonData(['status' => 'success', 'message' => '权限修改成功']);
+	$users_default_permissions = UOJContext::getMeta('users_default_permissions');
+	$type_text = UOJLocale::get('user::normal user');
+	if ($user['usergroup'] == 'S') {
+		$type_text = UOJLocale::get('user::super user');
+	} elseif ($user['usergroup'] == 'T') {
+		$type_text = UOJLocale::get('user::tmp user');
+	} elseif ($user['usergroup'] == 'B') {
+		$type_text = UOJLocale::get('user::banned user');
 	}
+	$disabled = !isSuperUser(Auth::user());
+	$update_user_permissions_form = new UOJForm('update_user_permissions');
+	if ($disabled) {
+		$update_user_permissions_form->config['no_submit'] = true;
+	}
+	$update_user_permissions_form->appendHTML(HTML::tag('span', [], UOJLocale::get('user::user group')));
+	$update_user_permissions_form->appendHTML(HTML::tag('span', ['class' => 'd-inline-block ms-3'], $type_text));
+	$update_user_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '题目'));
+	$update_user_permissions_form->addCheckbox('problems__view', [
+		'checked' => $extra['permissions']['problems']['view'],
+		'label' => '查看题目',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('problems__download_testdata', [
+		'checked' => $extra['permissions']['problems']['download_testdata'],
+		'label' => '下载测试数据',
+		'role' => 'switch',
+		'help' => '请谨慎开启此权限，以防数据泄露。',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('problems__create', [
+		'checked' => $extra['permissions']['problems']['create'],
+		'label' => '新建题目',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('problems__manage', [
+		'checked' => $extra['permissions']['problems']['manage'],
+		'label' => '管理题目',
+		'role' => 'switch',
+		'help' => '若用户不具有「新建题目」权限，则只能对现有题目进行管理。',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '比赛'));
+	$update_user_permissions_form->addCheckbox('contests__view', [
+		'checked' => $extra['permissions']['contests']['view'],
+		'label' => '查看比赛',
+		'role' => 'switch',
+		'help' => '若用户不具有此权限，则只显示已报名过的比赛列表及详情。',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('contests__register', [
+		'checked' => $extra['permissions']['contests']['register'],
+		'label' => '报名比赛',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('contests__create', [
+		'checked' => $extra['permissions']['contests']['create'],
+		'label' => '新建比赛',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('contests__start_final_test', [
+		'checked' => $extra['permissions']['contests']['start_final_test'],
+		'label' => '开始比赛最终测试',
+		'role' => 'switch',
+		'help' => '拥有此权限的用户可以代为开始比赛最终测试。',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('contests__manage', [
+		'checked' => $extra['permissions']['contests']['manage'],
+		'label' => '管理比赛',
+		'role' => 'switch',
+		'help' => '若用户不具有「新建比赛」权限，则只能对现有比赛进行管理。',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '题单'));
+	$update_user_permissions_form->addCheckbox('lists__view', [
+		'checked' => $extra['permissions']['lists']['view'],
+		'label' => '查看题单',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('lists__create', [
+		'checked' => $extra['permissions']['lists']['create'],
+		'label' => '新建题单',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('lists__manage', [
+		'checked' => $extra['permissions']['lists']['manage'],
+		'label' => '管理题单',
+		'role' => 'switch',
+		'help' => '若用户不具有「新建题单」权限，则只能对现有题单进行管理。',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '小组'));
+	$update_user_permissions_form->addCheckbox('groups__view', [
+		'checked' => $extra['permissions']['groups']['view'],
+		'label' => '查看小组',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('groups__create', [
+		'checked' => $extra['permissions']['groups']['create'],
+		'label' => '新建小组',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('groups__manage', [
+		'checked' => $extra['permissions']['groups']['manage'],
+		'label' => '管理小组',
+		'role' => 'switch',
+		'help' => '若用户不具有「新建小组」权限，则只能对现有小组进行管理。',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '博客'));
+	$update_user_permissions_form->addCheckbox('blogs__view', [
+		'checked' => $extra['permissions']['blogs']['view'],
+		'label' => '查看博客',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('blogs__create', [
+		'checked' => $extra['permissions']['blogs']['create'],
+		'label' => '新建博客',
+		'role' => 'switch',
+		'help' => '',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('blogs__manage', [
+		'checked' => $extra['permissions']['blogs']['manage'],
+		'label' => '管理博客',
+		'role' => 'switch',
+		'help' => '若用户不具有「新建博客」权限，则只能对现有博客进行管理。',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '用户'));
+	$update_user_permissions_form->addCheckbox('users__view', [
+		'checked' => $extra['permissions']['users']['view'],
+		'label' => '查看用户',
+		'role' => 'switch',
+		'help' => '若用户不具有此权限，则不能查看他人的个人资料。',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->addCheckbox('users__upload_image', [
+		'checked' => $extra['permissions']['users']['upload_image'],
+		'label' => '上传图片',
+		'role' => 'switch',
+		'help' => '若用户不具有此权限，则不能使用图床功能。',
+		'disabled' => $disabled,
+	]);
+	$update_user_permissions_form->setAjaxSubmit(<<<EOD
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert')
+					.html('修改成功！' + (res.message || ''))
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert')
+					.html('修改失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
+
+			$(window).scrollTop(0);
+		}
+EOD);
+	$update_user_permissions_form->handle = function () use ($user, $extra, $users_default_permissions) {
+		$new_permissions = [
+			'_placeholder' => '',
+			'problems' => [
+				'_placeholder' => '',
+				// 'view' => isset($_POST['problems__view']),
+				// 'download_testdata' => isset($_POST['problems__download_testdata']),
+				// 'create' => isset($_POST['problems__create']),
+				// 'manage' => isset($_POST['problems__manage']),
+			],
+			'contests' => [
+				'_placeholder' => '',
+				// 'view' => isset($_POST['contests__view']),
+				// 'register' => isset($_POST['contests__register']),
+				// 'create' => isset($_POST['contests__create']),
+				// 'start_final_test' => isset($_POST['contests__start_final_test']),
+				// 'manage' => isset($_POST['contests__manage']),
+			],
+			'lists' => [
+				'_placeholder' => '',
+				// 'view' => isset($_POST['lists__view']),
+				// 'create' => isset($_POST['lists__create']),
+				// 'manage' => isset($_POST['lists__manage']),
+			],
+			'groups' => [
+				'_placeholder' => '',
+				// 'view' => isset($_POST['groups__view']),
+				// 'create' => isset($_POST['groups__create']),
+				// 'manage' => isset($_POST['groups__manage']),
+			],
+			'blogs' => [
+				'_placeholder' => '',
+				// 'view' => isset($_POST['blogs__view']),
+				// 'create' => isset($_POST['blogs__create']),
+				// 'manage' => isset($_POST['blogs__manage']),
+			],
+			'users' => [
+				'_placeholder' => '',
+			]
+		];
+
+		if (isset($_POST['problems__view']) && !$users_default_permissions['problems']['view']) {
+			$new_permissions['problems']['view'] = true;
+		} elseif (!isset($_POST['problems__view']) && $users_default_permissions['problems']['view']) {
+			$new_permissions['problems']['view'] = false;
+		}
+
+		if (isset($_POST['problems__download_testdata']) && !$users_default_permissions['problems']['download_testdata']) {
+			$new_permissions['problems']['download_testdata'] = true;
+		} elseif (!isset($_POST['problems__download_testdata']) && $users_default_permissions['problems']['download_testdata']) {
+			$new_permissions['problems']['download_testdata'] = false;
+		}
+
+		if (isset($_POST['problems__create']) && !$users_default_permissions['problems']['create']) {
+			$new_permissions['problems']['create'] = true;
+		} elseif (!isset($_POST['problems__create']) && $users_default_permissions['problems']['create']) {
+			$new_permissions['problems']['create'] = false;
+		}
+
+		if (isset($_POST['problems__manage']) && !$users_default_permissions['problems']['manage']) {
+			$new_permissions['problems']['manage'] = true;
+		} elseif (!isset($_POST['problems__manage']) && $users_default_permissions['problems']['manage']) {
+			$new_permissions['problems']['manage'] = false;
+		}
+
+		if (isset($_POST['contests__view']) && !$users_default_permissions['contests']['view']) {
+			$new_permissions['contests']['view'] = true;
+		} elseif (!isset($_POST['contests__view']) && $users_default_permissions['contests']['view']) {
+			$new_permissions['contests']['view'] = false;
+		}
+
+		if (isset($_POST['contests__register']) && !$users_default_permissions['contests']['register']) {
+			$new_permissions['contests']['register'] = true;
+		} elseif (!isset($_POST['contests__register']) && $users_default_permissions['contests']['register']) {
+			$new_permissions['contests']['register'] = false;
+		}
+
+		if (isset($_POST['contests__create']) && !$users_default_permissions['contests']['create']) {
+			$new_permissions['contests']['create'] = true;
+		} elseif (!isset($_POST['contests__create']) && $users_default_permissions['contests']['create']) {
+			$new_permissions['contests']['create'] = false;
+		}
+
+		if (isset($_POST['contests__start_final_test']) && !$users_default_permissions['contests']['start_final_test']) {
+			$new_permissions['contests']['start_final_test'] = true;
+		} elseif (!isset($_POST['contests__start_final_test']) && $users_default_permissions['contests']['start_final_test']) {
+			$new_permissions['contests']['start_final_test'] = false;
+		}
+
+		if (isset($_POST['contests__manage']) && !$users_default_permissions['contests']['manage']) {
+			$new_permissions['contests']['manage'] = true;
+		} elseif (!isset($_POST['contests__manage']) && $users_default_permissions['contests']['manage']) {
+			$new_permissions['contests']['manage'] = false;
+		}
+
+		if (isset($_POST['lists__view']) && !$users_default_permissions['lists']['view']) {
+			$new_permissions['lists']['view'] = true;
+		} elseif (!isset($_POST['lists__view']) && $users_default_permissions['lists']['view']) {
+			$new_permissions['lists']['view'] = false;
+		}
+
+		if (isset($_POST['lists__create']) && !$users_default_permissions['lists']['create']) {
+			$new_permissions['lists']['create'] = true;
+		} elseif (!isset($_POST['lists__create']) && $users_default_permissions['lists']['create']) {
+			$new_permissions['lists']['create'] = false;
+		}
+
+		if (isset($_POST['lists__manage']) && !$users_default_permissions['lists']['manage']) {
+			$new_permissions['lists']['manage'] = true;
+		} elseif (!isset($_POST['lists__manage']) && $users_default_permissions['lists']['manage']) {
+			$new_permissions['lists']['manage'] = false;
+		}
+
+		if (isset($_POST['groups__view']) && !$users_default_permissions['groups']['view']) {
+			$new_permissions['groups']['view'] = true;
+		} elseif (!isset($_POST['groups__view']) && $users_default_permissions['groups']['view']) {
+			$new_permissions['groups']['view'] = false;
+		}
+
+		if (isset($_POST['groups__create']) && !$users_default_permissions['groups']['create']) {
+			$new_permissions['groups']['create'] = true;
+		} elseif (!isset($_POST['groups__create']) && $users_default_permissions['groups']['create']) {
+			$new_permissions['groups']['create'] = false;
+		}
+
+		if (isset($_POST['groups__manage']) && !$users_default_permissions['groups']['manage']) {
+			$new_permissions['groups']['manage'] = true;
+		} elseif (!isset($_POST['groups__manage']) && $users_default_permissions['groups']['manage']) {
+			$new_permissions['groups']['manage'] = false;
+		}
+
+		if (isset($_POST['blogs__view']) && !$users_default_permissions['blogs']['view']) {
+			$new_permissions['blogs']['view'] = true;
+		} elseif (!isset($_POST['blogs__view']) && $users_default_permissions['blogs']['view']) {
+			$new_permissions['blogs']['view'] = false;
+		}
+
+		if (isset($_POST['blogs__create']) && !$users_default_permissions['blogs']['create']) {
+			$new_permissions['blogs']['create'] = true;
+		} elseif (!isset($_POST['blogs__create']) && $users_default_permissions['blogs']['create']) {
+			$new_permissions['blogs']['create'] = false;
+		}
+
+		if (isset($_POST['blogs__manage']) && !$users_default_permissions['blogs']['manage']) {
+			$new_permissions['blogs']['manage'] = true;
+		} elseif (!isset($_POST['blogs__manage']) && $users_default_permissions['blogs']['manage']) {
+			$new_permissions['blogs']['manage'] = false;
+		}
+
+		if (isset($_POST['users__view']) && !$users_default_permissions['users']['view']) {
+			$new_permissions['users']['view'] = true;
+		} elseif (!isset($_POST['users__view']) && $users_default_permissions['users']['view']) {
+			$new_permissions['users']['view'] = false;
+		}
+
+		if (isset($_POST['users__upload_image']) && !$users_default_permissions['users']['upload_image']) {
+			$new_permissions['users']['upload_image'] = true;
+		} elseif (!isset($_POST['users__upload_image']) && $users_default_permissions['users']['upload_image']) {
+			$new_permissions['users']['upload_image'] = false;
+		}
+
+		$extra['permissions'] = $new_permissions;
+
+		DB::update([
+			"update user_info",
+			"set", [
+				"extra" => json_encode($extra),
+			],
+			"where", [
+				"username" => $user['username'],
+			],
+		]);
+
+		dieWithJsonData(['status' => 'success', 'message' => '']);
+	};
+	$update_user_permissions_form->runAtServer();
 }
 
 $pageTitle = $user['username'] == Auth::id()
@@ -386,7 +717,7 @@ $pageTitle = $user['username'] == Auth::id()
 							<input type="password" class="form-control" id="input-confirm_password" placeholder="<?= UOJLocale::get('re-enter your new password') ?>" maxlength="20">
 							<div id="help-confirm_password" class="invalid-feedback"></div>
 						</div>
-						<?php if (isSuperUser(Auth::user()) && $user['username'] != $myUser['username']) : ?>
+						<?php if (isSuperUser(Auth::user()) && $user['username'] != Auth::id()) : ?>
 							<div class="alert alert-warning mb-0" role="alert">
 								如需重置其他用户的密码，请前往 <a href="/super_manage/users" class="alert-link">系统管理</a> 页面操作。
 							</div>
@@ -451,105 +782,7 @@ $pageTitle = $user['username'] == Auth::id()
 			<div class="card">
 				<div class="card-body">
 					<div id="result-alert" class="alert" role="alert" style="display: none"></div>
-					<form id="form-privilege" method="post">
-						<?php if (isSuperUser(Auth::user())) : ?>
-							<fieldset>
-							<?php else : ?>
-								<fieldset disabled>
-								<?php endif ?>
-								<div class="mb-3">
-									<span>
-										<?= UOJLocale::get('user::user group') ?>
-									</span>
-									<span class="d-inline-block ms-3">
-										<?php if ($user['usergroup'] == 'S') : ?>
-											<?= UOJLocale::get('user::super user') ?>
-										<?php elseif ($user['usergroup'] == 'B') : ?>
-											<?= UOJLocale::get('user::banned user') ?>
-										<?php else : ?>
-											<?= UOJLocale::get('user::normal user') ?>
-										<?php endif ?>
-									</span>
-								</div>
-								<div class="input-group mb-3">
-									<label for="input-user_type" class="form-label">
-										<?= UOJLocale::get('user::user type') ?>
-									</label>
-									<div class="form-check ms-3">
-										<input class="form-check-input" type="radio" name="user_type" value="student" id="input-user_type" <?= hasUserType($user, 'student') && !hasUserType($user, 'teacher') ? 'checked' : '' ?>>
-										<label class="form-check-label" for="input-user_type">
-											<?= UOJLocale::get('user::student') ?>
-										</label>
-									</div>
-									<div class="form-check ms-2">
-										<input class="form-check-input" type="radio" name="user_type" value="teacher" id="input-user_type_2" <?= hasUserType($user, 'teacher') ? 'checked' : '' ?>>
-										<label class="form-check-label" for="input-user_type_2">
-											<?= UOJLocale::get('user::teacher') ?>
-										</label>
-									</div>
-								</div>
-
-								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" role="switch" name="problem_uploader" id="input-problem_uploader" <?= hasUserType($user, 'problem_uploader') ? 'checked' : '' ?>>
-									<label class="form-check-label" for="input-problem_uploader">
-										<?= UOJLocale::get('user::problem uploader') ?>
-									</label>
-								</div>
-
-								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" role="switch" name="problem_manager" id="input-problem_manager" <?= hasUserType($user, 'problem_manager') ? 'checked' : '' ?>>
-									<label class="form-check-label" for="input-problem_manager">
-										<?= UOJLocale::get('user::problem manager') ?>
-									</label>
-								</div>
-
-								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" role="switch" name="contest_judger" id="input-contest_judger" <?= hasUserType($user, 'contest_judger') ? 'checked' : '' ?>>
-									<label class="form-check-label" for="input-contest_judger">
-										<?= UOJLocale::get('user::contest judger') ?>
-									</label>
-								</div>
-								</fieldset>
-
-								<?php if (isSuperUser(Auth::user())) : ?>
-									<div class="text-center">
-										<button type="submit" id="button-submit-privilege" name="submit-privilege" value="privilege" class="mt-3 btn btn-secondary">更新</button>
-									</div>
-								<?php endif ?>
-					</form>
-					<script>
-						$('#form-privilege').submit(function(e) {
-							$('#result-alert').hide();
-
-							$.post('', {
-								user_type: $('input[name=user_type]:checked').val(),
-								problem_uploader: $('input[name=problem_uploader]').prop('checked') ? 'yes' : 'no',
-								problem_manager: $('input[name=problem_manager]').prop('checked') ? 'yes' : 'no',
-								contest_judger: $('input[name=contest_judger]').prop('checked') ? 'yes' : 'no',
-								'submit-privilege': 'privilege',
-							}, function(res) {
-								if (res && res.status === 'success') {
-									$('#result-alert')
-										.html('权限修改成功！')
-										.addClass('alert-success')
-										.removeClass('alert-danger')
-										.show();
-
-									$(window).scrollTop(0);
-								} else {
-									$('#result-alert')
-										.html('权限修改失败。' + (res.message || ''))
-										.removeClass('alert-success')
-										.addClass('alert-danger')
-										.show();
-
-									$(window).scrollTop(0);
-								}
-							});
-
-							return false;
-						});
-					</script>
+					<?php $update_user_permissions_form->printHTML() ?>
 				</div>
 			</div>
 		<?php endif ?>

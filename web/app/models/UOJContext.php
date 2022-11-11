@@ -2,13 +2,46 @@
 
 class UOJContext {
 	public static $meta_default = [
-		'active_duration_M' => 12,
+		'users_default_permissions' => [
+			'problems' => [
+				'view' => true,
+				'download_testdata' => false,
+				'create' => false,
+				'manage' => false,
+			],
+			'contests' => [
+				'view' => true,
+				'register' => true,
+				'create' => false,
+				'start_final_test' => false,
+				'manage' => false,
+			],
+			'lists' => [
+				'view' => true,
+				'create' => false,
+				'manage' => false,
+			],
+			'groups' => [
+				'view' => true,
+				'create' => false,
+				'manage' => false,
+			],
+			'blogs' => [
+				'view' => true,
+				'create' => true,
+				'manage' => false,
+			],
+			'users' => [
+				'view' => true,
+				'upload_image' => true,
+			],
+		],
 	];
 
 	public static $data = [
 		'type' => 'main'
 	];
-	
+
 	public static function pageConfig() {
 		switch (self::$data['type']) {
 			case 'main':
@@ -23,23 +56,23 @@ class UOJContext {
 				];
 		}
 	}
-	
+
 	public static function isAjax() {
 		return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 	}
-	
+
 	public static function contentLength() {
 		if (!isset($_SERVER['CONTENT_LENGTH'])) {
 			return null;
 		}
 		return (int)$_SERVER['CONTENT_LENGTH'];
 	}
-	
+
 	public static function documentRoot() {
 		return $_SERVER['DOCUMENT_ROOT'];
 	}
 	public static function storagePath() {
-		return $_SERVER['DOCUMENT_ROOT'].'/app/storage';
+		return $_SERVER['DOCUMENT_ROOT'] . '/app/storage';
 	}
 	public static function remoteAddr() {
 		return $_SERVER['REMOTE_ADDR'];
@@ -100,7 +133,7 @@ class UOJContext {
 		if (validateIP($domain) || strpos($domain, '.') === false) {
 			$domain = '';
 		} else {
-			$domain = '.'.$domain;
+			$domain = '.' . $domain;
 		}
 		return $domain;
 	}
@@ -112,7 +145,7 @@ class UOJContext {
 	public static function type() {
 		return self::$data['type'];
 	}
-	
+
 	public static function setupBlog() {
 		UOJUserBlog::init();
 		self::$data['type'] = 'blog';

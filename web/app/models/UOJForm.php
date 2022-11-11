@@ -1,36 +1,41 @@
 <?php
 
 class UOJForm {
-	public $form_name;
-	public $succ_href;
-	public $back_href = null;
-	public $no_submit = false;
-	public $ctrl_enter_submit = false;
+	public ?string $form_name;
+	public ?string $succ_href;
 	public $extra_validator = null;
-	public $is_big = false;
-	public $has_file = false;
-	public $ajax_submit_js = null;
-	public $run_at_server_handler = [];
+	public $handle;
+	private $ajax_submit_js = null;
+	private $run_at_server_handler = [];
 	private $data = [];
 	private $vdata = [];
 	private $main_html = '';
-	public $max_post_size = 15728640; // 15M
-	public $max_file_size_mb = 10; // 10M
-
-	public $handle;
 
 	public $config = [
-		'container' => [
+		'is_big' => false,
+		'has_file' => false,
+		'ctrl_enter_submit' => false,
+		'max_post_size' => 15728640, // 15M
+		'max_file_size_mb' => 10, // 10M
+		'form' => [
 			'class' => '',
 		],
+		'submit_container' => [
+			'class' => 'mt-3 text-center',
+		],
 		'submit_button' => [
+			'class' => 'btn btn-primary',
+			'text' => '提交',
+		],
+		'back_button' => [
+			'href' => null,
 			'class' => 'btn btn-secondary',
 		],
+		'confirm' => [
+			'smart' => false,
+			'text' => null,
+		]
 	];
-	public $submit_button_config = [];
-	public $control_label_config = ['class' => 'col-sm-2'];
-	public $input_config = ['class' => 'col-sm-3'];
-	public $textarea_config = ['class' => 'col-sm-10'];
 
 	public function __construct($form_name) {
 		$this->form_name = $form_name;
@@ -42,7 +47,7 @@ class UOJForm {
 			die(json_encode($this->validateAtServer()));
 		};
 		$this->run_at_server_handler["submit-{$this->form_name}"] = function () {
-			if ($this->no_submit) {
+			if ($this->config['no_submit']) {
 				UOJResponse::page404();
 			}
 			foreach ($this->data as $field) {
@@ -55,7 +60,7 @@ class UOJForm {
 				$len = UOJContext::contentLength();
 				if ($len === null) {
 					UOJResponse::page403();
-				} elseif ($len > $this->max_post_size) {
+				} elseif ($len > $this->config['max_post_size']) {
 					UOJResponse::message('The form is too large.');
 				}
 			}
@@ -87,14 +92,11 @@ class UOJForm {
 
 	public function add($name, $html, $validator_php, $validator_js) {
 		$this->main_html .= $html;
-		$this->data[] = array(
+		$this->data[] = [
 			'name' => $name,
 			'validator_php' => $validator_php,
 			'validator_js' => $validator_js
-		);
-	}
-	public function appendHTML($html) {
-		$this->main_html .= $html;
+		];
 	}
 
 	public function addNoVal($name, $html) {
@@ -106,6 +108,10 @@ class UOJForm {
 		);
 	}
 
+	public function appendHTML($html) {
+		$this->main_html .= $html;
+	}
+
 	public function addHidden($name, $default_value, $validator_php, $validator_js) {
 		$default_value = HTML::escape($default_value);
 		$html = <<<EOD
@@ -114,78 +120,102 @@ class UOJForm {
 		$this->add($name, $html, $validator_php, $validator_js);
 	}
 
-	public function printHTML() {
-		$form_entype_str = $this->is_big ? ' enctype="multipart/form-data"' : '';
+	public function addCheckbox($name, $config) {
+		$config += [
+			'checked' => false,
+			'div_class' => 'form-check',
+			'role' => 'checkbox',
+			'input_class' => 'form-check-input',
+			'label' => '',
+			'label_class' => 'form-check-label',
+			'help' => '',
+			'help_class' => 'form-text',
+			'disabled' => false,
+		];
 
-		echo '<form action="', $_SERVER['REQUEST_URI'], '" method="post" class="" id="form-', $this->form_name, '"', $form_entype_str, '>';
-		echo HTML::hiddenToken();
-		echo $this->main_html;
+		$html = '';
+		$html .= HTML::tag_begin('div', ['class' => $config['div_class']]);
+		$html .= HTML::empty_tag('input', [
+			'class' => $config['input_class'],
+			'type' => 'checkbox',
+			'name' => $name,
+			'id' => "input-$name",
+			'checked' => $config['checked'] ? 'checked' : null,
+			'value' => '1',
+			'disabled' => $config['disabled'] ? 'disabled' : null,
+		]);
+		$html .= HTML::tag('label', [
+			'class' => $config['label_class'],
+			'for' => "input-$name",
+		], $config['label']);
 
-		if (!$this->no_submit) {
-			if (!isset($this->submit_button_config['align'])) {
-				$this->submit_button_config['align'] = 'center';
-			}
-			if (!isset($this->submit_button_config['text'])) {
-				$this->submit_button_config['text'] = UOJLocale::get('submit');
-			}
-			if (!isset($this->submit_button_config['class_str'])) {
-				$this->submit_button_config['class_str'] = 'btn btn-secondary';
-			}
-			if ($this->submit_button_config['align'] == 'offset') {
-				echo '<div class="form-group">';
-				echo '<div class="col-sm-offset-2 col-sm-3">';
-			} else {
-				echo '<div class="text-', $this->submit_button_config['align'], '">';
-			}
-
-			if ($this->back_href !== null) {
-				echo '<div class="btn-toolbar">';
-			}
-			echo HTML::tag('button', [
-				'type' => 'submit', 'id' => "button-submit-{$this->form_name}", 'name' => "submit-{$this->form_name}",
-				'value' => $this->form_name, 'class' => $this->submit_button_config['class_str']
-			], $this->submit_button_config['text']);
-			if ($this->back_href !== null) {
-				echo HTML::tag('a', [
-					'class' => 'btn btn-secondary', 'href' => $this->back_href
-				], '返回');
-			}
-			if ($this->back_href !== null) {
-				echo '</div>';
-			}
-
-			if ($this->submit_button_config['align'] == 'offset') {
-				echo '</div>';
-			}
-			echo '</div>';
+		if ($config['help']) {
+			$html .= HTML::tag('div', ['class' => $config['help_class']], $config['help']);
 		}
 
-		echo '</form>';
+		$html .= HTML::tag_end('div');
 
-		if ($this->no_submit) {
+		$this->addNoVal($name, $html);
+	}
+
+	public function printHTML() {
+		echo HTML::tag_begin('form', [
+			'action' => UOJContext::requestURI(),
+			'method' => 'POST',
+			'class' => $this->config['form']['class'],
+			'id' => "form-{$this->form_name}",
+			'enctype' => $this->config['is_big'] ? 'multipart/form-data' : 'application/x-www-form-urlencoded',
+		]);
+
+		echo HTML::hiddenToken();
+
+		echo $this->main_html;
+
+		if (!$this->config['no_submit']) {
+			echo HTML::tag_begin('div', ['class' => $this->config['submit_container']['class']]);
+
+			echo HTML::tag('button', [
+				'type' => 'submit',
+				'id' => "button-submit-{$this->form_name}",
+				'name' => "submit-{$this->form_name}",
+				'value' => $this->form_name,
+				'class' => $this->config['submit_button']['class']
+			], $this->config['submit_button']['text']);
+
+			if ($this->config['back_button']['href'] !== null) {
+				echo HTML::tag('a', [
+					'class' => $this->config['back_button']['class'],
+					'href' => $this->config['back_button']['href']
+				], '返回');
+			}
+
+			echo HTML::tag_end('div');
+		}
+
+		echo HTML::tag_end('form');
+
+		if ($this->config['no_submit']) {
 			return;
 		}
 
 		echo <<<EOD
-					<script type="text/javascript">
-					$(document).ready(function() {
-
-					EOD;
-		if ($this->ctrl_enter_submit) {
+		<script type="text/javascript">
+			$(document).ready(function() {
+		EOD;
+		if ($this->config['ctrl_enter_submit']) {
 			echo <<<EOD
-						$('#form-{$this->form_name}').keydown(function(e) {
-							if (e.keyCode == 13 && e.ctrlKey) {
-								$('#button-submit-{$this->form_name}').click();
-							}
-						});
-
-					EOD;
+				$('#form-{$this->form_name}').keydown(function(e) {
+					if (e.keyCode == 13 && e.ctrlKey) {
+						$('#button-submit-{$this->form_name}').click();
+					}
+				});
+		EOD;
 		}
 		echo <<<EOD
-						$('#form-{$this->form_name}').submit(function(e) {
-							var ok = true;
+				$('#form-{$this->form_name}').submit(function(e) {
+					var ok = true;
 
-					EOD;
+		EOD;
 		$need_ajax = false;
 		if ($this->extra_validator) {
 			$need_ajax = true;
@@ -194,8 +224,7 @@ class UOJForm {
 			if ($field['validator_js'] != null) {
 				if ($field['validator_js'] != 'always_ok') {
 					echo <<<EOD
-							var {$field['name']}_err = ({$field['validator_js']})($('#input-{$field['name']}').val());
-
+					var {$field['name']}_err = ({$field['validator_js']})($('#input-{$field['name']}').val());
 					EOD;
 				}
 			} else {
@@ -205,125 +234,116 @@ class UOJForm {
 
 		if ($need_ajax) {
 			echo <<<EOD
-							var post_data = {};
-
-					EOD;
+					var post_data = {};
+			EOD;
 			foreach ($this->data as $field) {
 				if ($field['validator_js'] == null) {
 					echo <<<EOD
-							var {$field['name']}_err = 'Unknown error';
-							post_data.{$field['name']} = $('#input-{$field['name']}').val();
-
+						var {$field['name']}_err = 'Unknown error';
+						post_data.{$field['name']} = $('#input-{$field['name']}').val();
 					EOD;
 				}
 			}
 			echo <<<EOD
-							post_data['check-{$this->form_name}'] = "";
-							$.ajax({
-								url : '{$_SERVER['REQUEST_URI']}',
-								type : 'POST',
-								dataType : 'json',
-								async : false,
+				post_data['check-{$this->form_name}'] = "";
+				$.ajax({
+					url: '{$_SERVER['REQUEST_URI']}',
+					type: 'POST',
+					dataType: 'json',
+					async: false,
 
-								data : post_data,
-								success : function(data) {
-
-					EOD;
+					data: post_data,
+					success: function(data) {
+			EOD;
 			foreach ($this->data as $field) {
 				if ($field['validator_js'] == null) {
 					echo <<<EOD
-									{$field['name']}_err = data.${field['name']};
-
+						{$field['name']}_err = data.${field['name']};
 					EOD;
 				}
 			}
 			echo <<<EOD
-									if (data.extra != undefined) {
-										alert(data.extra);
-										ok = false;
-									}
-								}
-							});
-
-					EOD;
+						if (data.extra != undefined) {
+							alert(data.extra);
+							ok = false;
+						}
+					}
+				});
+			EOD;
 		}
 
 		foreach ($this->data as $field) {
 			if ($field['validator_js'] != 'always_ok') {
 				echo <<<EOD
-							if (${field['name']}_err) {
-								$('#div-${field['name']}').addClass('has-validation has-error');
-								$('#div-${field['name']}').addClass('is-invalid');
-								$('#input-${field['name']}').addClass('is-invalid');
-								$('#help-${field['name']}').text(${field['name']}_err);
-								ok = false;
-							} else {
-								$('#div-${field['name']}').removeClass('has-validation has-error');
-								$('#div-${field['name']}').removeClass('is-invalid');
-								$('#input-${field['name']}').removeClass('is-invalid');
-								$('#help-${field['name']}').text('');
-							}
-					EOD;
+					if (${field['name']}_err) {
+						$('#div-${field['name']}').addClass('has-validation has-error');
+						$('#div-${field['name']}').addClass('is-invalid');
+						$('#input-${field['name']}').addClass('is-invalid');
+						$('#help-${field['name']}').text(${field['name']}_err);
+						ok = false;
+					} else {
+						$('#div-${field['name']}').removeClass('has-validation has-error');
+						$('#div-${field['name']}').removeClass('is-invalid');
+						$('#input-${field['name']}').removeClass('is-invalid');
+						$('#help-${field['name']}').text('');
+					}
+				EOD;
 			}
 		}
 
-		if (isset($this->submit_button_config['smart_confirm'])) {
-			$this->submit_button_config['confirm_text'] = '你真的要' . $this->submit_button_config['text'] . '吗？';
+		if ($this->config['confirm']['smart']) {
+			$this->config['confirm']['text'] = '你真的要' . $this->config['submit']['text'] . '吗？';
 		}
-		if (isset($this->submit_button_config['confirm_text'])) {
+		if ($this->config['confirm']['text']) {
 			echo <<<EOD
-							if (!confirm('{$this->submit_button_config['confirm_text']}')) {
-								ok = false;
-							}
-
-					EOD;
+				if (!confirm('{$this->config['confirm']['text']}')) {
+					ok = false;
+				}
+			EOD;
 		}
-		if ($this->has_file) {
+		if ($this->config['has_file']) {
 			echo <<<EOD
-							$(this).find("input[type='file']").each(function() {
-								for (var i = 0; i < this.files.length; i++) {
-									if (this.files[i].size > {$this->max_file_size_mb} * 1024 * 1024) {
-										$('#div-' + $(this).attr('name')).addClass('has-validation has-error');
-										$('#div-' + $(this).attr('name')).addClass('is-invalid');
-										$('#input-' + $(this).attr('name')).addClass('is-invalid');
-										$('#help-' + $(this).attr('name')).text('文件大小不能超过{$this->max_file_size_mb}M');
-										ok = false;
-									} else {
-										$('#div-' + $(this).attr('name')).removeClass('has-validation has-error');
-										$('#div-' + $(this).attr('name')).removeClass('is-invalid');
-										$('#input-' + $(this).attr('name')).removeClass('is-invalid');
-										$('#help-' + $(this).attr('name')).text('');
-									}
-								}
-							});
-
-					EOD;
+				$(this).find("input[type='file']").each(function() {
+					for (var i = 0; i < this.files.length; i++) {
+						if (this.files[i].size > {$this->config['max_file_size_mb']} * 1024 * 1024) {
+							$('#div-' + $(this).attr('name')).addClass('has-validation has-error');
+							$('#div-' + $(this).attr('name')).addClass('is-invalid');
+							$('#input-' + $(this).attr('name')).addClass('is-invalid');
+							$('#help-' + $(this).attr('name')).text('文件大小不能超过 {$this->config['max_file_size_mb']} MB');
+							ok = false;
+						} else {
+							$('#div-' + $(this).attr('name')).removeClass('has-validation has-error');
+							$('#div-' + $(this).attr('name')).removeClass('is-invalid');
+							$('#input-' + $(this).attr('name')).removeClass('is-invalid');
+							$('#help-' + $(this).attr('name')).text('');
+						}
+					}
+				});
+			EOD;
 		}
 
 		if ($this->ajax_submit_js !== null) {
 			echo <<<EOD
-							e.preventDefault();
-							if (ok) {
-								$(this).ajaxSubmit({
-									beforeSubmit: function(formData) {
-										formData.push({name: 'submit-{$this->form_name}', value: '{$this->form_name}', type: 'submit'});
-									},
-									success : {$this->ajax_submit_js}
-								});
-							}
-
-					EOD;
+				e.preventDefault();
+				if (ok) {
+					$(this).ajaxSubmit({
+						beforeSubmit: function(formData) {
+							formData.push({name: 'submit-{$this->form_name}', value: '{$this->form_name}', type: 'submit'});
+						},
+						success: {$this->ajax_submit_js}
+					});
+				}
+			EOD;
 		} else {
 			echo <<<EOD
-							return ok;
-
-					EOD;
+				return ok;
+			EOD;
 		}
 		echo <<<EOD
-						});
-					});
-					</script>
-					EOD;
+				});
+			});
+		</script>
+		EOD;
 	}
 
 	private function validateAtServer() {

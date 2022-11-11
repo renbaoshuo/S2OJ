@@ -7,7 +7,7 @@ requirePHPLib('judger');
 
 Auth::check() || redirectToLogin();
 UOJProblem::init(UOJRequest::get('id')) || UOJResponse::page404();
-UOJProblem::cur()->userCanView(Auth::user()) || UOJResponse::page403();
+UOJProblem::cur()->userCanView(Auth::user(), ['ensure' => true]);
 
 if (!UOJProblem::cur()->userCanManage(Auth::user())) {
 	UOJProblem::cur()->userPermissionCodeCheck(Auth::user(), UOJProblem::cur()->getExtraConfig('view_solution_type')) || UOJResponse::page403();
@@ -81,8 +81,8 @@ if (UOJProblem::cur()->userCanManage(Auth::user()) || UOJProblem::cur()->userPer
 				}
 			}
 
-			if (querySolution(UOJProblem::info('id'), $blog_id)) {
-				return '该题解已提交';
+			if ($problem_id = $blog->getSolutionProblemId()) {
+				return "该博客已经是题目 #$problem_id 的题解";
 			}
 
 			return '';
@@ -200,15 +200,12 @@ $pag = new Paginator($pag_config);
 			</ul>
 		</div>
 
-		<!-- Pagination -->
 		<?= $pag->pagination() ?>
-
 	</div>
-	<!-- End left col -->
+	<!-- end left col -->
 
-	<!-- Right col -->
+	<!-- right col -->
 	<aside class="col-lg-3 mt-3 mt-lg-0">
-
 		<div class="card card-default mb-2">
 			<ul class="nav nav-pills nav-fill flex-column" role="tablist">
 				<li class="nav-item text-start">

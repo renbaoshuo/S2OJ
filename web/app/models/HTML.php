@@ -46,6 +46,7 @@ class HTML {
 	public static function attr($attr) {
 		$html = '';
 		foreach ($attr as $key => $val) {
+			if ($val === null) continue;
 			$html .= ' ' . $key . '="';
 			$html .= HTML::escape(is_array($val) ? implode(' ', $val) : $val);
 			$html .= '"';

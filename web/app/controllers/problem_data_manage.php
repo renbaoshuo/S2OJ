@@ -127,7 +127,7 @@ if ($_POST['problem_settings_file_submit'] == 'submit') {
 
 $info_form = new UOJBs4Form('info');
 $http_host = HTML::escape(UOJContext::httpHost());
-$attachment_url = HTML::url("/download.php?type=attachment&id={$problem['id']}");
+$attachment_url = UOJProblem::cur()->getAttachmentUri();
 $info_form->appendHTML(
 	<<<EOD
 <div class="form-group row">
@@ -140,7 +140,7 @@ $info_form->appendHTML(
 </div>
 EOD
 );
-$download_url = HTML::url("/download.php?type=problem&id={$problem['id']}");
+$download_url = UOJProblem::cur()->getMainDataUri();
 $info_form->appendHTML(
 	<<<EOD
 <div class="form-group row">
@@ -194,7 +194,7 @@ $esc_extra_config
 </div>
 EOD
 );
-if (isSuperUser($myUser)) {
+if (isSuperUser(Auth::user())) {
 	$info_form->addVInput(
 		'submission_requirement',
 		'text',

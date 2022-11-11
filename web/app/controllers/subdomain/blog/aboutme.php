@@ -3,6 +3,8 @@ requireLib('bootstrap5');
 requireLib('calendar_heatmap');
 
 Auth::check() || redirectToLogin();
+UOJUserBlog::userIsOwner(Auth::user()) || UOJUser::checkPermission(Auth::user(), 'blogs.view') || UOJResponse::page403();
+Auth::id() == $user['username'] || UOJUser::checkPermission(Auth::user(), 'users.view') || UOJResponse::page403();
 ?>
 <?php echoUOJPageHeader('关于我') ?>
 

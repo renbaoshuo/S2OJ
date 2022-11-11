@@ -4,6 +4,7 @@ requireLib('mathjax');
 requireLib('hljs');
 requirePHPLib('form');
 
+Auth::check() || redirectToLogin();
 UOJBlog::init(UOJRequest::get('id')) || UOJResponse::page404();
 UOJBlog::cur()->belongsToUserBlog() || UOJResponse::page404();
 UOJBlog::cur()->userCanView(Auth::user()) || UOJResponse::page403();
@@ -15,21 +16,6 @@ function getCommentContentToDisplay($comment) {
 		return $comment['content'];
 	} else {
 		return '<span class="text-muted">【' . HTML::escape($comment['reason_to_hide']) . '】</span>';
-	}
-}
-
-if (!Auth::check()) {
-	redirectToLogin();
-}
-
-$solutions = DB::selectAll("select * from problems_solutions where blog_id = {$blog['id']}");
-if ($solutions) {
-	foreach ($solutions as $solution) {
-		$problem = queryProblemBrief($solution['problem_id']);
-
-		if (!hasProblemPermission($myUser, $problem) && isRegisteredRunningContestProblem($myUser, $problem)) {
-			become403Page();
-		}
 	}
 }
 

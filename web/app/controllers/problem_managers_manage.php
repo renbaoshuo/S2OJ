@@ -31,7 +31,7 @@ $managers_form = newAddDelCmdForm(
 
 $managers_form->runAtServer();
 
-if (isSuperUser($myUser)) {
+if (isSuperUser(Auth::user())) {
 	$update_uploader_form = new UOJBs4Form('update_uploader');
 	$update_uploader_form->addInput(
 		'new_uploader_username',

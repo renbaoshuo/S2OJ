@@ -4,6 +4,7 @@ requireLib('hljs');
 requireLib('mathjax');
 
 Auth::check() || redirectToLogin();
+UOJUserBlog::userIsOwner(Auth::user()) || UOJUser::checkPermission(Auth::user(), 'blogs.view') || UOJResponse::page403();
 
 $blogs_pag = new Paginator([
 	'col_names' => ['*'],
@@ -33,7 +34,7 @@ $all_tags = DB::selectAll("select distinct tag from blogs_tags where blog_id in 
 	</div>
 	<div class="col-lg-3">
 		<img class="media-object img-thumbnail center-block" alt="<?= UOJUserBlog::id() ?> Avatar" src="<?= HTML::avatar_addr(UOJUserBlog::user(), 512) ?>" />
-		<?php if (UOJUserBlog::userCanManage(Auth::user())) : ?>
+		<?php if (UOJUserBlog::userCanManage(Auth::user()) && UOJUser::checkPermission(Auth::user(), 'blogs.create')) : ?>
 			<div class="btn-group d-flex mt-3">
 				<a href="<?= HTML::blog_url(UOJUserBlog::id(), '/post/new/write') ?>" class="btn btn-primary">
 					<i class="bi bi-pencil-square"></i>

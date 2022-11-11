@@ -192,7 +192,7 @@
 		</nav>
 
 		<?php if (!isset($is_blog_aboutme)) : ?>
-			<?php $groups = UOJGroup::queryGroupsOfUser($user['username']) ?>
+			<?php $groups = UOJGroup::queryGroupsOfUser($user) ?>
 			<div class="card mb-2">
 				<div class="card-body">
 					<h4 class="card-title">

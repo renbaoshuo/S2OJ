@@ -21,10 +21,12 @@ Auth::check() || redirectToLogin();
 						<a href="<?= HTML::blog_url(Auth::id(), '/') ?>" class="btn btn-secondary btn-sm">
 							我的博客首页
 						</a>
-						<a href="<?= HTML::blog_url(Auth::id(), '/post/new/write') ?>" class="btn btn-primary btn-sm">
-							<i class="bi bi-pencil"></i>
-							写新博客
-						</a>
+						<?php if (UOJUser::checkPermission(Auth::user(), 'blogs.create')) : ?>
+							<a href="<?= HTML::blog_url(Auth::id(), '/post/new/write') ?>" class="btn btn-primary btn-sm">
+								<i class="bi bi-pencil"></i>
+								写新博客
+							</a>
+						<?php endif ?>
 					</div>
 				</div>
 			<?php endif ?>
@@ -35,16 +37,16 @@ Auth::check() || redirectToLogin();
 		echoLongTable(
 			['id', 'poster', 'title', 'post_time', 'zan', 'is_hidden'],
 			'blogs',
-			isSuperUser($myUser) ? "1" : "is_hidden = 0 or poster = '{$myUser['username']}'",
+			'1',
 			'order by post_time desc',
 			<<<EOD
-	<tr>
-		<th>标题</th>
-		<th style="width:200px">发表者</th>
-		<th style="width:200px">发表日期</th>
-		<th style="width:50px" class="text-center">评价</th>
-	</tr>
-EOD,
+				<tr>
+					<th>标题</th>
+					<th style="width:200px">发表者</th>
+					<th style="width:200px">发表日期</th>
+					<th style="width:50px" class="text-center">评价</th>
+				</tr>
+			EOD,
 			function ($info) {
 				$blog = new UOJBlog($info);
 
@@ -64,6 +66,9 @@ EOD,
 				'page_len' => 10,
 				'div_classes' => ['card', 'my-3', 'table-responsive'],
 				'table_classes' => ['table', 'uoj-table', 'mb-0'],
+				'post_filter' => function ($info) {
+					return (new UOJBlog($info))->userCanView(Auth::user());
+				},
 			]
 		);
 		?>

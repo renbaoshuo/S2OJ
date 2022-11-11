@@ -4,6 +4,7 @@ return [
 	'super user' => 'Super User',
 	'normal user' => 'Normal User',
 	'banned user' => 'Banned User',
+	'tmp user' => 'Temporary User',
 	'real name' => 'Real name',
 	'belongs to these groups' => 'Belongs to these groups:',
 	'avatar source' => 'Avatar source',

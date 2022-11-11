@@ -1,13 +1,11 @@
 <?php
-	requireLib('bootstrap5');
-	requireLib('calendar_heatmap');
+requireLib('bootstrap5');
+requireLib('calendar_heatmap');
 
-	if (!Auth::check()) {
-		redirectToLogin();
-	}
-
-	($user = UOJUser::query($_GET['username'])) || UOJResponse::page404();
-	?>
+Auth::check() || redirectToLogin();
+($user = UOJUser::query($_GET['username'])) || UOJResponse::page404();
+Auth::id() == $user['username'] || UOJUser::checkPermission(Auth::user(), 'users.view') || UOJResponse::page403();
+?>
 
 <?php echoUOJPageHeader($user['username'] . ' - ' . UOJLocale::get('user profile')) ?>
 

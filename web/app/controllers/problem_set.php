@@ -5,8 +5,9 @@ requirePHPLib('judger');
 requirePHPLib('data');
 
 Auth::check() || redirectToLogin();
+UOJUser::checkPermission(Auth::user(), 'problems.view') || UOJResponse::page403();
 
-if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)) {
+if (UOJProblem::userCanCreateProblem(Auth::user())) {
 	$default_statement = <<<'EOD'
 <!-- 题目中如有图片，请点击页面顶部的「应用」菜单，打开「图床」，上传至 S2OJ 图床中。 -->
 
@@ -240,12 +241,11 @@ $pag = new Paginator([
 
 		<!-- title -->
 		<div class="d-flex justify-content-between">
-
 			<h1>
 				<?= UOJLocale::get('problems') ?>
 			</h1>
 
-			<?php if (isSuperUser($myUser) || isProblemManager($myUser) || isProblemUploader($myUser)) : ?>
+			<?php if (isset($new_problem_form)) : ?>
 				<div class="text-end">
 					<?php $new_problem_form->printHTML(); ?>
 				</div>
@@ -360,7 +360,7 @@ $pag = new Paginator([
 					</label>
 				</div>
 			<?php endif ?>
-			<?php if (isProblemManager(Auth::user())) : ?>
+			<?php if (UOJProblem::userCanManageSomeProblem(Auth::user())) : ?>
 				<div class="form-check d-inline-block ms-2">
 					<input type="checkbox" name="is_hidden" <?= isset($_GET['is_hidden']) ? 'checked="checked"' : '' ?> class="form-check-input" id="input-is_hidden">
 					<label class="form-check-label" for="input-is_hidden">

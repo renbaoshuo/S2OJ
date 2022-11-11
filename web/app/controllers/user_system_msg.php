@@ -55,7 +55,7 @@ $system_msgs = [];
 foreach ($pag->get() as $idx => $msg) {
 	$system_msgs[$idx] = $msg;
 
-	if (isSuperUser($myUser)) {
+	if (isSuperUser(Auth::user())) {
 		$delete_form = newDeleteSystemMsgForm($msg['id']);
 		$delete_form->runAtServer();
 		$system_msgs[$idx]['delete_form'] = $delete_form;

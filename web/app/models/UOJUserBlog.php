@@ -26,10 +26,17 @@ class UOJUserBlog {
 		return self::$user;
 	}
 
+	public static function userIsOwner(?array $user) {
+		if ($user === null) {
+			return false;
+		}
+		return self::$user['username'] === $user['username'];
+	}
+
 	public static function userCanManage(?array $user, ?string $whose_blog = null) {
 		if ($whose_blog === null) {
 			$whose_blog = self::id();
 		}
-		return $user && (isSuperUser($user) || $user['username'] === $whose_blog);
+		return $user && (isSuperUser($user) || UOJUser::checkPermission($user, 'blogs.manage') || $user['username'] === $whose_blog);
 	}
 }

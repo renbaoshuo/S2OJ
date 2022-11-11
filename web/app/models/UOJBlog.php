@@ -10,7 +10,7 @@ class UOJBlog {
 		}
 		$info = DB::selectFirst([
 			"select id, title, post_time, active_time, poster, zan, is_hidden, type from blogs",
-		    "where", ['id' => $id]
+			"where", ['id' => $id]
 		]);
 		if (!$info) {
 			return null;
@@ -21,7 +21,7 @@ class UOJBlog {
 	public function __construct($info) {
 		$this->info = $info;
 	}
-	
+
 	/**
 	 * Check if the blog belongs to the current user blog
 	 */
@@ -30,7 +30,25 @@ class UOJBlog {
 	}
 
 	public function userCanView(array $user = null) {
-		return !$this->info['is_hidden'] || $this->userCanManage($user);
+		if ($this->userCanManage($user)) {
+			return true;
+		}
+
+		if ($this->info['poster'] != $user['username'] && !UOJUser::checkPermission($user, 'blogs.view')) {
+			return false;
+		}
+
+		if ($problem_id = $this->getSolutionProblemId()) {
+			$contests = UOJContest::queryContestsHasProblem($problem_id);
+
+			foreach ($contests as $contest) {
+				if ($contest->userHasRegistered($user) && $contest->progress() <= CONTEST_IN_PROGRESS) {
+					return false;
+				}
+			}
+		}
+
+		return !$this->info['is_hidden'];
 	}
 
 	public function userCanManage(array $user = null) {
@@ -70,7 +88,7 @@ class UOJBlog {
 				$link .= "{$level_str} ";
 			}
 		}
-		$link .= '<a href="'. $this->getBlogUri() .'">'.$this->getTitle($cfg).'</a>';
+		$link .= '<a href="' . $this->getBlogUri() . '">' . $this->getTitle($cfg) . '</a>';
 		if (!empty($cfg['show_new_tag'])) {
 			if ($this->isNew()) {
 				$link .= '<sup style="color:red">&nbsp;new</sup>';
@@ -104,7 +122,7 @@ class UOJBlog {
 				return '';
 		}
 	}
-	
+
 	public function queryNewestComment() {
 		return DB::selectFirst([
 			"select * from blogs_comments",
@@ -116,15 +134,15 @@ class UOJBlog {
 			DB::limit(1)
 		]);
 	}
-	
+
 	public function updateActiveTime() {
 		$active_time = $this->info['post_time'];
-		
+
 		$newest = $this->queryNewestComment();
 		if ($newest) {
 			$active_time = $newest['post_time'];
 		}
-		
+
 		DB::update([
 			"update blogs",
 			"set", ['active_time' => $active_time],
@@ -190,6 +208,15 @@ class UOJBlog {
 			'is_preview' => false
 		];
 		uojIncludeView('blog-preview', $cfg);
+	}
+
+	public function getSolutionProblemId() {
+		return DB::selectSingle([
+			DB::lc(), "select 1 from problems_solutions",
+			"where", [
+				"blog_id" => $this->info['id'],
+			],
+		]);
 	}
 }
 

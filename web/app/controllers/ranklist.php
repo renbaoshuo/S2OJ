@@ -2,6 +2,7 @@
 requireLib('bootstrap5');
 
 Auth::check() || redirectToLogin();
+UOJUser::checkPermission(Auth::user(), 'users.view') || UOJResponse::page403();
 
 $config = [
 	'page_len' => 50,
@@ -34,7 +35,6 @@ if (isset($_GET['type']) && $_GET['type'] == 'accepted') {
 		<?php uojIncludeView('sidebar') ?>
 	</aside>
 	<!-- end right col -->
-
 </div>
 
 <?php echoUOJPageFooter() ?>

@@ -313,7 +313,7 @@ if (UOJContest::cur()) {
 					</div>
 				</div>
 				<div class="card-footer bg-transparent">
-					比赛评价：<?= ClickZans::getBlock('C', UOJContest::info('id'), UOJContest::info('zan')) ?>
+					比赛评价：<?= UOJContest::cur()->getZanBlock() ?>
 				</div>
 			</div>
 			<?php if (UOJContest::cur()->progress() <= CONTEST_IN_PROGRESS) : ?>
