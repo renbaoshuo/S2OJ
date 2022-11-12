@@ -243,8 +243,8 @@ if (UOJContest::cur()) {
 				</h1>
 
 				<?php
-				$time_limit = $conf instanceof UOJProblemConf ? $conf->getVal('time_limit', null) : null;
-				$memory_limit = $conf instanceof UOJProblemConf ? $conf->getVal('memory_limit', null) : null;
+				$time_limit = $conf instanceof UOJProblemConf ? $conf->getVal('time_limit', 1) : null;
+				$memory_limit = $conf instanceof UOJProblemConf ? $conf->getVal('memory_limit', 256) : null;
 				?>
 				<div class="text-center small">
 					时间限制: <?= $time_limit ? "$time_limit s" : "N/A" ?>
@@ -285,16 +285,13 @@ if (UOJContest::cur()) {
 						</div>
 					<?php endif ?>
 				</div>
-
 			</div>
 		</div>
-
 	</div>
-	<!-- End left col -->
+	<!-- end left col -->
 
+	<!-- right col -->
 	<aside class="col-lg-3 mt-3 mt-lg-0">
-		<!-- Right col -->
-
 		<?php if (UOJContest::cur()) : ?>
 			<!-- Contest card -->
 			<div class="card card-default mb-2">
