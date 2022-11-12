@@ -439,6 +439,130 @@ if ($cur_tab == 'index') {
 EOD);
 	$register_form->runAtServer();
 
+	$register_tmp_user_form = new UOJBs4Form('register_tmp_user');
+	$register_tmp_user_form->addVInput(
+		'new_tmp_username',
+		'text',
+		'用户名',
+		'',
+		function ($username, &$vdata) {
+			if (!validateUsername($username)) {
+				return '用户名不合法';
+			}
+
+			if (UOJUser::query($username)) {
+				return '该用户已存在';
+			}
+
+			$vdata['username'] = $username;
+
+			return '';
+		},
+		null
+	);
+	$register_tmp_user_form->addVInput(
+		'new_tmp_password',
+		'password',
+		'密码',
+		'',
+		function ($password, &$vdata) {
+			$vdata['password'] = $password;
+
+			return '';
+		},
+		'validatePassword'
+	);
+	$register_tmp_user_form->addVInput(
+		'new_tmp_email',
+		'text',
+		'电子邮件（选填）',
+		'',
+		function ($email, &$vdata) {
+			if ($email && !validateEmail($email)) {
+				return '邮件地址不合法';
+			}
+
+			$vdata['email'] = $email;
+
+			return '';
+		},
+		null
+	);
+	$register_tmp_user_form->addVInput(
+		'new_tmp_realname',
+		'text',
+		'真实姓名（选填）',
+		'',
+		function ($realname, &$vdata) {
+			$vdata['realname'] = $realname;
+
+			return '';
+		},
+		null
+	);
+	$register_tmp_user_form->addVInput(
+		'new_tmp_school',
+		'text',
+		'学校名称（选填）',
+		'',
+		function ($school, &$vdata) {
+			$vdata['school'] = $school;
+
+			return '';
+		},
+		null
+	);
+	$register_tmp_user_form->addVInput(
+		'new_tmp_expiration_time',
+		'text',
+		'过期时间',
+		(new DateTime())->add(new DateInterval('P7D'))->format('Y-m-d H:i:s'),
+		function ($str, &$vdata) {
+			try {
+				$vdata['expiration_time'] = new DateTime($str);
+			} catch (Exception $e) {
+				return '无效时间格式';
+			}
+
+			return '';
+		},
+		null
+	);
+	$register_tmp_user_form->handle = function (&$vdata) {
+		$user = [
+			'username' => $vdata['username'],
+			'realname' => $vdata['realname'],
+			'school' => $vdata['school'],
+			'email' => $vdata['email'],
+			'expiration_time' => $vdata['expiration_time']->format('Y-m-d H:i:s'),
+			'password' => hash_hmac('md5', $vdata['password'], getPasswordClientSalt()),
+		];
+
+		UOJUser::registerTmpAccount($user, ['check_email' => false]);
+
+		dieWithJsonData(['status' => 'success', 'message' => '']);
+	};
+	$register_tmp_user_form->setAjaxSubmit(<<<EOD
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert-register_tmp')
+					.html('临时用户新建成功！' + (res.message || ''))
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert-register_tmp')
+					.html('临时用户新建失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
+
+			$(window).scrollTop(0);
+		}
+EOD);
+	$register_tmp_user_form->runAtServer();
+
 	$change_password_form = new UOJBs4Form('change_password');
 	$change_password_form->addVInput(
 		'p_username',
@@ -1152,6 +1276,9 @@ EOD);
 							<a class="nav-link" href="#new-user" data-bs-toggle="tab" data-bs-target="#new-user">新增用户</a>
 						</li>
 						<li class="nav-item">
+							<a class="nav-link" href="#new-tmp-user" data-bs-toggle="tab" data-bs-target="#new-tmp-user">新增临时用户</a>
+						</li>
+						<li class="nav-item">
 							<a class="nav-link" href="#reset-password" data-bs-toggle="tab" data-bs-target="#reset-password">重置密码</a>
 						</li>
 						<li class="nav-item">
@@ -1253,7 +1380,25 @@ EOD);
 										<li>用户名推荐格式为年级 + 姓名全拼，如 2022 级的张三同学可以设置为 <code>2022zhangsan</code>。对于外校学生，推荐格式为学校名称缩写 + 姓名拼音首字母，如山大附中的赵锦熙同学可以设置为 <code>sdfzzjx</code>)。</li>
 										<li>请提醒用户及时修改初始密码，以免账号被盗导致教学资源流出。请勿设置过于简单的初始密码。</li>
 										<li>我们推荐在创建账号时输入号主的电子邮件地址以便后期发生忘记密码等情况时进行验证。</li>
-										<li>创建账号后可以在「修改个人信息」页面中的「特权」选项卡为用户分配权限。特别地，如果该用户是外校学生，那么您可能需要将其设置为「仅比赛参加者」以禁止其查看已参与比赛以外的题目。</li>
+										<li>创建账号后可以在「修改个人信息」页面中的「特权」选项卡为用户分配权限。特别地，如果该用户是外校学生，那么您可能需要禁用其 <b>所有权限</b>，并为其手动报名比赛。</li>
+										<li>对于外校学生，更推荐分发 <b>临时账号</b>。</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane" id="new-tmp-user">
+							<div id="result-alert-register_tmp" class="alert" role="alert" style="display: none"></div>
+							<div class="row row-cols-1 row-cols-md-2">
+								<div class="col">
+									<?php $register_tmp_user_form->printHTML() ?>
+								</div>
+								<div class="col mt-3 mt-md-0">
+									<h5>注意事项</h5>
+									<ul class="mb-0">
+										<li>用户名推荐格式为年级 + 姓名全拼，如 2022 级的张三同学可以设置为 <code>2022zhangsan</code>。对于外校学生，推荐格式为学校名称缩写 + 姓名拼音首字母，如山大附中的赵锦熙同学可以设置为 <code>sdfzzjx</code>)。</li>
+										<li>请提醒用户及时修改初始密码，以免账号被盗导致教学资源流出。请勿设置过于简单的初始密码。</li>
+										<li>我们推荐在创建账号时输入号主的电子邮件地址以便后期发生忘记密码等情况时进行验证。</li>
+										<li>临时账号不具有任何权限，只能查看、参加已经用户报名了的比赛。创建账号后可以在「修改个人信息」页面中的「特权」选项卡为用户分配权限。特别地，如果该用户是外校学生，那么您可能需要禁用其 <b>所有权限</b>，并为其手动报名比赛。</li>
 									</ul>
 								</div>
 							</div>

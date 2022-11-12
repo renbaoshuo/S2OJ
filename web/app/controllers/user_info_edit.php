@@ -70,6 +70,35 @@ EOD);
 	</div>
 EOD);
 	}
+	if (isTmpUser($user)) {
+		if (isSuperUser(Auth::user())) {
+			$update_profile_form->addVInput(
+				'expiration_time',
+				'text',
+				UOJLocale::get('user::expiration time'),
+				$user['expiration_time'],
+				function ($str, &$vdata) {
+					try {
+						$vdata['expiration_time'] = new DateTime($str);
+					} catch (Exception $e) {
+						return '无效时间格式';
+					}
+
+					return '';
+				},
+				null
+			);
+		} else {
+			$expiration_time = UOJLocale::get('user::expiration time');
+			$update_profile_form->appendHTML(<<<EOD
+		<div class="mb-3">
+			<label for="input-expiration_time" class="form-label">$expiration_time</label>
+			<input type="text" class="form-control" id="input-expiration_time" aria-describedby="help-expiration_time" value="{$user['expiration_time']}" disabled>
+			<div id="help-expiration_time" class="form-text">只有管理员才能修改用户的账号过期时间。</div>
+		</div>
+	EOD);
+		}
+	}
 	$update_profile_form->addVCheckboxes('avatar_source', [
 		'gravatar' => 'Gravatar',
 		'qq' => 'QQ',
@@ -215,6 +244,10 @@ EOD);
 		if (isSuperUser(Auth::user())) {
 			$data['realname'] = $vdata['realname'];
 			$data['school'] = $vdata['school'];
+
+			if (isTmpUser($user)) {
+				$data['expiration_time'] = $vdata['expiration_time']->format(UOJTime::FORMAT);
+			}
 		}
 
 		DB::update([

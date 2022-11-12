@@ -292,6 +292,10 @@
 						<h5 class="list-group-item-heading">last_visit_time</h5>
 						<p class="list-group-item-text"><?= $user['last_visit_time'] ?></p>
 					</li>
+					<li class="list-group-item">
+						<h5 class="list-group-item-heading">expiration_time</h5>
+						<p class="list-group-item-text"><?= $user['expiration_time'] ?></p>
+					</li>
 				</ul>
 			</div>
 		<?php endif ?>

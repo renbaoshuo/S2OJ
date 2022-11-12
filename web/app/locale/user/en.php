@@ -20,4 +20,5 @@ return [
 	'last active at' => 'Last active at',
 	'online' => 'Online',
 	'offline' => 'Offline',
+	'expiration time' => 'Expiration time',
 ];

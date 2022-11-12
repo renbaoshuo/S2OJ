@@ -145,10 +145,15 @@ if (isset($_POST['login'])) {
 				$('#div-captcha > .form-floating, #input-captcha').addClass('is-invalid');
 				$('#help-captcha').html('验证码错误。');
 				refreshCaptcha();
-			} else if (msg == 'banned') {
+			} else if (msg == 'account:banned') {
 				$('#div-username').addClass('has-validation');
 				$('#div-username > .form-floating, #input-username').addClass('is-invalid');
 				$('#help-username').html('该用户已被封停，请联系管理员。');
+				refreshCaptcha();
+			} else if (msg == 'account:expired') {
+				$('#div-username').addClass('has-validation');
+				$('#div-username > .form-floating, #input-username').addClass('is-invalid');
+				$('#help-username').html('该用户已过期，请联系管理员。');
 				refreshCaptcha();
 			} else if (msg == 'expired') {
 				$('#div-username').addClass('has-validation');

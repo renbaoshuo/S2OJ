@@ -76,6 +76,68 @@ class UOJUser {
 		return $user;
 	}
 
+	public static function registerTmpAccount($user, $cfg = []) {
+		UOJUser::checkBasicInfo($user, $cfg);
+
+		$password = getPasswordToStore($user['password'], $user['username']);
+		$extra = [
+			'permissions' => [
+				'problems' => [
+					'view' => false,
+					'download_testdata' => false,
+					'create' => false,
+					'manage' => false,
+				],
+				'contests' => [
+					'view' => false,
+					'register' => false,
+					'create' => false,
+					'start_final_test' => false,
+					'manage' => false,
+				],
+				'lists' => [
+					'view' => false,
+					'create' => false,
+					'manage' => false,
+				],
+				'groups' => [
+					'view' => false,
+					'create' => false,
+					'manage' => false,
+				],
+				'blogs' => [
+					'view' => false,
+					'create' => false,
+					'manage' => false,
+				],
+				'users' => [
+					'view' => false,
+					'upload_image' => false,
+				],
+			],
+		];
+
+		$info = [
+			'username' => $user['username'],
+			'usergroup' => 'T',
+			'email' => $user['email'],
+			'school' => $user['school'] ?: '',
+			'password' => $password,
+			'svn_password' => uojRandString(20),
+			'register_time' => DB::now(),
+			'expiration_time' => $user['expiration_time'],
+			'extra' => json_encode($extra),
+		];
+
+		DB::insert([
+			"insert into user_info",
+			DB::bracketed_fields(array_keys($info)),
+			"values", DB::tuple($info)
+		]);
+
+		return $user;
+	}
+
 	public static function registerTmpACMTeamAccount($team, $cfg = []) {
 		UOJUser::checkBasicInfo($team, $cfg);
 
