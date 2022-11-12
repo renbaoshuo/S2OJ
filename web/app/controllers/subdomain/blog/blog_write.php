@@ -2,11 +2,8 @@
 requireLib('bootstrap5');
 requirePHPLib('form');
 
+Auth::check() || redirectToLogin();
 UOJUserBlog::userCanManage(Auth::user()) || UOJResponse::page403();
-
-if (!Auth::check()) {
-	redirectToLogin();
-}
 
 if (isset($_GET['id'])) {
 	UOJBlog::init(UOJRequest::get('id')) || UOJResponse::page404();
@@ -15,6 +12,9 @@ if (isset($_GET['id'])) {
 	$blog = UOJBlog::info();
 	$blog['content'] = UOJBlog::cur()->queryContent()['content'];
 	$blog['content_md'] = UOJBlog::cur()->queryContent()['content_md'];
+} else {
+	UOJUser::checkPermission(Auth::user(), 'blogs.create') || UOJResponse::page403();
+	isSuperUser(Auth::user()) || UOJUserBlog::userIsOwner(Auth::user()) || UOJResponse::page403();
 }
 
 $blog_editor = new UOJBlogEditor();

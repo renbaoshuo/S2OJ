@@ -15,7 +15,7 @@
 		}
 		
 		$newPW = $_POST['newPW'];
-		$user = queryUser($username);
+		$user = UOJUser::query($username);
 		if ($user == null) {
 			return '不明错误';
 		}

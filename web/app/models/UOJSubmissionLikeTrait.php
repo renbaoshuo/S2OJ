@@ -50,7 +50,11 @@ trait UOJSubmissionLikeTrait {
 
 	public function userCanView(array $user = null, array $cfg = []) {
 		$cfg += ['ensure' => false];
-		if (!$this->info['is_hidden']) {
+
+		if (!$this->problem->userCanView($user) && !$this->userIsSubmitter($user)) {
+			$cfg['ensure'] && UOJResponse::page403();
+			return false;
+		} elseif (!$this->info['is_hidden']) {
 			return true;
 		} elseif ($this->userCanManageProblemOrContest($user)) {
 			return true;
@@ -107,7 +111,7 @@ trait UOJSubmissionLikeTrait {
 		return $this->info['id'];
 	}
 	public function getLink() {
-		return '<a class="text-decoration-none" href="'.$this->getUri().'">#'.$this->info['id'].'</a></td>';
+		return '<a class="text-decoration-none" href="' . $this->getUri() . '">#' . $this->info['id'] . '</a></td>';
 	}
 
 	public function getResult($key = null) {
@@ -139,7 +143,7 @@ trait UOJSubmissionLikeTrait {
 		}
 
 		$zip_file = new ZipArchive();
-		if ($zip_file->open(UOJContext::storagePath().$content['file_name'], ZipArchive::RDONLY) !== true) {
+		if ($zip_file->open(UOJContext::storagePath() . $content['file_name'], ZipArchive::RDONLY) !== true) {
 			echo <<<EOD
             <div class="card mb-3">
                 <div class="card-header text-bg-danger fw-bold">
@@ -152,12 +156,12 @@ trait UOJSubmissionLikeTrait {
             EOD;
 			return false;
 		}
-        
+
 		$config = [];
 		foreach ($content['config'] as $val) {
 			$config[$val[0]] = $val[1];
 		}
-        
+
 		foreach ($this->problem->getSubmissionRequirement() as $req) {
 			if ($req['type'] == "source code") {
 				$file_content = $zip_file->getFromName("{$req['name']}.code");
@@ -172,7 +176,7 @@ trait UOJSubmissionLikeTrait {
 				}
 
 				$file_content = uojTextEncode($file_content, array('allow_CR' => true, 'html_escape' => true));
-				$footer_text = UOJLocale::get('problems::source code').': ';
+				$footer_text = UOJLocale::get('problems::source code') . ': ';
 				$footer_text .= UOJLang::getLanguageDisplayName($file_language);
 				$sh_class = UOJLang::getLanguagesCSSClass($file_language);
 				echo <<<EOD
@@ -229,18 +233,18 @@ trait UOJSubmissionLikeTrait {
 			case 'submitter':
 			case 'owner':
 			case 'hacker':
-				echo getUserLink($this->info[$name]);
+				echo UOJUser::getLink($this->info[$name]);
 				break;
 			case 'used_time':
 				if ($cfg['show_actual_score']) {
-					echo $this->info['used_time'].'ms';
+					echo $this->info['used_time'] . 'ms';
 				} else {
 					echo '/';
 				}
 				break;
 			case 'used_memory':
 				if ($cfg['show_actual_score']) {
-					echo $this->info['used_memory'].'kb';
+					echo $this->info['used_memory'] . 'kb';
 				} else {
 					echo '/';
 				}
@@ -254,7 +258,7 @@ trait UOJSubmissionLikeTrait {
 				break;
 			case 'submit_time':
 			case 'judge_time':
-				echo '<small>', $this->info[$name],'</small>';
+				echo '<small>', $this->info[$name], '</small>';
 				break;
 			default:
 				echo '?';

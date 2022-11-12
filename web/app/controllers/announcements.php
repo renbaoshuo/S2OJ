@@ -32,7 +32,7 @@ EOD,
 
 				echo '<tr>';
 				echo '<td>' . $blog->getLink(['show_level' => true, 'show_new_tag' => true]) . '</td>';
-				echo '<td>' . getUserLink($blog->info['poster']) . '</td>';
+				echo '<td>' . UOJUser::getLink($blog->info['poster']) . '</td>';
 				echo '<td>' . $blog->info['post_time'] . '</td>';
 				echo '</tr>';
 			},

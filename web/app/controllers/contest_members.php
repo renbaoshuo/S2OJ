@@ -197,7 +197,7 @@ echoLongTable(
 
 		echo '<tr>';
 		echo '<td>' . $num . '</td>';
-		echo '<td>' . getUserLink($user['username']) . '</td>';
+		echo '<td>' . UOJUser::getLink($user) . '</td>';
 		if ($show_ip) {
 			echo '<td>' . $user['remote_addr'] . '</td>';
 			echo '<td>' . $user['http_x_forwarded_for'] . '</td>';

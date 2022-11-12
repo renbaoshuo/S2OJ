@@ -150,49 +150,6 @@ function camelize($str, $delimiters = '-_') {
 	return $str;
 }
 
-function addUserType(&$user, $type) {
-	$usertype = explode(',', $user['usertype']);
-	if (!in_array($type, $usertype)) {
-		$usertype[] = $type;
-	}
-	$user['usertype'] = implode(',', $usertype);
-	return $user;
-}
-function removeUserType(&$user, $type) {
-	$usertype = explode(',', $user['usertype']);
-	if (in_array($type, $usertype)) {
-		$usertype = array_diff($usertype, array($type));
-	}
-	$user['usertype'] = implode(',', $usertype);
-	return $user;
-}
-function hasUserType($user, $type) {
-	$usertype = explode(',', $user['usertype']);
-	return in_array($type, $usertype);
-}
-
-function isProblemUploader($user) {
-	if ($user == null) {
-		return false;
-	}
-	return hasUserType($user, 'problem_uploader');
-}
-function isProblemManager($user) {
-	if ($user == null) {
-		return false;
-	}
-	if (isSuperUser($user)) {
-		return true;
-	}
-	return hasUserType($user, 'problem_manager');
-}
-function isContestJudger($user) {
-	if ($user == null) {
-		return false;
-	}
-	return hasUserType($user, 'contest_judger');
-}
-
 function isSuperUser($user) {
 	return $user != null && $user['usergroup'] == 'S';
 }

@@ -53,7 +53,7 @@ if ($is_manager) {
 
 isset($tabs_info[$cur_tab]) || UOJResponse::page404();
 
-if (isSuperUser($myUser) || isContestJudger($myUser)) {
+if (UOJContest::cur()->userCanStartFinalTest(Auth::user())) {
 	if (CONTEST_PENDING_FINAL_TEST <= $contest['cur_progress']) {
 		$start_test_form = new UOJBs4Form('start_test');
 		$start_test_form->handle = function () {
@@ -113,7 +113,7 @@ if ($cur_tab == 'dashboard') {
 		$post_question = null;
 	}
 } elseif ($cur_tab == 'backstage') {
-	if (isSuperUser(Auth::user())) {
+	if ($is_manager) {
 		$post_notice = new UOJBs4Form('post_notice');
 		$post_notice->addInput(
 			'title',
@@ -157,7 +157,6 @@ if ($cur_tab == 'dashboard') {
 	} else {
 		$post_notice = null;
 	}
-
 
 	if ($is_manager) {
 		$reply_question = new UOJBs4Form('reply_question');
@@ -486,10 +485,8 @@ function echoSelfReviews() {
 
 	uojIncludeView('contest-reviews', ['contest' => $contest] + UOJContest::cur()->queryResult());
 }
-
-$page_header = HTML::stripTags($contest['name']) . ' - ';
 ?>
-<?php echoUOJPageHeader(HTML::stripTags($contest['name']) . ' - ' . $tabs_info[$cur_tab]['name'] . ' - ' . UOJLocale::get('contests::contest')) ?>
+<?php echoUOJPageHeader($tabs_info[$cur_tab]['name'] . ' - ' . UOJContest::info('name') . ' - ' . UOJLocale::get('contests::contest')) ?>
 
 <div class="text-center d-md-none mb-3">
 	<h1><?= $contest['name'] ?></h1>
@@ -600,7 +597,7 @@ $page_header = HTML::stripTags($contest['name']) . ' - ';
 							</div>
 						</div>
 						<div class="card-footer bg-transparent">
-							比赛评价：<?= ClickZans::getBlock('C', $contest['id'], $contest['zan']) ?>
+							比赛评价：<?= UOJContest::cur()->getZanBlock() ?>
 						</div>
 					</div>
 
@@ -618,7 +615,7 @@ $page_header = HTML::stripTags($contest['name']) . ' - ';
 					<a href="/contest/<?= $contest['id'] ?>/registrants" class="btn btn-secondary d-block mt-2">
 						<?= UOJLocale::get('contests::contest registrants') ?>
 					</a>
-					<?php if (isSuperUser($myUser)) : ?>
+					<?php if ($is_manager) : ?>
 						<a href="/contest/<?= $contest['id'] ?>/manage" class="btn btn-primary d-block mt-2">
 							管理
 						</a>

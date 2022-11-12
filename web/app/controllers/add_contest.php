@@ -3,7 +3,7 @@ requireLib('bootstrap5');
 requirePHPLib('form');
 
 Auth::check() || redirectToLogin();
-isSuperUser(Auth::user()) || UOJResponse::page403();
+UOJContest::userCanCreateContest(Auth::user()) || UOJResponse::page403();
 
 $time_form = new UOJBs4Form('time');
 $time_form->addVInput(

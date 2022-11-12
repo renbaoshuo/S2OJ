@@ -6,7 +6,7 @@ function uojHandleAtSign($str, $uri) {
 		if ($matches[1] === '@') {
 			return '@';
 		} else {
-			$user = queryUser($matches[1]);
+			$user = UOJUser::query($matches[1]);
 			if ($user == null) {
 				return $matches[0];
 			} else {
@@ -96,71 +96,6 @@ function become404Page($message = '未找到页面。') {
 function become403Page($message = '访问被拒绝，您可能需要适当的权限以访问此页面。') {
 	header($_SERVER['SERVER_PROTOCOL'] . " 403 Forbidden", true, 403);
 	becomeMsgPage('<div class="text-center"><div style="font-size:150px">403</div><p>' . $message . '</p></div>', '403');
-}
-
-function getUserLink($username) {
-	if (validateUsername($username) && ($user = queryUser($username)) && $user['usergroup'] != 'B') {
-		$realname = $user['realname'];
-
-		if ($realname == "") {
-			return '<span class="uoj-username">' . $username . '</span>';
-		} else {
-			return '<span class="uoj-username" data-realname="' . HTML::escape($realname) . '">' . $username . '</span>';
-		}
-	} else {
-		$esc_username = HTML::escape($username);
-		return '<span>' . $esc_username . '</span>';
-	}
-}
-
-function getUserName($username, $realname = null) {
-	if ($realname == null) {
-		if (validateUsername($username) && ($user = queryUser($username))) {
-			$realname = $user['realname'];
-		}
-	}
-
-	if ($realname == "") {
-		return "$username";
-	} else {
-		return "$username ($realname)";
-	}
-}
-
-
-function getProblemLink($problem, $problem_title = '!title_only') {
-	global $REQUIRE_LIB;
-
-	if ($problem_title == '!title_only') {
-		$problem_title = $problem['title'];
-	} elseif ($problem_title == '!id_and_title') {
-		$problem_title = "#${problem['id']}. ${problem['title']}";
-	}
-	$result = '<a ';
-	if (isset($REQUIRE_LIB['bootstrap5'])) {
-		$result .= ' class="text-decoration-none" ';
-	}
-	$result .= ' href="/problem/' . $problem['id'] . '">' . $problem_title . '</a>';
-
-	return $result;
-}
-function getContestProblemLink($problem, $contest_id, $problem_title = '!title_only') {
-	if ($problem_title == '!title_only') {
-		$problem_title = $problem['title'];
-	} elseif ($problem_title == '!id_and_title') {
-		$problem_title = "#{$problem['id']}. {$problem['title']}";
-	}
-	$result = '<a class="text-decoration-none" href="/contest/' . $contest_id . '/problem/' . $problem['id'] . '">' . $problem_title . '</a>';
-
-	return $result;
-}
-function getBlogLink($id) {
-	$result = '';
-	if (validateUInt($id) && $blog = queryBlog($id)) {
-		$result = '<a class="text-decoration-none" href="/blogs/' . $id . '">' . $blog['title'] . '</a>';
-	}
-
-	return $result;
 }
 
 function getLongTablePageRawUri($page) {
@@ -294,7 +229,6 @@ function echoSubmission($submission, $config, $viewer) {
 	$usubm->echoStatusTableRow($config, $viewer);
 }
 
-
 function echoSubmissionsListOnlyOne($submission, $config, $user) {
 	echo '<div class="card mb-3 table-responsive">';
 	echo '<table class="table text-center uoj-table mb-0">';
@@ -389,27 +323,15 @@ function echoSubmissionsList($cond, $tail, $config, $user) {
 
 	$table_name = isset($config['table_name']) ? $config['table_name'] : 'submissions';
 
-	if (!isProblemManager($user)) {
-		if ($user != null) {
-			$permission_cond = DB::lor([
-				"submissions.is_hidden" => false,
-				"submissions.submitter" => $user['username'],
-				DB::land([
-					"submissions.is_hidden" => true,
-					DB::lor([
-						"submissions.problem_id in (select problem_id from problems_permissions where username = '{$user['username']}')",
-						"submissions.problem_id in (select id from problems where uploader = '{$user['username']}')",
-					]),
-				]),
-			]);
-		} else {
-			$permission_cond = ["submissions.is_hidden" => "false"];
-		}
-		if ($cond !== '1') {
-			$cond = DB::land($cond, $permission_cond);
-		} else {
-			$cond = $permission_cond;
-		}
+	$cond = $cond === '1' ? [] : [DB::conds($cond)];
+	$cond[] = UOJSubmission::sqlForUserCanView($user, $config['problem']);
+	if ($config['problem']) {
+		$cond[] = ['submissions.problem_id', '=', $config['problem']->info['id']];
+	}
+	if (count($cond) == 1) {
+		$cond = $cond[0];
+	} else {
+		$cond = DB::land($cond);
 	}
 
 	$table_config = isset($config['table_config']) ? $config['table_config'] : null;
@@ -916,49 +838,13 @@ function echoHackDetails($hack_details, $name) {
 	echoJudgementDetails($hack_details, new HackDetailsStyler(), $name);
 }
 
-function echoHack($hack, $config, $user) {
-	$problem = queryProblemBrief($hack['problem_id']);
-	echo '<tr>';
-	if (!isset($config['id_hidden'])) {
-		echo '<td><a href="/hack/', $hack['id'], '">#', $hack['id'], '</a></td>';
-	}
-	if (!isset($config['submission_hidden'])) {
-		echo '<td><a href="/submission/', $hack['submission_id'], '">#', $hack['submission_id'], '</a></td>';
-	}
-	if (!isset($config['problem_hidden'])) {
-		if ($hack['contest_id']) {
-			echo '<td>', getContestProblemLink($problem, $hack['contest_id'], '!id_and_title'), '</td>';
-		} else {
-			echo '<td>', getProblemLink($problem, '!id_and_title'), '</td>';
-		}
-	}
-	if (!isset($config['hacker_hidden'])) {
-		echo '<td>', getUserLink($hack['hacker']), '</td>';
-	}
-	if (!isset($config['owner_hidden'])) {
-		echo '<td>', getUserLink($hack['owner']), '</td>';
-	}
-	if (!isset($config['result_hidden'])) {
-		if ($hack['judge_time'] == null) {
-			echo '<td><a href="/hack/', $hack['id'], '">Waiting</a></td>';
-		} elseif ($hack['success'] == null) {
-			echo '<td><a href="/hack/', $hack['id'], '">Judging</a></td>';
-		} elseif ($hack['success']) {
-			echo '<td><a href="/hack/', $hack['id'], '" class="uoj-status" data-success="1"><strong>Success!</strong></a></td>';
-		} else {
-			echo '<td><a href="/hack/', $hack['id'], '" class="uoj-status" data-success="0"><strong>Failed.</strong></a></td>';
-		}
-	} else {
-		echo '<td>Hidden</td>';
-	}
-	if (!isset($config['submit_time_hidden'])) {
-		echo '<td>', $hack['submit_time'], '</td>';
-	}
-	if (!isset($config['judge_time_hidden'])) {
-		echo '<td>', $hack['judge_time'], '</td>';
-	}
-	echo '</tr>';
+function echoHack($hack, $config, $viewer) {
+	$uhack = new UOJHack($hack);
+	$uhack->setProblem();
+	$uhack->setSubmission();
+	$uhack->echoStatusTableRow($config, $viewer);
 }
+
 function echoHackListOnlyOne($hack, $config, $user) {
 	echo '<div class="card mb-3 table-responsive">';
 	echo '<table class="table text-center uoj-table mb-0">';
@@ -1150,7 +1036,7 @@ function echoRanklist($config = []) {
 
 		echo '<tr>';
 		echo '<td>' . $user['rank'] . '</td>';
-		echo '<td>' . getUserLink($user['username']) . '</td>';
+		echo '<td>' . UOJUser::getLink($user['username']) . '</td>';
 		echo "<td>";
 		echo $purifier->purify($parsedown->line($user['motto']));
 		echo "</td>";

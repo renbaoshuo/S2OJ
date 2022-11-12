@@ -18,6 +18,14 @@ class UOJList {
 		return new UOJList($info);
 	}
 
+	public static function userCanCreateList(array $user = null) {
+		if (!$user) {
+			return false;
+		}
+
+		return isSuperUser($user) || UOJUser::checkPermission($user, 'lists.create');
+	}
+
 	public function __construct($info) {
 		$this->info = $info;
 	}
@@ -59,15 +67,22 @@ class UOJList {
 	}
 
 	public function userCanManage(array $user = null) {
-		return isSuperUser($user);
+		return isSuperUser($user) || UOJUser::checkPermission($user, 'lists.manage');
 	}
 
 	public function userCanView(array $user = null, array $cfg = []) {
 		$cfg += ['ensure' => false];
+
 		if ($this->info['is_hidden'] && !$this->userCanManage($user)) {
 			$cfg['ensure'] && UOJResponse::page404();
 			return false;
 		}
+
+		if (!UOJUser::checkPermission($user, 'lists.view')) {
+			$cfg['ensure'] && UOJResponse::page403();
+			return false;
+		}
+
 		return true;
 	}
 }

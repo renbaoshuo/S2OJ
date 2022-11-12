@@ -43,7 +43,7 @@ class UOJRanklist {
 			$user['rank'] = $rank;
 
 			$userpro = HTML::url('/user/' . $user['username']);
-			$userlink = getUserLink($user['username']);
+			$userlink = UOJUser::getLink($user['username']);
 			$asrc = HTML::avatar_addr($user, 100);
 			$esc_motto = $purifier->purify($parsedown->line($user['motto']));
 			$solved_text = UOJLocale::get('solved');
@@ -160,7 +160,7 @@ class UOJRanklist {
 
 			echo '<tr>';
 			echo '<td>' . $user['rank'] . '</td>';
-			echo '<td>' . getUserLink($user['username']) . '</td>';
+			echo '<td>' . UOJUser::getLink($user['username']) . '</td>';
 			echo '<td>' . $purifier->purify($parsedown->line($user['motto'])) . '</td>';
 			echo '<td>' . $user['ac_num'] . '</td>';
 			echo '</tr>';

@@ -5,6 +5,7 @@ requireLib('hljs');
 requirePHPLib('form');
 
 Auth::check() || redirectToLogin();
+UOJUserBlog::userIsOwner(Auth::user()) || UOJUser::checkPermission(Auth::user(), 'blogs.view') || UOJResponse::page403();
 
 $blogs_conds = [
 	"poster" => UOJUserBlog::id(),
@@ -144,7 +145,7 @@ $all_tags = DB::selectAll([
 		</div>
 	</div>
 	<div class="col-md-3">
-		<?php if (UOJUserBlog::userCanManage(Auth::user())) : ?>
+		<?php if (UOJUserBlog::userCanManage(Auth::user()) && UOJUser::checkPermission(Auth::user(), 'blogs.create')) : ?>
 			<div class="btn-group d-flex">
 				<a href="<?= HTML::blog_url(UOJUserBlog::id(), '/post/new/write') ?>" class="btn btn-primary">
 					<i class="bi bi-pencil-square"></i>

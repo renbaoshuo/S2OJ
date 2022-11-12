@@ -52,7 +52,7 @@ function echoContest($info) {
 	echo '<td>', '<a class="text-decoration-none"  href="' . HTML::timeanddate_url($contest->info['start_time'], ['duration' => $contest->info['last_min']]) . '">' . $contest->info['start_time_str'] . '</a>', '</td>';
 	echo '<td>', UOJLocale::get('hours', $last_hour), '</td>';
 	echo '<td>', '<a class="text-decoration-none"  href="/contest/' . $contest->info['id'] . '/registrants">', '<i class="bi bi-person-fill"></i>', ' &times;' . $contest->info['player_num'] . '</a>', '</td>';
-	echo '<td>', '<div class="text-left">' . ClickZans::getBlock('C', $contest->info['id'], $contest->info['zan']) . '</div>', '</td>';
+	echo HTML::tag('td', [], $contest->getZanBlock());
 	echo '</tr>';
 }
 ?>
@@ -64,7 +64,7 @@ function echoContest($info) {
 		<?= UOJLocale::get('contests') ?>
 	</h1>
 
-	<?php if (isSuperUser($myUser)) : ?>
+	<?php if (UOJContest::userCanCreateContest(Auth::user())) : ?>
 		<div class="text-end">
 			<a href="/contest/new" class="btn btn-primary"><?= UOJLocale::get('contests::add new contest') ?></a>
 		</div>
@@ -91,6 +91,12 @@ $table_config = [
 	'div_classes' => ['card', 'mb-3'],
 	'table_classes' => ['table', 'uoj-table', 'mb-0', 'text-center'],
 ];
+
+if (!UOJUser::checkPermission(Auth::user(), 'contests.view')) {
+	$table_config['post_filter'] = function ($info) {
+		return (new UOJContest($info))->userCanView(Auth::user());
+	};
+}
 
 echoLongTable(
 	['*'],

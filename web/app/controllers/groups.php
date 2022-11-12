@@ -4,11 +4,9 @@ requirePHPLib('form');
 requirePHPLib('judger');
 requirePHPLib('data');
 
-if (!Auth::check()) {
-	redirectToLogin();
-}
+Auth::check() || redirectToLogin();
 
-if (isSuperUser($myUser)) {
+if (UOJGroup::userCanCreateGroup(Auth::user())) {
 	$new_group_form = new UOJBs4Form('new_group');
 	$new_group_form->handle = function () {
 		DB::query("insert into `groups` (title, is_hidden) values ('新小组', 1)");
@@ -33,7 +31,7 @@ if (isSuperUser($myUser)) {
 			</h1>
 
 			<?php if (isset($new_group_form)) : ?>
-				<div class="text-end mb-2">
+				<div class="text-end">
 					<?php $new_group_form->printHTML(); ?>
 				</div>
 			<?php endif ?>
@@ -45,23 +43,17 @@ if (isSuperUser($myUser)) {
 		$groups_caption = UOJLocale::get('groups');
 		$users_caption = UOJLocale::get('users count');
 		$header = <<<EOD
-<tr>
-    <th class="text-center" style="width:5em;">ID</th>
-    <th>{$groups_caption}</th>
-    <th class="text-center" style="width:8em;">{$users_caption}</th>
-</tr>
-EOD;
-
-		if (isSuperUser(Auth::user())) {
-			$cond = "1";
-		} else {
-			$cond = ["is_hidden" => false];
-		}
+			<tr>
+				<th class="text-center" style="width:5em;">ID</th>
+				<th>{$groups_caption}</th>
+				<th class="text-center" style="width:8em;">{$users_caption}</th>
+			</tr>
+		EOD;
 
 		echoLongTable(
-			['id', 'title', 'is_hidden'],
+			['*'],
 			"`groups`",
-			$cond,
+			'1',
 			'order by id asc',
 			$header,
 			function ($group) {
@@ -93,6 +85,9 @@ EOD;
 				'div_classes' => ['card', 'my-3'],
 				'table_classes' => ['table', 'uoj-table', 'mb-0'],
 				'head_pagination' => true,
+				'post_filter' => function ($info) {
+					return (new UOJGroup($info))->userCanView(Auth::user());
+				}
 			]
 		);
 		?>

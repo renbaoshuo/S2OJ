@@ -31,6 +31,10 @@ class UOJProblem {
 			return false;
 		}
 
+		if (isSuperUser($user) || UOJUser::checkPermission($user, 'problems.manage')) {
+			return true;
+		}
+
 		return DB::selectFirst([
 			DB::lc(), "select 1 from problems_permissions",
 			"where", [
@@ -42,6 +46,14 @@ class UOJProblem {
 				"uploader" => $user['username'],
 			], DB::limit(1),
 		]) != null;
+	}
+
+	public static function userCanCreateProblem(array $user = null) {
+		if (!$user) {
+			return false;
+		}
+
+		return isSuperUser($user) || UOJUser::checkPermission($user, 'problems.create');
 	}
 
 	public function __construct($info) {
@@ -83,7 +95,7 @@ class UOJProblem {
 	}
 
 	public function getUploaderLink() {
-		return getUserLink($this->info['uploader'] ?: "root");
+		return UOJUser::getLink($this->info['uploader'] ?: "root");
 	}
 
 	public function findInContests() {
@@ -162,10 +174,17 @@ class UOJProblem {
 
 	public function userCanView(array $user = null, array $cfg = []) {
 		$cfg += ['ensure' => false];
+
 		if ($this->info['is_hidden'] && !$this->userCanManage($user)) {
 			$cfg['ensure'] && UOJResponse::page404();
 			return false;
 		}
+
+		if (!UOJUser::checkPermission($user, 'problems.view')) {
+			$cfg['ensure'] && UOJResponse::page403();
+			return false;
+		}
+
 		return true;
 	}
 
@@ -174,7 +193,7 @@ class UOJProblem {
 	 * Need to be consistent with the member function userCanView
 	 */
 	public static function sqlForUserCanView(array $user = null) {
-		if (isSuperUser($user)) {
+		if (isSuperUser($user) || UOJUser::checkPermission($user, 'problems.manage')) {
 			return "(1)";
 		} elseif (UOJProblem::userCanManageSomeProblem($user)) {
 			return DB::lor([
@@ -247,9 +266,11 @@ class UOJProblem {
 		if (!$user) {
 			return false;
 		}
-		if (isSuperUser($user) || $user['username'] == $this->info['poster'] || isProblemManager($user)) {
+
+		if (isSuperUser($user) || $this->isUserOwnProblem($user) || UOJUser::checkPermission($user, 'problems.manage')) {
 			return true;
 		}
+
 		return DB::selectFirst([
 			DB::lc(), "select 1 from problems_permissions",
 			"where", [
@@ -260,7 +281,7 @@ class UOJProblem {
 	}
 
 	public function userCanDownloadTestData(array $user = null) {
-		return $this->userCanManage($user);
+		return $this->userCanManage($user) || UOJUser::checkPermission($user, 'problems.download_testdata');
 	}
 
 	public function preHackCheck(array $user = null) {

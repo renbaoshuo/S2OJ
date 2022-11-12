@@ -692,6 +692,7 @@ CREATE TABLE `problems_solutions` (
   `problem_id` int NOT NULL,
   `blog_id` int NOT NULL,
   PRIMARY KEY (`problem_id`, `blog_id`),
+  UNIQUE KEY `unique__blog_id` (`blog_id`),
   KEY `problem_id` (`problem_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -986,7 +987,7 @@ UNLOCK TABLES;
 CREATE TABLE `user_info` (
   `usergroup` char(1) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'U',
   `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `usertype` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'student',
+  `usertype` enum('student','teacher','system','banned') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'student',
   `realname` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `school` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `email` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,

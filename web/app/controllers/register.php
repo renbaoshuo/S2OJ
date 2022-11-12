@@ -40,7 +40,7 @@ if (isset($_POST['register'])) {
 	die();
 } elseif (isset($_POST['check_username'])) {
 	$username = $_POST['username'];
-	if (validateUsername($username) && !queryUser($username)) {
+	if (validateUsername($username) && !UOJUser::query($username)) {
 		die('{"ok": true}');
 	} else {
 		die('{"ok": false}');

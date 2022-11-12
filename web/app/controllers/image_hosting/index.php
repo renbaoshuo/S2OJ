@@ -6,6 +6,7 @@ requirePHPLib('form');
 requireLib('bootstrap5');
 
 Auth::check() || redirectToLogin();
+UOJUser::checkPermission(Auth::user(), 'users.upload_image') || UOJResponse::page403();
 
 $extra = UOJUser::getExtra($user);
 $limit = $extra['image_hosting']['total_size_limit'];
@@ -56,18 +57,18 @@ if ($_POST['image_upload_file_submit'] == 'submit') {
 		throwError('not_a_image');
 	}
 
-		list($width, $height, $type) = $size;
-		$hash = hash_file("sha256", $_FILES['image_upload_file']['tmp_name']) . Auth::id();
-		$scale = ceil($height / 600.0);
+	list($width, $height, $type) = $size;
+	$hash = hash_file("sha256", $_FILES['image_upload_file']['tmp_name']) . Auth::id();
+	$scale = ceil($height / 600.0);
 
-		$watermark_text = UOJConfig::$data['profile']['oj-name-short'];
-		if (isSuperUser($myUser) && $_POST['watermark'] == 'no_watermark') {
-			$watermark_text = "";
-			$hash .= "__no_watermark";
-		} elseif ($_POST['watermark'] == 'site_shortname_and_username') {
-			$watermark_text .= ' @' . Auth::id();
-			$hash .= "__id";
-		}
+	$watermark_text = UOJConfig::$data['profile']['oj-name-short'];
+	if (isSuperUser(Auth::user()) && $_POST['watermark'] == 'no_watermark') {
+		$watermark_text = "";
+		$hash .= "__no_watermark";
+	} elseif ($_POST['watermark'] == 'site_shortname_and_username') {
+		$watermark_text .= ' @' . Auth::id();
+		$hash .= "__id";
+	}
 
 	$existing_image = DB::selectFirst("SELECT * FROM users_images WHERE `hash` = '$hash'");
 
@@ -96,7 +97,19 @@ if ($_POST['image_upload_file_submit'] == 'submit') {
 		throwError('unknown error');
 	}
 
-	DB::insert("INSERT INTO users_images (`path`, uploader, width, height, upload_time, size, `hash`) VALUES ('$filename', '{$myUser['username']}', $width, $height, now(), {$_FILES["image_upload_file"]["size"]}, '$hash')");
+	DB::insert([
+		"insert into users_images",
+		DB::bracketed_fields(["path", "uploader", "width", "height", "upload_time", "size", "hash"]),
+		"values", DB::tuple([
+			$filename,
+			Auth::id(),
+			$width,
+			$height,
+			DB::now(),
+			$_FILES["image_upload_file"]["size"],
+			$hash,
+		]),
+	]);
 
 	dieWithJsonData(['status' => 'success', 'path' => $filename]);
 } elseif ($_POST['image_delete_submit'] == 'submit') {

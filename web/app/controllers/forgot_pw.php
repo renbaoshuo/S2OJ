@@ -7,7 +7,7 @@
 			if (!validateUsername($username)) {
 				return '用户名不合法';
 			}
-			$vdata['user'] = queryUser($username);
+			$vdata['user'] = UOJUser::query($username);
 			if (!$vdata['user']) {
 				return '该用户不存在';
 			}

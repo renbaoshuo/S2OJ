@@ -212,6 +212,7 @@ class UOJUser {
 			$extra = [];
 		}
 		mergeConfig($extra, [
+			'permissions' => UOJContext::getMeta('users_default_permissions'),
 			'social' => [
 				'codeforces' => null,
 				'github' => null,
@@ -250,6 +251,24 @@ class UOJUser {
 			'email' => UOJUser::checkVisibility($extra['show_email'], $user, $viewer),
 			'qq' => UOJUser::checkVisibility($extra['show_qq'], $user, $viewer)
 		];
+	}
+
+	public static function checkPermission(array $user = null, string $perm = '') {
+		if ($user == null) {
+			return false;
+		}
+
+		$extra = UOJUser::getExtra($user);
+		$cur = $extra['permissions'];
+
+		foreach (explode('.', $perm) as $p) {
+			if (!is_assoc($cur) || !isset($cur[$p])) {
+				return false;
+			}
+			$cur = $cur[$p];
+		}
+
+		return $cur;
 	}
 
 	public static function updateVisitHistory($user, $info) {

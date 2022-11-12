@@ -4,6 +4,7 @@ requireLib('mathjax');
 requireLib('hljs');
 requirePHPLib('form');
 
+Auth::check() || redirectToLogin();
 UOJBlog::init(UOJRequest::get('id')) || UOJResponse::page404();
 UOJBlog::cur()->belongsToUserBlog() || UOJResponse::page404();
 UOJBlog::cur()->userCanView(Auth::user()) || UOJResponse::page403();
@@ -15,21 +16,6 @@ function getCommentContentToDisplay($comment) {
 		return $comment['content'];
 	} else {
 		return '<span class="text-muted">【' . HTML::escape($comment['reason_to_hide']) . '】</span>';
-	}
-}
-
-if (!Auth::check()) {
-	redirectToLogin();
-}
-
-$solutions = DB::selectAll("select * from problems_solutions where blog_id = {$blog['id']}");
-if ($solutions) {
-	foreach ($solutions as $solution) {
-		$problem = queryProblemBrief($solution['problem_id']);
-
-		if (!hasProblemPermission($myUser, $problem) && isRegisteredRunningContestProblem($myUser, $problem)) {
-			become403Page();
-		}
 	}
 }
 
@@ -76,7 +62,7 @@ $comment_form->handle = function () {
 	$page = floor($rank / 20) + 1;
 
 	$uri = getLongTablePageUri($page) . '#' . "comment-{$comment_id}";
-	$user_link = getUserLink($myUser['username']);
+	$user_link = UOJUser::getLink(Auth::user());
 
 	foreach ($referrers as $referrer) {
 		$content = $user_link . ' 在博客 ' . $blog['title'] . ' 的评论里提到你：<a href="' . $uri . '">点击此处查看</a>';
@@ -156,7 +142,7 @@ $reply_form->handle = function (&$vdata) {
 	$page = floor($rank / 20) + 1;
 
 	$uri = getLongTablePageUri($page) . '#' . "comment-{$reply_id}";
-	$user_link = getUserLink($myUser['username']);
+	$user_link = UOJUser::getLink(Auth::user());
 
 	foreach ($referrers as $referrer) {
 		$content = $user_link . ' 在博客 ' . $blog['title'] . ' 的评论里提到你：<a href="' . $uri . '">点击此处查看</a>';
@@ -229,7 +215,7 @@ $comments_pag = new Paginator([
 					</div>
 					<div id="comment-body-<?= $comment['id'] ?>" class="comtbox flex-grow-1 ms-3">
 						<div class="row">
-							<div class="col-sm-6"><?= getUserLink($poster['username']) ?></div>
+							<div class="col-sm-6"><?= UOJUser::getLink($poster['username']) ?></div>
 							<div class="col-sm-6 text-end"><?= ClickZans::getBlock('BC', $comment['id'], $comment['zan']) ?></div>
 						</div>
 						<div class="comtbox1"><?= $comment['content'] ?></div>

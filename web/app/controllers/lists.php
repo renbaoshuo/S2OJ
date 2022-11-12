@@ -6,17 +6,17 @@ requirePHPLib('judger');
 requirePHPLib('data');
 
 Auth::check() || redirectToLogin();
+UOJUser::checkPermission(Auth::user(), 'lists.view') || UOJResponse::page403();
 
-if (isSuperUser($myUser)) {
+if (UOJList::userCanCreateList(Auth::user())) {
 	$new_list_form = new UOJBs4Form('new_list');
 	$new_list_form->handle = function () {
-		DB::query("insert into lists (title, is_hidden) values ('未命名题单', 1)");
+		DB::insert("insert into lists (title, is_hidden) values ('未命名题单', 1)");
 	};
 	$new_list_form->submit_button_config['align'] = 'right';
 	$new_list_form->submit_button_config['class_str'] = 'btn btn-primary';
 	$new_list_form->submit_button_config['text'] = UOJLocale::get('problems::add new list');
 	$new_list_form->submit_button_config['smart_confirm'] = '';
-
 	$new_list_form->runAtServer();
 }
 
@@ -92,14 +92,14 @@ $pag = new Paginator([
 <div class="row">
 	<!-- left col -->
 	<div class="col-lg-9">
-
 		<!-- title container -->
 		<div class="d-flex justify-content-between">
 			<h1>
 				<?= UOJLocale::get('problems lists') ?>
 			</h1>
+
 			<?php if (isset($new_list_form)) : ?>
-				<div class="text-end mb-2">
+				<div class="text-end">
 					<?php $new_list_form->printHTML(); ?>
 				</div>
 			<?php endif ?>

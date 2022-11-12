@@ -4,9 +4,6 @@ requireLib('morris');
 
 Auth::check() || redirectToLogin();
 UOJProblem::init(UOJRequest::get('id')) || UOJResponse::page404();
-
-$problem = UOJProblem::cur()->info;
-
 if (UOJRequest::get('contest_id')) {
 	UOJContest::init(UOJRequest::get('contest_id')) || UOJResponse::page404();
 	UOJProblem::upgradeToContestProblem() || UOJResponse::page404();
@@ -183,7 +180,7 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 						hoverCallback: function(index, options, content, row) {
 							var scr = row.score;
 							return '<div class="morris-hover-row-label">' + 'score: ' + scr + '</div>' +
-								'<div class="morris-hover-point">' + '<a href="/submissions?problem_id=' + <?= $problem['id'] ?> + '&amp;min_score=' + scr + '&amp;max_score=' + scr + '">' + 'number: ' + row.count + '</a>' + '</div>';
+								'<div class="morris-hover-point">' + '<a href="/submissions?problem_id=' + <?= UOJProblem::info('id') ?> + '&amp;min_score=' + scr + '&amp;max_score=' + scr + '">' + 'number: ' + row.count + '</a>' + '</div>';
 						},
 						resize: true
 					});
@@ -212,7 +209,7 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 						hoverCallback: function(index, options, content, row) {
 							var scr = row.score / 100;
 							return '<div class="morris-hover-row-label">' + 'score: &le;' + scr + '</div>' +
-								'<div class="morris-hover-point">' + '<a href="/submissions?problem_id=' + <?= $problem['id'] ?> + '&amp;max_score=' + scr + '">' + 'number: ' + row.count + '</a>' + '</div>';
+								'<div class="morris-hover-point">' + '<a href="/submissions?problem_id=' + <?= UOJProblem::info('id') ?> + '&amp;max_score=' + scr + '">' + 'number: ' + row.count + '</a>' + '</div>';
 						},
 						resize: true
 					});
@@ -241,7 +238,7 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 						hoverCallback: function(index, options, content, row) {
 							var scr = row.score / 100;
 							return '<div class="morris-hover-row-label">' + 'score: &ge;' + scr + '</div>' +
-								'<div class="morris-hover-point">' + '<a href="/submissions?problem_id=' + <?= $problem['id'] ?> + '&amp;min_score=' + scr + '">' + 'number: ' + row.count + '</a>' + '</div>';
+								'<div class="morris-hover-point">' + '<a href="/submissions?problem_id=' + <?= UOJProblem::info('id') ?> + '&amp;min_score=' + scr + '">' + 'number: ' + row.count + '</a>' + '</div>';
 						},
 						resize: true
 					});
@@ -252,20 +249,17 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 		<!-- end left col -->
 	</div>
 
-	<!-- Right col -->
+	<!-- right col -->
 	<aside class="col-lg-3 mt-3 mt-lg-0">
-
-		<?php if ($contest) : ?>
+		<?php if (UOJContest::cur()) : ?>
 			<!-- Contest card -->
 			<div class="card card-default mb-2">
 				<div class="card-body">
 					<h3 class="h4 card-title text-center">
-						<a class="text-decoration-none text-body" href="/contest/<?= $contest['id'] ?>">
-							<?= $contest['name'] ?>
-						</a>
+						<?= UOJContest::cur()->getLink(['class' => 'text-body']) ?>
 					</h3>
 					<div class="card-text text-center text-muted">
-						<?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) : ?>
+						<?php if (UOJContest::cur()->progress() <= CONTEST_IN_PROGRESS) : ?>
 							<span id="contest-countdown"></span>
 						<?php else : ?>
 							<?= UOJLocale::get('contests::contest ended') ?>
@@ -273,12 +267,12 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 					</div>
 				</div>
 				<div class="card-footer bg-transparent">
-					比赛评价：<?= ClickZans::getBlock('C', $contest['id'], $contest['zan']) ?>
+					比赛评价：<?= UOJContest::cur()->getZanBlock() ?>
 				</div>
 			</div>
-			<?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) : ?>
+			<?php if (UOJContest::cur()->progress() <= CONTEST_IN_PROGRESS) : ?>
 				<script type="text/javascript">
-					$('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJTime::$time_now->getTimestamp() ?>, function() {}, '1.75rem', false);
+					$('#contest-countdown').countdown(<?= UOJContest::info('end_time')->getTimestamp() - UOJTime::$time_now->getTimestamp() ?>, function() {}, '1.75rem', false);
 				</script>
 			<?php endif ?>
 		<?php endif ?>
@@ -286,14 +280,14 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 		<div class="card card-default mb-2">
 			<ul class="nav nav-pills nav-fill flex-column" role="tablist">
 				<li class="nav-item text-start">
-					<a class="nav-link" role="tab" <?php if ($contest) : ?> href="/contest/<?= $contest['id'] ?>/problem/<?= $problem['id'] ?>" <?php else : ?> href="/problem/<?= $problem['id'] ?>" <?php endif ?>>
+					<a class="nav-link" role="tab" <?php if (UOJContest::cur()) : ?> href="/contest/<?= UOJContest::info('id') ?>/problem/<?= UOJProblem::info('id') ?>" <?php else : ?> href="/problem/<?= UOJProblem::info('id') ?>" <?php endif ?>>
 						<i class="bi bi-journal-text"></i>
 						<?= UOJLocale::get('problems::statement') ?>
 					</a>
 				</li>
-				<?php if (!$contest || $contest['cur_progress'] >= CONTEST_FINISHED) : ?>
+				<?php if (!UOJContest::cur() || UOJContest::cur()->progress() >= CONTEST_FINISHED) : ?>
 					<li class="nav-item text-start">
-						<a href="/problem/<?= $problem['id'] ?>/solutions" class="nav-link" role="tab">
+						<a href="/problem/<?= UOJProblem::info('id') ?>/solutions" class="nav-link" role="tab">
 							<i class="bi bi-journal-bookmark"></i>
 							<?= UOJLocale::get('problems::solutions') ?>
 						</a>
@@ -305,9 +299,9 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 						<?= UOJLocale::get('problems::statistics') ?>
 					</a>
 				</li>
-				<?php if (hasProblemPermission($myUser, $problem)) : ?>
+				<?php if (UOJProblem::cur()->userCanManage(Auth::user())) : ?>
 					<li class="nav-item text-start">
-						<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
+						<a class="nav-link" href="/problem/<?= UOJProblem::info('id') ?>/manage/statement" role="tab">
 							<i class="bi bi-sliders"></i>
 							<?= UOJLocale::get('problems::manage') ?>
 						</a>

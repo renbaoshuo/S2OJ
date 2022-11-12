@@ -4,6 +4,7 @@ requireLib('mathjax');
 requirePHPLib('form');
 
 Auth::check() || redirectToLogin();
+UOJUserBlog::userIsOwner(Auth::user()) || UOJUser::checkPermission(Auth::user(), 'blogs.view') || UOJResponse::page403();
 ?>
 
 <?php echoUOJPageHeader(UOJLocale::get('contests::contest self reviews')) ?>

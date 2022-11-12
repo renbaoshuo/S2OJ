@@ -28,12 +28,22 @@ class UOJContest {
 		]));
 	}
 
+	public static function queryContestsHasProblem(UOJProblem $problem) {
+		return array_map(fn ($x) => UOJContest::query($x['contest_id']), DB::selectAll([
+			"select contest_id from contests_problems",
+			"where", [
+				"problem_id" => $problem->info['id'],
+			],
+			"order by contest_id",
+		]));
+	}
+
 	public static function userCanManageSomeContest(array $user = null) {
 		if (!$user) {
 			return false;
 		}
 
-		if (isSuperUser($user)) {
+		if (isSuperUser($user) || UOJUser::checkPermission($user, 'contests.manage')) {
 			return true;
 		}
 
@@ -43,6 +53,14 @@ class UOJContest {
 				'username' => $user['username']
 			], DB::limit(1)
 		]) != null;
+	}
+
+	public static function userCanCreateContest(array $user = null) {
+		if (!$user) {
+			return false;
+		}
+
+		return isSuperUser($user) || UOJUser::checkPermission($user, 'contests.create');
 	}
 
 	public static function finalTest() {
@@ -117,7 +135,7 @@ class UOJContest {
 		calcStandings($contest, $data, $score, $standings, ['update_contests_submissions' => true]);
 
 		for ($i = 0; $i < count($standings); $i++) {
-			$user_link = getUserLink($standings[$i][2][0]);
+			$user_link = UOJUser::getLink($standings[$i][2][0]);
 			$tail = $standings[$i][0] == $total_score ? '，请继续保持。' : '，请继续努力！';
 
 			$content = '<p>' . $user_link . ' 您好：</p>';
@@ -306,6 +324,10 @@ class UOJContest {
 			$cfg['ensure'] && $this->redirectToAnnouncementBlog();
 			return false;
 		}
+		if (!UOJUser::checkPermission($user, 'contests.register')) {
+			$cfg['ensure'] && UOJResponse::page403();
+			return false;
+		}
 		if ($this->progress() == CONTEST_IN_PROGRESS && !$this->allowExtraRegistration()) {
 			$cfg['ensure'] && redirectTo('/contests');
 			return false;
@@ -351,6 +373,7 @@ class UOJContest {
 
 					return true;
 				}
+
 				if ($cfg['ensure']) {
 					if ($this->info['extra_config']['extra_registration']) {
 						redirectTo($this->getUri('/register'));
@@ -358,11 +381,17 @@ class UOJContest {
 						UOJResponse::message("<h1>比赛正在进行中</h1><p>很遗憾，您尚未报名。比赛结束后再来看吧～</p>");
 					}
 				}
+
 				return false;
 			} else {
 				return true;
 			}
 		} else {
+			if (!$this->userHasRegistered($user) && !UOJUser::checkPermission($user, 'contests.view')) {
+				$cfg['ensure'] && UOJResponse::page403();
+				return false;
+			}
+
 			return true;
 		}
 	}
@@ -381,9 +410,11 @@ class UOJContest {
 		if (!$user) {
 			return false;
 		}
-		if (isSuperUser($user)) {
+
+		if (isSuperUser($user) || UOJUser::checkPermission($user, 'contests.manage')) {
 			return true;
 		}
+
 		return DB::selectFirst([
 			DB::lc(), "select 1 from contests_permissions",
 			"where", [
@@ -391,6 +422,10 @@ class UOJContest {
 				'contest_id' => $this->info['id']
 			]
 		]) != null;
+	}
+
+	public function userCanStartFinalTest(array $user = null) {
+		return $this->userCanManage($user) || UOJUser::checkPermission($user, 'contests.start_final_test');
 	}
 
 	public function userHasRegistered(array $user = null) {
@@ -471,6 +506,10 @@ class UOJContest {
 		];
 
 		return HTML::tag('a', ['class' => $cfg['class'], 'href' => $this->getUri($cfg['where'])], $this->info['name']);
+	}
+
+	public function getZanBlock() {
+		return ClickZans::getBlock('C', $this->info['id'], $this->info['zan']);
 	}
 
 	public function redirectToAnnouncementBlog() {

@@ -25,25 +25,23 @@
 				</div>
 			</div>
 			<ul class="list-group list-group-flush">
-				<?php if ($user['realname']) : ?>
-					<li class="list-group-item">
-						<i class="bi bi-person-fill me-1"></i>
-						<?= $user['realname'] ?>
-					</li>
-				<?php endif ?>
+				<li class="list-group-item">
+					<i class="bi bi-person-fill me-1"></i>
+					<?= $user['realname'] ?>
+					<?php if ($user['realname']) : ?>
+						<span class="small text-secondary">
+							(<?= UOJLocale::get('user::' . $user['usertype']) ?: HTML::escape($user['usertype']) ?>)
+						</span>
+					<?php else : ?>
+						<span class="text-secondary">
+							<?= UOJLocale::get('user::' . $user['usertype']) ?: HTML::escape($user['usertype']) ?>
+						</span>
+					<?php endif ?>
+				</li>
 				<?php if ($user['school']) : ?>
 					<li class="list-group-item">
 						<i class="bi bi-person-badge-fill me-1"></i>
 						<?= $user['school'] ?>
-					</li>
-				<?php endif ?>
-				<?php if ($user['usertype']) : ?>
-					<li class="list-group-item">
-						<i class="bi bi-key-fill me-1"></i>
-						<?php foreach (explode(',', $user['usertype']) as $idx => $type) : ?>
-							<?php if ($idx) : ?>,<?php endif ?>
-							<span><?= UOJLocale::get('user::' . str_replace('_', ' ', $type)) ?: HTML::escape($type) ?></span>
-						<?php endforeach ?>
 					</li>
 				<?php endif ?>
 				<?php if ($user['email']) : ?>
@@ -56,9 +54,11 @@
 				<?php endif ?>
 				<?php if ($user['qq']) : ?>
 					<li class="list-group-item">
-						<i class="align-text-bottom me-1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16">
+						<i class="align-text-bottom me-1">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16">
 								<path d="M433.754 420.445c-11.526 1.393-44.86-52.741-44.86-52.741 0 31.345-16.136 72.247-51.051 101.786 16.842 5.192 54.843 19.167 45.803 34.421-7.316 12.343-125.51 7.881-159.632 4.037-34.122 3.844-152.316 8.306-159.632-4.037-9.045-15.25 28.918-29.214 45.783-34.415-34.92-29.539-51.059-70.445-51.059-101.792 0 0-33.334 54.134-44.859 52.741-5.37-.65-12.424-29.644 9.347-99.704 10.261-33.024 21.995-60.478 40.144-105.779C60.683 98.063 108.982.006 224 0c113.737.006 163.156 96.133 160.264 214.963 18.118 45.223 29.912 72.85 40.144 105.778 21.768 70.06 14.716 99.053 9.346 99.704z" fill="currentColor" />
-							</svg></i>
+							</svg>
+						</i>
 						<a class="text-decoration-none text-body" href="http://wpa.qq.com/msgrd?v=3&uin=<?= HTML::escape($user['qq']) ?>&site=qq&menu=yes" target="_blank">
 							<?= HTML::escape($user['qq']) ?>
 						</a>
@@ -74,10 +74,14 @@
 				<?php endif ?>
 				<?php if ($extra['social']['codeforces']) : ?>
 					<li class="list-group-item d-flex align-items-center">
-						<div class="flex-shrink-0"><i class="align-text-bottom me-1"><svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 24 24" width="16" height="16">
+						<div class="flex-shrink-0">
+							<i class="align-text-bottom me-1">
+								<svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 24 24" width="16" height="16">
 									<title>Codeforces</title>
 									<path d="M4.5 7.5C5.328 7.5 6 8.172 6 9v10.5c0 .828-.672 1.5-1.5 1.5h-3C.673 21 0 20.328 0 19.5V9c0-.828.673-1.5 1.5-1.5h3zm9-4.5c.828 0 1.5.672 1.5 1.5v15c0 .828-.672 1.5-1.5 1.5h-3c-.827 0-1.5-.672-1.5-1.5v-15c0-.828.673-1.5 1.5-1.5h3zm9 7.5c.828 0 1.5.672 1.5 1.5v7.5c0 .828-.672 1.5-1.5 1.5h-3c-.828 0-1.5-.672-1.5-1.5V12c0-.828.672-1.5 1.5-1.5h3z" fill="currentColor" />
-								</svg></i>&nbsp;</div>
+								</svg>
+							</i>&nbsp;
+						</div>
 						<div>
 							<a id="codeforces-profile-link" class="text-decoration-none" href="https://codeforces.com/profile/<?= $extra['social']['codeforces'] ?>" target="_blank" style="color: rgba(var(--bs-body-color-rgb), var(--bs-text-opacity)) !important;">
 								<?= $extra['social']['codeforces'] ?>

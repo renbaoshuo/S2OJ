@@ -22,11 +22,19 @@ class UOJGroup {
 			return [];
 		}
 
-		return array_map(fn ($x) => UOJGroup::query($x['group_id']), DB::selectAll([
+		return array_filter(array_map(fn ($x) => UOJGroup::query($x['group_id']), DB::selectAll([
 			DB::lc(), "select group_id from groups_users",
 			"where", ['username' => $user['username']],
 			"order by group_id"
-		]));
+		])), fn ($group) => $group->userCanView($user));
+	}
+
+	public static function userCanCreateGroup($user) {
+		if (!$user) {
+			return false;
+		}
+
+		return isSuperUser($user) || UOJUser::checkPermission($user, 'groups.create');
 	}
 
 	public function __construct($info) {
@@ -34,15 +42,22 @@ class UOJGroup {
 	}
 
 	public function userCanManage(array $user = null) {
-		return isSuperUser($user);
+		return isSuperUser($user) || UOJUser::checkPermission($user, 'groups.manage');
 	}
 
 	public function userCanView(array $user = null, array $cfg = []) {
 		$cfg += ['ensure' => false];
+
 		if ($this->info['is_hidden'] && !$this->userCanManage($user)) {
 			$cfg['ensure'] && UOJResponse::page404();
 			return false;
 		}
+
+		if (!$this->hasUser($user) && !UOJUser::checkPermission($user, 'groups.view')) {
+			$cfg['ensure'] && UOJResponse::page403();
+			return false;
+		}
+
 		return true;
 	}
 

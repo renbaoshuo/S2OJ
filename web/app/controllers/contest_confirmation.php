@@ -40,7 +40,7 @@ $confirm_form->runAtServer();
 					</tr>
 					<tr>
 						<td class="text-center">参赛选手</td>
-						<td><?= getUserLink(Auth::id()) ?></td>
+						<td><?= UOJUser::getLink(Auth::user()) ?></td>
 					</tr>
 					<tr>
 						<td class="text-center">开始时间</td>
