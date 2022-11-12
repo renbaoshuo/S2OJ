@@ -85,7 +85,6 @@ class SyncProblemDataHandler {
 		}
 
 		if (isset($this->problem_extra_config['dont_use_formatter']) || !is_file("{$this->upload_dir}/$file_name")) {
-			exec("cp $src $dest -r", $output, $ret);
 			$ret = UOJLocalRun::exec(['cp', $src, $dest, '-r']);
 		} else {
 			$ret = UOJLocalRun::formatter($src, $dest);
