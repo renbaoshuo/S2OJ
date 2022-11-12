@@ -302,14 +302,29 @@ class HTML {
 		return $res;
 	}
 
-	public static function link(?string $uri, $text, $cfg = ['location' => 'main']) {
-		if ($uri === null) {
-			return '<a>' . HTML::escape($text) . '</a>';
+	public static function link(?string $uri, $text, $cfg = []) {
+		$cfg += ['location' => 'main', 'escape' => true];
+
+		if ($cfg['escape']) {
+			$text = HTML::escape($text);
 		}
-		return '<a class="text-decoration-none" href="' . HTML::url($uri, $cfg) . '">' . HTML::escape($text) . '</a>';
+
+		if ($uri === null) {
+			return HTML::tag('a', [], $text);
+		}
+
+		return HTML::tag('a', ['href' => HTML::url($uri, $cfg)], $text);
 	}
-	public static function autolink(string $url, array $attr = []) {
-		return '<a class="text-decoration-none" href="' . $url . '"' . HTML::attr($attr) . '>' . $url . '</a>';
+
+	public static function autolink(string $url, array $attr = [], $cfg = []) {
+		$cfg += ['escape' => true];
+		$text = $url;
+
+		if ($cfg['escape']) {
+			$text = HTML::escape($text);
+		}
+
+		return '<a href="' . $url . '"' . HTML::attr($attr) . '>' . $text . '</a>';
 	}
 	public static function js_src(string $uri, array $cfg = []) {
 		$cfg += [
