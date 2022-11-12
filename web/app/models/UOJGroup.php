@@ -97,6 +97,7 @@ class UOJGroup {
 			],
 			"group by problem_id",
 			"order by id desc",
+			DB::limit($limit),
 		]));
 	}
 
