@@ -409,7 +409,7 @@ EOD);
 									echo '</tr>';
 								},
 								[
-									'page_len' => 20,
+									'page_len' => 10,
 									'div_classes' => ['table-responsive'],
 									'table_classes' => ['table', 'align-middle'],
 								]
@@ -469,7 +469,7 @@ EOD);
 									echo HTML::tag('td', [], UOJUser::getLink($row['username']));
 									echo '<td>';
 									echo '<form class="d-inline-block" method="POST" onsubmit=\'return confirm("你真的要从小组中移除这个用户吗？")\'>'
-										. '<input type="hidden" name="_token" value="' . crsf_token() . '">'
+										. HTML::hiddenToken()
 										. '<input type="hidden" name="remove_username" value="' . $row['username'] . '">'
 										. '<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-remove_user" value="remove_user">移除</button>'
 										. '</form>';
@@ -477,7 +477,7 @@ EOD);
 									echo HTML::tag_end('tr');
 								},
 								[
-									'page_len' => 20,
+									'page_len' => 10,
 									'div_classes' => ['table-responsive'],
 									'table_classes' => ['table', 'align-middle'],
 								]

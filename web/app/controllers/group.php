@@ -140,7 +140,7 @@ UOJGroup::cur()->userCanView(Auth::user(), ['ensure' => true]);
 					<?= UOJLocale::get('top solver') ?>
 				</h2>
 				<?php UOJRanklist::printHTML([
-					'page_len' => 25,
+					'page_len' => 15,
 					'group_id' => UOJGroup::info('id'),
 				]) ?>
 			</div>

@@ -64,7 +64,7 @@ $header .= '<th class="text-center" style="width:50px;">' . UOJLocale::get('appr
 $header .= '</tr>';
 
 $pag_config = [
-	'page_len' => 40,
+	'page_len' => 20,
 	'col_names' => [
 		'best_ac_submissions.submission_id as submission_id',
 		'problems.id as id',
