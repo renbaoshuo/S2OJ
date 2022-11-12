@@ -39,7 +39,7 @@ class UOJBlog {
 		}
 
 		if ($problem_id = $this->getSolutionProblemId()) {
-			$contests = UOJContest::queryContestsHasProblem($problem_id);
+			$contests = UOJContest::queryContestsHasProblem(UOJProblem::query($problem_id));
 
 			foreach ($contests as $contest) {
 				if ($contest->userHasRegistered($user) && $contest->progress() <= CONTEST_IN_PROGRESS) {

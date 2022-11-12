@@ -25,7 +25,7 @@ switch (UOJRequest::get('type')) {
 		UOJProblem::init(UOJRequest::get('id')) || UOJResponse::page404();
 
 		if (!$auth) {
-			UOJProblem::cur()->userCanDownloadTestData(Auth::user()) || UOJResponse::page404();
+			UOJProblem::cur()->userCanDownloadTestData(Auth::user()) || UOJResponse::page403();
 		}
 
 		$file_name = UOJProblem::cur()->getDataZipPath();

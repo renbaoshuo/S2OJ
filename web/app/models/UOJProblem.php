@@ -281,7 +281,23 @@ class UOJProblem {
 	}
 
 	public function userCanDownloadTestData(array $user = null) {
-		return $this->userCanManage($user) || UOJUser::checkPermission($user, 'problems.download_testdata');
+		if ($this->userCanManage($user)) {
+			return true;
+		}
+
+		if (!UOJUser::checkPermission($user, 'problems.download_testdata')) {
+			return false;
+		}
+
+		$contests = UOJContest::queryContestsHasProblem($this);
+
+		foreach ($contests as $contest) {
+			if ($contest->userHasRegistered($user) && $contest->progress() <= CONTEST_IN_PROGRESS) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public function preHackCheck(array $user = null) {
