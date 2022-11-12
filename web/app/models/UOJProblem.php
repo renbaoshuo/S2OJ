@@ -326,6 +326,22 @@ class UOJProblem {
 	}
 
 	public function additionalSubmissionComponentsCannotBeSeenByUser(array $user = null, UOJSubmission $submission) {
+		$contests = UOJContest::queryContestsHasProblem($this);
+
+		foreach ($contests as $contest) {
+			if ($contest->userHasRegistered($user) && $contest->progress() == CONTEST_IN_PROGRESS) {
+				if ($submission->userIsSubmitter($user)) {
+					if ($contest->getJudgeTypeInContest() == 'no-details') {
+						return ['low_level_details'];
+					} else {
+						return [];
+					}
+				} else {
+					return ['content', 'high_level_details', 'low_level_details'];
+				}
+			}
+		}
+
 		return [];
 	}
 

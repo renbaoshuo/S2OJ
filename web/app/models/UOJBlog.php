@@ -42,7 +42,7 @@ class UOJBlog {
 			$contests = UOJContest::queryContestsHasProblem(UOJProblem::query($problem_id));
 
 			foreach ($contests as $contest) {
-				if ($contest->userHasRegistered($user) && $contest->progress() <= CONTEST_IN_PROGRESS) {
+				if ($contest->userHasRegistered($user) && $contest->progress() == CONTEST_IN_PROGRESS) {
 					return false;
 				}
 			}

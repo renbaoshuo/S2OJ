@@ -392,8 +392,6 @@ class UOJSubmission {
 			$perm[$com] = false;
 		}
 
-		// TODO: hide older submissions when a registered unfinished contest has this problem
-
 		return $perm;
 	}
 
