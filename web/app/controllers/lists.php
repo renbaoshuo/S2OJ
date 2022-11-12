@@ -44,7 +44,7 @@ function getListTR($info) {
 		$html .= ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span> ';
 	}
 	foreach ($list->queryTags() as $tag) {
-		$html .= ' <a class="uoj-list-tag"><span class="badge text-bg-secondary">' . $tag['tag'] . '</span></a> ';
+		$html .= ' <a class="uoj-list-tag"><span class="badge text-bg-secondary">' . HTML::escape($tag) . '</span></a> ';
 	}
 	$html .= HTML::tag('td', [], max(0, $accepted));
 	$html .= HTML::tag('td', [], count($problems));
