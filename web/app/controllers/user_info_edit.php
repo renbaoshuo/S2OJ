@@ -815,6 +815,8 @@ $pageTitle = $user['username'] == Auth::id()
 			<div class="card">
 				<div class="card-body">
 					<div id="result-alert" class="alert" role="alert" style="display: none"></div>
+					<p>关于各项权限的详细解释，请查看 <a href="https://s2oj.github.io/#/manage/permissions">权限管理</a> 文档。</p>
+					<hr />
 					<?php $update_user_permissions_form->printHTML() ?>
 				</div>
 			</div>

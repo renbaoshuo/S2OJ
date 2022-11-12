@@ -20,7 +20,7 @@
 
 ## 文档
 
-有关安装、管理、维护，可参阅：[https://universaloj.github.io/](https://universaloj.github.io/) 和 [https://vfleaking.github.io/uoj/](https://vfleaking.github.io/uoj/)。
+有关安装、管理、维护，可参阅：[https://s2oj.github.io/](https://s2oj.github.io/) 、 [https://universaloj.github.io/](https://universaloj.github.io/) 和 [https://vfleaking.github.io/uoj/](https://vfleaking.github.io/uoj/)。
 
 ## 部署
 
