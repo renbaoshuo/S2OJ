@@ -65,7 +65,7 @@ trait UOJSubmissionLikeTrait {
 	}
 
 	public function userCanManageProblemOrContest(array $user = null) {
-		if ($this->problem->userCanManage($user)) {
+		if (!$this->problem instanceof UOJContestProblem && $this->problem->userCanManage($user)) {
 			return true;
 		} elseif ($this->problem instanceof UOJContestProblem && $this->problem->contest->userCanManage($user)) {
 			return true;
