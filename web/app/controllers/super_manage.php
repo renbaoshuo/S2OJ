@@ -325,9 +325,6 @@ if ($cur_tab == 'index') {
 	if (isset($_GET['usergroup']) && $_GET['usergroup'] != "") {
 		$user_list_cond[] = "usergroup = '" . DB::escape($_GET['usergroup']) . "'";
 	}
-	if (isset($_GET['usertype']) && $_GET['usertype'] != "") {
-		$user_list_cond[] = "usertype like '%" . DB::escape($_GET['usertype']) . "%'";
-	}
 
 	if ($user_list_cond) {
 		$user_list_cond = implode(' and ', $user_list_cond);
@@ -1190,24 +1187,6 @@ EOD);
 									</select>
 								</div>
 								<div class="col-auto">
-									<label for="user-query-usertype" class="form-label">用户权限</label>
-									<select class="form-select" id="user-query-usertype" name="usertype">
-										<?php
-										$usertypes = [
-											'' => '*: 所有',
-											'student' => 'student: 学生',
-											'teacher' => 'teacher: 老师',
-											'problem_uploader' => 'problem_uploader: 题目上传者',
-											'problem_manager' => 'problem_manager: 题目管理员',
-											'contest_judger' => 'contest_judger: 比赛评测员',
-										];
-										?>
-										<?php foreach ($usertypes as $name => $type) : ?>
-											<option value="<?= $name ?>" <?php if ($_GET['usertype'] == $name) : ?> selected <?php endif ?>><?= $type ?></option>
-										<?php endforeach ?>
-									</select>
-								</div>
-								<div class="col-auto">
 									<button type="submit" id="user-query-submit" class="mt-2 btn btn-secondary">查询</button>
 								</div>
 							</form>
@@ -1218,15 +1197,15 @@ EOD);
 								$user_list_cond,
 								'order by username asc',
 								<<<EOD
-	<tr>
-		<th>用户名</th>
-		<th>学校</th>
-		<th>用户类别</th>
-		<th>权限</th>
-		<th>注册时间</th>
-		<th>操作</th>
-	</tr>
-EOD,
+									<tr>
+										<th>用户名</th>
+										<th>学校</th>
+										<th>用户类别</th>
+										<th>权限</th>
+										<th>注册时间</th>
+										<th>操作</th>
+									</tr>
+								EOD,
 								function ($row) {
 									echo '<tr>';
 									echo '<td>', '<span class="uoj-username" data-realname="', HTML::escape($row['realname']), '">', $row['username'], '</span>', '</td>';
@@ -1239,18 +1218,16 @@ EOD,
 										case 'B':
 											echo UOJLocale::get('user::banned user');
 											break;
+										case 'T':
+											echo UOJLocale::get('user::tmp user');
+											break;
 										default:
 											echo UOJLocale::get('user::normal user');
 											break;
 									}
 									echo '</td>';
 									echo '<td>';
-									foreach (explode(',', $row['usertype']) as $idx => $type) {
-										if ($idx) {
-											echo ', ';
-										}
-										echo UOJLocale::get('user::' . str_replace('_', ' ', $type)) ?: HTML::escape($type);
-									}
+									echo UOJLocale::get('user::' . $row['usertype']) ?: HTML::escape($row['usertype']);
 									echo '</td>';
 									echo '<td>', $row['register_time'], '</td>';
 									echo '<td>', '<a class="text-decoration-none d-inline-block align-middle" href="/user/', $row['username'], '/edit">编辑</a>', '</td>';
