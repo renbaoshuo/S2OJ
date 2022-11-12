@@ -289,10 +289,8 @@ class UOJProblem {
 			return false;
 		}
 
-		$contests = UOJContest::queryContestsHasProblem($this);
-
-		foreach ($contests as $contest) {
-			if ($contest->userHasRegistered($user) && $contest->progress() <= CONTEST_IN_PROGRESS) {
+		foreach ($this->findInContests() as $cp) {
+			if ($cp->contest->userHasRegistered($user) && $cp->contest->progress() == CONTEST_IN_PROGRESS) {
 				return false;
 			}
 		}
@@ -326,12 +324,10 @@ class UOJProblem {
 	}
 
 	public function additionalSubmissionComponentsCannotBeSeenByUser(array $user = null, UOJSubmission $submission) {
-		$contests = UOJContest::queryContestsHasProblem($this);
-
-		foreach ($contests as $contest) {
-			if ($contest->userHasRegistered($user) && $contest->progress() == CONTEST_IN_PROGRESS) {
+		foreach ($this->findInContests() as $cp) {
+			if ($cp->contest->userHasRegistered($user) && $cp->contest->progress() == CONTEST_IN_PROGRESS) {
 				if ($submission->userIsSubmitter($user)) {
-					if ($contest->getJudgeTypeInContest() == 'no-details') {
+					if ($cp->contest->getJudgeTypeInContest() == 'no-details') {
 						return ['low_level_details'];
 					} else {
 						return [];

@@ -38,11 +38,10 @@ class UOJBlog {
 			return false;
 		}
 
-		if ($problem_id = $this->getSolutionProblemId()) {
-			$contests = UOJContest::queryContestsHasProblem(UOJProblem::query($problem_id));
-
-			foreach ($contests as $contest) {
-				if ($contest->userHasRegistered($user) && $contest->progress() == CONTEST_IN_PROGRESS) {
+		$problem = $this->getSolutionProblem();
+		if ($problem) {
+			foreach ($problem->findInContests() as $cp) {
+				if ($cp->contest->userHasRegistered($user) && $cp->contest->progress() == CONTEST_IN_PROGRESS) {
 					return false;
 				}
 			}
@@ -217,6 +216,15 @@ class UOJBlog {
 				"blog_id" => $this->info['id'],
 			],
 		]);
+	}
+
+	public function getSolutionProblem() {
+		return UOJProblem::query(DB::selectSingle([
+			DB::lc(), "select 1 from problems_solutions",
+			"where", [
+				"blog_id" => $this->info['id'],
+			],
+		]));
 	}
 }
 

@@ -28,16 +28,6 @@ class UOJContest {
 		]));
 	}
 
-	public static function queryContestsHasProblem(UOJProblem $problem) {
-		return array_map(fn ($x) => UOJContest::query($x['contest_id']), DB::selectAll([
-			"select contest_id from contests_problems",
-			"where", [
-				"problem_id" => $problem->info['id'],
-			],
-			"order by contest_id",
-		]));
-	}
-
 	public static function userCanManageSomeContest(array $user = null) {
 		if (!$user) {
 			return false;
