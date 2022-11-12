@@ -63,14 +63,13 @@ $parsedown = HTML::parsedown();
 
 <?php if (Auth::check()) : ?>
 	<?php if (!isset($upcoming_contests_hidden)) : ?>
-		<?php $upcoming_contests = UOJContest::queryUpcomingContestIds(Auth::user(), 5); ?>
+		<?php $upcoming_contests = UOJContest::queryUpcomingContests(Auth::user(), 5); ?>
 		<div class="card card-default mb-2" id="group-user-announcements">
 			<div class="card-header fw-bold bg-transparent">
 				近期比赛
 			</div>
 			<ul class="list-group list-group-flush">
-				<?php foreach ($upcoming_contests as $id) : ?>
-					<?php $contest = UOJContest::query($id); ?>
+				<?php foreach ($upcoming_contests as $contest) : ?>
 					<?php if ($contest->info['cur_progress'] == CONTEST_NOT_STARTED || $contest->info['cur_progress'] == CONTEST_IN_PROGRESS) : ?>
 						<li class="list-group-item text-center">
 							<?= $contest->getLink(['class' => 'fw-bold']) ?>

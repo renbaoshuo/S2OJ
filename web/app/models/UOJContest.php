@@ -17,15 +17,15 @@ class UOJContest {
 		return new UOJContest($info);
 	}
 
-	public static function queryUpcomingContestIds(array $user = null, $limit = -1) {
-		return array_map(fn ($x) => $x['id'], DB::selectAll([
+	public static function queryUpcomingContests(array $user = null, $limit = -1) {
+		return array_filter(array_map(fn ($x) => UOJContest::query($x['id']), DB::selectAll([
 			"select id from contests",
 			"where", [
 				"status" => "unfinished",
 			],
 			"order by start_time asc, id asc",
 			$limit == -1 ? "" : DB::limit($limit),
-		]));
+		])), fn ($contest) => $contest->userCanView($user));
 	}
 
 	public static function userCanManageSomeContest(array $user = null) {
