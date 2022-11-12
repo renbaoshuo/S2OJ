@@ -150,27 +150,6 @@ function camelize($str, $delimiters = '-_') {
 	return $str;
 }
 
-function addUserType(&$user, $type) {
-	$usertype = explode(',', $user['usertype']);
-	if (!in_array($type, $usertype)) {
-		$usertype[] = $type;
-	}
-	$user['usertype'] = implode(',', $usertype);
-	return $user;
-}
-function removeUserType(&$user, $type) {
-	$usertype = explode(',', $user['usertype']);
-	if (in_array($type, $usertype)) {
-		$usertype = array_diff($usertype, array($type));
-	}
-	$user['usertype'] = implode(',', $usertype);
-	return $user;
-}
-function hasUserType($user, $type) {
-	$usertype = explode(',', $user['usertype']);
-	return in_array($type, $usertype);
-}
-
 function isSuperUser($user) {
 	return $user != null && $user['usergroup'] == 'S';
 }
