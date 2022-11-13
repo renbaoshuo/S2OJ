@@ -1304,6 +1304,7 @@ EOD);
 										$usergroups = [
 											'' => '*: 所有用户',
 											'B' => 'B: 封禁用户',
+											'T' => 'T: 临时用户',
 											'U' => 'U: 普通用户',
 											'S' => 'S: 超级用户',
 										];
@@ -1328,8 +1329,8 @@ EOD);
 										<th>用户名</th>
 										<th>学校</th>
 										<th>用户类别</th>
-										<th>权限</th>
 										<th>注册时间</th>
+										<th>过期时间</th>
 										<th>操作</th>
 									</tr>
 								EOD,
@@ -1352,11 +1353,10 @@ EOD);
 											echo UOJLocale::get('user::normal user');
 											break;
 									}
-									echo '</td>';
-									echo '<td>';
-									echo UOJLocale::get('user::' . $row['usertype']) ?: HTML::escape($row['usertype']);
+									echo ', ', HTML::tag('small', ['class' => 'text-muted'], UOJLocale::get('user::' . $row['usertype']) ?: HTML::escape($row['usertype']));
 									echo '</td>';
 									echo '<td>', $row['register_time'], '</td>';
+									echo '<td>', $row['expiration_time'], '</td>';
 									echo '<td>', '<a class="text-decoration-none d-inline-block align-middle" href="/user/', $row['username'], '/edit">编辑</a>', '</td>';
 									echo '</tr>';
 								},
