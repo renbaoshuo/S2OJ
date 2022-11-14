@@ -623,7 +623,9 @@ CREATE TABLE `problems` (
   `submit_num` int(11) NOT NULL DEFAULT '0',
   `assigned_to_judger` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'any',
   PRIMARY KEY (`id`),
-  KEY `assigned_to_judger` (`assigned_to_judger`)
+  KEY `assigned_to_judger` (`assigned_to_judger`),
+  KEY `uploader` (`uploader`),
+  KEY `is_hidden` (`is_hidden`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci TABLESPACE `innodb_system`;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
