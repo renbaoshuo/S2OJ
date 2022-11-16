@@ -211,7 +211,7 @@ class UOJBlog {
 
 	public function getSolutionProblemId() {
 		return DB::selectSingle([
-			DB::lc(), "select 1 from problems_solutions",
+			DB::lc(), "select problem_id from problems_solutions",
 			"where", [
 				"blog_id" => $this->info['id'],
 			],
