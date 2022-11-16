@@ -25,13 +25,13 @@ if (UOJProblem::userCanCreateProblem(Auth::user())) {
 
 ## 输入输出样例
 
-### 输入样例 #1
+### 样例输入 #1
 
 ```text
 样例 1 的输入内容
 ```
 
-### 输出样例 #1
+### 样例输出 #1
 
 ```text
 样例 1 的输出内容
