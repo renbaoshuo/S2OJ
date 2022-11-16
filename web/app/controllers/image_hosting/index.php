@@ -59,7 +59,7 @@ if ($_POST['image_upload_file_submit'] == 'submit') {
 
 	list($width, $height, $type) = $size;
 	$hash = hash_file("sha256", $_FILES['image_upload_file']['tmp_name']) . Auth::id();
-	$scale = ceil($height / 600.0);
+	$scale = ceil($width / 600.0);
 
 	$watermark_text = UOJConfig::$data['profile']['oj-name-short'];
 	if (isSuperUser(Auth::user()) && $_POST['watermark'] == 'no_watermark') {
