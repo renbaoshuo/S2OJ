@@ -9,7 +9,7 @@ class UOJLocale {
 	public static function init() {
 		if (UOJRequest::get('locale')) {
 			UOJLocale::setLocale(UOJRequest::get('locale'));
-			redirectTo(UOJContext::requestURI());
+			redirectTo(UOJContext::requestPath());
 		}
 
 		self::requireModule('basic');
