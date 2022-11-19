@@ -209,11 +209,11 @@ class HTML {
 			$param['_token'] = crsf_token();
 		}
 
-		// $url = '//'.UOJConfig::$data['web'][$config['location']]['host'];
-		// if (HTML::port($cfg['location']) != HTML::standard_port($protocol)) {
-		// 	$url .= ':'.HTML::port($cfg['location']);
-		// }
-		$url = '';
+		$protocol = HTML::protocol($cfg['location']);
+		$url = '//'.UOJConfig::$data['web'][$cfg['location']]['host'];
+		if (HTML::port($cfg['location']) != HTML::standard_port($protocol)) {
+			$url .= ':'.HTML::port($cfg['location']);
+		}
 		if ($param) {
 			$url .= $path . '?' . HTML::query_string_encode($param);
 		} elseif ($path != '/') {
