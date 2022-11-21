@@ -25,7 +25,7 @@ $comment_form->addVTextArea(
 	'内容',
 	'',
 	function ($comment) {
-		if (Auth::check()) {
+		if (!Auth::check()) {
 			return '请先登录';
 		}
 		if (!$comment) {
