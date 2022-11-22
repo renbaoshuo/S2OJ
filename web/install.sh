@@ -95,6 +95,7 @@ initProgress(){
 	mkdir -p /opt/uoj/web/app/storage/image_hosting
 	chmod -R 777 /opt/uoj/web/app/storage
 	#Using cli upgrade to latest
+	sleep 15 # Wait for uoj-db
     php7.4 /opt/uoj/web/app/cli.php upgrade:latest
     touch /var/uoj_data/.UOJSetupDone
     #Touch SetupDone flag file
