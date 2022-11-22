@@ -12,6 +12,8 @@ if (UOJList::userCanCreateList(Auth::user())) {
 	$new_list_form = new UOJBs4Form('new_list');
 	$new_list_form->handle = function () {
 		DB::insert("insert into lists (title, is_hidden) values ('未命名题单', 1)");
+		$id = DB::insert_id();
+		DB::insert("insert into lists_contents (id, content, content_md) values ($id, '', '')");
 	};
 	$new_list_form->submit_button_config['align'] = 'right';
 	$new_list_form->submit_button_config['class_str'] = 'btn btn-primary';
