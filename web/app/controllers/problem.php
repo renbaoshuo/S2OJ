@@ -351,6 +351,12 @@ if (UOJContest::cur()) {
 						</a>
 					</li>
 				<?php endif ?>
+				<li class="nav-item text-start">
+					<a class="nav-link" href="/submissions?problem_id=<?= UOJProblem::info('id') ?>">
+						<i class="bi bi-list-ul"></i>
+						<?= UOJLocale::get('submissions') ?>
+					</a>
+				</li>
 				<?php if (UOJContest::cur() && UOJContest::cur()->userCanSeeProblemStatistics(Auth::user())) : ?>
 					<li class="nav-item text-start">
 						<a class="nav-link" href="/contest/<?= UOJContest::info('id') ?>/problem/<?= $problem['id'] ?>/statistics">

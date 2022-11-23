@@ -294,6 +294,12 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 					</li>
 				<?php endif ?>
 				<li class="nav-item text-start">
+					<a class="nav-link" href="/submissions?problem_id=<?= UOJProblem::info('id') ?>">
+						<i class="bi bi-list-ul"></i>
+						<?= UOJLocale::get('submissions') ?>
+					</a>
+				</li>
+				<li class="nav-item text-start">
 					<a class="nav-link active" href="#">
 						<i class="bi bi-graph-up"></i>
 						<?= UOJLocale::get('problems::statistics') ?>
