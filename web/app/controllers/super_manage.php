@@ -1295,7 +1295,7 @@ EOD);
 							<form class="row gy-2 gx-3 align-items-end mb-3" target="_self" method="GET">
 								<div class="col-auto">
 									<label for="username" class="form-label">用户名</label>
-									<input type="text" class="form-control" name="username" id="user-query-username" value="" />
+									<input type="text" class="form-control" name="username" id="user-query-username" value="<?= HTML::escape(UOJRequest::get('username', null, '')) ?>" />
 								</div>
 								<div class="col-auto">
 									<label for="user-query-usergroup" class="form-label">用户类别</label>
