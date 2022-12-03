@@ -288,11 +288,12 @@ $pag = new Paginator([
 			$('#input-show_tags_mode').click(function() {
 				if (this.checked) {
 					$.cookie('show_tags_mode', '', {
-						path: '/'
+						path: '/problems',
+						expires: 365,
 					});
 				} else {
 					$.removeCookie('show_tags_mode', {
-						path: '/'
+						path: '/problems',
 					});
 				}
 				location.reload();
@@ -300,11 +301,12 @@ $pag = new Paginator([
 			$('#input-show_submit_mode').click(function() {
 				if (this.checked) {
 					$.cookie('show_submit_mode', '', {
-						path: '/'
+						path: '/problems',
+						expires: 365,
 					});
 				} else {
 					$.removeCookie('show_submit_mode', {
-						path: '/'
+						path: '/problems'
 					});
 				}
 				location.reload();
@@ -312,11 +314,12 @@ $pag = new Paginator([
 			$('#input-show_difficulty').click(function() {
 				if (this.checked) {
 					$.cookie('show_difficulty', '', {
-						path: '/'
+						path: '/problems',
+						expires: 365,
 					});
 				} else {
 					$.removeCookie('show_difficulty', {
-						path: '/'
+						path: '/problems'
 					});
 				}
 				location.reload();

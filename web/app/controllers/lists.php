@@ -45,8 +45,10 @@ function getListTR($info) {
 	if ($list->info['is_hidden']) {
 		$html .= ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span> ';
 	}
-	foreach ($list->queryTags() as $tag) {
-		$html .= ' <a class="uoj-list-tag"><span class="badge text-bg-secondary">' . HTML::escape($tag) . '</span></a> ';
+	if (isset($_COOKIE['show_tags_mode'])) {
+		foreach ($list->queryTags() as $tag) {
+			$html .= ' <a class="uoj-list-tag"><span class="badge text-bg-secondary">' . HTML::escape($tag) . '</span></a> ';
+		}
 	}
 	$html .= HTML::tag('td', [], max(0, $accepted));
 	$html .= HTML::tag('td', [], count($problems));
@@ -121,11 +123,12 @@ $pag = new Paginator([
 			$('#input-show_tags_mode').click(function() {
 				if (this.checked) {
 					$.cookie('show_tags_mode', '', {
-						path: '/'
+						path: '/lists',
+						expires: 365,
 					});
 				} else {
 					$.removeCookie('show_tags_mode', {
-						path: '/'
+						path: '/lists',
 					});
 				}
 				location.reload();

@@ -166,11 +166,12 @@ $pag = new Paginator($pag_config);
 			$('#input-show_tags_mode').click(function() {
 				if (this.checked) {
 					$.cookie('show_tags_mode', '', {
-						path: '/'
+						path: '/list',
+						expires: 365,
 					});
 				} else {
 					$.removeCookie('show_tags_mode', {
-						path: '/'
+						path: '/list',
 					});
 				}
 				location.reload();
@@ -178,11 +179,12 @@ $pag = new Paginator($pag_config);
 			$('#input-show_submit_mode').click(function() {
 				if (this.checked) {
 					$.cookie('show_submit_mode', '', {
-						path: '/'
+						path: '/list',
+						expires: 365,
 					});
 				} else {
 					$.removeCookie('show_submit_mode', {
-						path: '/'
+						path: '/list',
 					});
 				}
 				location.reload();
@@ -190,11 +192,12 @@ $pag = new Paginator($pag_config);
 			$('#input-show_difficulty').click(function() {
 				if (this.checked) {
 					$.cookie('show_difficulty', '', {
-						path: '/'
+						path: '/list',
+						expires: 365,
 					});
 				} else {
 					$.removeCookie('show_difficulty', {
-						path: '/'
+						path: '/list',
 					});
 				}
 				location.reload();
