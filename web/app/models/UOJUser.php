@@ -222,10 +222,13 @@ class UOJUser {
 		}
 
 		if ($user['usergroup'] == 'B') {
-			return '<span class="text-danger">' . $user['username'] . '</span>';
+			return HTML::tag('a', ['class' => 'text-danger fw-bold', 'href' => "/user/{$user['username']}"], $user['username']);
 		}
 
-		return HTML::tag('span', ['class' => 'uoj-username', 'data-realname' => trim(HTML::escape($user['realname']))], $user['username']);
+		// 未登录不可查看真实姓名
+		$realname =  Auth::check() ? $user['realname'] : '';
+
+		return HTML::tag('span', ['class' => 'uoj-username', 'data-realname' => trim(HTML::escape($realname))], $user['username']);
 	}
 
 	public static function getUpdatedExtraVisitHistory($history, $cur) {
