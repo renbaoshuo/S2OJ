@@ -129,7 +129,7 @@ function getProblemTR($info) {
 		);
 	}
 	if (isset($_COOKIE['show_difficulty'])) {
-		$html .= HTML::tag('td', [], $problem->getExtraConfig('difficulty'));
+		$html .= HTML::tag('td', [], UOJProblem::getDifficultyHTML($problem->info['difficulty']));
 	}
 	$html .= HTML::tag('td', [], ClickZans::getCntBlock($problem->info['zan']));
 	$html .= HTML::tag_end('tr');
@@ -190,7 +190,7 @@ if (isset($_COOKIE['show_submit_mode'])) {
 	$header .= '<th class="text-center" style="width:125px;">' . UOJLocale::get('problems::ac ratio') . '</th>';
 }
 if (isset($_COOKIE['show_difficulty'])) {
-	$header .= '<th class="text-center" style="width:3em;">' . UOJLocale::get('problems::difficulty') . '</th>';
+	$header .= '<th class="text-center" style="width:8em;">' . UOJLocale::get('problems::difficulty') . '</th>';
 }
 $header .= '<th class="text-center" style="width:50px;">' . UOJLocale::get('appraisal') . '</th>';
 $header .= '</tr>';

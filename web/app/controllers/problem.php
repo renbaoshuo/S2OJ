@@ -250,8 +250,6 @@ if (UOJContest::cur()) {
 					时间限制: <?= $time_limit ? "$time_limit s" : "N/A" ?>
 					&emsp;
 					空间限制: <?= $memory_limit ? "$memory_limit MB" : "N/A" ?>
-					&emsp;
-					上传者: <?= UOJProblem::cur()->getUploaderLink() ?>
 				</div>
 
 				<hr>
@@ -381,9 +379,46 @@ if (UOJContest::cur()) {
 					</li>
 				<?php endif ?>
 			</ul>
-			<div class="card-footer bg-transparent">
-				评价：<?= UOJProblem::cur()->getZanBlock() ?>
-			</div>
+		</div>
+
+		<!-- 题目信息卡片 -->
+		<div class="card mb-2">
+			<ul class="list-group list-group-flush">
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span>上传者</span>
+					<span><?= UOJProblem::cur()->getUploaderLink() ?></span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span>难度</span>
+					<span><?= UOJProblem::getDifficultyHTML(UOJProblem::info('difficulty')) ?></span>
+				</li>
+				<?php if (Auth::check()) : ?>
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						<span>历史分数</span>
+						<?php $his_score = DB::selectSingle(["select max(score)", "from submissions", "where", ["problem_id" => UOJProblem::info('id'), "submitter" => Auth::id()]]) ?>
+
+						<a class="<?= is_null($his_score) ? '' : 'uoj-score' ?>" href="<?= HTML::url('/submissions', ['params' => ['problem_id' => UOJProblem::info('id'), 'submitter' => Auth::id()]]) ?>">
+							<?= is_null($his_score) ? '无' : $his_score ?>
+						</a>
+					</li>
+				<?php endif ?>
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span>标签</span>
+					<span>
+						<?php foreach (UOJProblem::cur()->queryTags() as $tag) : ?>
+							<a class="uoj-problem-tag">
+								<span class="badge bg-secondary">
+									<?= HTML::escape($tag) ?>
+								</span>
+							</a>
+						<?php endforeach ?>
+					</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span>评价</span>
+					<span><?= UOJProblem::cur()->getZanBlock() ?></span>
+				</li>
+			</ul>
 		</div>
 
 		<!-- 附件 -->
@@ -411,6 +446,7 @@ if (UOJContest::cur()) {
 		if (UOJContest::cur() && UOJContest::cur()->progress() <= CONTEST_IN_PROGRESS) {
 			$sidebar_config['upcoming_contests_hidden'] = '';
 		}
+
 		uojIncludeView('sidebar', $sidebar_config);
 		?>
 	</aside>

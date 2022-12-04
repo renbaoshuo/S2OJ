@@ -62,6 +62,24 @@ $problem_editor->save = function ($data) {
 };
 
 $problem_editor->runAtServer();
+
+$difficulty_form = new UOJForm('difficulty');
+$difficulty_form->addSelect('difficulty', [
+	'options' => UOJProblem::$difficulty,
+	'default_value' => UOJProblem::info('difficulty'),
+]);
+$difficulty_form->handle = function () {
+	DB::update([
+		"update problems",
+		"set", [
+			"difficulty" => $_POST['difficulty'],
+		],
+		"where", [
+			"id" => UOJProblem::info('id'),
+		],
+	]);
+};
+$difficulty_form->runAtServer();
 ?>
 
 <?php echoUOJPageHeader('题面编辑 - ' . HTML::stripTags(UOJProblem::info('title'))) ?>
@@ -153,7 +171,14 @@ $problem_editor->runAtServer();
 			</div>
 		</div>
 
-		<?php uojIncludeView('sidebar') ?>
+		<div class="card mt-3">
+			<div class="card-header fw-bold">
+				题目难度
+			</div>
+			<div class="card-body">
+				<?php $difficulty_form->printHTML() ?>
+			</div>
+		</div>
 	</aside>
 
 </div>
