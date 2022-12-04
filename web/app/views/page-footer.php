@@ -4,6 +4,11 @@ if (!isset($ShowPageFooter)) {
 }
 ?>
 </div>
+<script>
+	$(document).ready(function() {
+		[...document.querySelectorAll('[data-bs-toggle="tooltip"]')].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+	});
+</script>
 <?php if ($ShowPageFooter) : ?>
 	<?php if (UOJNotice::shouldConstantlyCheckNotice()) : ?>
 		<script type="text/javascript">

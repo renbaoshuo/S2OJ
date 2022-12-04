@@ -31,15 +31,28 @@ function getProblemTR($info) {
 	$html .= HTML::tag_end('td');
 	if (isset($_COOKIE['show_submit_mode'])) {
 		$perc = $info['submit_num'] > 0 ? round(100 * $info['ac_num'] / $info['submit_num']) : 0;
-		$html .= '<td><a href="/submissions?problem_id=' . $info['id'] . '&min_score=100&max_score=100">&times;' . $info['ac_num'] . '</a></td>';
-		$html .= '<td><a href="/submissions?problem_id=' . $info['id'] . '">&times;' . $info['submit_num'] . '</a></td>';
-		$html .= '<td>';
-		$html .= '<div class="progress bot-buffer-no">';
-		$html .= '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="' . $perc . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $perc . '%; min-width: 20px;">';
-		$html .= $perc . '%';
-		$html .= '</div>';
-		$html .= '</div>';
-		$html .= '</td>';
+
+		$html .= HTML::tag(
+			'td',
+			[],
+			HTML::tag(
+				'div',
+				[
+					'class' => 'progress',
+					'data-bs-toggle' => 'tooltip',
+					'data-bs-title' => "{$info['ac_num']} / {$info['submit_num']}",
+					'data-bs-placement' => 'bottom',
+				],
+				HTML::tag('div', [
+					'class' => 'progress-bar bg-success',
+					'role' => 'progressbar',
+					'aria-valuenow' => $perc,
+					'aria-valuemin' => 0,
+					'aria-valuemax' => 100,
+					'style' => "width: {$perc}%; min-width: 20px;",
+				], "{$perc}%")
+			)
+		);
 	}
 	if (isset($_COOKIE['show_difficulty'])) {
 		$html .= HTML::tag('td', [], $problem->getExtraConfig('difficulty'));
@@ -53,8 +66,6 @@ $header = '<tr>';
 $header .= '<th class="text-center" style="width:5em;">ID</th>';
 $header .= '<th>' . UOJLocale::get('problems::problem') . '</th>';
 if (isset($_COOKIE['show_submit_mode'])) {
-	$header .= '<th class="text-center" style="width:4em">' . UOJLocale::get('problems::ac') . '</th>';
-	$header .= '<th class="text-center" style="width:4em">' . UOJLocale::get('problems::submit') . '</th>';
 	$header .= '<th class="text-center" style="width:125px;">' . UOJLocale::get('problems::ac ratio') . '</th>';
 }
 if (isset($_COOKIE['show_difficulty'])) {
