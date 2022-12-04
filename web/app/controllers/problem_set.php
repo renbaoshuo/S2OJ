@@ -61,8 +61,8 @@ EOD;
 	$new_problem_form->handle = function () use ($default_statement) {
 		DB::insert([
 			"insert into problems",
-			"(title, uploader, is_hidden, submission_requirement)",
-			"values", DB::tuple(["New Problem", Auth::id(), 1, "{}"])
+			"(title, uploader, is_hidden, submission_requirement, extra_config)",
+			"values", DB::tuple(["New Problem", Auth::id(), 1, "{}", "{}"])
 		]);
 		$id = DB::insert_id();
 		DB::insert([
