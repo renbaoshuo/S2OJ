@@ -108,7 +108,7 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 
 				<h1 class="text-center">
 					<?php if (UOJContest::cur()) : ?>
-						<?= UOJProblem::cur()->getTitle(['with' => 'letter']) ?>
+						<?= UOJProblem::cur()->getTitle(['with' => 'letter', 'simplify' => true]) ?>
 					<?php else : ?>
 						<?= UOJProblem::cur()->getTitle(['with' => 'id']) ?>
 					<?php endif ?>
