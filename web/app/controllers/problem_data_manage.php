@@ -656,7 +656,6 @@ $info_form->runAtServer();
 <div class="row">
 	<!-- left col -->
 	<div class="col-12 col-lg-9">
-
 		<h1>
 			#<?= $problem['id'] ?>. <?= $problem['title'] ?> 管理
 		</h1>
