@@ -82,8 +82,9 @@ h6,
 	padding-right: 5px;
 }
 
-.float-right {
-	float: right;
+.uoj-difficulty {
+	font-size: 0.9em;
+	font-weight: bold;
 }
 
 .uoj-table > tbody > tr:last-child,

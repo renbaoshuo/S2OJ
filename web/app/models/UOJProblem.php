@@ -8,6 +8,28 @@ class UOJProblem {
 	use UOJDataTrait;
 	use UOJArticleTrait;
 
+	public static array $difficulty = [
+		-1 => '暂无评定',
+		1 => '入门',
+		2 => '普及-',
+		3 => '普及/提高-',
+		4 => '普及+/提高',
+		6 => '提高+/省选-',
+		8 => '省选/NOI-',
+		10 => 'NOI/NOI+/CTSC',
+	];
+
+	public static array $difficulty_color = [
+		-1 => '#bfbfbf',
+		1 => '#fe4c61',
+		2 => '#f39c11',
+		3 => '#ffc116',
+		4 => '#52c41a',
+		6 => '#3498db',
+		8 => '#9d3dcf',
+		10 => '#0e1d69',
+	];
+
 	public static function query($id) {
 		if (!isset($id) || !validateUInt($id)) {
 			return null;
@@ -54,6 +76,14 @@ class UOJProblem {
 		}
 
 		return isSuperUser($user) || UOJUser::checkPermission($user, 'problems.create');
+	}
+
+	public static function getDifficultyHTML($difficulty = -1) {
+		$difficulty = (int)$difficulty;
+		$difficulty_text = self::$difficulty[$difficulty] ?: self::$difficulty[-1];
+		$difficulty_color = self::$difficulty_color[$difficulty] ?: self::$difficulty_color[-1];
+
+		return HTML::tag('span', ['class' => 'uoj-difficulty', 'style' => "color: $difficulty_color"], $difficulty_text);
 	}
 
 	public function __construct($info) {

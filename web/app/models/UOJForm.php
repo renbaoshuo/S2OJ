@@ -158,6 +158,60 @@ class UOJForm {
 		$this->addNoVal($name, $html);
 	}
 
+	public function addSelect($name, $config) {
+		$config += [
+			'div_class' => '',
+			'select_class' => 'form-select',
+			'options' => [],
+			'default_value' => '',
+			'label' => '',
+			'label_class' => 'form-check-label',
+			'help' => '',
+			'help_class' => 'form-text',
+			'disabled' => false,
+		];
+
+		$html = '';
+		$html .= HTML::tag_begin('div', ['id' => "div-$name", 'class' => $config['div_class']]);
+
+		// Label
+		if ($config['label']) {
+			$html .= HTML::tag('label', [
+				'class' => $config['label_class'],
+				'for' => "input-$name",
+			], $config['label']);
+		}
+
+		// Select
+		$html .= HTML::tag_begin('select', ['id' => "input-$name", 'name' => $name, 'class' => $config['select_class']]);
+
+		foreach ($config['options'] as $opt_name => $opt_label) {
+			if ($opt_name == $config['default_value']) {
+				$html .= HTML::tag('option', ['value' => $opt_name, 'selected' => 'selected'], $opt_label);
+			} else {
+				$html .= HTML::tag('option', ['value' => $opt_name], $opt_label);
+			}
+		}
+
+		$html .= HTML::tag_end('select');
+
+		// Help text
+		if ($config['help']) {
+			$html .= HTML::tag('div', ['class' => $config['help_class']], $config['help']);
+		}
+
+		$html .= HTML::tag_end('div');
+
+		$this->add(
+			$name,
+			$html,
+			function ($opt) use ($config) {
+				return isset($config['options'][$opt]) ? '' : "无效选项";
+			},
+			null
+		);
+	}
+
 	public function printHTML() {
 		echo HTML::tag_begin('form', [
 			'action' => UOJContext::requestURI(),
