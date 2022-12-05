@@ -553,29 +553,6 @@ $solution_view_type_form->handle = function () {
 };
 $solution_view_type_form->submit_button_config['class_str'] = 'btn btn-warning d-block w-100 mt-2';
 
-$difficulty_form = new UOJBs4Form('difficulty');
-$difficulty_form->addVInput(
-	'difficulty',
-	'text',
-	'难度系数',
-	$problem_extra_config['difficulty'],
-	function ($str) {
-		if (!is_numeric($str)) {
-			return '难度系数必须是一个数字';
-		}
-		return '';
-	},
-	null
-);
-$difficulty_form->handle = function () {
-	global $problem, $problem_extra_config;
-	$config = $problem_extra_config;
-	$config['difficulty'] = $_POST['difficulty'] + 0;
-	$esc_config = DB::escape(json_encode($config));
-	DB::query("update problems set extra_config = '$esc_config' where id = '{$problem['id']}'");
-};
-$difficulty_form->submit_button_config['class_str'] = 'btn btn-warning d-block w-100 mt-2';
-
 if ($problem['hackable']) {
 	$test_std_form = new UOJBs4Form('test_std');
 	$test_std_form->handle = function () use ($problem, $data_disp) {
@@ -643,7 +620,6 @@ if ($problem['hackable']) {
 $hackable_form->runAtServer();
 $view_type_form->runAtServer();
 $solution_view_type_form->runAtServer();
-$difficulty_form->runAtServer();
 $data_form->runAtServer();
 $clear_data_form->runAtServer();
 $rejudge_form->runAtServer();
@@ -802,13 +778,6 @@ $info_form->runAtServer();
 			</div>
 			<div class="mt-2">
 				<button type="button" class="btn d-block w-100 btn-primary" data-bs-toggle="modal" data-bs-target="#ProblemSettingsFileModal">试题配置</button>
-			</div>
-
-			<div class="mt-2">
-				<button id="button-difficulty" type="button" class="btn d-block w-100 btn-primary" onclick="$('#div-difficulty').toggle('fast');">难度系数</button>
-				<div class="mt-2" id="div-difficulty" style="display:none; padding-left:5px; padding-right:5px;">
-					<?php $difficulty_form->printHTML(); ?>
-				</div>
 			</div>
 		</div>
 	</aside>

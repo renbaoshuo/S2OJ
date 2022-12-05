@@ -9,25 +9,45 @@ class UOJProblem {
 	use UOJArticleTrait;
 
 	public static array $difficulty = [
-		-1 => '暂无评定',
-		1 => '入门',
-		2 => '普及-',
-		3 => '普及/提高-',
-		4 => '普及+/提高',
-		6 => '提高+/省选-',
-		8 => '省选/NOI-',
-		10 => 'NOI/NOI+/CTSC',
+		800,
+		1000,
+		1200,
+		1400,
+		1600,
+		1800,
+		1900,
+		2000,
+		2100,
+		2200,
+		2300,
+		2400,
+		2500,
+		2700,
+		2900,
+		3100,
+		3300,
+		3500,
 	];
 
 	public static array $difficulty_color = [
-		-1 => '#bfbfbf',
-		1 => '#fe4c61',
-		2 => '#f39c11',
-		3 => '#ffc116',
-		4 => '#52c41a',
-		6 => '#3498db',
-		8 => '#9d3dcf',
-		10 => '#0e1d69',
+		800 => '#008000',
+		1000 => '#008000',
+		1200 => '#00c0c0',
+		1400 => '#00c0c0',
+		1600 => '#0000ff',
+		1800 => '#0000ff',
+		1900 => '#0000ff',
+		2000 => '#c0c000',
+		2100 => '#c0c000',
+		2200 => '#c0c000',
+		2300 => '#c0c000',
+		2400 => '#ff8000',
+		2500 => '#ff8000',
+		2700 => '#ff8000',
+		2900 => '#ff0000',
+		3100 => '#ff0000',
+		3300 => '#aa0000',
+		3500 => '#aa0000',
 	];
 
 	public static function query($id) {
@@ -78,14 +98,6 @@ class UOJProblem {
 		return isSuperUser($user) || UOJUser::checkPermission($user, 'problems.create');
 	}
 
-	public static function getDifficultyHTML($difficulty = -1) {
-		$difficulty = (int)$difficulty;
-		$difficulty_text = self::$difficulty[$difficulty] ?: self::$difficulty[-1];
-		$difficulty_color = self::$difficulty_color[$difficulty] ?: self::$difficulty_color[-1];
-
-		return HTML::tag('span', ['class' => 'uoj-difficulty', 'style' => "color: $difficulty_color"], $difficulty_text);
-	}
-
 	public function __construct($info) {
 		$this->info = $info;
 	}
@@ -126,6 +138,14 @@ class UOJProblem {
 
 	public function getUploaderLink() {
 		return UOJUser::getLink($this->info['uploader'] ?: "root");
+	}
+
+	public function getDifficultyHTML() {
+		$difficulty = (int)$this->info['difficulty'];
+		$difficulty_text = in_array($difficulty, static::$difficulty) ? $difficulty : '-';
+		$difficulty_color = in_array($difficulty, static::$difficulty) ? static::$difficulty_color[$difficulty] : '#7e7e7e';
+
+		return HTML::tag('span', ['class' => 'uoj-difficulty', 'style' => "color: $difficulty_color"], $difficulty_text);
 	}
 
 	public function findInContests() {

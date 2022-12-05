@@ -128,7 +128,7 @@ function getProblemTR($info) {
 			)
 		);
 	}
-	$html .= HTML::tag('td', [], UOJProblem::getDifficultyHTML($problem->info['difficulty']));
+	$html .= HTML::tag('td', [], $problem->getDifficultyHTML());
 	$html .= HTML::tag('td', [], ClickZans::getCntBlock($problem->info['zan']));
 	$html .= HTML::tag_end('tr');
 	return $html;
@@ -177,8 +177,12 @@ if (Auth::check() && isset($_GET['my'])) {
 	$cond['problems.uploader'] = Auth::id();
 }
 
-if (isset($_GET['difficulty']) && $_GET['difficulty']) {
-	$cond['problems.difficulty'] = $_GET['difficulty'];
+if (isset($_GET['min_difficulty']) && $_GET['min_difficulty']) {
+	$cond[] = ['problems.difficulty', '>=', $_GET['min_difficulty']];
+}
+
+if (isset($_GET['max_difficulty']) && $_GET['max_difficulty']) {
+	$cond[] = ['problems.difficulty', '<=', $_GET['max_difficulty']];
 }
 
 if (empty($cond)) {
@@ -191,7 +195,7 @@ $header .= '<th>' . UOJLocale::get('problems::problem') . '</th>';
 if (isset($_COOKIE['show_submit_mode'])) {
 	$header .= '<th class="text-center" style="width:125px;">' . UOJLocale::get('problems::ac ratio') . '</th>';
 }
-$header .= '<th class="text-center" style="width:8em;">' . UOJLocale::get('problems::difficulty') . '</th>';
+$header .= '<th class="text-center" style="width:4em;">' . UOJLocale::get('problems::difficulty') . '</th>';
 $header .= '<th class="text-center" style="width:50px;">' . UOJLocale::get('appraisal') . '</th>';
 $header .= '</tr>';
 
@@ -247,8 +251,7 @@ $pag = new Paginator([
 
 <div class="row">
 	<!-- left col -->
-	<div class="col-lg-9">
-
+	<div class="col-md-9">
 		<!-- title -->
 		<div class="d-flex justify-content-between">
 			<h1>
@@ -335,8 +338,7 @@ $pag = new Paginator([
 	<!-- end left col -->
 
 	<!-- right col -->
-	<aside class="col-lg-3 mt-3 mt-lg-0">
-
+	<aside class="col-md-3 mt-3 mt-md-0">
 		<!-- search bar -->
 		<form method="get" class="mb-3" id="form-problem_search">
 			<div class="input-group mb-3">
@@ -363,15 +365,20 @@ $pag = new Paginator([
 					</div>
 				<?php endif ?>
 			</div>
-			<div class="row mt-3">
-				<label class="col-sm-3 col-form-label" for="input-difficulty">难度</label>
-				<div class="col-sm-9">
-					<select id="input-difficulty" name="difficulty" class="form-select">
-						<option value="">全部</option>
-						<?php foreach (UOJProblem::$difficulty as $opt_name => $opt_value) : ?>
-							<?= HTML::option($opt_name, $opt_value, $opt_name == $_GET['difficulty']) ?>
-						<?php endforeach ?>
-					</select>
+
+			<div class="card mt-3">
+				<div class="card-header fw-bold">
+					题目难度
+				</div>
+				<div class="card-body">
+					<div class="input-group input-group-sm">
+						<input type="text" class="form-control" name="min_difficulty" id="input-min_difficulty" maxlength="4" style="width:4em" placeholder="800" value="<?= HTML::escape($_GET['min_difficulty']) ?>" autocomplete="off" />
+						<span class="input-group-text">~</span>
+						<input type="text" class="form-control" name="max_difficulty" id="input-max_difficulty" maxlength="4" style="width:4em" placeholder="3500" value="<?= HTML::escape($_GET['max_difficulty']) ?>" autocomplete="off" />
+						<button type="submit" class="btn btn-outline-secondary">
+							<i class="bi bi-funnel"></i>
+						</button>
+					</div>
 				</div>
 			</div>
 		</form>
