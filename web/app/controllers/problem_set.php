@@ -128,9 +128,7 @@ function getProblemTR($info) {
 			)
 		);
 	}
-	if (isset($_COOKIE['show_difficulty'])) {
-		$html .= HTML::tag('td', [], UOJProblem::getDifficultyHTML($problem->info['difficulty']));
-	}
+	$html .= HTML::tag('td', [], UOJProblem::getDifficultyHTML($problem->info['difficulty']));
 	$html .= HTML::tag('td', [], ClickZans::getCntBlock($problem->info['zan']));
 	$html .= HTML::tag_end('tr');
 	return $html;
@@ -179,6 +177,10 @@ if (Auth::check() && isset($_GET['my'])) {
 	$cond['problems.uploader'] = Auth::id();
 }
 
+if (isset($_GET['difficulty']) && $_GET['difficulty']) {
+	$cond['problems.difficulty'] = $_GET['difficulty'];
+}
+
 if (empty($cond)) {
 	$cond = '1';
 }
@@ -189,9 +191,7 @@ $header .= '<th>' . UOJLocale::get('problems::problem') . '</th>';
 if (isset($_COOKIE['show_submit_mode'])) {
 	$header .= '<th class="text-center" style="width:125px;">' . UOJLocale::get('problems::ac ratio') . '</th>';
 }
-if (isset($_COOKIE['show_difficulty'])) {
-	$header .= '<th class="text-center" style="width:8em;">' . UOJLocale::get('problems::difficulty') . '</th>';
-}
+$header .= '<th class="text-center" style="width:8em;">' . UOJLocale::get('problems::difficulty') . '</th>';
 $header .= '<th class="text-center" style="width:50px;">' . UOJLocale::get('appraisal') . '</th>';
 $header .= '</tr>';
 
@@ -246,7 +246,6 @@ $pag = new Paginator([
 <?php echoUOJPageHeader(UOJLocale::get('problems')) ?>
 
 <div class="row">
-
 	<!-- left col -->
 	<div class="col-lg-9">
 
@@ -283,13 +282,6 @@ $pag = new Paginator([
 						<?= UOJLocale::get('problems::show statistics') ?>
 					</label>
 				</div>
-
-				<div class="form-check d-inline-block">
-					<input type="checkbox" id="input-show_difficulty" class="form-check-input" <?= isset($_COOKIE['show_difficulty']) ? 'checked="checked" ' : '' ?> />
-					<label class="form-check-label" for="input-show_difficulty">
-						<?= UOJLocale::get('problems::show difficulty') ?>
-					</label>
-				</div>
 			</div>
 		</div>
 
@@ -317,19 +309,6 @@ $pag = new Paginator([
 					});
 				} else {
 					$.removeCookie('show_submit_mode', {
-						path: '/problems'
-					});
-				}
-				location.reload();
-			});
-			$('#input-show_difficulty').click(function() {
-				if (this.checked) {
-					$.cookie('show_difficulty', '', {
-						path: '/problems',
-						expires: 365,
-					});
-				} else {
-					$.removeCookie('show_difficulty', {
 						path: '/problems'
 					});
 				}
@@ -366,26 +345,39 @@ $pag = new Paginator([
 					<i class="bi bi-search"></i>
 				</button>
 			</div>
-			<?php if (Auth::check()) : ?>
-				<div class="form-check d-inline-block">
-					<input type="checkbox" name="my" <?= isset($_GET['my']) ? 'checked="checked"' : '' ?> class="form-check-input" id="input-my">
-					<label class="form-check-label" for="input-my">
-						我的题目
-					</label>
+			<div>
+				<?php if (Auth::check()) : ?>
+					<div class="form-check d-inline-block">
+						<input type="checkbox" name="my" <?= isset($_GET['my']) ? 'checked="checked"' : '' ?> class="form-check-input" id="input-my">
+						<label class="form-check-label" for="input-my">
+							我的题目
+						</label>
+					</div>
+				<?php endif ?>
+				<?php if (UOJProblem::userCanManageSomeProblem(Auth::user())) : ?>
+					<div class="form-check d-inline-block ms-2">
+						<input type="checkbox" name="is_hidden" <?= isset($_GET['is_hidden']) ? 'checked="checked"' : '' ?> class="form-check-input" id="input-is_hidden">
+						<label class="form-check-label" for="input-is_hidden">
+							隐藏题目
+						</label>
+					</div>
+				<?php endif ?>
+			</div>
+			<div class="row mt-3">
+				<label class="col-sm-3 col-form-label" for="input-difficulty">难度</label>
+				<div class="col-sm-9">
+					<select id="input-difficulty" name="difficulty" class="form-select">
+						<option value="">全部</option>
+						<?php foreach (UOJProblem::$difficulty as $opt_name => $opt_value) : ?>
+							<?= HTML::option($opt_name, $opt_value, $opt_name == $_GET['difficulty']) ?>
+						<?php endforeach ?>
+					</select>
 				</div>
-			<?php endif ?>
-			<?php if (UOJProblem::userCanManageSomeProblem(Auth::user())) : ?>
-				<div class="form-check d-inline-block ms-2">
-					<input type="checkbox" name="is_hidden" <?= isset($_GET['is_hidden']) ? 'checked="checked"' : '' ?> class="form-check-input" id="input-is_hidden">
-					<label class="form-check-label" for="input-is_hidden">
-						隐藏题目
-					</label>
-				</div>
-			<?php endif ?>
+			</div>
 		</form>
 		<script>
 			$('#search-input').val(new URLSearchParams(location.search).get('search'));
-			$('#input-my, #input-is_hidden').click(function() {
+			$('#input-my, #input-is_hidden, #input-difficulty').change(function() {
 				$('#form-problem_search').submit();
 			});
 		</script>

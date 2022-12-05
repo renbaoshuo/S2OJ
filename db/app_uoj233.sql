@@ -626,6 +626,7 @@ CREATE TABLE `problems` (
   PRIMARY KEY (`id`),
   KEY `assigned_to_judger` (`assigned_to_judger`),
   KEY `uploader` (`uploader`),
+  KEY `difficulty` (`difficulty`),
   KEY `is_hidden` (`is_hidden`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci TABLESPACE `innodb_system`;
 /*!40101 SET character_set_client = @saved_cs_client */;
