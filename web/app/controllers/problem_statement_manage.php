@@ -65,7 +65,7 @@ $problem_editor->runAtServer();
 
 $difficulty_form = new UOJForm('difficulty');
 $difficulty_form->addSelect('difficulty', [
-	'options' => array_combine(UOJProblem::$difficulty, UOJProblem::$difficulty),
+	'options' => [-1 => '暂无评定'] + array_combine(UOJProblem::$difficulty, UOJProblem::$difficulty),
 	'default_value' => UOJProblem::info('difficulty'),
 ]);
 $difficulty_form->handle = function () {
