@@ -54,9 +54,7 @@ function getProblemTR($info) {
 			)
 		);
 	}
-	if (isset($_COOKIE['show_difficulty'])) {
-		$html .= HTML::tag('td', [], $problem->getExtraConfig('difficulty'));
-	}
+	$html .= HTML::tag('td', [], UOJProblem::getDifficultyHTML($problem->info['difficulty']));
 	$html .= HTML::tag('td', [], ClickZans::getCntBlock($problem->info['zan']));
 	$html .= HTML::tag_end('tr');
 	return $html;
@@ -68,9 +66,7 @@ $header .= '<th>' . UOJLocale::get('problems::problem') . '</th>';
 if (isset($_COOKIE['show_submit_mode'])) {
 	$header .= '<th class="text-center" style="width:125px;">' . UOJLocale::get('problems::ac ratio') . '</th>';
 }
-if (isset($_COOKIE['show_difficulty'])) {
-	$header .= '<th class="text-center" style="width:3em;">' . UOJLocale::get('problems::difficulty') . '</th>';
-}
+$header .= '<th class="text-center" style="width:8em;">' . UOJLocale::get('problems::difficulty') . '</th>';
 $header .= '<th class="text-center" style="width:50px;">' . UOJLocale::get('appraisal') . '</th>';
 $header .= '</tr>';
 
@@ -84,6 +80,7 @@ $pag_config = [
 		'problems.submit_num as submit_num',
 		'problems.ac_num as ac_num',
 		'problems.zan as zan',
+		'problems.difficulty as difficulty',
 		'problems.extra_config as extra_config',
 		'problems.uploader as uploader',
 	],
@@ -163,13 +160,6 @@ $pag = new Paginator($pag_config);
 						<?= UOJLocale::get('problems::show statistics') ?>
 					</label>
 				</div>
-
-				<div class="form-check d-inline-block">
-					<input type="checkbox" id="input-show_difficulty" class="form-check-input" <?= isset($_COOKIE['show_difficulty']) ? 'checked="checked" ' : '' ?> />
-					<label class="form-check-label" for="input-show_difficulty">
-						<?= UOJLocale::get('problems::show difficulty') ?>
-					</label>
-				</div>
 			</div>
 		</div>
 
@@ -195,19 +185,6 @@ $pag = new Paginator($pag_config);
 					});
 				} else {
 					$.removeCookie('show_submit_mode', {
-						path: '/list',
-					});
-				}
-				location.reload();
-			});
-			$('#input-show_difficulty').click(function() {
-				if (this.checked) {
-					$.cookie('show_difficulty', '', {
-						path: '/list',
-						expires: 365,
-					});
-				} else {
-					$.removeCookie('show_difficulty', {
 						path: '/list',
 					});
 				}
