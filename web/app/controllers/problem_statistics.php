@@ -325,7 +325,7 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-center">
 					<span>难度</span>
-					<span><?= UOJProblem::getDifficultyHTML(UOJProblem::info('difficulty')) ?></span>
+					<span><?= UOJProblem::cur()->getDifficultyHTML() ?></span>
 				</li>
 				<?php if (Auth::check()) : ?>
 					<li class="list-group-item d-flex justify-content-between align-items-center">

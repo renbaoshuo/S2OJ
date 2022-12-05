@@ -390,7 +390,7 @@ if (UOJContest::cur()) {
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-center">
 					<span>难度</span>
-					<span><?= UOJProblem::getDifficultyHTML(UOJProblem::info('difficulty')) ?></span>
+					<span><?= UOJProblem::cur()->getDifficultyHTML() ?></span>
 				</li>
 				<?php if (Auth::check()) : ?>
 					<li class="list-group-item d-flex justify-content-between align-items-center">

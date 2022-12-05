@@ -54,7 +54,7 @@ function getProblemTR($info) {
 			)
 		);
 	}
-	$html .= HTML::tag('td', [], UOJProblem::getDifficultyHTML($problem->info['difficulty']));
+	$html .= HTML::tag('td', [], $problem->getDifficultyHTML());
 	$html .= HTML::tag('td', [], ClickZans::getCntBlock($problem->info['zan']));
 	$html .= HTML::tag_end('tr');
 	return $html;
@@ -66,7 +66,7 @@ $header .= '<th>' . UOJLocale::get('problems::problem') . '</th>';
 if (isset($_COOKIE['show_submit_mode'])) {
 	$header .= '<th class="text-center" style="width:125px;">' . UOJLocale::get('problems::ac ratio') . '</th>';
 }
-$header .= '<th class="text-center" style="width:8em;">' . UOJLocale::get('problems::difficulty') . '</th>';
+$header .= '<th class="text-center" style="width:4em;">' . UOJLocale::get('problems::difficulty') . '</th>';
 $header .= '<th class="text-center" style="width:50px;">' . UOJLocale::get('appraisal') . '</th>';
 $header .= '</tr>';
 
