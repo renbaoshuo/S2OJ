@@ -406,11 +406,11 @@ if (UOJContest::cur()) {
 					<span>标签</span>
 					<span>
 						<?php foreach (UOJProblem::cur()->queryTags() as $tag) : ?>
-							<a class="uoj-problem-tag">
-								<span class="badge bg-secondary">
-									<?= HTML::escape($tag) ?>
-								</span>
-							</a>
+							<?= HTML::tag(
+								'a',
+								['class' => 'uoj-problem-tag'],
+								HTML::tag('span', ['class' => 'badge bg-secondary'], HTML::escape($tag))
+							) ?>
 						<?php endforeach ?>
 					</span>
 				</li>
