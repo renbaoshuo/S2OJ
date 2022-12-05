@@ -142,7 +142,7 @@ class UOJProblem {
 
 	public function getDifficultyHTML() {
 		$difficulty = (int)$this->info['difficulty'];
-		$difficulty_text = in_array($difficulty, static::$difficulty) ? $difficulty : '-';
+		$difficulty_text = in_array($difficulty, static::$difficulty) ? $difficulty : '?';
 		$difficulty_color = in_array($difficulty, static::$difficulty) ? static::$difficulty_color[$difficulty] : '#7e7e7e';
 
 		return HTML::tag('span', ['class' => 'uoj-difficulty', 'style' => "color: $difficulty_color"], $difficulty_text);
