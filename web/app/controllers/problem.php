@@ -405,6 +405,14 @@ if (UOJContest::cur()) {
 				<li class="list-group-item d-flex justify-content-between align-items-center">
 					<span>标签</span>
 					<span>
+						<?php if (UOJProblem::info('is_hidden')) : ?>
+							<a href="<?= HTML::url('/problems', ['params' => ['is_hidden' => 'on']]) ?>">
+								<span class="badge text-bg-danger">
+									<i class="bi bi-eye-slash-fill"></i>
+									<?= UOJLocale::get('hidden') ?>
+								</span>
+							</a>
+						<?php endif ?>
 						<?php foreach (UOJProblem::cur()->queryTags() as $tag) : ?>
 							<?= HTML::tag(
 								'a',
