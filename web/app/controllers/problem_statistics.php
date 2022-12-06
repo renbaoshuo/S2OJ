@@ -285,6 +285,12 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 						<?= UOJLocale::get('problems::statement') ?>
 					</a>
 				</li>
+				<li class="nav-item text-start">
+					<a href="/problem/<?= UOJProblem::info('id') ?>#submit" class="nav-link" role="tab">
+						<i class="bi bi-upload"></i>
+						<?= UOJLocale::get('problems::submit') ?>
+					</a>
+				</li>
 				<?php if (!UOJContest::cur() || UOJContest::cur()->progress() >= CONTEST_FINISHED) : ?>
 					<li class="nav-item text-start">
 						<a href="/problem/<?= UOJProblem::info('id') ?>/solutions" class="nav-link" role="tab">

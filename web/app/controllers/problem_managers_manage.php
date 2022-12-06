@@ -140,6 +140,12 @@ if (isSuperUser(Auth::user())) {
 					</a>
 				</li>
 				<li class="nav-item text-start">
+					<a href="/problem/<?= UOJProblem::info('id') ?>#submit" class="nav-link" role="tab">
+						<i class="bi bi-upload"></i>
+						<?= UOJLocale::get('problems::submit') ?>
+					</a>
+				</li>
+				<li class="nav-item text-start">
 					<a href="/problem/<?= UOJProblem::info('id') ?>/solutions" class="nav-link" role="tab">
 						<i class="bi bi-journal-bookmark"></i>
 						<?= UOJLocale::get('problems::solutions') ?>
