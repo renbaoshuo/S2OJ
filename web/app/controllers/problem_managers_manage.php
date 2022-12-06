@@ -130,7 +130,6 @@ if (isSuperUser(Auth::user())) {
 
 	<!-- right col -->
 	<aside class="col-lg-3 mt-3 mt-lg-0">
-
 		<div class="card card-default mb-2">
 			<ul class="nav nav-pills nav-fill flex-column" role="tablist">
 				<li class="nav-item text-start">
@@ -170,12 +169,7 @@ if (isSuperUser(Auth::user())) {
 					</a>
 				</li>
 			</ul>
-			<div class="card-footer bg-transparent">
-				评价：<?= UOJProblem::cur()->getZanBlock() ?>
-			</div>
 		</div>
-
-		<?php uojIncludeView('sidebar') ?>
 	</aside>
 	<!-- end right col -->
 

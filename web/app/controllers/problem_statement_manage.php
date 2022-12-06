@@ -172,9 +172,6 @@ $difficulty_form->runAtServer();
 					</a>
 				</li>
 			</ul>
-			<div class="card-footer bg-transparent">
-				评价：<?= UOJProblem::cur()->getZanBlock() ?>
-			</div>
 		</div>
 
 		<div class="card mt-3">

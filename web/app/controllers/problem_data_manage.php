@@ -735,18 +735,17 @@ $info_form->runAtServer();
 					</a>
 				</li>
 			</ul>
-			<div class="card-footer bg-transparent">
-				评价：<?= UOJProblem::cur()->getZanBlock() ?>
-			</div>
 		</div>
 
 		<div class="order-1 order-lg-2">
 			<div>
-				<?php if ($problem['hackable']) : ?>
-					<i class="bi bi-check-lg text-success"></i> Hack 功能已启用
-				<?php else : ?>
-					<i class="bi bi-x-lg text-danger"></i> Hack 功能已禁用
-				<?php endif ?>
+				<div class="mb-2">
+					<?php if ($problem['hackable']) : ?>
+						<i class="bi bi-check-lg text-success"></i> Hack 功能已启用
+					<?php else : ?>
+						<i class="bi bi-x-lg text-danger"></i> Hack 功能已禁用
+					<?php endif ?>
+				</div>
 				<?php $hackable_form->printHTML() ?>
 			</div>
 			<?php if ($problem['hackable']) : ?>
