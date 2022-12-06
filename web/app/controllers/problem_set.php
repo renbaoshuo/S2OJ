@@ -90,10 +90,10 @@ function getProblemTR($info) {
 	$html .= HTML::tag_begin('td', ['class' => 'text-start']);
 	$html .= $problem->getLink(['with' => 'none']);
 	if ($problem->isUserOwnProblem(Auth::user())) {
-		$html .= ' <span class="badge text-white bg-info">' . UOJLocale::get('problems::my problem') . '</span> ';
+		$html .= ' <a href="/problems?my=on"><span class="badge text-white bg-info">' . UOJLocale::get('problems::my problem') . '</span></a> ';
 	}
 	if ($info['is_hidden']) {
-		$html .= ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span> ';
+		$html .= ' <a href="/problems?is_hidden=on"><span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span></a> ';
 	}
 	if (isset($_COOKIE['show_tags_mode'])) {
 		foreach ($problem->queryTags() as $tag) {
