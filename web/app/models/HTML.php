@@ -437,6 +437,7 @@ class HTML {
 
 		$extra_allowed_html = [
 			'span' => ['data-realname' => 'Text', 'data-uoj-username' => 'Number'],
+			'img' => ['width' => 'Text'],
 		];
 
 		foreach ($extra_allowed_html as $element => $attributes) {
