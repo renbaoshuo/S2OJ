@@ -250,46 +250,6 @@ $pag = new Paginator($pag_config);
 			</ul>
 		</div>
 
-		<!-- 题目信息卡片 -->
-		<div class="card mb-2">
-			<ul class="list-group list-group-flush">
-				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span>上传者</span>
-					<span><?= UOJProblem::cur()->getUploaderLink() ?></span>
-				</li>
-				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span>难度</span>
-					<span><?= UOJProblem::cur()->getDifficultyHTML() ?></span>
-				</li>
-				<?php if (Auth::check()) : ?>
-					<li class="list-group-item d-flex justify-content-between align-items-center">
-						<span>历史分数</span>
-						<?php $his_score = DB::selectSingle(["select max(score)", "from submissions", "where", ["problem_id" => UOJProblem::info('id'), "submitter" => Auth::id()]]) ?>
-
-						<a class="<?= is_null($his_score) ? '' : 'uoj-score' ?>" href="<?= HTML::url('/submissions', ['params' => ['problem_id' => UOJProblem::info('id'), 'submitter' => Auth::id()]]) ?>">
-							<?= is_null($his_score) ? '无' : $his_score ?>
-						</a>
-					</li>
-				<?php endif ?>
-				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span>标签</span>
-					<span>
-						<?php foreach (UOJProblem::cur()->queryTags() as $tag) : ?>
-							<?= HTML::tag(
-								'a',
-								['class' => 'uoj-problem-tag'],
-								HTML::tag('span', ['class' => 'badge bg-secondary'], HTML::escape($tag))
-							) ?>
-						<?php endforeach ?>
-					</span>
-				</li>
-				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span>评价</span>
-					<span><?= UOJProblem::cur()->getZanBlock() ?></span>
-				</li>
-			</ul>
-		</div>
-
 		<div class="card card-default mb-2">
 			<div class="card-header bg-transparent fw-bold">
 				增加题解
