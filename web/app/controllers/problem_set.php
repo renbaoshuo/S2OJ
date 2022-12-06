@@ -9,11 +9,9 @@ UOJUser::checkPermission(Auth::user(), 'problems.view') || UOJResponse::page403(
 
 if (UOJProblem::userCanCreateProblem(Auth::user())) {
 	$default_statement = <<<'EOD'
-<!-- 题目中如有图片，请点击页面顶部的「应用」菜单，打开「图床」，上传至 S2OJ 图床中。 -->
-
 ## 题目描述
 
-在此处填写题目描述。
+在此处填写题目描述。题目中的图片应上传至 S2OJ 图床中（点击顶栏 应用——图床 进入），以免丢失。
 
 ## 输入格式
 
@@ -51,8 +49,8 @@ if (UOJProblem::userCanCreateProblem(Auth::user())) {
 
 <!-- 请根据实际情况修改下方的数据范围。 -->
 
-- 对于 $50\%$ 的数据，[满足条件（替换此处）]。
-- 对于 $100\%$ 的数据，[满足条件（替换此处）]。
+- 对于 $50\%$ 的数据，【替换此处】。
+- 对于 $100\%$ 的数据，【替换此处】。
 
 如有，在此处填写其他于题意或数据相关的说明。
 
