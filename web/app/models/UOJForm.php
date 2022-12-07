@@ -134,7 +134,7 @@ class UOJForm {
 		];
 
 		$html = '';
-		$html .= HTML::tag_begin('div', ['class' => $config['div_class']]);
+		$html .= HTML::tag_begin('div', ['class' => $config['div_class'], 'id' => "div-$name"]);
 		$html .= HTML::empty_tag('input', [
 			'class' => $config['input_class'],
 			'type' => 'checkbox',
