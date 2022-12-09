@@ -100,7 +100,7 @@ if (UOJContest::cur()) {
 
 $submission_requirement = UOJProblem::cur()->getSubmissionRequirement();
 $custom_test_requirement = UOJProblem::cur()->getCustomTestRequirement();
-$custom_test_enabled = false; // $custom_test_requirement && $pre_submit_check_ret === true;
+$custom_test_enabled = $custom_test_requirement && $pre_submit_check_ret === true;
 
 function handleUpload($zip_file_name, $content, $tot_size) {
 	global $is_participating;
