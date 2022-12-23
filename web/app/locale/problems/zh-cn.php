@@ -52,4 +52,7 @@ return [
 	'hacks to me' => '我的被Hack记录',
 	'difficulty' => '难度',
 	'show difficulty' => '显示难度',
+	'tags' => '标签',
+	'historical score' => '历史分数',
+	'uploader' => '上传者',
 ];

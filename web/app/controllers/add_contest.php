@@ -9,7 +9,7 @@ $time_form = new UOJBs4Form('time');
 $time_form->addVInput(
 	'name',
 	'text',
-	'比赛标题',
+	UOJLocale::get('contests::new contest'),
 	'New Contest',
 	function ($name, &$vdata) {
 		if ($name == '') {
@@ -35,7 +35,7 @@ $time_form->addVInput(
 $time_form->addVInput(
 	'start_time',
 	'text',
-	'开始时间',
+	UOJLocale::get('contests::start time'),
 	date("Y-m-d H:i:s"),
 	function ($str, &$vdata) {
 		try {
@@ -75,7 +75,7 @@ $time_form->handle = function (&$vdata) {
 $time_form->succ_href = "/contests";
 $time_form->runAtServer();
 ?>
-<?php echoUOJPageHeader('添加比赛') ?>
+<?php echoUOJPageHeader(UOJLocale::get('contests::add new contest')) ?>
 
 <div class="row">
 	<!-- left col -->
@@ -83,12 +83,13 @@ $time_form->runAtServer();
 		<div class="card card-default mb-2">
 			<div class="card-body">
 
-				<h1 class="card-title">添加比赛</h1>
+				<h1 class="card-title">
+					<?= UOJLocale::get('contests::add new contest') ?>
+				</h1>
 
 				<div class="w-full" style="max-width: 400px">
 					<?php $time_form->printHTML(); ?>
 				</div>
-
 			</div>
 		</div>
 	</div>

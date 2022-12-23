@@ -385,16 +385,26 @@ if (UOJContest::cur()) {
 		<div class="card mb-2">
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span class="flex-shrink-0">上传者</span>
-					<span><?= UOJProblem::cur()->getUploaderLink() ?></span>
+					<span class="flex-shrink-0">
+						<?= UOJLocale::get('problems::uploader') ?>
+					</span>
+					<span>
+						<?= UOJProblem::cur()->getUploaderLink() ?>
+					</span>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span class="flex-shrink-0">难度</span>
-					<span><?= UOJProblem::cur()->getDifficultyHTML() ?></span>
+					<span class="flex-shrink-0">
+						<?= UOJLocale::get('problems::difficulty') ?>
+					</span>
+					<span>
+						<?= UOJProblem::cur()->getDifficultyHTML() ?>
+					</span>
 				</li>
 				<?php if (Auth::check()) : ?>
 					<li class="list-group-item d-flex justify-content-between align-items-center">
-						<span class="flex-shrink-0">历史分数</span>
+						<span class="flex-shrink-0">
+							<?= UOJLocale::get('problems::historical score') ?>
+						</span>
 						<?php $his_score = DB::selectSingle(["select max(score)", "from submissions", "where", ["problem_id" => UOJProblem::info('id'), "submitter" => Auth::id()]]) ?>
 
 						<a class="<?= is_null($his_score) ? '' : 'uoj-score' ?>" href="<?= HTML::url('/submissions', ['params' => ['problem_id' => UOJProblem::info('id'), 'submitter' => Auth::id()]]) ?>">
@@ -403,7 +413,9 @@ if (UOJContest::cur()) {
 					</li>
 				<?php endif ?>
 				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span class="flex-shrink-0">标签</span>
+					<span class="flex-shrink-0">
+						<?= UOJLocale::get('problems::tags') ?>
+					</span>
 					<span>
 						<?php if (UOJProblem::info('is_hidden')) : ?>
 							<a href="<?= HTML::url('/problems', ['params' => ['is_hidden' => 'on']]) ?>">
@@ -423,8 +435,12 @@ if (UOJContest::cur()) {
 					</span>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span class="flex-shrink-0">评价</span>
-					<span><?= UOJProblem::cur()->getZanBlock() ?></span>
+					<span class="flex-shrink-0">
+						<?= UOJLocale::get('appraisal') ?>
+					</span>
+					<span>
+						<?= UOJProblem::cur()->getZanBlock() ?>
+					</span>
 				</li>
 			</ul>
 		</div>

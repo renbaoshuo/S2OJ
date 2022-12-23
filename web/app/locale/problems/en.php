@@ -52,4 +52,7 @@ return [
 	'hacks to me' => 'Hacks to me',
 	'difficulty' => 'Difficulty',
 	'show difficulty' => 'Show difficulty',
+	'tags' => 'Tags',
+	'historical score' => 'Historical Score',
+	'uploader' => 'Uploader',
 ];
