@@ -32,26 +32,35 @@ $managers_form = newAddDelCmdForm(
 $managers_form->runAtServer();
 
 if (isSuperUser(Auth::user())) {
-	$update_uploader_form = new UOJBs4Form('update_uploader');
+	$update_uploader_form = new UOJForm('update_uploader');
+	$update_uploader_form->appendHTML(
+		HTML::tag(
+			'div',
+			['class' => 'col-auto'],
+			HTML::tag('label', ['class' => 'col-form-label'], '上传者')
+		)
+	);
 	$update_uploader_form->addInput(
 		'new_uploader_username',
-		'text',
-		'用户名',
-		UOJProblem::info('uploader') ?: 'root',
-		function ($username, &$vdata) {
-			if (!UOJUser::query($username)) {
-				return '用户不存在';
-			}
+		[
+			'div_class' => 'col-auto',
+			'default_value' => UOJProblem::info('uploader') ?: 'root',
+			'validator_php' => function ($username, &$vdata) {
+				if (!UOJUser::query($username)) {
+					return '用户不存在';
+				}
 
-			$vdata['username'] = $username;
+				$vdata['username'] = $username;
 
-			return '';
-		},
-		null
+				return '';
+			},
+		]
 	);
-	$update_uploader_form->submit_button_config['align'] = 'compressed';
-	$update_uploader_form->submit_button_config['text'] = '修改上传者';
-	$update_uploader_form->submit_button_config['class_str'] = 'mt-2 btn btn-warning';
+	$update_uploader_form->config['form']['class'] = 'mt-2 row g-3 align-items-center';
+	$update_uploader_form->config['submit_container']['class'] = 'col-auto';
+	$update_uploader_form->config['submit_button']['class'] = 'btn btn-warning';
+	$update_uploader_form->config['submit_button']['text'] = '修改上传者';
+	$update_uploader_form->config['confirm']['smart'] = true;
 	$update_uploader_form->handle = function (&$vdata) {
 		DB::update([
 			"update problems",
