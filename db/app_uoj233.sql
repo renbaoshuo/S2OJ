@@ -979,6 +979,17 @@ CREATE TABLE `upgrades` (
 
 LOCK TABLES `upgrades` WRITE;
 /*!40000 ALTER TABLE `upgrades` DISABLE KEYS */;
+INSERT INTO `upgrades` (`name`, `status`, `updated_at`) VALUES
+  ('3_parsedown', 'up', now()),
+  ('4_image_hosting', 'up', now()),
+  ('6_user_info_v2', 'up', now()),
+  ('8_group_v2', 'up', now()),
+  ('9_list_v2', 'up', now()),
+  ('14_sync_from_uoj.ac', 'up', now()),
+  ('16_list_v3', 'up', now()),
+  ('18_user_permissions', 'up', now()),
+  ('20_problem_difficulty', 'up', now()),
+  ('21_problem_difficulty', 'up', now());
 /*!40000 ALTER TABLE `upgrades` ENABLE KEYS */;
 UNLOCK TABLES;
 
