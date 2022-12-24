@@ -37,7 +37,7 @@ if (!isset($tabs_info[$cur_tab])) {
 }
 
 if ($cur_tab == 'profile') {
-	$update_profile_form = new UOJBs4Form('update_profile');
+	$update_profile_form = new UOJForm('update_profile');
 	$username = UOJLocale::get('username');
 	$avatar = UOJLocale::get('avatar');
 	$update_profile_form->appendHTML(<<<EOD
@@ -48,17 +48,18 @@ if ($cur_tab == 'profile') {
 	</div>
 EOD);
 	if (isSuperUser(Auth::user())) {
-		$update_profile_form->addVInput(
+		$update_profile_form->addInput(
 			'realname',
-			'text',
-			UOJLocale::get('user::real name'),
-			$user['realname'],
-			function ($realname, &$vdata) {
-				$vdata['realname'] = $realname;
+			[
+				'div_class' => 'mb-3',
+				'label' => UOJLocale::get('user::real name'),
+				'default_value' => $user['realname'],
+				'validator_php' => function ($realname, &$vdata) {
+					$vdata['realname'] = $realname;
 
-				return '';
-			},
-			null
+					return '';
+				},
+			]
 		);
 	} else {
 		$real_name = UOJLocale::get('user::real name');
@@ -72,21 +73,22 @@ EOD);
 	}
 	if (isTmpUser($user)) {
 		if (isSuperUser(Auth::user())) {
-			$update_profile_form->addVInput(
+			$update_profile_form->addInput(
 				'expiration_time',
-				'text',
-				UOJLocale::get('user::expiration time'),
-				$user['expiration_time'],
-				function ($str, &$vdata) {
-					try {
-						$vdata['expiration_time'] = new DateTime($str);
-					} catch (Exception $e) {
-						return '无效时间格式';
-					}
+				[
+					'div_class' => 'mb-3',
+					'label' => UOJLocale::get('user::expiration time'),
+					'default_value' => $user['expiration_time'],
+					'validator_php' => function ($str, &$vdata) {
+						try {
+							$vdata['expiration_time'] = new DateTime($str);
+						} catch (Exception $e) {
+							return '无效时间格式';
+						}
 
-					return '';
-				},
-				null
+						return '';
+					},
+				]
 			);
 		} else {
 			$expiration_time = UOJLocale::get('user::expiration time');
@@ -98,77 +100,97 @@ EOD);
 		</div>
 	EOD);
 		}
-	}
-	$update_profile_form->addVCheckboxes('avatar_source', [
-		'gravatar' => 'Gravatar',
-		'qq' => 'QQ',
-	], UOJLocale::get('user::avatar source'), $extra['avatar_source'] ?: 'gravatar');
-	$change_avatar_help = UOJLocale::get('change avatar help');
-	$update_profile_form->appendHTML(<<<EOD
-	<div style="margin-top: -1.25rem;" class="mb-3 small text-muted">
-		$change_avatar_help
-		</div>
+	} else {
+		$expiration_time = UOJLocale::get('user::expiration time');
+		$expiration_help_text = isSuperUser(Auth::user())
+			? '只有用户组别为「临时用户」的用户才能被修改过期时间。'
+			: '只有管理员才能修改用户的账号过期时间。';
+		$update_profile_form->appendHTML(<<<EOD
+	<div class="mb-3">
+		<label for="input-expiration_time" class="form-label">$expiration_time</label>
+		<input type="text" class="form-control" id="input-expiration_time" aria-describedby="help-expiration_time" value="永不过期" disabled>
+		<div id="help-expiration_time" class="form-text">$expiration_help_text</div>
+	</div>
 EOD);
-	$update_profile_form->addVInput(
+	}
+	$update_profile_form->addCheckboxes('avatar_source', [
+		'div_class' => 'mb-3',
+		'label' => UOJLocale::get('user::avatar source'),
+		'label_class' => 'me-3',
+		'default_value' => $extra['avatar_source'] ?: 'gravatar',
+		'select_class' => 'd-inline-block',
+		'option_div_class' => 'form-check d-inline-block ms-2',
+		'options' => [
+			'gravatar' => 'Gravatar',
+			'qq' => 'QQ',
+		],
+		'help' => UOJLocale::get('change avatar help'),
+	]);
+	$update_profile_form->addInput(
 		'email',
-		'email',
-		UOJLocale::get('email'),
-		$user['email'] ?: '',
-		function ($email, &$vdata) {
-			if (!validateEmail($email)) {
-				return 'Email 格式不合法。';
-			}
+		[
+			'div_class' => 'mb-3',
+			'type' => 'email',
+			'label' => UOJLocale::get('email'),
+			'default_value' => $user['email'] ?: '',
+			'validator_php' => function ($email, &$vdata) {
+				if (!validateEmail($email)) {
+					return 'Email 格式不合法。';
+				}
 
-			$vdata['email'] = $email;
-
-			return '';
-		},
-		null
-	);
-	$update_profile_form->addVInput(
-		'qq',
-		'text',
-		UOJLocale::get('QQ'),
-		$user['qq'] == 0 ? '' : $user['qq'],
-		function ($qq, &$vdata) {
-			if ($qq && !validateQQ($qq)) {
-				return 'QQ 格式不合法。';
-			}
-
-			$vdata['qq'] = $qq;
-
-			return '';
-		},
-		null
-	);
-	$update_profile_form->addVInput(
-		'github',
-		'text',
-		'GitHub',
-		$extra['social']['github'] ?: '',
-		function ($github, &$vdata) {
-			if ($github && !validateGitHubUsername($github)) {
-				return 'GitHub 用户名不合法。';
-			}
-
-			$vdata['github'] = $github;
-
-			return '';
-		},
-		null
-	);
-	if (isSuperUser(Auth::user())) {
-		$update_profile_form->addVInput(
-			'school',
-			'text',
-			UOJLocale::get('school'),
-			$user['school'] ?: '',
-			function ($school, &$vdata) {
-				$vdata['school'] = $school;
+				$vdata['email'] = $email;
 
 				return '';
 			},
-			null
+		]
+	);
+	$update_profile_form->addInput(
+		'qq',
+		[
+			'div_class' => 'mb-3',
+			'label' => UOJLocale::get('QQ'),
+			'default_value' => $user['qq'] == 0 ? '' : $user['qq'],
+			'validator_php' => function ($qq, &$vdata) {
+				if ($qq && !validateQQ($qq)) {
+					return 'QQ 格式不合法。';
+				}
+
+				$vdata['qq'] = $qq;
+
+				return '';
+			},
+		]
+	);
+	$update_profile_form->addInput(
+		'github',
+		[
+			'div_class' => 'mb-3',
+			'label' => 'GitHub',
+			'default_value' => $extra['social']['github'] ?: '',
+			'validator_php' => function ($github, &$vdata) {
+				if ($github && !validateGitHubUsername($github)) {
+					return 'GitHub 用户名不合法。';
+				}
+
+				$vdata['github'] = $github;
+
+				return '';
+			},
+		]
+	);
+	if (isSuperUser(Auth::user())) {
+		$update_profile_form->addInput(
+			'school',
+			[
+				'div_class' => 'mb-3',
+				'label' => UOJLocale::get('school'),
+				'default_value' => $user['school'] ?: '',
+				'validator_php' => function ($school, &$vdata) {
+					$vdata['school'] = $school;
+
+					return '';
+				},
+			]
 		);
 	} else {
 		$school = UOJLocale::get('school');
@@ -180,58 +202,69 @@ EOD);
 	</div>
 EOD);
 	}
-	$update_profile_form->addVCheckboxes('sex', [
-		'U' => UOJLocale::get('refuse to answer'),
-		'M' => UOJLocale::get('male'),
-		'F' => UOJLocale::get('female'),
-	], UOJLocale::get('sex'), $user['sex']);
-	$update_profile_form->addVInput(
+	$update_profile_form->addCheckboxes('sex', [
+		'div_class' => 'mb-3',
+		'label' => UOJLocale::get('sex'),
+		'label_class' => 'me-3',
+		'default_value' => $user['sex'],
+		'select_class' => 'd-inline-block',
+		'option_div_class' => 'form-check d-inline-block ms-2',
+		'options' => [
+			'U' => UOJLocale::get('refuse to answer'),
+			'M' => UOJLocale::get('male'),
+			'F' => UOJLocale::get('female'),
+		],
+	]);
+	$update_profile_form->addInput(
 		'motto',
-		'text',
-		UOJLocale::get('motto'),
-		$user['motto'] ?: '',
-		function ($motto, &$vdata) {
-			if (!validateMotto($motto)) {
-				return '格言格式不合法';
-			}
+		[
+			'div_class' => 'mb-3',
+			'label' => UOJLocale::get('motto'),
+			'default_value' => $user['motto'] ?: '',
+			'validator_php' => function ($motto, &$vdata) {
+				if (!validateMotto($motto)) {
+					return '格言格式不合法';
+				}
 
-			$vdata['motto'] = $motto;
+				$vdata['motto'] = $motto;
 
-			return '';
-		},
-		null
+				return '';
+			},
+		]
 	);
-	$update_profile_form->addVInput(
+	$update_profile_form->addInput(
 		'codeforces',
-		'text',
-		UOJLocale::get('codeforces handle'),
-		$extra['social']['codeforces'] ?: '',
-		function ($codeforces, &$vdata) {
-			if ($codeforces && !validateUsername($codeforces)) {
-				return 'Codeforces 用户名格式不合法。';
-			}
+		[
+			'div_class' => 'mb-3',
+			'label' => UOJLocale::get('codeforces handle'),
+			'default_value' => $extra['social']['codeforces'] ?: '',
+			'validator_php' => function ($codeforces, &$vdata) {
+				if ($codeforces && !validateUsername($codeforces)) {
+					return 'Codeforces 用户名格式不合法。';
+				}
 
-			$vdata['codeforces'] = $codeforces;
+				$vdata['codeforces'] = $codeforces;
 
-			return '';
-		},
-		null
+				return '';
+			},
+		]
 	);
-	$update_profile_form->addVInput(
+	$update_profile_form->addInput(
 		'website',
-		'text',
-		UOJLocale::get('user::website'),
-		$extra['social']['website'] ?: '',
-		function ($url, &$vdata) {
-			if ($url && !validateURL($url)) {
-				return '链接格式不合法。';
-			}
+		[
+			'div_class' => 'mb-3',
+			'label' => UOJLocale::get('user::website'),
+			'default_value' => $extra['social']['website'] ?: '',
+			'validator_php' => function ($url, &$vdata) {
+				if ($url && !validateURL($url)) {
+					return '链接格式不合法。';
+				}
 
-			$vdata['website'] = $url;
+				$vdata['website'] = $url;
 
-			return '';
-		},
-		null
+				return '';
+			},
+		]
 	);
 	$update_profile_form->handle = function (&$vdata) use ($user) {
 		$data = [
@@ -276,8 +309,9 @@ EOD);
 
 		dieWithJsonData(['status' => 'success']);
 	};
-	$update_profile_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
-	$update_profile_form->submit_button_config['text'] = '更新';
+	$update_profile_form->config['submit_container']['class'] = 'text-center mt-3';
+	$update_profile_form->config['submit_button']['class'] = 'btn btn-secondary';
+	$update_profile_form->config['submit_button']['text'] = '更新';
 	$update_profile_form->setAjaxSubmit(<<<EOD
 function(res) {
 	if (res.status === 'success') {
