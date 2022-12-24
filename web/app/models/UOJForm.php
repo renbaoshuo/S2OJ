@@ -259,6 +259,85 @@ class UOJForm {
 		);
 	}
 
+	public function addCheckboxes($name, $config) {
+		$config += [
+			'div_class' => '',
+			'select_class' => '',
+			'label' => '',
+			'label_class' => 'form-check-label',
+			'options' => [],
+			'default_value' => '',
+			'option_div_class' => 'form-check',
+			'option_class' => 'form-check-input',
+			'option_label_class' => 'form-check-label',
+			'help' => '',
+			'help_class' => 'form-text',
+			'disabled' => false,
+		];
+
+		$html = '';
+		$html .= HTML::tag_begin('div', ['id' => "div-$name", 'class' => $config['div_class']]);
+
+		// Label
+		if ($config['label']) {
+			$html .= HTML::tag('label', [
+				'class' => $config['label_class'],
+				'for' => "input-$name",
+			], $config['label']);
+		}
+
+		// Select
+		$html .= HTML::tag_begin('div', ['class' => $config['select_class']]);
+
+		foreach ($config['options'] as $opt_name => $opt_label) {
+			$html .= HTML::tag_begin('div', ['class' => $config['option_div_class']]);
+
+			if ($opt_name == $config['default_value']) {
+				$html .= HTML::empty_tag('input', [
+					'name' => $name,
+					'id' => "input-$name-$opt_name",
+					'class' => $config['option_class'],
+					'type' => 'radio',
+					'value' => $opt_name,
+					'checked' => 'checked',
+				]);
+			} else {
+				$html .= HTML::empty_tag('input', [
+					'name' => $name,
+					'id' => "input-$name-$opt_name",
+					'class' => $config['option_class'],
+					'type' => 'radio',
+					'value' => $opt_name,
+				]);
+			}
+
+			$html .= HTML::tag('label', [
+				'class' => $config['option_label_class'],
+				'for' => "input-$name-$opt_name",
+			], $opt_label);
+
+			$html .= HTML::tag_end('div');
+		}
+
+		$html .= HTML::tag_end('div');
+
+		// Help text
+		if ($config['help']) {
+			$html .= HTML::tag('div', ['class' => $config['help_class']], $config['help']);
+		}
+
+		$html .= HTML::tag_end('div');
+
+		$this->add(
+			$name,
+			$html,
+			function ($opt) use ($config) {
+				return isset($config['options'][$opt]) ? '' : "无效选项";
+			},
+			null
+		);
+	}
+
 	public function printHTML() {
 		echo HTML::tag_begin('form', [
 			'action' => UOJContext::requestURI(),
