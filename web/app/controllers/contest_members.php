@@ -11,56 +11,56 @@ $is_manager = UOJContest::cur()->userCanManage(Auth::user());
 $show_ip = isSuperUser(Auth::user());
 
 if ($is_manager) {
-	$add_new_contestant_form = new UOJBs4Form('add_new_contestant_form');
+	$add_new_contestant_form = new UOJForm('add_new_contestant_form');
 	$add_new_contestant_form->addInput(
 		'new_username',
-		'text',
-		'用户名',
-		'',
-		function ($username, &$vdata) {
-			$user = UOJUser::query($username);
+		[
+			'placeholder' => '用户名',
+			'validator_php' => function ($username, &$vdata) {
+				$user = UOJUser::query($username);
 
-			if (!$user) {
-				return '用户不存在';
-			}
+				if (!$user) {
+					return '用户不存在';
+				}
 
-			if (UOJContest::cur()->userHasRegistered($user)) {
-				return '该用户已经报名';
-			}
+				if (UOJContest::cur()->userHasRegistered($user)) {
+					return '该用户已经报名';
+				}
 
-			$vdata['user'] = $user;
+				$vdata['user'] = $user;
 
-			return '';
-		},
-		null
+				return '';
+			},
+		]
 	);
-	$add_new_contestant_form->submit_button_config['align'] = 'compressed';
-	$add_new_contestant_form->submit_button_config['text'] = '注册该用户';
+	$add_new_contestant_form->config['submit_container']['class'] = 'mt-3 text-center';
+	$add_new_contestant_form->config['submit_button']['class'] = 'btn btn-secondary';
+	$add_new_contestant_form->config['submit_button']['text'] = '注册该用户';
 	$add_new_contestant_form->handle = function (&$vdata) {
 		UOJContest::cur()->userRegister($vdata['user']);
 	};
 	$add_new_contestant_form->runAtServer();
 
-	$add_group_to_contest_form = new UOJBs4Form('add_group_to_contest');
+	$add_group_to_contest_form = new UOJForm('add_group_to_contest');
 	$add_group_to_contest_form->addInput(
 		'group_id',
-		'text',
-		'小组 ID',
-		'',
-		function ($group_id, &$vdata) {
-			$group = UOJGroup::query($group_id);
-			if (!$group) {
-				return '小组不存在';
-			}
+		[
+			'placeholder' => '小组 ID',
+			'validator_php' => function ($group_id, &$vdata) {
+				$group = UOJGroup::query($group_id);
+				if (!$group) {
+					return '小组不存在';
+				}
 
-			$vdata['group'] = $group;
+				$vdata['group'] = $group;
 
-			return '';
-		},
-		null
+				return '';
+			},
+		]
 	);
-	$add_group_to_contest_form->submit_button_config['align'] = 'compressed';
-	$add_group_to_contest_form->submit_button_config['text'] = '注册该小组中的用户';
+	$add_group_to_contest_form->config['submit_container']['class'] = 'mt-3 text-center';
+	$add_group_to_contest_form->config['submit_button']['class'] = 'btn btn-secondary';
+	$add_group_to_contest_form->config['submit_button']['text'] = '注册该小组中的用户';
 	$add_group_to_contest_form->handle = function (&$vdata) {
 		$usernames = $vdata['group']->getUsernames();
 
@@ -72,63 +72,61 @@ if ($is_manager) {
 	};
 	$add_group_to_contest_form->runAtServer();
 
-	$remove_user_from_contest_form = new UOJBs4Form('remove_user_from_contest');
+	$remove_user_from_contest_form = new UOJForm('remove_user_from_contest');
 	$remove_user_from_contest_form->addInput(
 		'remove_username',
-		'text',
-		'用户名',
-		'',
-		function ($username, &$vdata) {
-			$user = UOJUser::query($username);
+		[
+			'placeholder' => '用户名',
+			'validator_php' => function ($username, &$vdata) {
+				$user = UOJUser::query($username);
 
-			if (!$user) {
-				return '用户不存在';
-			}
+				if (!$user) {
+					return '用户不存在';
+				}
 
-			if (!UOJContest::cur()->userHasRegistered($user)) {
-				return '该用户未报名';
-			}
+				if (!UOJContest::cur()->userHasRegistered($user)) {
+					return '该用户未报名';
+				}
 
-			$vdata['user'] = $user;
+				$vdata['user'] = $user;
 
-			return '';
-		},
-		null
+				return '';
+			},
+		]
 	);
-	$remove_user_from_contest_form->submit_button_config['align'] = 'compressed';
-	$remove_user_from_contest_form->submit_button_config['text'] = '移除该用户';
-	$remove_user_from_contest_form->submit_button_config['class_str'] = 'mt-2 btn btn-danger';
+	$remove_user_from_contest_form->config['submit_container']['class'] = 'mt-3 text-center';
+	$remove_user_from_contest_form->config['submit_button']['class'] = 'btn btn-danger';
+	$remove_user_from_contest_form->config['submit_button']['text'] = '移除该用户';
 	$remove_user_from_contest_form->handle = function (&$vdata) {
 		UOJContest::cur()->userUnregister($vdata['user']);
 	};
 	$remove_user_from_contest_form->runAtServer();
 
-	$force_set_user_participated_form = new UOJBs4Form('force_set_user_participated');
+	$force_set_user_participated_form = new UOJForm('force_set_user_participated');
 	$force_set_user_participated_form->addInput(
 		'force_set_username',
-		'text',
-		'用户名',
-		'',
-		function ($username, &$vdata) {
-			$user = UOJUser::query($username);
+		[
+			'placeholder' => '用户名',
+			'validator_php' => function ($username, &$vdata) {
+				$user = UOJUser::query($username);
 
-			if (!$user) {
-				return '用户不存在';
-			}
+				if (!$user) {
+					return '用户不存在';
+				}
 
-			if (!UOJContest::cur()->userHasRegistered($user)) {
-				return '该用户未报名';
-			}
+				if (!UOJContest::cur()->userHasRegistered($user)) {
+					return '该用户未报名';
+				}
 
-			$vdata['user'] = $user;
+				$vdata['user'] = $user;
 
-			return '';
-		},
-		null
+				return '';
+			},
+		]
 	);
-	$force_set_user_participated_form->submit_button_config['align'] = 'compressed';
-	$force_set_user_participated_form->submit_button_config['text'] = '强制参赛';
-	$force_set_user_participated_form->submit_button_config['class_str'] = 'mt-2 btn btn-warning';
+	$force_set_user_participated_form->config['submit_container']['class'] = 'mt-3 text-center';
+	$force_set_user_participated_form->config['submit_button']['class'] = 'btn btn-warning';
+	$force_set_user_participated_form->config['submit_button']['text'] = '强制参赛';
 	$force_set_user_participated_form->handle = function (&$vdata) {
 		UOJContest::cur()->markUserAsParticipated($vdata['user']);
 	};
@@ -140,39 +138,40 @@ if ($contest['cur_progress'] == CONTEST_NOT_STARTED) {
 
 	if ($iHasRegistered) {
 		if ($iHasRegistered && UOJContest::cur()->freeRegistration()) {
-			$unregister_form = new UOJBs4Form('unregister');
+			$unregister_form = new UOJForm('unregister');
 			$unregister_form->handle = function () {
 				UOJContest::cur()->userUnregister(Auth::user());
 			};
-			$unregister_form->submit_button_config['class_str'] = 'btn btn-danger btn-xs';
-			$unregister_form->submit_button_config['text'] = '取消报名';
+			$unregister_form->config['submit_container']['class'] = 'text-end';
+			$unregister_form->config['submit_button']['class'] = 'btn btn-danger btn-xs';
+			$unregister_form->config['submit_button']['text'] = '取消报名';
 			$unregister_form->succ_href = "/contests";
-
 			$unregister_form->runAtServer();
 		}
 	}
 }
 ?>
-<?php echoUOJPageHeader(HTML::stripTags($contest['name']) . ' - ' . UOJLocale::get('contests::contest registrants')) ?>
+<?php echoUOJPageHeader(HTML::stripTags(UOJContest::info('name')) . ' - ' . UOJLocale::get('contests::contest registrants')) ?>
 
 <h1 class="text-center">
-	<?= $contest['name'] ?>
+	<?= UOJContest::info('name') ?>
 </h1>
 
-<?php if ($contest['cur_progress'] == CONTEST_NOT_STARTED) : ?>
+<?php if (UOJContest::cur()->progress() == CONTEST_NOT_STARTED) : ?>
 	<?php if ($iHasRegistered) : ?>
-		<div class="row">
+		<div class="row mb-3">
 			<div class="col-6">
 				<a class="text-decoration-none text-success">已报名</a>
 			</div>
-			<div class="col-6 text-end">
-				<?php $unregister_form->printHTML(); ?>
+			<div class="col-6">
+				<?php $unregister_form->printHTML() ?>
 			</div>
 		</div>
 	<?php else : ?>
-		<div>当前尚未报名，您可以 <a class="text-decoration-none text-danger" href="/contest/<?= $contest['id'] ?>/register">报名</a>。</div>
+		<div class="mb-3">
+			当前尚未报名，您可以 <a class="text-decoration-none text-danger" href="/contest/<?= UOJContest::info('id') ?>/register">报名</a>。
+		</div>
 	<?php endif ?>
-	<div class="mt-2"></div>
 <?php endif ?>
 
 <?php
@@ -216,18 +215,50 @@ echoLongTable(
 );
 ?>
 
-<?php
-if (isset($add_new_contestant_form)) {
-	$add_new_contestant_form->printHTML();
-}
-if (isset($add_group_to_contest_form)) {
-	$add_group_to_contest_form->printHTML();
-}
-if (isset($remove_user_from_contest_form)) {
-	$remove_user_from_contest_form->printHTML();
-}
-if (isset($force_set_user_participated_form)) {
-	$force_set_user_participated_form->printHTML();
-}
-?>
+<div class="row gy-2 gx-3 align-items-center">
+	<?php if (isset($add_new_contestant_form)) : ?>
+		<div class="col-auto">
+			<div class="card">
+				<div class="card-header fw-bold">添加参赛者</div>
+				<div class="card-body">
+					<?php $add_new_contestant_form->printHTML() ?>
+				</div>
+			</div>
+		</div>
+	<?php endif ?>
+
+	<?php if (isset($add_group_to_contest_form)) : ?>
+		<div class="col-auto">
+			<div class="card">
+				<div class="card-header fw-bold">小组报名</div>
+				<div class="card-body">
+					<?php $add_group_to_contest_form->printHTML() ?>
+				</div>
+			</div>
+		</div>
+	<?php endif ?>
+
+	<?php if (isset($remove_user_from_contest_form)) : ?>
+		<div class="col-auto">
+			<div class="card border-danger">
+				<div class="card-header fw-bold text-bg-danger">移除选手</div>
+				<div class="card-body">
+					<?php $remove_user_from_contest_form->printHTML() ?>
+				</div>
+			</div>
+		</div>
+	<?php endif ?>
+
+	<?php if (isset($force_set_user_participated_form)) : ?>
+		<div class="col-auto">
+			<div class="card">
+				<div class="card-header fw-bold">强制参赛</div>
+				<div class="card-body">
+					<?php $force_set_user_participated_form->printHTML() ?>
+				</div>
+			</div>
+		</div>
+	<?php endif ?>
+</div>
+
 <?php echoUOJPageFooter() ?>
