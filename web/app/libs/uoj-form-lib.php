@@ -735,7 +735,7 @@ function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle
 			$stat = $zip_file->statName($req['file_name']);
 
 			if ($req['type'] == 'source code') {
-				$max_size = isset($req['size']) ? (int)$req['size'] : 50;
+				$max_size = isset($req['size']) ? (int)$req['size'] : 100;
 				if ($stat['size'] > $max_size * 1024) {
 					$zip_file->close();
 					unlink(UOJContext::storagePath() . $zip_file_name);
