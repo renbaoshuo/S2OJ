@@ -7,14 +7,18 @@ requirePHPLib('data');
 Auth::check() || redirectToLogin();
 
 if (UOJGroup::userCanCreateGroup(Auth::user())) {
-	$new_group_form = new UOJBs4Form('new_group');
+	$new_group_form = new UOJForm('new_group');
 	$new_group_form->handle = function () {
-		DB::query("insert into `groups` (title, is_hidden) values ('新小组', 1)");
+		DB::insert([
+			"insert into `groups`",
+			DB::bracketed_fields(['title', 'is_hidden']),
+			"values", DB::tuple(['新小组', 1]),
+		]);
 	};
-	$new_group_form->submit_button_config['align'] = 'right';
-	$new_group_form->submit_button_config['class_str'] = 'btn btn-primary';
-	$new_group_form->submit_button_config['text'] = UOJLocale::get('add new group');
-	$new_group_form->submit_button_config['smart_confirm'] = '';
+	$new_group_form->config['submit_container']['class'] = 'text-end';
+	$new_group_form->config['submit_button']['class'] = 'btn btn-primary';
+	$new_group_form->config['submit_button']['text'] = UOJLocale::get('add new group');
+	$new_group_form->config['confirm']['smart'] = true;
 	$new_group_form->runAtServer();
 }
 ?>
@@ -23,7 +27,7 @@ if (UOJGroup::userCanCreateGroup(Auth::user())) {
 
 <div class="row">
 	<!-- left col -->
-	<div class="col-lg-9">
+	<div class="col-md-9">
 		<!-- title container -->
 		<div class="d-flex justify-content-between">
 			<h1>
@@ -31,11 +35,8 @@ if (UOJGroup::userCanCreateGroup(Auth::user())) {
 			</h1>
 
 			<?php if (isset($new_group_form)) : ?>
-				<div class="text-end">
-					<?php $new_group_form->printHTML(); ?>
-				</div>
+				<?php $new_group_form->printHTML() ?>
 			<?php endif ?>
-
 		</div>
 		<!-- end title container -->
 
@@ -91,11 +92,11 @@ if (UOJGroup::userCanCreateGroup(Auth::user())) {
 			]
 		);
 		?>
-		<!-- end left col -->
 	</div>
+	<!-- end left col -->
 
 	<!-- right col -->
-	<aside class="col-lg-3 mt-3 mt-lg-0">
+	<aside class="col-md-3 mt-3 mt-md-0">
 		<?php uojIncludeView('sidebar') ?>
 	</aside>
 	<!-- end right col -->
