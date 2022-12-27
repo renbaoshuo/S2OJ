@@ -392,48 +392,50 @@ if (UOJContest::cur()) {
 						<?= UOJProblem::cur()->getUploaderLink() ?>
 					</span>
 				</li>
-				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span class="flex-shrink-0">
-						<?= UOJLocale::get('problems::difficulty') ?>
-					</span>
-					<span>
-						<?= UOJProblem::cur()->getDifficultyHTML() ?>
-					</span>
-				</li>
-				<?php if (Auth::check()) : ?>
+				<?php if (!UOJContest::cur() || UOJContest::cur()->progress() >= CONTEST_FINISHED) : ?>
 					<li class="list-group-item d-flex justify-content-between align-items-center">
 						<span class="flex-shrink-0">
-							<?= UOJLocale::get('problems::historical score') ?>
+							<?= UOJLocale::get('problems::difficulty') ?>
 						</span>
-						<?php $his_score = DB::selectSingle(["select max(score)", "from submissions", "where", ["problem_id" => UOJProblem::info('id'), "submitter" => Auth::id()]]) ?>
+						<span>
+							<?= UOJProblem::cur()->getDifficultyHTML() ?>
+						</span>
+					</li>
+					<?php if (Auth::check()) : ?>
+						<li class="list-group-item d-flex justify-content-between align-items-center">
+							<span class="flex-shrink-0">
+								<?= UOJLocale::get('problems::historical score') ?>
+							</span>
+							<?php $his_score = DB::selectSingle(["select max(score)", "from submissions", "where", ["problem_id" => UOJProblem::info('id'), "submitter" => Auth::id()]]) ?>
 
-						<a class="<?= is_null($his_score) ? '' : 'uoj-score' ?>" href="<?= HTML::url('/submissions', ['params' => ['problem_id' => UOJProblem::info('id'), 'submitter' => Auth::id()]]) ?>">
-							<?= is_null($his_score) ? '无' : $his_score ?>
-						</a>
+							<a class="<?= is_null($his_score) ? '' : 'uoj-score' ?>" href="<?= HTML::url('/submissions', ['params' => ['problem_id' => UOJProblem::info('id'), 'submitter' => Auth::id()]]) ?>">
+								<?= is_null($his_score) ? '无' : $his_score ?>
+							</a>
+						</li>
+					<?php endif ?>
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						<span class="flex-shrink-0">
+							<?= UOJLocale::get('problems::tags') ?>
+						</span>
+						<span>
+							<?php if (UOJProblem::info('is_hidden')) : ?>
+								<a href="<?= HTML::url('/problems', ['params' => ['is_hidden' => 'on']]) ?>">
+									<span class="badge text-bg-danger">
+										<i class="bi bi-eye-slash-fill"></i>
+										<?= UOJLocale::get('hidden') ?>
+									</span>
+								</a>
+							<?php endif ?>
+							<?php foreach (UOJProblem::cur()->queryTags() as $tag) : ?>
+								<?= HTML::tag(
+									'a',
+									['class' => 'uoj-problem-tag'],
+									HTML::tag('span', ['class' => 'badge bg-secondary'], HTML::escape($tag))
+								) ?>
+							<?php endforeach ?>
+						</span>
 					</li>
 				<?php endif ?>
-				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span class="flex-shrink-0">
-						<?= UOJLocale::get('problems::tags') ?>
-					</span>
-					<span>
-						<?php if (UOJProblem::info('is_hidden')) : ?>
-							<a href="<?= HTML::url('/problems', ['params' => ['is_hidden' => 'on']]) ?>">
-								<span class="badge text-bg-danger">
-									<i class="bi bi-eye-slash-fill"></i>
-									<?= UOJLocale::get('hidden') ?>
-								</span>
-							</a>
-						<?php endif ?>
-						<?php foreach (UOJProblem::cur()->queryTags() as $tag) : ?>
-							<?= HTML::tag(
-								'a',
-								['class' => 'uoj-problem-tag'],
-								HTML::tag('span', ['class' => 'badge bg-secondary'], HTML::escape($tag))
-							) ?>
-						<?php endforeach ?>
-					</span>
-				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-center">
 					<span class="flex-shrink-0">
 						<?= UOJLocale::get('appraisal') ?>
