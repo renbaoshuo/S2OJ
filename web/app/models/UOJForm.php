@@ -165,7 +165,7 @@ class UOJForm {
 			'options' => [],
 			'default_value' => '',
 			'label' => '',
-			'label_class' => 'form-check-label',
+			'label_class' => 'form-label',
 			'help' => '',
 			'help_class' => 'form-text',
 			'disabled' => false,

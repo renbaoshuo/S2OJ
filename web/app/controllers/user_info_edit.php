@@ -342,6 +342,17 @@ EOD);
 	}
 	$update_user_permissions_form->appendHTML(HTML::tag('span', [], UOJLocale::get('user::user group')));
 	$update_user_permissions_form->appendHTML(HTML::tag('span', ['class' => 'd-inline-block ms-3'], $type_text));
+	$update_user_permissions_form->addSelect('user_type', [
+		'label' => '账号类型',
+		'options' => [
+			'student' => '学生',
+			'teacher' => '老师',
+			'system' => '系统',
+		],
+		'div_class' => 'my-3 row gy-2 gx-3 align-items-center',
+		'label_class' => 'form-label col-auto',
+		'select_class' => 'form-select w-auto col-auto',
+	]);
 	$update_user_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '题目'));
 	$update_user_permissions_form->addCheckbox('problems__view', [
 		'checked' => $extra['permissions']['problems']['view'],
@@ -673,6 +684,7 @@ EOD);
 		DB::update([
 			"update user_info",
 			"set", [
+				"usertype" => $_POST['user_type'],
 				"extra" => json_encode($extra),
 			],
 			"where", [
