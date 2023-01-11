@@ -1103,3 +1103,44 @@ function showCommentReplies(id, replies) {
 		}
 	);
 }
+
+// Tooltip
+$(document).ready(function() {
+	[...document.querySelectorAll('[data-bs-toggle="tooltip"]')].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+});
+
+// Copy button
+$(document).ready(function() {
+	$('.markdown-body pre, .copy-button-container pre').each(function () {
+		var thisEl = $(this);
+
+		$(this).wrap(
+			$('<div class="wrapped-copy-button-container" style="position: relative;"></div>')
+		).parent().prepend(
+			$(
+				'<div style="position: absolute; right: 0; top: 0; margin-top: 0.75rem; margin-right: 0.75rem; font-size: 0.85em;"></div>'
+			).append(
+				$('<button style="position: relative; background: transparent; border: 0;"></button>')
+					.click(function () {
+						navigator.clipboard
+							.writeText($(thisEl).text())
+							.then(() => {
+								$(this).html('<i class="bi bi-check2 text-success"></i>');
+	
+								setTimeout(() => {
+									$(this).html('<i class="bi bi-clipboard text-muted"></i>');
+								}, 1000);
+							})
+							.catch(() => {
+								$(this).html('<i class="bi bi-x-lg text-danger"></i>');
+	
+								setTimeout(() => {
+									$(this).html('<i class="bi bi-clipboard text-muted"></i>');
+								}, 1000);
+							});
+					})
+					.append('<i class="bi bi-clipboard text-muted"></i>')
+			)
+		);
+	});	
+});

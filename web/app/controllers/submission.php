@@ -168,7 +168,9 @@ if ($perm['manager_view']) {
 ?>
 
 <?php if ($perm['content'] || $perm['manager_view']) : ?>
-	<?php UOJSubmission::cur()->echoContent() ?>
+	<div class="copy-button-container">
+		<?php UOJSubmission::cur()->echoContent() ?>
+	</div>
 
 	<?php if (isset($hack_form)) : ?>
 		<p class="text-center">
@@ -221,17 +223,17 @@ if (UOJSubmission::cur()->hasJudged()) {
 ?>
 
 <div class="d-flex gap-2 justify-content-end">
-<?php if (isset($minor_rejudge_form)) : ?>
-	<?php $minor_rejudge_form->printHTML() ?>
-<?php endif ?>
+	<?php if (isset($minor_rejudge_form)) : ?>
+		<?php $minor_rejudge_form->printHTML() ?>
+	<?php endif ?>
 
-<?php if (isset($rejudge_form)) : ?>
-	<?php $rejudge_form->printHTML() ?>
-<?php endif ?>
+	<?php if (isset($rejudge_form)) : ?>
+		<?php $rejudge_form->printHTML() ?>
+	<?php endif ?>
 
-<?php if (isset($delete_form)) : ?>
-	<?php $delete_form->printHTML() ?>
-<?php endif ?>
+	<?php if (isset($delete_form)) : ?>
+		<?php $delete_form->printHTML() ?>
+	<?php endif ?>
 </div>
 
 <?php echoUOJPageFooter() ?>

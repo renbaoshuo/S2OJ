@@ -102,6 +102,9 @@ if (!isset($ShowPageHeader)) {
 	<!-- Color converter -->
 	<?= HTML::js_src('/js/color-converter.min.js') ?>
 
+	<!-- Clipboard Polyfill -->
+	<?= HTML::js_src('/js/clipboard-polyfill.overwrite-globals.es5.min.js') ?>
+
 	<!-- uoj -->
 	<?= HTML::js_src('/js/uoj.js?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
 
