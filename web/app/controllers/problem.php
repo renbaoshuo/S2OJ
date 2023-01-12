@@ -193,7 +193,7 @@ if ($pre_submit_check_ret === true && !$no_more_submission) {
 			'FS::randomAvailableSubmissionFileName',
 			'handleUpload'
 		);
-		$zip_answer_form->extra_validators[] = $submission_extra_validator;
+		$zip_answer_form->extra_validator = $submission_extra_validator;
 		$zip_answer_form->succ_href = $is_participating ? '/contest/' . UOJContest::info('id') . '/submissions' : '/submissions';
 		$zip_answer_form->runAtServer();
 	}
