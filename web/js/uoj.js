@@ -1109,6 +1109,11 @@ $(document).ready(function() {
 	[...document.querySelectorAll('[data-bs-toggle="tooltip"]')].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 });
 
+// Popovers
+$(document).ready(function() {
+	[...document.querySelectorAll('[data-bs-toggle="popover"]')].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+});
+
 // Copy button
 $(document).ready(function() {
 	$('.markdown-body pre, .copy-button-container pre').each(function () {
