@@ -210,6 +210,33 @@ class UOJUser {
 		}
 	}
 
+	public static function getUserColor($user) {
+		$extra = UOJUser::getExtra($user);
+
+		return UOJUser::getUserColor2($user['usergroup'], $extra['username_color']);
+	}
+
+	public static function getUserColor2($usergroup, $custom_color = null) {
+		if ($usergroup == 'B') {
+			return '#996600';
+		}
+
+		if ($usergroup == 'T') {
+			return '#707070';
+		}
+
+		if ($usergroup == 'S') {
+			return $custom_color ?: '#9d3dcf';
+		}
+
+		// 前管理员设置颜色为紫色、红色的，颜色改为蓝色
+		if ($custom_color == '#9d3dcf' || $custom_color == '#fe4c61') {
+			return '#0d6efd';
+		}
+
+		return $custom_color ?: '#0d6efd';
+	}
+
 	public static function getLink($user) {
 		if (is_string($user)) {
 			$info = UOJUser::query($user);
@@ -221,36 +248,21 @@ class UOJUser {
 			}
 		}
 
-		$extra = UOJUser::getExtra($user);
 		$realname = $user['realname'];
-		$color = '#0d6efd';
-
-		if ($user['usergroup'] === 'B') {
-			$color = '#996600';
-		} else if (isTmpUser($user)) {
-			$color = '#707070';
-		} else {
-			if (isSuperUser($user)) {
-				$color = '#9d3dcf';
-			}
-
-			$color = $extra['username_color'];
-
-			// 前管理员设置颜色为紫色、红色的，颜色改为蓝色
-			if (($color === '#9d3dcf' || $color === '#fe4c61') && !isSuperUser($user)) {
-				$color = '#0d6efd';
-			}
-		}
 
 		if ($user['usertype'] == 'teacher') {
 			$realname .= '老师';
 		}
 
+		if (!Auth::check()) {
+			$realname = '';
+		}
+
 		return HTML::tag('span', [
 			'class' => 'uoj-username',
+			'data-color' => UOJUser::getUserColor($user),
 			// 未登录不可查看真实姓名
-			'data-realname' => Auth::check() ? trim(HTML::escape($realname)) : '',
-			'data-color' => $color,
+			'data-realname' => trim(HTML::escape($realname)),
 		], $user['username']);
 	}
 

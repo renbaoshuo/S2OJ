@@ -87,14 +87,23 @@ function queryContestData($contest, $config = []) {
 	$people = [];
 
 	if ($contest['extra_config']['individual_or_team'] == 'individual') {
-		$people = DB::selectAll([
-			"select contests_registrants.username, user_info.realname from contests_registrants",
+		$res = DB::selectAll([
+			"select contests_registrants.username, user_info.realname, user_info.extra, user_info.usergroup from contests_registrants",
 			"inner join user_info on contests_registrants.username = user_info.username",
 			"where", [
 				"contest_id" => $contest['id'],
 				"has_participated" => 1
 			]
 		], DB::NUM);
+		foreach ($res as $row) {
+			$extra = json_decode($row[2], true);
+			$people[] = [
+				$row[0],
+				trim(HTML::escape($row[1])),
+				null,
+				UOJUser::getUserColor2($row[3], $extra['username_color']),
+			];
+		}
 	} elseif ($contest['extra_config']['individual_or_team'] == 'team') {
 		$res = DB::selectAll([
 			"select user_info.username, null, user_info.extra from contests_registrants, user_info",
@@ -106,11 +115,15 @@ function queryContestData($contest, $config = []) {
 		], DB::NUM);
 		foreach ($res as $row) {
 			$extra = json_decode($row[2], true);
-			$row[2] = [
-				'team_name' => $extra['acm']['team_name'],
-				'members' => $extra['acm']['members']
+			$people[] = [
+				$row[0],
+				null,
+				[
+					'team_name' => $extra['acm']['team_name'],
+					'members' => $extra['acm']['members'],
+				],
+				null,
 			];
-			$people[] = $row;
 		}
 	}
 
@@ -373,7 +386,7 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $cfg = [])
 		}
 	}
 
-	// standings: rank => score, penalty, [username, realname], virtual_rank, ?review
+	// standings: rank => score, penalty, [username, realname, null|array, null|color], virtual_rank, ?review
 	$standings = [];
 	foreach ($contest_data['people'] as $person) {
 		$cur = array(0, 0, $person);

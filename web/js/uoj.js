@@ -118,46 +118,51 @@ function getColOfScore(score) {
 	}
 }
 
-function getUserLink(username, realname) {
+function getUserLink(username, realname, color) {
 	if (!username) {
 		return '';
 	}
 	var text = username;
+	var style = '';
 	if (username.charAt(0) == '@') {
 		username = username.substr(1);
 	}
 	if (realname) {
 		text = text + ' <span class="uoj-realname d-inline-block">(' + realname + ')</span>';
 	}
-	return '<a class="uoj-username" href="' + uojHome + '/user/' + username + '">' + text + '</a>';
+	if (color) {
+		style += 'color: ' + color + ';';
+	}
+	return '<a class="uoj-username" href="' + uojHome + '/user/' + username + '" ' + 'style="' + style + '">' + text + '</a>';
 }
-function getUserSpan(username, realname) {
+function getUserSpan(username, realname, color) {
 	if (!username) {
 		return '';
 	}
 	var text = username;
+	var style = '';
 	if (username.charAt(0) == '@') {
 		username = username.substr(1);
 	}
 	if (realname) {
 		text = text + ' <span class="uoj-realname d-inline-block">(' + realname + ')</span>';
 	}
-	return '<span class="uoj-username">' + text + '</span>';
+	if (color) {
+		style += 'color: ' + color + ';';
+	}
+	return '<span class="uoj-username" ' + 'style="' + style + '">' + text + '</span>';
 }
 
 function replaceWithHighlightUsername() {
 	var username = $(this).text();
 	var realname = $(this).data("realname");
 	var color = $(this).data("color");
-	var new_elem_inner = '';
 
 	if ($(this).data("link") != 0) {
-		new_elem_inner = getUserLink(username, realname);
+		$(this).replaceWith(getUserLink(username, realname, color));
 	} else {
-		new_elem_inner = getUserSpan(username, realname);
+		$(this).replaceWith(getUserSpan(username, realname, color));
 	}
-
-	$(this).replaceWith($(new_elem_inner).css('color', color));
 }
 
 $.fn.uoj_honor = function() {
