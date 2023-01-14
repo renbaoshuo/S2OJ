@@ -201,7 +201,9 @@ $comments_pag = new Paginator([
 				"order by id"
 			]);
 			foreach ($replies as $idx => $reply) {
-				$replies[$idx]['poster_realname'] = UOJUser::query($reply['poster'])['realname'];
+				$reply_user = UOJUser::query($reply['poster']);
+				$replies[$idx]['poster_realname'] = $reply_user['realname'];
+				$replies[$idx]['poster_username_color'] = UOJUser::getUserColor($reply_user);
 				$replies[$idx]['content'] = getCommentContentToDisplay($reply);
 			}
 			$replies_json = json_encode($replies);
