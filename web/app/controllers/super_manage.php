@@ -1336,7 +1336,7 @@ EOD);
 								EOD,
 								function ($row) {
 									echo '<tr>';
-									echo '<td>', '<span class="uoj-username" data-realname="', HTML::escape($row['realname']), '">', $row['username'], '</span>', '</td>';
+									echo '<td>', UOJUser::getLink($row), '</td>';
 									echo '<td>', HTML::escape($row['school']), '</td>';
 									echo '<td>';
 									switch ($row['usergroup']) {

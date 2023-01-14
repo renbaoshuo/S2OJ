@@ -221,14 +221,37 @@ class UOJUser {
 			}
 		}
 
-		if ($user['usergroup'] == 'B') {
-			return HTML::tag('a', ['class' => 'text-danger fw-bold', 'href' => "/user/{$user['username']}"], $user['username']);
+		$extra = UOJUser::getExtra($user);
+		$realname = $user['realname'];
+		$color = '#0d6efd';
+
+		if ($user['usergroup'] === 'B') {
+			$color = '#996600';
+		} else if (isTmpUser($user)) {
+			$color = '#707070';
+		} else {
+			if (isSuperUser($user)) {
+				$color = '#9d3dcf';
+			}
+
+			$color = $extra['username_color'];
+
+			// 前管理员设置颜色为紫色、红色的，颜色改为蓝色
+			if (($color === '#9d3dcf' || $color === '#fe4c61') && !isSuperUser($user)) {
+				$color = '#0d6efd';
+			}
 		}
 
-		// 未登录不可查看真实姓名
-		$realname =  Auth::check() ? $user['realname'] : '';
+		if ($user['usertype'] == 'teacher') {
+			$realname .= '老师';
+		}
 
-		return HTML::tag('span', ['class' => 'uoj-username', 'data-realname' => trim(HTML::escape($realname))], $user['username']);
+		return HTML::tag('span', [
+			'class' => 'uoj-username',
+			// 未登录不可查看真实姓名
+			'data-realname' => Auth::check() ? trim(HTML::escape($realname)) : '',
+			'data-color' => $color,
+		], $user['username']);
 	}
 
 	public static function getUpdatedExtraVisitHistory($history, $cur) {
@@ -290,6 +313,7 @@ class UOJUser {
 			'show_email' => 'all',
 			'show_qq' => 'all',
 			'avatar_source' => 'gravatar',
+			'username_color' => isSuperUser($user) ? '#9d3dcf' : '#0d6efd',
 		]);
 		return $extra;
 	}

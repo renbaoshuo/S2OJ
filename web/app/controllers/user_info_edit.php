@@ -233,6 +233,36 @@ EOD);
 		},
 		null
 	);
+	if ($user['usergroup'] == 'B') {
+		$update_profile_form->appendHTML(<<<EOD
+			<div class="mb-3">
+				<label for="input-username_color" class="form-label">用户名颜色</label>
+				<input type="text" class="form-control" id="input-username_color" aria-describedby="help-username_color" value="棕色 - #996600" disabled>
+				<div id="help-username_color" class="form-text">被封禁的用户无法修改用户名颜色。</div>
+			</div>
+		EOD);
+	} else if ($user['usergroup'] == 'T') {
+		$update_profile_form->appendHTML(<<<EOD
+			<div class="mb-3">
+				<label for="input-username_color" class="form-label">用户名颜色</label>
+				<input type="text" class="form-control" id="input-username_color" aria-describedby="help-username_color" value="灰色 - #707070" disabled>
+				<div id="help-username_color" class="form-text">临时用户无法修改用户名颜色。</div>
+			</div>
+		EOD);
+	} else {
+		$additional_colors = [];
+
+		if (isSuperUser($user)) {
+			$additional_colors['#9d3dcf'] = '紫色 - #9d3dcf';
+			$additional_colors['#fe4c61'] = '红色 - #fe4c61';
+		}
+
+		$update_profile_form->addVSelect('username_color', $additional_colors + [
+			'#0d6efd' => '蓝色 - #0d6efd',
+			'#2da44e' => '绿色 - #2da44e',
+			'#f48fb1' => '粉色 - #f48fb1',
+		], '用户名颜色', '#0d6efd');
+	}
 	$update_profile_form->handle = function (&$vdata) use ($user) {
 		$data = [
 			'email' => $vdata['email'],
@@ -268,7 +298,9 @@ EOD);
 					'$.social.codeforces',
 					$vdata['codeforces'],
 					'$.social.website',
-					$vdata['website']
+					$vdata['website'],
+					'$.username_color',
+					$_POST['username_color']
 				),
 			],
 			"where", ["username" => $user['username']]

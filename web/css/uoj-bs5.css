@@ -25,6 +25,11 @@ a {
 		'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
+.uoj-realname {
+	font-size: 90%;
+	font-weight: normal;
+}
+
 h1,
 .h1 {
 	/* font-size: 2.5rem; */
@@ -164,7 +169,7 @@ h6,
 
 .card-uoj-tle > .card-header:hover,
 .card-uoj-tle > div.card-header > div > .uoj-status-text {
-	color: sandybrown;
+	color: #f4a460;
 }
 
 .card-uoj-wrong > .card-header:hover,
