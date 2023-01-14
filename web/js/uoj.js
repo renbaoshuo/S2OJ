@@ -148,11 +148,16 @@ function getUserSpan(username, realname) {
 function replaceWithHighlightUsername() {
 	var username = $(this).text();
 	var realname = $(this).data("realname");
+	var color = $(this).data("color");
+	var new_elem_inner = '';
+
 	if ($(this).data("link") != 0) {
-		$(this).replaceWith(getUserLink(username, realname));
+		new_elem_inner = getUserLink(username, realname);
 	} else {
-		$(this).replaceWith(getUserSpan(username, realname));
+		new_elem_inner = getUserSpan(username, realname);
 	}
+
+	$(this).replaceWith($(new_elem_inner).css('color', color));
 }
 
 $.fn.uoj_honor = function() {
