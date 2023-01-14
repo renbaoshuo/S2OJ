@@ -261,7 +261,7 @@ EOD);
 			'#0d6efd' => '蓝色 - #0d6efd',
 			'#2da44e' => '绿色 - #2da44e',
 			'#f48fb1' => '粉色 - #f48fb1',
-		], '用户名颜色', '#0d6efd');
+		], '用户名颜色', $extra['username_color']);
 	}
 	$update_profile_form->handle = function (&$vdata) use ($user) {
 		$data = [
