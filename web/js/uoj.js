@@ -1092,7 +1092,7 @@ function showCommentReplies(id, replies) {
 		function(reply) {
 			return $('<tr id="' + 'comment-' + reply.id + '" />').append(
 				$('<td />').append(
-					$('<div class="comtbox6">' + getUserLink(reply.poster, reply.poster_realname) + '：' + reply.content + '</div>')
+					$('<div class="comtbox6">' + getUserLink(reply.poster, reply.poster_realname, reply.poster_username_color) + '：' + reply.content + '</div>')
 				).append(
 					$('<ul class="' + (isBootstrap5Page ? 'text-end mb-0' : 'text-right bot-buffer-no') + ' list-inline" />').append(
 						'<li>' + '<small class="text-muted">' + reply.post_time + '</small>' + '</li>'
