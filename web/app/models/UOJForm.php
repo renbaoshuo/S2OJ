@@ -346,7 +346,7 @@ class UOJForm {
 		}
 
 		if ($this->config['confirm']['smart']) {
-			$this->config['confirm']['text'] = '你真的要' . $this->config['submit']['text'] . '吗？';
+			$this->config['confirm']['text'] = '你真的要' . $this->config['submit_button']['text'] . '吗？';
 		}
 		if ($this->config['confirm']['text']) {
 			echo <<<EOD
