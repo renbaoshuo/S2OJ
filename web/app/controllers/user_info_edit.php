@@ -115,7 +115,7 @@ EOD);
 		UOJLocale::get('email'),
 		$user['email'] ?: '',
 		function ($email, &$vdata) {
-			if (!validateEmail($email)) {
+			if ($email && !validateEmail($email)) {
 				return 'Email 格式不合法。';
 			}
 
