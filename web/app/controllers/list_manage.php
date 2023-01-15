@@ -318,7 +318,7 @@ EOD);
 								echo HTML::tag_begin('tr');
 								echo HTML::tag('td', ['class' => 'text-center'], $problem->info['id']);
 								echo HTML::tag_begin('td');
-								echo $problem->getLink();
+								echo $problem->getLink(['with' => 'none']);
 								if ($problem->info['is_hidden']) {
 									echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
 								}
