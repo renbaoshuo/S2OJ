@@ -436,7 +436,11 @@ class HTML {
 		$def->addElement('footer',  'Block', 'Flow', 'Common');
 
 		$extra_allowed_html = [
-			'span' => ['data-realname' => 'Text', 'data-uoj-username' => 'Number'],
+			'span' => [
+				'class' => 'Enum#uoj-username',
+				'data-realname' => 'Text',
+				'data-color' => 'Color',
+			],
 			'img' => ['width' => 'Text'],
 		];
 
@@ -463,7 +467,11 @@ class HTML {
 			'small' => [],
 			'del' => [],
 			'br' => [],
-			'span' => ['data-realname' => 'Text', 'data-uoj-username' => 'Number'],
+			'span' => [
+				'class' => 'Enum#uoj-username',
+				'data-realname' => 'Text',
+				'data-color' => 'Color',
+			],
 		];
 
 		$allowed_elements = [];
@@ -490,8 +498,8 @@ class HTML {
 		return new HTMLPurifier($config);
 	}
 
-	public static function parsedown() {
-		return new UOJMarkdown([
+	public static function parsedown($config = []) {
+		return new UOJMarkdown($config + [
 			'math' => [
 				'enabled' => true,
 				'matchSingleDollar' => true

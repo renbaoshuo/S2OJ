@@ -49,7 +49,7 @@ UOJGroup::cur()->userCanView(Auth::user(), ['ensure' => true]);
 				</h2>
 				<?php if (UOJGroup::info('announcement')) : ?>
 					<div class="text-break">
-						<?= HTML::purifier_inline()->purify(HTML::parsedown()->line(UOJGroup::info('announcement'))) ?>
+						<?= HTML::purifier_inline()->purify(HTML::parsedown(['username_with_color' => true])->line(UOJGroup::info('announcement'))) ?>
 					</div>
 				<?php else : ?>
 					<div class="text-muted">

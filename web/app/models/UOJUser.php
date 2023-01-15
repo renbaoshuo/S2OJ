@@ -210,6 +210,16 @@ class UOJUser {
 		}
 	}
 
+	public static function getRealname($user) {
+		$realname = $user['realname'];
+
+		if ($user['usertype'] == 'teacher') {
+			$realname .= '老师';
+		}
+
+		return $realname;
+	}
+
 	public static function getUserColor($user) {
 		$extra = UOJUser::getExtra($user);
 
@@ -248,12 +258,9 @@ class UOJUser {
 			}
 		}
 
-		$realname = $user['realname'];
+		$realname = UOJUser::getRealname($user);
 
-		if ($user['usertype'] == 'teacher') {
-			$realname .= '老师';
-		}
-
+		// 未登录不可查看真实姓名
 		if (!Auth::check()) {
 			$realname = '';
 		}
@@ -261,7 +268,6 @@ class UOJUser {
 		return HTML::tag('span', [
 			'class' => 'uoj-username',
 			'data-color' => UOJUser::getUserColor($user),
-			// 未登录不可查看真实姓名
 			'data-realname' => trim(HTML::escape($realname)),
 		], $user['username']);
 	}
