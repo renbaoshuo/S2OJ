@@ -52,6 +52,9 @@ $forgot_form->handle = function (&$vdata) {
 	$url = HTML::url("/reset-password", ['params' => ['p' => $sufs]]);
 	$oj_url = HTML::url('/');
 	$name = $user['username'];
+	$remote_addr = UOJContext::remoteAddr();
+	$http_x_forwarded_for = UOJContext::httpXForwardedFor();
+	$user_agent = UOJContext::httpUserAgent();
 
 	if ($user['realname']) {
 		$name .= ' (' . $user['realname'] . ')';
@@ -64,6 +67,11 @@ $forgot_form->handle = function (&$vdata) {
 
 <p>您最近告知我们需要重置您在 {$oj_name_short} 上账号的密码。请访问以下链接：<a href="{$url}">{$url}</a> (如果无法点击链接，请试着复制链接并粘贴至浏览器中打开。)</p>
 <p>如果您没有请求重置密码，则忽略此信息。该链接将在 72 小时后自动过期失效。</p>
+
+<ul>
+<li><small>请求 IP: {$remote_addr} (转发来源: {$http_x_forwarded_for})</small></li>
+<li><small>用户代理: {$user_agent}</small></li>
+</ul>
 
 <p>{$oj_name}</p>
 <p><a href="{$oj_url}">{$oj_url}</a></p>
