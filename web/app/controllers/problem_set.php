@@ -55,7 +55,7 @@ if (UOJProblem::userCanCreateProblem(Auth::user())) {
 如有，在此处填写其他于题意或数据相关的说明。
 
 EOD;
-	$new_problem_form = new UOJBs4Form('new_problem');
+	$new_problem_form = new UOJForm('new_problem');
 	$new_problem_form->handle = function () use ($default_statement) {
 		DB::insert([
 			"insert into problems",
@@ -77,11 +77,10 @@ EOD;
 		redirectTo("/problem/{$id}/manage/statement");
 		die();
 	};
-	$new_problem_form->submit_button_config['align'] = 'right';
-	$new_problem_form->submit_button_config['class_str'] = 'btn btn-primary';
-	$new_problem_form->submit_button_config['text'] = UOJLocale::get('problems::add new');
-	$new_problem_form->submit_button_config['smart_confirm'] = '';
-
+	$new_problem_form->config['submit_container']['class'] = 'text-end';
+	$new_problem_form->config['submit_button']['class'] = 'btn btn-primary';
+	$new_problem_form->config['submit_button']['text'] = UOJLocale::get('problems::add new');
+	$new_problem_form->config['confirm']['smart'] = true;
 	$new_problem_form->runAtServer();
 }
 
