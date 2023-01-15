@@ -167,7 +167,7 @@ class UOJForm {
 		$this->add($name, $html, $config['validator_php'], $config['validator_js']);
 	}
 
-	public function addTextarea($name, $config) {
+	public function addTextArea($name, $config) {
 		$config += [
 			'type' => 'text',
 			'div_class' => '',
