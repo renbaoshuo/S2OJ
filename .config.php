@@ -7,34 +7,20 @@ return [
 		'admin-email' => 'admin@sjzezoj.com',
 		'QQ-group' => '',
 		'ICP-license' => '冀ICP备2020028886号',
-		's2oj-version' => 'dev'
 	],
 	'database' => [
 		'database' => 'app_uoj233',
 		'username' => 'root',
-		'password' => '_database_password_',
-		'host' => '127.0.0.1',
+		'password' => 'root',
+		'host' => 'uoj-db',
 		'port' => '3306',
-	],
-	'web' => [
-		'domain' => null,
-		'main' => [
-			'protocol' => 'http',
-			'host' => UOJContext::requestDomain(),
-			'port' => '80/443',
-		],
-		'blog' => [
-			'protocol' => 'http',
-			'host' => UOJContext::requestDomain(),
-			'port' => '80/443',
-		]
 	],
 	'security' => [
 		'user' => [
-			'client_salt' => 'salt0',
+			'client_salt' => 'salt_0',
 		],
 		'cookie' => [
-			'checksum_salt' => ['salt1', 'salt2', 'salt3'],
+			'checksum_salt' => ['salt_1', 'salt_2', 'salt_3'],
 		],
 	],
 	'mail' => [
@@ -48,9 +34,9 @@ return [
 	],
 	'judger' => [
 		'socket' => [
-			'port' => '233',
-			'password' => '_judger_socket_password_',
-		]
+			'port' => '2333',
+			'password' => '_judger_socket_password_'
+		],
 	],
 	'switch' => [
 		'blog-domain-mode' => 3,
