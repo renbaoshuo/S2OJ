@@ -31,13 +31,11 @@ if (!isset($tabs_info[$cur_tab])) {
 }
 
 if ($cur_tab == 'profile') {
-	$update_profile_form = new UOJBs4Form('update_profile');
-	$update_profile_form->addVInput(
-		'name',
-		'text',
-		'名称',
-		UOJGroup::info('title'),
-		function ($title, &$vdata) {
+	$update_profile_form = new UOJForm('update_profile');
+	$update_profile_form->addInput('name', [
+		'label' => '名称',
+		'default_value' => UOJGroup::info('title'),
+		'validator_php' => function ($title, &$vdata) {
 			if ($title == '') {
 				return '名称不能为空';
 			}
@@ -55,17 +53,26 @@ if ($cur_tab == 'profile') {
 
 			return '';
 		},
-		null
-	);
-	$update_profile_form->addVCheckboxes('is_hidden', [
-		'0' => '公开',
-		'1' => '隐藏',
-	], '可见性', UOJGroup::info('is_hidden'));
-	$update_profile_form->addVTextArea(
-		'announcement',
-		'公告',
-		UOJGroup::info('announcement'),
-		function ($announcement, &$vdata) {
+	]);
+	$update_profile_form->addCheckboxes('is_hidden', [
+		'div_class' => 'mt-3',
+		'label' => '可见性',
+		'label_class' => 'me-3',
+		'options' => [
+			0 => '公开',
+			1 => '隐藏',
+		],
+		'select_class' => 'd-inline-block',
+		'option_div_class' => 'form-check d-inline-block ms-2',
+		'default_value' => UOJGroup::info('is_hidden'),
+	]);
+	$update_profile_form->addTextArea('announcement', [
+		'div_class' => 'mt-3',
+		'label' => '公告',
+		'input_class' => 'form-control font-monospace',
+		'default_value' => UOJGroup::info('announcement'),
+		'help' => '公告支持 Markdown 语法。',
+		'validator_php' => function ($announcement, &$vdata) {
 			if (strlen($announcement) > 3000) {
 				return '公告过长';
 			}
@@ -74,8 +81,7 @@ if ($cur_tab == 'profile') {
 
 			return '';
 		},
-		null
-	);
+	]);
 	$update_profile_form->handle = function ($vdata) {
 		DB::update([
 			"update `groups`",
@@ -92,26 +98,26 @@ if ($cur_tab == 'profile') {
 		dieWithJsonData(['status' => 'success', 'message' => '修改成功']);
 	};
 	$update_profile_form->setAjaxSubmit(<<<EOD
-function(res) {
-	if (res.status === 'success') {
-		$('#result-alert')
-			.html('小组信息修改成功！')
-			.addClass('alert-success')
-			.removeClass('alert-danger')
-			.show();
-	} else {
-		$('#result-alert')
-			.html('小组信息修改失败。' + (res.message || ''))
-			.removeClass('alert-success')
-			.addClass('alert-danger')
-			.show();
-	}
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert')
+					.html('小组信息修改成功！')
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert')
+					.html('小组信息修改失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
 
-	$(window).scrollTop(0);
-}
-EOD);
-	$update_profile_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
-	$update_profile_form->submit_button_config['text'] = '更新';
+			$(window).scrollTop(0);
+		}
+	EOD);
+	$update_profile_form->config['submit_button']['class'] = 'btn btn-secondary';
+	$update_profile_form->config['submit_button']['text'] = '更新';
 	$update_profile_form->runAtServer();
 } elseif ($cur_tab == 'assignments') {
 	if (isset($_POST['submit-remove_assignment']) && $_POST['submit-remove_assignment'] == 'remove_assignment') {
@@ -133,13 +139,10 @@ EOD);
 		dieWithAlert('移除成功！');
 	}
 
-	$add_new_assignment_form = new UOJBs4Form('add_new_assignment');
-	$add_new_assignment_form->addVInput(
-		'new_assignment_list_id',
-		'text',
-		'题单 ID',
-		'',
-		function ($list_id, &$vdata) {
+	$add_new_assignment_form = new UOJForm('add_new_assignment');
+	$add_new_assignment_form->addInput('new_assignment_list_id', [
+		'label' => '题单 ID',
+		'validator_php' => function ($list_id, &$vdata) {
 			if (!validateUInt($list_id)) {
 				return '题单 ID 不合法';
 			}
@@ -162,17 +165,11 @@ EOD);
 
 			return '';
 		},
-		null
-	);
-	$default_end_time = new DateTime();
-	$default_end_time->setTime(22, 30, 0);
-	$default_end_time->add(new DateInterval("P7D"));
-	$add_new_assignment_form->addVInput(
-		'new_assignment_end_time',
-		'text',
-		'截止时间',
-		$default_end_time->format('Y-m-d H:i'),
-		function ($end_time, &$vdata) {
+	]);
+	$add_new_assignment_form->addInput('new_assignment_end_time', [
+		'label' => '截止时间',
+		'default_value' => UOJTime::time2str((new DateTime())->add(new DateInterval("P7D"))->setTime(22, 30, 0)),
+		'validator_php' => function ($end_time, &$vdata) {
 			try {
 				$vdata['end_time'] = new DateTime($end_time);
 			} catch (Exception $e) {
@@ -181,8 +178,7 @@ EOD);
 
 			return '';
 		},
-		null
-	);
+	]);
 	$add_new_assignment_form->handle = function (&$vdata) {
 		DB::insert([
 			"insert into groups_assignments",
@@ -199,27 +195,27 @@ EOD);
 			'message' => '题单 #' . $vdata['list_id'] . ' 已经被添加到作业列表中，结束时间为 ' . $vdata['end_time']->format('Y-m-d H:i:s') . '。'
 		]);
 	};
-	$add_new_assignment_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
-	$add_new_assignment_form->submit_button_config['text'] = '添加';
+	$add_new_assignment_form->config['submit_button']['class'] = 'btn btn-secondary';
+	$add_new_assignment_form->config['submit_button']['text'] = '添加';
 	$add_new_assignment_form->setAjaxSubmit(<<<EOD
-function(res) {
-	if (res.status === 'success') {
-		$('#result-alert')
-			.html('作业添加成功！' + (res.message || ''))
-			.addClass('alert-success')
-			.removeClass('alert-danger')
-			.show();
-	} else {
-		$('#result-alert')
-			.html('作业添加失败。' + (res.message || ''))
-			.removeClass('alert-success')
-			.addClass('alert-danger')
-			.show();
-	}
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert')
+					.html('作业添加成功！' + (res.message || ''))
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert')
+					.html('作业添加失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
 
-	$(window).scrollTop(0);
-}
-EOD);
+			$(window).scrollTop(0);
+		}
+	EOD);
 	$add_new_assignment_form->runAtServer();
 
 	$hidden_time = new DateTime();
@@ -247,13 +243,10 @@ EOD);
 		dieWithAlert('移除成功！');
 	}
 
-	$add_new_user_form = new UOJBs4Form('add_new_user');
-	$add_new_user_form->addVInput(
-		'new_username',
-		'text',
-		'用户名',
-		'',
-		function ($username, &$vdata) {
+	$add_new_user_form = new UOJForm('add_new_user');
+	$add_new_user_form->addInput('new_username', [
+		'label' => '用户名',
+		'validator_php' => function ($username, &$vdata) {
 			$user = UOJUser::query($username);
 
 			if (!$user) {
@@ -268,10 +261,9 @@ EOD);
 
 			return '';
 		},
-		null
-	);
-	$add_new_user_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
-	$add_new_user_form->submit_button_config['text'] = '添加';
+	]);
+	$add_new_user_form->config['submit_button']['class'] = 'btn btn-secondary';
+	$add_new_user_form->config['submit_button']['text'] = '添加';
 	$add_new_user_form->handle = function (&$vdata) {
 		DB::insert([
 			"insert into groups_users",
@@ -286,24 +278,24 @@ EOD);
 		dieWithJsonData(['status' => 'success', 'message' => '已将用户名为 ' . $vdata['username'] . ' 的用户添加到本小组。']);
 	};
 	$add_new_user_form->setAjaxSubmit(<<<EOD
-function(res) {
-	if (res.status === 'success') {
-		$('#result-alert')
-			.html('用户添加成功！' + (res.message || ''))
-			.addClass('alert-success')
-			.removeClass('alert-danger')
-			.show();
-	} else {
-		$('#result-alert')
-			.html('用户添加失败。' + (res.message || ''))
-			.removeClass('alert-success')
-			.addClass('alert-danger')
-			.show();
-	}
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert')
+					.html('用户添加成功！' + (res.message || ''))
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert')
+					.html('用户添加失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
 
-	$(window).scrollTop(0);
-}
-EOD);
+			$(window).scrollTop(0);
+		}
+	EOD);
 	$add_new_user_form->runAtServer();
 }
 ?>
