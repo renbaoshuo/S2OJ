@@ -130,7 +130,7 @@ class UOJForm {
 			'label_class' => 'form-label',
 			'placeholder' => '',
 			'help' => '',
-			'help_class' => '',
+			'help_class' => 'form-text',
 			'validator_php' => function ($x) {
 				return '';
 			},

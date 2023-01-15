@@ -37,72 +37,73 @@ if (!isset($tabs_info[$cur_tab])) {
 }
 
 if ($cur_tab == 'profile') {
-	$profile_form = new UOJBs4Form('time');
-	$profile_form->addVInput(
+	$profile_form = new UOJForm('time');
+	$profile_form->addInput(
 		'name',
-		'text',
-		'比赛标题',
-		$contest['name'],
-		function ($name, &$vdata) {
-			if ($name == '') {
-				return '标题不能为空';
-			}
+		[
+			'label' => '比赛标题',
+			'default_value' => UOJContest::info('name'),
+			'validator_php' => function ($name, &$vdata) {
+				if ($name == '') {
+					return '标题不能为空';
+				}
 
-			if (strlen($name) > 100) {
-				return '标题过长';
-			}
+				if (strlen($name) > 100) {
+					return '标题过长';
+				}
 
-			$name = HTML::escape($name);
+				$name = HTML::escape($name);
 
-			if ($name === '') {
-				return '无效编码';
-			}
+				if ($name === '') {
+					return '无效编码';
+				}
 
-			$vdata['name'] = $name;
+				$vdata['name'] = $name;
 
-			return '';
-		},
-		null
+				return '';
+			},
+		],
 	);
-	$profile_form->addVInput(
+	$profile_form->addInput(
 		'start_time',
-		'text',
-		'开始时间',
-		$contest['start_time_str'],
-		function ($str, &$vdata) {
-			try {
-				$vdata['start_time'] = new DateTime($str);
-			} catch (Exception $e) {
-				return '无效时间格式';
-			}
-			return '';
-		},
-		null
+		[
+			'div_class' => 'mt-3',
+			'label' => '开始时间',
+			'default_value' => UOJContest::info('start_time_str'),
+			'validator_php' => function ($start_time, &$vdata) {
+				try {
+					$vdata['start_time'] = new DateTime($start_time);
+				} catch (Exception $e) {
+					return '无效时间格式';
+				}
+				return '';
+			},
+		]
 	);
-	$profile_form->addVInput(
+	$profile_form->addInput(
 		'last_min',
-		'text',
-		'时长（单位：分钟）',
-		$contest['last_min'],
-		function ($str, &$vdata) {
-			if (!validateUInt($str)) {
-				return '必须为一个整数';
-			}
-
-			$vdata['last_min'] = $str;
-
-			return '';
-		},
-		null
+		[
+			'div_class' => 'mt-3',
+			'label' => '时长',
+			'help' => '单位为分钟。',
+			'default_value' => UOJContest::info('last_min'),
+			'validator_php' => function ($last_min, &$vdata) {
+				if (!validateUInt($last_min)) {
+					return '必须为一个整数';
+				}
+				$vdata['last_min'] = $last_min;
+				return '';
+			},
+		]
 	);
-	$profile_form->handle = function (&$vdata) use ($contest) {
+	$profile_form->handle = function (&$vdata) {
 		DB::update([
 			"update contests",
 			"set", [
 				"name" => $vdata['name'],
-				"start_time" => $vdata['start_time']->format('Y-m-d H:i:s'),
+				"start_time" => UOJTime::time2str($vdata['start_time']),
 				"last_min" => $vdata['last_min'],
-			], "where", ["id" => $contest['id']]
+			], "where", ["id" => UOJContest::info('id')]
 		]);
 
 		dieWithJsonData(['status' => 'success', 'message' => '修改成功']);
@@ -162,51 +163,58 @@ EOD);
 		dieWithAlert('移除成功！');
 	}
 
-	$add_problem_form = new UOJBs4Form('add_problem');
-	$add_problem_form->addVInput(
+	$add_problem_form = new UOJForm('add_problem');
+	$add_problem_form->addInput(
 		'problem_id',
-		'text',
-		'题目 ID',
-		'',
-		function ($problem_id, &$vdata) {
-			$problem = UOJProblem::query($problem_id);
-			if (!$problem) {
-				return '题目不存在。';
-			}
+		[
+			'label' => '题目 ID',
+			'validator_php' => function ($problem_id, &$vdata) {
+				$problem = UOJProblem::query($problem_id);
+				if (!$problem) {
+					return '题目不存在。';
+				}
 
-			if (!$problem->userCanManage(Auth::user())) {
-				return "无权添加此题目。";
-			}
+				if (!$problem->userCanManage(Auth::user())) {
+					return "无权添加此题目。";
+				}
 
-			if (UOJContest::cur()->hasProblem($problem)) {
-				return "题目已经在本场比赛中。";
-			}
+				if (UOJContest::cur()->hasProblem($problem)) {
+					return "题目已经在本场比赛中。";
+				}
 
-			$vdata['problem_id'] = $problem_id;
+				$vdata['problem_id'] = $problem_id;
 
-			return '';
-		},
-		null
+				return '';
+			},
+		]
 	);
-	$add_problem_form->addVSelect('judge_config', [
-		'default' => '默认',
-		'sample' => '只测样例',
-		'no-details' => '测试全部数据，对于每个测试点显示得分但不显示详情',
-		'full' => '测试全部数据',
-	], '评测设置', 'default');
-	$add_problem_form->addVCheckboxes('bonus', ['0' => '否', '1' => '是'], '是否为 bonus 题（ACM 赛制）', '0');
+	$add_problem_form->addSelect('judge_config', [
+		'div_class' => 'mt-3',
+		'label' => '评测设置',
+		'options' => [
+			'default' => '默认',
+			'sample' => '只测样例',
+			'no-details' => '测试全部数据，对于每个测试点显示得分但不显示详情',
+			'full' => '测试全部数据',
+		],
+		'default_value' => 'default',
+	]);
+	$add_problem_form->addCheckbox('bonus', [
+		'div_class' => 'form-check mt-3',
+		'label' => '是否为 bonus 题（针对 ACM 赛制）',
+	]);
 	$add_problem_form->handle = function (&$vdata) use ($contest) {
-		$level = DB::selectFirst([
+		$level = DB::selectSingle([
 			"select", "max(level)",
 			"from", "contests_problems",
 			"where", [
-				"contest_id" => $contest['id'],
+				"contest_id" => UOJContest::info('id'),
 			]
-		])["max(level)"];
+		]);
 		DB::insert([
 			"insert ignore into contests_problems",
 			"(contest_id, problem_id, level)",
-			"values", DB::tuple([$contest['id'], $vdata['problem_id'], $level + 1])
+			"values", DB::tuple([UOJContest::info('id'), $vdata['problem_id'], $level + 1])
 		]);
 
 		$judge_type = $_POST['judge_config'];
@@ -220,13 +228,13 @@ EOD);
 		DB::update([
 			"update contests",
 			"set", ["extra_config" => $esc_extra_config],
-			"where", ["id" => $contest['id']]
+			"where", ["id" => UOJContest::info('id')]
 		]);
 
 		dieWithJsonData(['status' => 'success', 'message' => "题目 #{$vdata['problem_id']} 添加成功！"]);
 	};
-	$add_problem_form->submit_button_config['text'] = '添加';
-	$add_problem_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
+	$add_problem_form->config['submit_button']['text'] = '添加';
+	$add_problem_form->config['submit_button']['class'] = 'btn btn-secondary mt-3';
 	$add_problem_form->setAjaxSubmit(<<<EOD
 function(res) {
 	if (res.status === 'success') {
@@ -260,7 +268,6 @@ EOD);
 			dieWithAlert('用户不是这场比赛的管理员。');
 		}
 
-
 		DB::delete([
 			"delete from contests_permissions",
 			"where", [
@@ -271,40 +278,40 @@ EOD);
 		dieWithAlert('移除成功！');
 	}
 
-	$add_manager_form = new UOJBs4Form('add_manager');
-	$add_manager_form->addVInput(
+	$add_manager_form = new UOJForm('add_manager');
+	$add_manager_form->addInput(
 		'username',
-		'text',
-		'用户名',
-		'',
-		function ($username, &$vdata) use ($contest) {
-			$user = UOJUser::query($username);
+		[
+			'label' => '用户名',
+			'validator_php' => function ($username, &$vdata) {
+				$user = UOJUser::query($username);
 
-			if (!$user) {
-				return '用户不存在';
-			}
+				if (!$user) {
+					return '用户不存在';
+				}
 
-			if (UOJContest::cur()->userCanManage($user)) {
-				return '用户已经是这场比赛的管理员';
-			}
+				if (UOJContest::cur()->userCanManage($user)) {
+					return '用户已经是这场比赛的管理员';
+				}
 
-			$vdata['username'] = $username;
+				$vdata['username'] = $username;
 
-			return '';
-		},
-		null
+				return '';
+			},
+		]
 	);
-	$add_manager_form->handle = function (&$vdata) use ($contest) {
+	$add_manager_form->handle = function (&$vdata) {
 		DB::insert([
 			"insert into contests_permissions",
-			"(contest_id, username)",
-			"values", DB::tuple([$contest['id'], $vdata['username']])
+			DB::bracketed_fields(["contest_id", "username"]),
+			"values",
+			DB::tuple([UOJContest::info('id'), $vdata['username']])
 		]);
 
 		dieWithJsonData(['status' => 'success', 'message' => '已将用户名为 ' . $vdata['username'] . ' 的用户设置为本场比赛的管理者。']);
 	};
-	$add_manager_form->submit_button_config['text'] = '添加';
-	$add_manager_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
+	$add_manager_form->config['submit_button']['text'] = '添加';
+	$add_manager_form->config['submit_button']['class'] = 'btn btn-secondary mt-3';
 	$add_manager_form->setAjaxSubmit(<<<EOD
 function(res) {
 	if (res.status === 'success') {
@@ -326,83 +333,68 @@ function(res) {
 EOD);
 	$add_manager_form->runAtServer();
 } elseif ($cur_tab == 'others') {
-	$version_form = new UOJBs4Form('version');
-	$version_form->addVSelect('standings_version', [
-		'1' => '1',
-		'2' => '2',
-	], '比赛排名版本', $contest['extra_config']['standings_version']);
-	$version_form->handle = function () use ($contest) {
-		$contest['extra_config']['standings_version'] = $_POST['standings_version'];
-		$esc_extra_config = json_encode($contest['extra_config']);
-		DB::update([
-			"update contests",
-			"set", ["extra_config" => $esc_extra_config],
-			"where", ["id" => $contest['id']],
-		]);
-
-		dieWithJsonData(['status' => 'success', 'message' => '修改成功']);
-	};
-	$version_form->setAjaxSubmit(<<<EOD
-function(res) {
-	if (res.status === 'success') {
-		$('#version-result-alert')
-			.html('修改成功！')
-			.addClass('alert-success')
-			.removeClass('alert-danger')
-			.show();
-	} else {
-		$('#version-result-alert')
-			.html('修改失败。' + (res.message || ''))
-			.removeClass('alert-success')
-			.addClass('alert-danger')
-			.show();
-	}
-
-	$(window).scrollTop(0);
-}
-EOD);
-	$version_form->runAtServer();
-
-	$rule_form = new UOJBs4Form('basic_rule');
-	$rule_form->addVSelect('basic_rule', [
-		'OI' => 'OI',
-		'IOI' => 'IOI',
-		'ACM' => 'ACM',
-	], '比赛类型', $contest['extra_config']['basic_rule']);
-	$rule_form->addVSelect('free_registration', [
-		1 => '所有人都可以自由报名',
-		0 => '只能由管理员帮选手报名'
-	], "报名方式", $contest['extra_config']['free_registration']);
-	$rule_form->addVCheckboxes('extra_registration', [
-		'0' => '禁止',
-		'1' => '允许'
-	], '是否允许额外报名', isset($contest['extra_config']['extra_registration']) ? $contest['extra_config']['extra_registration'] : '1');
-	$rule_form->addVSelect('individual_or_team', [
-		'individual' => '个人赛',
-		'team' => '团体赛'
-	], "个人赛/团体赛", $contest['extra_config']['individual_or_team']);
-	$rule_form->addVInput(
-		'max_n_submissions_per_problem',
-		'text',
-		'每题最高提交次数（-1 表示不限制）',
-		$contest['extra_config']['max_n_submissions_per_problem'],
-		function ($str) {
+	$rule_form = new UOJForm('basic_rule');
+	$rule_form->addSelect('basic_rule', [
+		'label' => '比赛类型',
+		'options' => [
+			'OI' => 'OI',
+			'IOI' => 'IOI',
+			'ACM' => 'ACM',
+		],
+		'default_value' => $contest['extra_config']['basic_rule'],
+	]);
+	$rule_form->addSelect('free_registration', [
+		'div_class' => 'mt-3',
+		'label' => '报名方式',
+		'options' => [
+			1 => '所有人都可以自由报名',
+			0 => '只能由管理员帮选手报名'
+		],
+		'default_value' => $contest['extra_config']['free_registration'],
+	]);
+	$rule_form->addCheckbox('extra_registration', [
+		'div_class' => 'form-check mt-3',
+		'label' => '允许额外报名',
+		'checked' => $contest['extra_config']['extra_registration'] ?: true,
+	]);
+	$rule_form->addSelect('individual_or_team', [
+		'div_class' => 'mt-3',
+		'label' => '个人赛/团体赛',
+		'options' => [
+			'individual' => '个人赛',
+			'team' => '团体赛',
+		],
+		'default_value' => $contest['extra_config']['individual_or_team'],
+	]);
+	$rule_form->addInput('max_n_submissions_per_problem', [
+		'div_class' => 'mt-3',
+		'label' => '每题最高提交次数',
+		'type' => 'number',
+		'default_value' => $contest['extra_config']['max_n_submissions_per_problem'],
+		'help' => '设为 -1 表示无限制（系统默认频率限制仍有效）。',
+		'validator_php' => function ($str) {
 			return !validateUInt($str) && $str !== '-1' ? '必须为一个非负整数或 -1' : '';
 		},
-		null
-	);
+	]);
+	$rule_form->addSelect('standings_version', [
+		'div_class' => 'mt-3',
+		'label' => '比赛排名版本',
+		'options' => [1 => 1, 2 => 2],
+		'default_value' => $contest['extra_config']['standings_version'],
+	]);
 	$rule_form->handle = function () use ($contest) {
 		$contest['extra_config']['basic_rule'] = $_POST['basic_rule'];
 		$contest['extra_config']['free_registration'] = (int)$_POST['free_registration'];
 		$contest['extra_config']['individual_or_team'] = $_POST['individual_or_team'];
 		$contest['extra_config']['max_n_submissions_per_problem'] = (int)$_POST['max_n_submissions_per_problem'];
 		$contest['extra_config']['extra_registration'] = (int)$_POST['extra_registration'];
+		$contest['extra_config']['standings_version'] = (int)$_POST['standings_version'];
 
 		$esc_extra_config = json_encode($contest['extra_config']);
 		DB::update([
 			"update contests",
 			"set", ["extra_config" => $esc_extra_config],
-			"where", ["id" => $contest['id']]
+			"where", ["id" => UOJContest::info('id')]
 		]);
 
 		dieWithJsonData(['status' => 'success', 'message' => '修改成功']);
@@ -723,9 +715,6 @@ EOD);
 							<a class="nav-link active" href="#type" data-bs-toggle="tab" data-bs-target="#type">规则</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" href="#standings-version" data-bs-toggle="tab" data-bs-target="#standings-version">排名版本</a>
-						</li>
-						<li class="nav-item">
 							<a class="nav-link" href="#blogs" data-bs-toggle="tab" data-bs-target="#blogs">比赛资料</a>
 						</li>
 					</ul>
@@ -747,20 +736,6 @@ EOD);
 								<h5>常见问题</h5>
 								<ul class="mb-0">
 									<li>暂无</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-					<div class="tab-pane" id="standings-version">
-						<div id="version-result-alert" class="alert" role="alert" style="display: none"></div>
-						<div class="row row-cols-1 row-cols-md-2">
-							<div class="col">
-								<?php $version_form->printHTML(); ?>
-							</div>
-							<div class="col mt-3 mt-md-0">
-								<h5>注意事项</h5>
-								<ul class="mb-0">
-									<li>正常情况下无需调整此项设置。</li>
 								</ul>
 							</div>
 						</div>
