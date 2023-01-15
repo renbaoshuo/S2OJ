@@ -516,7 +516,7 @@ EOD);
 		'new_tmp_expiration_time',
 		'text',
 		'过期时间',
-		(new DateTime())->add(new DateInterval('P7D'))->format('Y-m-d H:i:s'),
+		UOJTime::time2str((new DateTime())->add(new DateInterval('P7D'))->setTime(0, 0, 0)),
 		function ($str, &$vdata) {
 			try {
 				$vdata['expiration_time'] = new DateTime($str);
@@ -657,6 +657,7 @@ EOD);
 	);
 	$change_usergroup_form->addVSelect('op_type', [
 		'banneduser' => '设为封禁用户',
+		'tempuser' => '设为临时用户',
 		'normaluser' => '设为普通用户',
 		'superuser' => '设为超级用户',
 	], '操作类型', '');
@@ -666,15 +667,59 @@ EOD);
 
 		switch ($_POST['op_type']) {
 			case 'banneduser':
-				DB::update("update user_info set usergroup = 'B', usertype = 'banned' where username = '{$username}'");
-				$usergroup = '被封禁的用户';
+				DB::update([
+					"update user_info",
+					"set", [
+						"usergroup" => "B",
+						"usertype" => "banned",
+						"expiration_time" => null,
+					],
+					"where", [
+						"username" => $username,
+					],
+				]);
+				$usergroup = '被封禁的用户，该用户将无法再次登录系统';
+				break;
+			case 'tempuser':
+				DB::update([
+					"update user_info",
+					"set", [
+						"usergroup" => "T",
+						"usertype" => "student",
+						"expiration_time" => DB::now(),
+					],
+					"where", [
+						"username" => $username,
+					],
+				]);
+				$usergroup = '临时用户，请前往个人信息编辑页面修改过期时间';
 				break;
 			case 'normaluser':
-				DB::update("update user_info set usergroup = 'U', usertype = 'student' where username = '{$username}'");
+				DB::update([
+					"update user_info",
+					"set", [
+						"usergroup" => "U",
+						"usertype" => "student",
+						"expiration_time" => null,
+					],
+					"where", [
+						"username" => $username,
+					],
+				]);
 				$usergroup = '普通用户';
 				break;
 			case 'superuser':
-				DB::update("update user_info set usergroup = 'S', usertype = 'student' where username = '{$username}'");
+				DB::update([
+					"update user_info",
+					"set", [
+						"usergroup" => "S",
+						"usertype" => "student",
+						"expiration_time" => null,
+					],
+					"where", [
+						"username" => $username,
+					],
+				]);
 				$usergroup = '超级用户';
 				break;
 		}
@@ -1429,7 +1474,8 @@ EOD);
 									<h5>注意事项</h5>
 									<ul class="mb-0">
 										<li>用户被封禁后将不能再次登录系统。</li>
-										<li>将当前用户移除权限后将无法再次访问本页面。</li>
+										<li>将用户修改为临时用户后，请前往个人信息编辑页面修改过期时间。</li>
+										<li>将当前用户移除管理权限后将无法再次访问本页面。</li>
 										<li>在修改用户类别前请仔细核对用户名以免产生不必要的麻烦。</li>
 										<li>如需为用户设置题目上传者、题目管理员等权限，请前往对应用户的个人资料编辑页面，点击「特权」选项卡修改。</li>
 									</ul>
