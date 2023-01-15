@@ -17,23 +17,23 @@ if (UOJHack::cur()->setSubmission()) {
 }
 
 if (UOJHack::cur()->userCanDelete(Auth::user())) {
-	$delete_form = new UOJBs4Form('delete');
+	$delete_form = new UOJForm('delete');
 	$delete_form->handle = function () {
 		DB::delete([
 			"delete from hacks",
 			"where", ["id" => UOJHack::info('id')]
 		]);
 	};
-	$delete_form->submit_button_config['class_str'] = 'btn btn-danger';
-	$delete_form->submit_button_config['text'] = '删除此 Hack';
-	$delete_form->submit_button_config['align'] = 'end';
-	$delete_form->submit_button_config['smart_confirm'] = '';
+	$delete_form->config['submit_container']['class'] = 'text-end';
+	$delete_form->config['submit_button']['class'] = 'btn btn-sm btn-danger';
+	$delete_form->config['submit_button']['text'] = '删除此 Hack';
+	$delete_form->config['confirm']['smart'] = true;
 	$delete_form->succ_href = "/hacks";
 	$delete_form->runAtServer();
 }
 
 if (UOJHack::cur()->userCanReview(Auth::user())) {
-	$addex_form = new UOJBs4Form('addex');
+	$addex_form = new UOJForm('addex');
 	$addex_form->handle = function () {
 		$input = UOJContext::storagePath() . UOJHack::info('input');
 		$new_in = "{$input}_in";
@@ -50,16 +50,17 @@ if (UOJHack::cur()->userCanReview(Auth::user())) {
 			], "where", ['id' => UOJHack::info('id')]
 		]);
 	};
-	$addex_form->submit_button_config['class_str'] = 'btn btn-danger mt-3';
-	$addex_form->submit_button_config['text'] = '确认无误，添加到测试数据';
-	$addex_form->submit_button_config['align'] = 'end';
-	$addex_form->submit_button_config['smart_confirm'] = '';
+	$addex_form->config['submit_button']['class'] = 'btn btn-sm btn-danger';
+	$addex_form->config['submit_button']['text'] = '确认无误，添加到测试数据';
+	$addex_form->config['submit_container']['class'] = 'mt-3 text-end';
+	$addex_form->config['confirm']['text'] = '将这个 Hack 数据添加到测试数据中';
 	$addex_form->succ_href = "/hacks";
 	$addex_form->runAtServer();
 }
 
 $perm = UOJHack::cur()->viewerCanSeeComponents(Auth::user());
 ?>
+
 <?php echoUOJPageHeader(UOJLocale::get('problems::hack') . ' #' . UOJHack::info('id')) ?>
 
 <h1>
