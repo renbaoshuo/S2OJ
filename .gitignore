@@ -4,3 +4,5 @@ uoj_data_2/
 .php-cs-fixer.cache
 docker-compose.local.yml
 .config.php
+.config.development.php
+.config.local.php
