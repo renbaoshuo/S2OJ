@@ -254,13 +254,15 @@ EOD);
 
 		if (isSuperUser($user)) {
 			$additional_colors['#9d3dcf'] = '紫色 - #9d3dcf';
-			$additional_colors['#fe4c61'] = '红色 - #fe4c61';
 		}
 
 		$update_profile_form->addVSelect('username_color', $additional_colors + [
 			'#0d6efd' => '蓝色 - #0d6efd',
 			'#2da44e' => '绿色 - #2da44e',
-			'#f48fb1' => '粉色 - #f48fb1',
+			'#e85aad' => '粉色 - #e85aad',
+			'#f32a38' => '红色 - #f32a38',
+			'#f57c00' => '橙色 - #f57c00',
+			'#00acc1' => '青色 - #00acc1',
 		], '用户名颜色', $extra['username_color']);
 	}
 	$update_profile_form->handle = function (&$vdata) use ($user) {

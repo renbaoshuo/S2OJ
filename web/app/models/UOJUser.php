@@ -229,8 +229,8 @@ class UOJUser {
 			return $custom_color ?: '#9d3dcf';
 		}
 
-		// 前管理员设置颜色为紫色、红色的，颜色改为蓝色
-		if ($custom_color == '#9d3dcf' || $custom_color == '#fe4c61') {
+		// 前管理员设置颜色为紫色的，颜色改为蓝色
+		if ($custom_color == '#9d3dcf') {
 			return '#0d6efd';
 		}
 
