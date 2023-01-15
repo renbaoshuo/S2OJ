@@ -22,7 +22,7 @@ class UOJRanklist {
 		}
 
 		$last_user = null;
-		$parsedown = HTML::parsedown();
+		$parsedown = HTML::parsedown(['username_with_color' => true]);
 		$purifier = HTML::purifier_inline();
 		$print_row = function ($user, $now_cnt) use (&$last_user, &$conds, &$parsedown, &$purifier) {
 			if ($last_user === null) {
@@ -138,7 +138,7 @@ class UOJRanklist {
 		$header_row .= '</tr>';
 
 		$last_user = null;
-		$parsedown = HTML::parsedown();
+		$parsedown = HTML::parsedown(['username_with_color' => true]);
 		$purifier = HTML::purifier_inline();
 		$print_row = function ($user, $now_cnt) use (&$last_user, &$conds, &$parsedown, &$purifier) {
 			if ($last_user === null) {

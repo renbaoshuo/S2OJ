@@ -176,6 +176,85 @@ $difficulty_form->runAtServer();
 
 		<div class="card mt-3">
 			<div class="card-header fw-bold">
+				标签填充
+			</div>
+			<div class="card-body">
+				<script>
+					function fillTag(tags) {
+						if (typeof tags === 'string') tags = [tags];
+
+						tags = tags.map(tag => tag.trim()).filter(Boolean);
+
+						var originalTags = $('#input-problem_tags')
+							.val()
+							.replace(/，/g, ',')
+							.split(',')
+							.map(tag => tag.trim())
+							.filter(Boolean);
+						var newTagsSet = new Set(originalTags.concat(tags));
+
+						$('#input-problem_tags').val(Array.from(newTagsSet.values()).join(', '));
+						$('#input-problem_tags').trigger('input');
+					}
+				</script>
+
+				<div class="row row-cols-4 row-cols-lg-2 g-2">
+					<?php foreach (UOJProblem::$categories as $category => $tags) : ?>
+						<?php $category_id = uniqid('category-'); ?>
+
+						<div class="d-inline-block" id="category-container-<?= $category_id ?>">
+							<button id="category-button-<?= $category_id ?>" class="btn btn-sm btn-light w-100" type="button"><?= $category ?></button>
+						</div>
+
+						<script>
+							$(document).ready(function() {
+								bootstrap.Popover.jQueryInterface.call($('#category-button-<?= $category_id ?>'), {
+									container: $('#category-container-<?= $category_id ?>'),
+									html: true,
+									placement: 'left',
+									animation: false,
+									trigger: 'manual',
+									fallbackPlacements: ['bottom', 'right'],
+									content: [
+										<?php foreach ($tags as $tag) : ?> '<?= $tag ?>', <?php endforeach ?>
+									].map(tag => ('<button class="btn btn-sm btn-light d-inline-block mr-1 mb-1" onclick="fillTag([\'<?= $category ?>\', \'' + tag + '\'])">' + tag + '</button>')).join(' '),
+									sanitizeFn(content) {
+										return content;
+									},
+								}).on("mouseenter", function() {
+									var _this = this;
+
+									$(this).popover("show");
+									$(this).siblings(".popover").on("mouseleave", function() {
+										$(_this).popover('hide');
+									});
+								}).on("mouseleave", function() {
+									var _this = this;
+
+									var check_popover_status = function() {
+										setTimeout(function() {
+											if (!$(".popover:hover").length) {
+												$(_this).popover("hide")
+											} else {
+												check_popover_status();
+											}
+										}, 50);
+									};
+
+									check_popover_status();
+								});
+							});
+						</script>
+					<?php endforeach ?>
+				</div>
+			</div>
+			<div class="card-footer text-muted small bg-transparent">
+				将鼠标悬浮至主分类上，点击弹出框中的对应标签即可将其填充至题目标签中。
+			</div>
+		</div>
+
+		<div class="card mt-3">
+			<div class="card-header fw-bold">
 				题目难度
 			</div>
 			<div class="card-body">
@@ -183,7 +262,6 @@ $difficulty_form->runAtServer();
 			</div>
 		</div>
 	</aside>
-
 </div>
 
 <?php echoUOJPageFooter() ?>

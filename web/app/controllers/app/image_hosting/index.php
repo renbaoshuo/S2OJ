@@ -466,6 +466,10 @@ $pag = new Paginator($pag_config);
 </div>
 
 <script>
+	$(document).ready(function() {
+		[...document.querySelectorAll('[data-bs-toggle="tooltip"]')].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+	});
+
 	var copy_url_toast = new bootstrap.Toast('#copy-url-toast', {
 		delay: 2000
 	});

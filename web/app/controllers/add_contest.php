@@ -79,19 +79,20 @@ $time_form->succ_href = "/contests";
 $time_form->runAtServer();
 ?>
 
-<?php echoUOJPageHeader('添加比赛') ?>
+<?php echoUOJPageHeader(UOJLocale::get('contests::add new contest')) ?>
 
 <div class="row">
 	<!-- left col -->
 	<div class="col-lg-9">
 		<div class="card card-default mb-2">
 			<div class="card-body">
-				<h1 class="card-title">添加比赛</h1>
+				<h1 class="card-title">
+					<?= UOJLocale::get('contests::add new contest') ?>
+				</h1>
 
 				<div class="w-full" style="max-width: 400px">
-					<?php $time_form->printHTML(); ?>
+					<?php $time_form->printHTML() ?>
 				</div>
-
 			</div>
 		</div>
 	</div>
@@ -101,6 +102,7 @@ $time_form->runAtServer();
 	<aside class="col-lg-3 mt-3 mt-lg-0">
 		<?php uojIncludeView('sidebar') ?>
 	</aside>
+	<!-- end right col -->
 </div>
 
 <?php echoUOJPageFooter() ?>

@@ -73,6 +73,9 @@ EOD;
 			])
 		]);
 		dataNewProblem($id);
+
+		redirectTo("/problem/{$id}/manage/statement");
+		die();
 	};
 	$new_problem_form->submit_button_config['align'] = 'right';
 	$new_problem_form->submit_button_config['class_str'] = 'btn btn-primary';

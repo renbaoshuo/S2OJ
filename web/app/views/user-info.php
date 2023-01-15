@@ -21,7 +21,7 @@
 					</span>
 				</h3>
 				<div class="card-text">
-					<?= HTML::purifier_inline()->purify(HTML::parsedown()->line($user['motto'])) ?>
+					<?= HTML::purifier_inline()->purify(HTML::parsedown(['username_with_color' => true])->line($user['motto'])) ?>
 				</div>
 			</div>
 			<ul class="list-group list-group-flush">

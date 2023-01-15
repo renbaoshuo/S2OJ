@@ -210,6 +210,43 @@ class UOJUser {
 		}
 	}
 
+	public static function getRealname($user) {
+		$realname = $user['realname'];
+
+		if ($user['usertype'] == 'teacher') {
+			$realname .= '老师';
+		}
+
+		return $realname;
+	}
+
+	public static function getUserColor($user) {
+		$extra = UOJUser::getExtra($user);
+
+		return UOJUser::getUserColor2($user['usergroup'], $extra['username_color']);
+	}
+
+	public static function getUserColor2($usergroup, $custom_color = null) {
+		if ($usergroup == 'B') {
+			return '#996600';
+		}
+
+		if ($usergroup == 'T') {
+			return '#707070';
+		}
+
+		if ($usergroup == 'S') {
+			return $custom_color ?: '#9d3dcf';
+		}
+
+		// 前管理员设置颜色为紫色的，颜色改为蓝色
+		if ($custom_color == '#9d3dcf') {
+			return '#0d6efd';
+		}
+
+		return $custom_color ?: '#0d6efd';
+	}
+
 	public static function getLink($user) {
 		if (is_string($user)) {
 			$info = UOJUser::query($user);
@@ -221,14 +258,18 @@ class UOJUser {
 			}
 		}
 
-		if ($user['usergroup'] == 'B') {
-			return HTML::tag('a', ['class' => 'text-danger fw-bold', 'href' => "/user/{$user['username']}"], $user['username']);
-		}
+		$realname = UOJUser::getRealname($user);
 
 		// 未登录不可查看真实姓名
-		$realname =  Auth::check() ? $user['realname'] : '';
+		if (!Auth::check()) {
+			$realname = '';
+		}
 
-		return HTML::tag('span', ['class' => 'uoj-username', 'data-realname' => trim(HTML::escape($realname))], $user['username']);
+		return HTML::tag('span', [
+			'class' => 'uoj-username',
+			'data-color' => UOJUser::getUserColor($user),
+			'data-realname' => trim(HTML::escape($realname)),
+		], $user['username']);
 	}
 
 	public static function getUpdatedExtraVisitHistory($history, $cur) {
@@ -290,6 +331,7 @@ class UOJUser {
 			'show_email' => 'all',
 			'show_qq' => 'all',
 			'avatar_source' => 'gravatar',
+			'username_color' => isSuperUser($user) ? '#9d3dcf' : '#0d6efd',
 		]);
 		return $extra;
 	}
@@ -340,6 +382,7 @@ class UOJUser {
 		$extra = UOJUser::getExtra($user);
 		$cur = [
 			'addr' => $info['remote_addr'],
+			'forwarded_addr' => $info['http_x_forwarded_for'],
 			'ua' => substr($info['http_user_agent'], 0, UOJUser::MAX_UA_LEN),
 			'last' => UOJTime::$time_now_str
 		];

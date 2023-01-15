@@ -60,14 +60,6 @@ setWebConf(){
     # Set webroot path
     ln -sf /opt/uoj/web /var/www/uoj
     chown -R www-data /var/www/uoj/app/storage
-    # Set web config file
-    php7.4 -a <<UOJEOF
-\$config = include '/var/www/uoj/app/.default-config.php';
-\$config['database']['host']='$_database_host_';
-\$config['database']['password']='$_database_password_';
-\$config['judger']['socket']['port']='$_judger_socket_port_';
-file_put_contents('/var/www/uoj/app/.config.php', "<?php\nreturn ".str_replace('\'_httpHost_\'','UOJContext::requestDomain()',var_export(\$config, true)).";\n");
-UOJEOF
     # Prepare local sandbox
     cd /opt/uoj/judger/uoj_judger
     cat >include/uoj_work_path.h <<UOJEOF
@@ -84,9 +76,6 @@ initProgress(){
     #Set uoj_data path
     mkdir -p /var/uoj_data/upload
     chown -R www-data:www-data /var/uoj_data
-    #Replace password placeholders
-    sed -i -e "s/salt0/$_salt0_/g" -e "s/salt1/$_salt1_/g" -e "s/salt2/$_salt2_/g" -e "s/salt3/$_salt3_/g" -e "s/_judger_socket_password_/$_judger_socket_password_/g" /var/www/uoj/app/.config.php
-	sed -i -e "s/'protocol' => 'http'/'protocol' => '$_uoj_protocol_'/g" /var/www/uoj/app/.config.php
     #Start services
     service ntp restart
     service apache2 restart

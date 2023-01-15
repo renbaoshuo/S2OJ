@@ -1,6 +1,6 @@
 <?php
 $purifier = HTML::purifier_inline();
-$parsedown = HTML::parsedown();
+$parsedown = HTML::parsedown(['username_with_color' => true]);
 ?>
 
 <?php if (Auth::check()) : ?>

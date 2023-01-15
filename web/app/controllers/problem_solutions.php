@@ -101,6 +101,29 @@ if (UOJProblem::cur()->userCanManage(Auth::user()) || UOJProblem::cur()->userPer
 		]);
 	};
 	$add_new_solution_form->runAtServer();
+
+	if (UOJUser::checkPermission(Auth::user(), 'blogs.create')) {
+		$quick_add_new_solution_form = new UOJForm('quick_add_new_solution');
+		$quick_add_new_solution_form->config['submit_container']['class'] = '';
+		$quick_add_new_solution_form->config['submit_button']['class'] = 'btn btn-link text-decoration-none p-0';
+		$quick_add_new_solution_form->config['submit_button']['text'] = '快速新建文章';
+		$quick_add_new_solution_form->handle = function () {
+			DB::insert([
+				"insert into blogs",
+				"(title, content, content_md, poster, is_hidden, post_time, active_time)",
+				"values", DB::tuple([
+					'【题解】' . UOJProblem::cur()->getTitle(), '', '',
+					Auth::id(), false, DB::now(), DB::now()
+				])
+			]);
+
+			$blog_id = DB::insert_id();
+
+			redirectTo(HTML::blog_url(Auth::id(), "/post/{$blog_id}/write"));
+			die();
+		};
+		$quick_add_new_solution_form->runAtServer();
+	}
 }
 
 $pag_config = [
@@ -262,18 +285,16 @@ $pag = new Paginator($pag_config);
 					您当前无法为本题新增题解。
 				<?php endif ?>
 			</div>
-			<div class="card-footer bg-transparent">
-				<a target="_blank" class="text-decoration-none" href="<?= HTML::blog_url(Auth::id(), '/post/new/write?title=' . urlencode('【题解】#' . UOJProblem::info('id') . '. ' . UOJProblem::info('title')) . '&is_hidden=0') ?>">
-					快速新建文章
-				</a>
-				<div class="small text-muted mt-1">发布文章后，请返回本页输入博客 ID</div>
-			</div>
+			<?php if (isset($quick_add_new_solution_form)) : ?>
+				<div class="card-footer bg-transparent">
+					<?php $quick_add_new_solution_form->printHTML() ?>
+				</div>
+			<?php endif ?>
 		</div>
 
-		<?php uojIncludeView('sidebar'); ?>
-		<!-- End right col -->
+		<?php uojIncludeView('sidebar') ?>
 	</aside>
-
+	<!-- end right col -->
 </div>
 
 <?php echoUOJPageFooter() ?>

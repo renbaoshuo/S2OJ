@@ -266,6 +266,43 @@ EOD);
 			},
 		]
 	);
+	if ($user['usergroup'] == 'B') {
+		$update_profile_form->appendHTML(<<<EOD
+			<div class="mb-3">
+				<label for="input-username_color" class="form-label">用户名颜色</label>
+				<input type="text" class="form-control" id="input-username_color" aria-describedby="help-username_color" value="棕色 - #996600" disabled>
+				<div id="help-username_color" class="form-text">被封禁的用户无法修改用户名颜色。</div>
+			</div>
+		EOD);
+	} else if ($user['usergroup'] == 'T') {
+		$update_profile_form->appendHTML(<<<EOD
+			<div class="mb-3">
+				<label for="input-username_color" class="form-label">用户名颜色</label>
+				<input type="text" class="form-control" id="input-username_color" aria-describedby="help-username_color" value="灰色 - #707070" disabled>
+				<div id="help-username_color" class="form-text">临时用户无法修改用户名颜色。</div>
+			</div>
+		EOD);
+	} else {
+		$additional_colors = [];
+
+		if (isSuperUser($user)) {
+			$additional_colors['#9d3dcf'] = '紫色 - #9d3dcf';
+		}
+
+		$update_profile_form->addSelect('username_color', [
+			'div_class' => 'mb-3',
+			'label' => '用户名颜色',
+			'default_value' => $extra['username_color'],
+			'options' => $additional_colors + [
+				'#0d6efd' => '蓝色 - #0d6efd',
+				'#2da44e' => '绿色 - #2da44e',
+				'#e85aad' => '粉色 - #e85aad',
+				'#f32a38' => '红色 - #f32a38',
+				'#f57c00' => '橙色 - #f57c00',
+				'#00acc1' => '青色 - #00acc1',
+			],
+		]);
+	}
 	$update_profile_form->handle = function (&$vdata) use ($user) {
 		$data = [
 			'email' => $vdata['email'],
@@ -301,7 +338,9 @@ EOD);
 					'$.social.codeforces',
 					$vdata['codeforces'],
 					'$.social.website',
-					$vdata['website']
+					$vdata['website'],
+					'$.username_color',
+					$_POST['username_color']
 				),
 			],
 			"where", ["username" => $user['username']]
@@ -376,6 +415,17 @@ EOD);
 	}
 	$update_user_permissions_form->appendHTML(HTML::tag('span', [], UOJLocale::get('user::user group')));
 	$update_user_permissions_form->appendHTML(HTML::tag('span', ['class' => 'd-inline-block ms-3'], $type_text));
+	$update_user_permissions_form->addSelect('user_type', [
+		'label' => '账号类型',
+		'options' => [
+			'student' => '学生',
+			'teacher' => '老师',
+			'system' => '系统',
+		],
+		'div_class' => 'my-3 row gy-2 gx-3 align-items-center',
+		'label_class' => 'form-label col-auto',
+		'select_class' => 'form-select w-auto col-auto',
+	]);
 	$update_user_permissions_form->appendHTML(HTML::tag('h3', ['class' => 'h5 mt-3'], '题目'));
 	$update_user_permissions_form->addCheckbox('problems__view', [
 		'checked' => $extra['permissions']['problems']['view'],
@@ -707,6 +757,7 @@ EOD);
 		DB::update([
 			"update user_info",
 			"set", [
+				"usertype" => $_POST['user_type'],
 				"extra" => json_encode($extra),
 			],
 			"where", [

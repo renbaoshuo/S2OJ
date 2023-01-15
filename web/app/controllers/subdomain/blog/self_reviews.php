@@ -32,7 +32,7 @@ $header_row .= '<th style="width:35em">' . UOJLocale::get('contests::problem sel
 $header_row .= '<th style="width:35em">' . UOJLocale::get('contests::contest self review') . '</th>';
 $header_row .= '</tr>';
 
-$parsedown = HTML::parsedown();
+$parsedown = HTML::parsedown(['username_with_color' => true]);
 $purifier = HTML::purifier_inline();
 
 $print_row = function ($row) use ($parsedown, $purifier) {

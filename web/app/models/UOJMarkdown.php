@@ -1,9 +1,11 @@
 <?php
 class UOJMarkdown extends ParsedownMath {
 	public function __construct($options = '') {
-		if (method_exists(get_parent_class(),"__construct")) {
+		if (method_exists(get_parent_class(), "__construct")) {
 			parent::__construct($options);
 		}
+
+		$this->options['username_with_color'] = $options['username_with_color'] ?: false;
 
 		// https://gist.github.com/ShNURoK42/b5ce8baa570975db487c
 		$this->InlineTypes['@'][] = 'UserMention';
@@ -19,18 +21,18 @@ class UOJMarkdown extends ParsedownMath {
 	}
 
 	// https://github.com/taufik-nurrohman/parsedown-extra-plugin/blob/1653418c5a9cf5277cd28b0b23ba2d95d18e9bc4/ParsedownExtraPlugin.php#L347-L358
-    protected function doGetContent($Element) {
-    	if (isset($Element['text'])) {
-    		return $Element['text'];
-    	}
-    	if (isset($Element['rawHtml'])) {
-    		return $Element['rawHtml'];
-    	}
-    	if (isset($Element['handler']['argument'])) {
-    		return implode("\n", (array) $Element['handler']['argument']);
-    	}
-    	return null;
-    }
+	protected function doGetContent($Element) {
+		if (isset($Element['text'])) {
+			return $Element['text'];
+		}
+		if (isset($Element['rawHtml'])) {
+			return $Element['rawHtml'];
+		}
+		if (isset($Element['handler']['argument'])) {
+			return implode("\n", (array) $Element['handler']['argument']);
+		}
+		return null;
+	}
 
 	// https://github.com/taufik-nurrohman/parsedown-extra-plugin/blob/1653418c5a9cf5277cd28b0b23ba2d95d18e9bc4/ParsedownExtraPlugin.php#L369-L378
 	protected function doSetAttributes(&$Element, $From, $Args = array()) {
@@ -52,27 +54,35 @@ class UOJMarkdown extends ParsedownMath {
 	}
 
 	// https://gist.github.com/ShNURoK42/b5ce8baa570975db487c
-    protected function inlineUserMention($Excerpt) {
-    	if (preg_match('/^@([^\s]+)/', $Excerpt['text'], $matches)) {
-    		if (($user = UOJUser::query($matches[1])) && $user['usergroup'] != 'B') {
-    			return [
-    				'extent' => strlen($matches[0]),
-    				'element' => [
-    					'name' => 'span',
-    					'text' => '@' . $user['username'],
-    					'attributes' => [
-    						'class' => 'uoj-username',
-    						'data-realname' => $user['realname'],
-							'data-uoj-username' => 1,
-    					],
-    				],
-    			];
-    		}
+	protected function inlineUserMention($Excerpt) {
+		if (preg_match('/^@([^\s]+)/', $Excerpt['text'], $matches)) {
+			$mentioned_user = UOJUser::query($matches[1]);
 
-    		return [
-    			'extent' => strlen($matches[0]),
-    			'markup' => $matches[0],
-    		];
-    	}
-    }
+			if ($mentioned_user) {
+				$color = '#0d6efd';
+
+				if ($this->options['username_with_color']) {
+					$color = UOJUser::getUserColor($mentioned_user);
+				}
+
+				return [
+					'extent' => strlen($matches[0]),
+					'element' => [
+						'name' => 'span',
+						'text' => '@' . $mentioned_user['username'],
+						'attributes' => [
+							'class' => 'uoj-username',
+							'data-realname' => UOJUser::getRealname($mentioned_user),
+							'data-color' => $color,
+						],
+					],
+				];
+			}
+
+			return [
+				'extent' => strlen($matches[0]),
+				'markup' => $matches[0],
+			];
+		}
+	}
 }

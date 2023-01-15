@@ -1009,62 +1009,6 @@ function echoUOJPageFooter($config = array()) {
 	uojIncludeView('page-footer', $config);
 }
 
-function echoRanklist($config = []) {
-	$header_row = '';
-	$header_row .= '<tr>';
-	$header_row .= '<th style="width: 5em;">#</th>';
-	$header_row .= '<th style="width: 14em;">' . UOJLocale::get('username') . '</th>';
-	$header_row .= '<th style="width: 50em;">' . UOJLocale::get('motto') . '</th>';
-	$header_row .= '<th style="width: 5em;">' . UOJLocale::get('solved') . '</th>';
-	$header_row .= '</tr>';
-
-	$parsedown = HTML::parsedown();
-	$purifier = HTML::purifier_inline();
-	$users = [];
-	$print_row = function ($user, $now_cnt) use (&$users, $config, $purifier, $parsedown) {
-		if (!$users) {
-			if ($now_cnt == 1) {
-				$rank = 1;
-			} else {
-				$rank = DB::selectCount("select count(*) from (select b.username as username, count(*) as accepted from best_ac_submissions a inner join user_info b on a.submitter = b.username group by username) as derived where accepted > {$user['ac_num']}") + 1;
-			}
-		} else {
-			$rank = $now_cnt;
-		}
-
-		$user['rank'] = $rank;
-
-		echo '<tr>';
-		echo '<td>' . $user['rank'] . '</td>';
-		echo '<td>' . UOJUser::getLink($user['username']) . '</td>';
-		echo "<td>";
-		echo $purifier->purify($parsedown->line($user['motto']));
-		echo "</td>";
-		echo '<td>' . $user['ac_num'] . '</td>';
-		echo '</tr>';
-
-		$users[] = $user;
-	};
-
-	$from = 'user_info';
-	$col_names = ['user_info.username as username', 'ac_num', 'motto'];
-	$cond = '1';
-	$tail = 'group by user_info.username order by ac_num desc, user_info.username asc';
-
-	if (isset($config['group_id'])) {
-		$group_id = $config['group_id'];
-		$from = "user_info inner join groups_users on (user_info.username = groups_users.username and groups_users.group_id = {$group_id})";
-		$config['pagination_cond'] = "group_id = {$group_id}";
-	}
-
-	if (isset($config['top10'])) {
-		$tail .= ' limit 10';
-	}
-
-	$config['get_row_index'] = '';
-	echoLongTable($col_names, $from, $cond, $tail, $header_row, $print_row, $config);
-}
-
 // ===== uoj.ac =====
 
 function echoJudgmentDetails($raw_details, $styler, $name) {

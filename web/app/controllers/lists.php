@@ -9,16 +9,28 @@ Auth::check() || redirectToLogin();
 UOJUser::checkPermission(Auth::user(), 'lists.view') || UOJResponse::page403();
 
 if (UOJList::userCanCreateList(Auth::user())) {
-	$new_list_form = new UOJBs4Form('new_list');
+	$new_list_form = new UOJForm('new_list');
 	$new_list_form->handle = function () {
-		DB::insert("insert into lists (title, is_hidden) values ('未命名题单', 1)");
-		$id = DB::insert_id();
-		DB::insert("insert into lists_contents (id, content, content_md) values ($id, '', '')");
+		DB::insert([
+			"insert into lists",
+			DB::bracketed_fields(['title', 'is_hidden']),
+			"values",
+			DB::tuple(['未命名题单', 1]),
+		]);
+		$list_id = DB::insert_id();
+		DB::insert([
+			"insert into lists_contents",
+			DB::bracketed_fields(['id', 'content', 'content_md']),
+			"values",
+			DB::tuple([$list_id, '', '']),
+		]);
+		redirectTo("/list/{$list_id}");
+		die();
 	};
-	$new_list_form->submit_button_config['align'] = 'right';
-	$new_list_form->submit_button_config['class_str'] = 'btn btn-primary';
-	$new_list_form->submit_button_config['text'] = UOJLocale::get('problems::add new list');
-	$new_list_form->submit_button_config['smart_confirm'] = '';
+	$new_list_form->config['submit_container']['class'] = 'text-end';
+	$new_list_form->config['submit_button']['class'] = 'btn btn-primary';
+	$new_list_form->config['submit_button']['text'] = UOJLocale::get('problems::add new list');
+	$new_list_form->config['confirm']['smart'] = true;
 	$new_list_form->runAtServer();
 }
 

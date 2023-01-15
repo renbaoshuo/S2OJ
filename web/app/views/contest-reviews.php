@@ -1,7 +1,7 @@
 <?php
 $reviews = [];
 
-$parsedown = HTML::parsedown();
+$parsedown = HTML::parsedown(['username_with_color' => true]);
 $purifier = HTML::purifier_inline();
 
 foreach ($contest_data['people'] as $person) {

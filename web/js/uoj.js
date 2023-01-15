@@ -118,40 +118,50 @@ function getColOfScore(score) {
 	}
 }
 
-function getUserLink(username, realname) {
+function getUserLink(username, realname, color) {
 	if (!username) {
 		return '';
 	}
 	var text = username;
+	var style = '';
 	if (username.charAt(0) == '@') {
 		username = username.substr(1);
 	}
 	if (realname) {
 		text = text + ' <span class="uoj-realname d-inline-block">(' + realname + ')</span>';
 	}
-	return '<a class="uoj-username" href="' + uojHome + '/user/' + username + '">' + text + '</a>';
+	if (color) {
+		style += 'color: ' + color + ';';
+	}
+	return '<a class="uoj-username" href="' + uojHome + '/user/' + username + '" ' + 'style="' + style + '">' + text + '</a>';
 }
-function getUserSpan(username, realname) {
+function getUserSpan(username, realname, color) {
 	if (!username) {
 		return '';
 	}
 	var text = username;
+	var style = '';
 	if (username.charAt(0) == '@') {
 		username = username.substr(1);
 	}
 	if (realname) {
 		text = text + ' <span class="uoj-realname d-inline-block">(' + realname + ')</span>';
 	}
-	return '<span class="uoj-username">' + text + '</span>';
+	if (color) {
+		style += 'color: ' + color + ';';
+	}
+	return '<span class="uoj-username" ' + 'style="' + style + '">' + text + '</span>';
 }
 
 function replaceWithHighlightUsername() {
 	var username = $(this).text();
 	var realname = $(this).data("realname");
+	var color = $(this).data("color");
+
 	if ($(this).data("link") != 0) {
-		$(this).replaceWith(getUserLink(username, realname));
+		$(this).replaceWith(getUserLink(username, realname, color));
 	} else {
-		$(this).replaceWith(getUserSpan(username, realname));
+		$(this).replaceWith(getUserSpan(username, realname, color));
 	}
 }
 
@@ -1082,7 +1092,7 @@ function showCommentReplies(id, replies) {
 		function(reply) {
 			return $('<tr id="' + 'comment-' + reply.id + '" />').append(
 				$('<td />').append(
-					$('<div class="comtbox6">' + getUserLink(reply.poster, reply.poster_realname) + '：' + reply.content + '</div>')
+					$('<div class="comtbox6">' + getUserLink(reply.poster, reply.poster_realname, reply.poster_username_color) + '：' + reply.content + '</div>')
 				).append(
 					$('<ul class="' + (isBootstrap5Page ? 'text-end mb-0' : 'text-right bot-buffer-no') + ' list-inline" />').append(
 						'<li>' + '<small class="text-muted">' + reply.post_time + '</small>' + '</li>'
@@ -1103,3 +1113,49 @@ function showCommentReplies(id, replies) {
 		}
 	);
 }
+
+// Tooltip
+$(document).ready(function() {
+	[...document.querySelectorAll('[data-bs-toggle="tooltip"]')].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+});
+
+// Popovers
+$(document).ready(function() {
+	[...document.querySelectorAll('[data-bs-toggle="popover"]')].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+});
+
+// Copy button
+$(document).ready(function() {
+	$('.markdown-body pre, .copy-button-container pre').each(function () {
+		var thisEl = $(this);
+
+		$(this).wrap(
+			$('<div class="wrapped-copy-button-container" style="position: relative;"></div>')
+		).parent().prepend(
+			$(
+				'<div style="position: absolute; right: 0; top: 0; margin-top: 0.75rem; margin-right: 0.75rem; font-size: 0.85em;"></div>'
+			).append(
+				$('<button style="position: relative; background: transparent; border: 0;"></button>')
+					.click(function () {
+						navigator.clipboard
+							.writeText($(thisEl).text())
+							.then(() => {
+								$(this).html('<i class="bi bi-check2 text-success"></i>');
+	
+								setTimeout(() => {
+									$(this).html('<i class="bi bi-clipboard text-muted"></i>');
+								}, 1000);
+							})
+							.catch(() => {
+								$(this).html('<i class="bi bi-x-lg text-danger"></i>');
+	
+								setTimeout(() => {
+									$(this).html('<i class="bi bi-clipboard text-muted"></i>');
+								}, 1000);
+							});
+					})
+					.append('<i class="bi bi-clipboard text-muted"></i>')
+			)
+		);
+	});	
+});

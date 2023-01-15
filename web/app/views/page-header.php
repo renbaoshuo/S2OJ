@@ -102,6 +102,9 @@ if (!isset($ShowPageHeader)) {
 	<!-- Color converter -->
 	<?= HTML::js_src('/js/color-converter.min.js') ?>
 
+	<!-- Clipboard Polyfill -->
+	<?= HTML::js_src('/js/clipboard-polyfill.overwrite-globals.es5.min.js') ?>
+
 	<!-- uoj -->
 	<?= HTML::js_src('/js/uoj.js?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
 
@@ -175,7 +178,7 @@ if (!isset($ShowPageHeader)) {
 				}
 			};
 		</script>
-		<script id="MathJax-script" src="<?= HTML::url('/lib/MathJax/tex-mml-chtml.js') ?>"></script>
+		<script id="MathJax-script" src="<?= HTML::url('/js/mathjax3/tex-mml-chtml.js') ?>"></script>
 	<?php endif ?>
 
 	<?php if (isset($REQUIRE_LIB['jquery.form'])) : ?>

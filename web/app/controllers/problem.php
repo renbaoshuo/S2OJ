@@ -100,7 +100,7 @@ if (UOJContest::cur()) {
 
 $submission_requirement = UOJProblem::cur()->getSubmissionRequirement();
 $custom_test_requirement = UOJProblem::cur()->getCustomTestRequirement();
-$custom_test_enabled = false; // $custom_test_requirement && $pre_submit_check_ret === true;
+$custom_test_enabled = $custom_test_requirement && $pre_submit_check_ret === true;
 
 function handleUpload($zip_file_name, $content, $tot_size) {
 	global $is_participating;
@@ -193,7 +193,7 @@ if ($pre_submit_check_ret === true && !$no_more_submission) {
 			'FS::randomAvailableSubmissionFileName',
 			'handleUpload'
 		);
-		$zip_answer_form->extra_validators[] = $submission_extra_validator;
+		$zip_answer_form->extra_validator = $submission_extra_validator;
 		$zip_answer_form->succ_href = $is_participating ? '/contest/' . UOJContest::info('id') . '/submissions' : '/submissions';
 		$zip_answer_form->runAtServer();
 	}
@@ -385,46 +385,64 @@ if (UOJContest::cur()) {
 		<div class="card mb-2">
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span class="flex-shrink-0">上传者</span>
-					<span><?= UOJProblem::cur()->getUploaderLink() ?></span>
+					<span class="flex-shrink-0">
+						<?= UOJLocale::get('problems::uploader') ?>
+					</span>
+					<span>
+						<?= UOJProblem::cur()->getUploaderLink() ?>
+					</span>
 				</li>
-				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span class="flex-shrink-0">难度</span>
-					<span><?= UOJProblem::cur()->getDifficultyHTML() ?></span>
-				</li>
-				<?php if (Auth::check()) : ?>
+				<?php if (!UOJContest::cur() || UOJContest::cur()->progress() >= CONTEST_FINISHED) : ?>
 					<li class="list-group-item d-flex justify-content-between align-items-center">
-						<span class="flex-shrink-0">历史分数</span>
-						<?php $his_score = DB::selectSingle(["select max(score)", "from submissions", "where", ["problem_id" => UOJProblem::info('id'), "submitter" => Auth::id()]]) ?>
+						<span class="flex-shrink-0">
+							<?= UOJLocale::get('problems::difficulty') ?>
+						</span>
+						<span>
+							<?= UOJProblem::cur()->getDifficultyHTML() ?>
+						</span>
+					</li>
+					<?php if (Auth::check()) : ?>
+						<li class="list-group-item d-flex justify-content-between align-items-center">
+							<span class="flex-shrink-0">
+								<?= UOJLocale::get('problems::historical score') ?>
+							</span>
+							<?php $his_score = DB::selectSingle(["select max(score)", "from submissions", "where", ["problem_id" => UOJProblem::info('id'), "submitter" => Auth::id()]]) ?>
 
-						<a class="<?= is_null($his_score) ? '' : 'uoj-score' ?>" href="<?= HTML::url('/submissions', ['params' => ['problem_id' => UOJProblem::info('id'), 'submitter' => Auth::id()]]) ?>">
-							<?= is_null($his_score) ? '无' : $his_score ?>
-						</a>
+							<a class="<?= is_null($his_score) ? '' : 'uoj-score' ?>" href="<?= HTML::url('/submissions', ['params' => ['problem_id' => UOJProblem::info('id'), 'submitter' => Auth::id()]]) ?>">
+								<?= is_null($his_score) ? '无' : $his_score ?>
+							</a>
+						</li>
+					<?php endif ?>
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						<span class="flex-shrink-0">
+							<?= UOJLocale::get('problems::tags') ?>
+						</span>
+						<span>
+							<?php if (UOJProblem::info('is_hidden')) : ?>
+								<a href="<?= HTML::url('/problems', ['params' => ['is_hidden' => 'on']]) ?>">
+									<span class="badge text-bg-danger">
+										<i class="bi bi-eye-slash-fill"></i>
+										<?= UOJLocale::get('hidden') ?>
+									</span>
+								</a>
+							<?php endif ?>
+							<?php foreach (UOJProblem::cur()->queryTags() as $tag) : ?>
+								<?= HTML::tag(
+									'a',
+									['class' => 'uoj-problem-tag'],
+									HTML::tag('span', ['class' => 'badge bg-secondary'], HTML::escape($tag))
+								) ?>
+							<?php endforeach ?>
+						</span>
 					</li>
 				<?php endif ?>
 				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span class="flex-shrink-0">标签</span>
-					<span>
-						<?php if (UOJProblem::info('is_hidden')) : ?>
-							<a href="<?= HTML::url('/problems', ['params' => ['is_hidden' => 'on']]) ?>">
-								<span class="badge text-bg-danger">
-									<i class="bi bi-eye-slash-fill"></i>
-									<?= UOJLocale::get('hidden') ?>
-								</span>
-							</a>
-						<?php endif ?>
-						<?php foreach (UOJProblem::cur()->queryTags() as $tag) : ?>
-							<?= HTML::tag(
-								'a',
-								['class' => 'uoj-problem-tag'],
-								HTML::tag('span', ['class' => 'badge bg-secondary'], HTML::escape($tag))
-							) ?>
-						<?php endforeach ?>
+					<span class="flex-shrink-0">
+						<?= UOJLocale::get('appraisal') ?>
 					</span>
-				</li>
-				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span class="flex-shrink-0">评价</span>
-					<span><?= UOJProblem::cur()->getZanBlock() ?></span>
+					<span>
+						<?= UOJProblem::cur()->getZanBlock() ?>
+					</span>
 				</li>
 			</ul>
 		</div>
