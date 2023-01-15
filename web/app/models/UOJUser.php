@@ -382,6 +382,7 @@ class UOJUser {
 		$extra = UOJUser::getExtra($user);
 		$cur = [
 			'addr' => $info['remote_addr'],
+			'forwarded_addr' => $info['http_x_forwarded_for'],
 			'ua' => substr($info['http_user_agent'], 0, UOJUser::MAX_UA_LEN),
 			'last' => UOJTime::$time_now_str
 		];
