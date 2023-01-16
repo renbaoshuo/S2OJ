@@ -83,13 +83,11 @@ if ($cur_tab == 'index') {
 		"order by level desc, important_blogs.blog_id desc",
 	]);
 
-	$add_announcement_form = new UOJBs4Form('add_announcement');
-	$add_announcement_form->addInput(
-		'blog_id',
-		'text',
-		'博客 ID',
-		'',
-		function ($id, &$vdata) {
+	$add_announcement_form = new UOJForm('add_announcement');
+	$add_announcement_form->addInput('blog_id', [
+		'div_class' => 'col-auto',
+		'label' => '博客 ID',
+		'validator_php' => function ($id, &$vdata) {
 			if (!validateUInt($id)) {
 				return '博客 ID 无效';
 			}
@@ -102,14 +100,12 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$add_announcement_form->addInput(
-		'blog_level',
-		'text',
-		'置顶级别',
-		'0',
-		function ($x, &$vdata) {
+	]);
+	$add_announcement_form->addInput('blog_level', [
+		'div_class' => 'col-auto',
+		'label' => '置顶级别',
+		'default_value' => '0',
+		'validator_php' => function ($x, &$vdata) {
 			if (!validateUInt($x)) {
 				return '数字不合法';
 			}
@@ -122,8 +118,7 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
+	]);
 	$add_announcement_form->handle = function (&$vdata) {
 		$blog_id = $vdata['blog_id'];
 		$blog_level = $vdata['level'];
@@ -152,8 +147,9 @@ if ($cur_tab == 'index') {
 			]);
 		}
 	};
-	$add_announcement_form->submit_button_config['align'] = 'compressed';
-	$add_announcement_form->submit_button_config['text'] = '提交';
+	$add_announcement_form->config['form']['class'] = 'row gy-2 gx-3 align-items-end';
+	$add_announcement_form->config['submit_container']['class'] = 'col-auto';
+	$add_announcement_form->config['submit_button']['text'] = '提交';
 	$add_announcement_form->succ_href = '/super_manage/index#announcements';
 	$add_announcement_form->runAtServer();
 
@@ -183,13 +179,11 @@ if ($cur_tab == 'index') {
 		"order by end_time asc",
 	]);
 
-	$add_countdown_form = new UOJBs4Form('add_countdown');
-	$add_countdown_form->addInput(
-		'countdown_title',
-		'text',
-		'标题',
-		'',
-		function ($title, &$vdata) {
+	$add_countdown_form = new UOJForm('add_countdown');
+	$add_countdown_form->addInput('countdown_title', [
+		'div_class' => 'col-auto',
+		'label' => '标题',
+		'validator_php' => function ($title, &$vdata) {
 			if ($title == '') {
 				return '标题不能为空';
 			}
@@ -198,14 +192,12 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$add_countdown_form->addInput(
-		'countdown_end_time',
-		'text',
-		'结束时间',
-		date("Y-m-d H:i:s"),
-		function ($end_time, &$vdata) {
+	]);
+	$add_countdown_form->addInput('countdown_end_time', [
+		'div_class' => 'col-auto',
+		'label' => '结束时间',
+		'default_value' => UOJTime::$time_now_str,
+		'validator_php' => function ($end_time, &$vdata) {
 			try {
 				$vdata['end_time'] = new DateTime($end_time);
 			} catch (Exception $e) {
@@ -214,8 +206,7 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
+	]);
 	$add_countdown_form->handle = function (&$vdata) {
 		DB::insert([
 			"insert into countdowns",
@@ -224,8 +215,9 @@ if ($cur_tab == 'index') {
 			DB::tuple([$vdata['title'], $vdata['end_time']->format('Y-m-d H:i:s')]),
 		]);
 	};
-	$add_countdown_form->submit_button_config['align'] = 'compressed';
-	$add_countdown_form->submit_button_config['text'] = '添加';
+	$add_countdown_form->config['form']['class'] = 'row gy-2 gx-3 align-items-end';
+	$add_countdown_form->config['submit_container']['class'] = 'col-auto';
+	$add_countdown_form->config['submit_button']['text'] = '添加';
 	$add_countdown_form->succ_href = '/super_manage/index#countdowns';
 	$add_countdown_form->runAtServer();
 
@@ -255,13 +247,11 @@ if ($cur_tab == 'index') {
 		"order by level desc, id asc",
 	]);
 
-	$add_link_form = new UOJBs4Form('add_link');
-	$add_link_form->addInput(
-		'link_title',
-		'text',
-		'标题',
-		'',
-		function ($title, &$vdata) {
+	$add_link_form = new UOJForm('add_link');
+	$add_link_form->addInput('link_title', [
+		'div_class' => 'col-auto',
+		'label' => '标题',
+		'validator_php' => function ($title, &$vdata) {
 			if ($title == '') {
 				return '标题不能为空';
 			}
@@ -270,14 +260,11 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$add_link_form->addInput(
-		'link_url',
-		'text',
-		'链接',
-		'',
-		function ($url, &$vdata) {
+	]);
+	$add_link_form->addInput('link_url', [
+		'div_class' => 'col-auto',
+		'label' => '链接',
+		'validator_php' => function ($url, &$vdata) {
 			if (!validateURL($url)) {
 				return '链接不合法';
 			}
@@ -286,14 +273,12 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$add_link_form->addInput(
-		'link_level',
-		'text',
-		'权重',
-		'10',
-		function ($level, &$vdata) {
+	]);
+	$add_link_form->addInput('link_level', [
+		'div_class' => 'col-auto',
+		'label' => '权重',
+		'default_value' => '10',
+		'validator_php' => function ($level, &$vdata) {
 			if (!validateUInt($level)) {
 				return '数字不合法';
 			}
@@ -302,8 +287,7 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
+	]);
 	$add_link_form->handle = function (&$vdata) {
 		DB::insert([
 			"insert into friend_links",
@@ -312,8 +296,9 @@ if ($cur_tab == 'index') {
 			DB::tuple([$vdata['title'], $vdata['url'], $vdata['level']]),
 		]);
 	};
-	$add_link_form->submit_button_config['align'] = 'compressed';
-	$add_link_form->submit_button_config['text'] = '添加';
+	$add_link_form->config['form']['class'] = 'row gy-2 gx-3 align-items-end';
+	$add_link_form->config['submit_container']['class'] = 'col-auto';
+	$add_link_form->config['submit_button']['text'] = '添加';
 	$add_link_form->succ_href = '/super_manage/index#links';
 	$add_link_form->runAtServer();
 } elseif ($cur_tab == 'users') {
