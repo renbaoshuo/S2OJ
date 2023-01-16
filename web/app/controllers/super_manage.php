@@ -953,38 +953,36 @@ if ($cur_tab == 'index') {
 	$custom_test_deleter->config['submit_container']['class'] = 'col-auto';
 	$custom_test_deleter->runAtServer();
 } elseif ($cur_tab == 'judger') {
-	$judger_adder = new UOJBs4Form('judger_adder');
-	$judger_adder->addInput(
-		'judger_adder_name',
-		'text',
-		'评测机名称',
-		'',
-		function ($x, &$vdata) {
+	$judger_adder = new UOJForm('judger_adder');
+	$judger_adder->addInput('judger_adder_name', [
+		'div_class' => 'col-auto',
+		'label' => '评测机名称',
+		'validator_php' => function ($x, &$vdata) {
 			if (!validateUsername($x)) {
 				return '不合法';
 			}
+
 			if (DB::selectCount("select count(*) from judger_info where judger_name='$x'") != 0) {
 				return '不合法';
 			}
+
 			$vdata['name'] = $x;
+
 			return '';
 		},
-		null
-	);
+	]);
 	$judger_adder->handle = function (&$vdata) {
 		$password = uojRandString(32);
-		DB::insert("insert into judger_info (judger_name,password) values('{$vdata['name']}','{$password}')");
+		DB::insert("insert into judger_info (judger_name, password) values('{$vdata['name']}', '{$password}')");
 	};
-	$judger_adder->submit_button_config['align'] = 'compressed';
+	$judger_adder->config['form']['class'] = 'row gy-2 gx-3 align-items-end';
+	$judger_adder->config['submit_container']['class'] = 'col-auto';
 	$judger_adder->runAtServer();
 
-	$judger_deleter = new UOJBs4Form('judger_deleter');
-	$judger_deleter->addInput(
-		'judger_deleter_name',
-		'text',
-		'评测机名称',
-		'',
-		function ($x, &$vdata) {
+	$judger_deleter = new UOJForm('judger_deleter');
+	$judger_deleter->addInput('judger_deleter_name', [
+		'div_class' => 'col-auto',
+		'label' => '评测机名称', 'validator_php' => function ($x, &$vdata) {
 			if (!validateUsername($x)) {
 				return '不合法';
 			}
@@ -994,12 +992,12 @@ if ($cur_tab == 'index') {
 			$vdata['name'] = $x;
 			return '';
 		},
-		null
-	);
+	]);
 	$judger_deleter->handle = function (&$vdata) {
 		DB::delete("delete from judger_info where judger_name='{$vdata['name']}'");
 	};
-	$judger_deleter->submit_button_config['align'] = 'compressed';
+	$judger_deleter->config['form']['class'] = 'row gy-2 gx-3 align-items-end';
+	$judger_deleter->config['submit_container']['class'] = 'col-auto';
 	$judger_deleter->runAtServer();
 } elseif ($cur_tab == 'image_hosting') {
 	if (isset($_POST['submit-delete_image']) && $_POST['submit-delete_image'] == 'delete_image') {
