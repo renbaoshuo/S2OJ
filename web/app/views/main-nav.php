@@ -135,20 +135,6 @@ mb-4" role="navigation">
 						<?= UOJLocale::get('help') ?>
 					</a>
 				</li>
-				<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-					<li class="nav-item">
-						<a class="nav-link" href="#" id="try-bs5">
-							<span class="glyphicon glyphicon-share"></span>
-							体验新版
-						</a>
-						<script>
-							$('#try-bs5').click(function() {
-								$.removeCookie('bootstrap4', { path: '/' });
-								location.reload();
-							});
-						</script>
-					</li>
-				<?php endif ?>
 			</ul>
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 			<hr class="d-md-none text-muted">

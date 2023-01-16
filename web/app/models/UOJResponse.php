@@ -5,6 +5,7 @@ class UOJResponse {
 		if (UOJContext::isAjax()) {
 			die($msg);
 		} else {
+			requireLib('bootstrap5');
 			echoUOJPageHeader($title);
 			echo $msg;
 			echoUOJPageFooter();
