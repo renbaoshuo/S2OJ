@@ -924,30 +924,33 @@ if ($cur_tab == 'index') {
 		'page_len' => 10
 	]);
 
-	$custom_test_deleter = new UOJBs4Form('custom_test_deleter');
-	$custom_test_deleter->addInput(
-		'last',
-		'text',
-		'删除末尾记录',
-		'5',
-		function ($x, &$vdata) {
+	$custom_test_deleter = new UOJForm('custom_test_deleter');
+	$custom_test_deleter->addInput('last', [
+		'div_class' => 'col-auto',
+		'label' => '删除末尾记录',
+		'default_value' => '5',
+		'validator_php' => function ($x, &$vdata) {
 			if (!validateUInt($x)) {
 				return '不合法';
 			}
+
 			$vdata['last'] = $x;
+
 			return '';
 		},
-		null
-	);
+	]);
 	$custom_test_deleter->handle = function (&$vdata) {
 		$all = DB::selectAll("select * from custom_test_submissions order by id asc limit {$vdata['last']}");
+
 		foreach ($all as $submission) {
 			$content = json_decode($submission['content'], true);
 			unlink(UOJContext::storagePath() . $content['file_name']);
 		}
+
 		DB::delete("delete from custom_test_submissions order by id asc limit {$vdata['last']}");
 	};
-	$custom_test_deleter->submit_button_config['align'] = 'compressed';
+	$custom_test_deleter->config['form']['class'] = 'row gy-2 gx-3 align-items-end';
+	$custom_test_deleter->config['submit_container']['class'] = 'col-auto';
 	$custom_test_deleter->runAtServer();
 } elseif ($cur_tab == 'judger') {
 	$judger_adder = new UOJBs4Form('judger_adder');
