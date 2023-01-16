@@ -188,11 +188,16 @@ if (isset($_POST['user_msg'])) {
 </div>
 
 <script type="text/javascript">
+	var REFRESH_INTERVAL = 30 * 1000;
+
 	$(document).ready(function() {
 		$.ajaxSetup({
 			async: false
 		});
+
 		refreshConversations();
+		setInterval(refreshConversations, REFRESH_INTERVAL);
+
 		<?php if (isset($_GET['enter'])) : ?>
 			enterConversation(<?= json_encode($_GET['enter']) ?>);
 		<?php endif ?>
@@ -264,7 +269,7 @@ if (isset($_POST['user_msg'])) {
 	function addBubble(content, send_time, read_time, msgId, conversation, page, type) {
 		$("#history-list").append(
 			'<div class="d-flex align-items-end mt-3" style="' + (type ? 'margin-left:20%;' : 'margin-right:20%;') + '">' +
-			(type ? '' : '<img class="flex-shrink-0 me-2 rounded" width="32" height="32" src="' + conversations[conversation][1] + '" />') +
+			(type ? '' : '<img class="flex-shrink-0 me-2 rounded" width="32" height="32" src="' + conversations[conversation][1] + '" style="user-select: none;" />') +
 			'<div class="card flex-grow-1">' +
 			'<div class="card-body px-3 py-2" style="white-space:pre-wrap">' +
 			htmlspecialchars(content) +
@@ -275,10 +280,10 @@ if (isset($_POST['user_msg'])) {
 			'</span>' +
 			(read_time == null ?
 				'<span class="float-end" data-bs-toggle="tooltip" data-bs-title="未读"><i class="bi bi-check2"></i></span>' :
-				'<span class="float-end" data-bs-toggle="tooltip" data-bs-title="查看时间: ' + read_time + '"><i class="bi bi-check2-all"></i></span>') +
+				'<span class="float-end" data-bs-toggle="tooltip" data-bs-title="' + read_time + '"><i class="bi bi-check2-all"></i></span>') +
 			'</div>' +
 			'</div>' +
-			(type ? '<img class="flex-shrink-0 ms-2 rounded" width="32" height="32" src="' + user_avatar + '" />' : '') +
+			(type ? '<img class="flex-shrink-0 ms-2 rounded" width="32" height="32" src="' + user_avatar + '" style="user-select: none;" />' : '') +
 			'</div>'
 		);
 	}
@@ -328,10 +333,14 @@ if (isset($_POST['user_msg'])) {
 					break;
 				}
 			}
+
 			if (result.length == 11) {
 				ret = true;
 			}
-			bootstrap.Tooltip.jQueryInterface.call($('#history-list [data-bs-toggle="tooltip"]'));
+
+			bootstrap.Tooltip.jQueryInterface.call($('#history-list [data-bs-toggle="tooltip"]'), {
+				container: $('#history-list'),
+			});
 		});
 		return ret;
 	}
@@ -362,6 +371,9 @@ if (isset($_POST['user_msg'])) {
 		var slideTime = 300;
 		var page = 1;
 		var changeAble = refreshHistory(conversationName, page);
+		intervalId = setInterval(function() {
+			changeAble = refreshHistory(conversationName, page);
+		}, REFRESH_INTERVAL);
 		$('#history').show();
 		$('#conversations').addClass('d-none d-md-block')
 		$('#input-message').unbind('keydown').keydown(function(e) {
@@ -377,18 +389,25 @@ if (isset($_POST['user_msg'])) {
 			return false;
 		});
 		$('#goBack').unbind("click").click(function() {
+			clearInterval(intervalId);
 			refreshConversations();
 			$("#history").hide();
 			$("#conversations").removeClass('d-none d-md-block');
 			return;
 		});
 		$('#pageLeft').unbind("click").click(function() {
-			if (changeAble) page++;
+			if (changeAble) {
+				page++;
+				clearInterval(intervalId);
+			}
 			changeAble = refreshHistory(conversationName, page);
 			return false;
 		});
 		$('#pageRight').unbind("click").click(function() {
-			if (page > 1) page--;
+			if (page > 1) {
+				page--;
+				clearInterval(intervalId);
+			}
 			changeAble = refreshHistory(conversationName, page);
 			return false;
 		});
