@@ -158,7 +158,7 @@
 						<span class="text-muted small">
 							(<?= UOJLocale::get('user::last active at') ?>
 							<?php if ((clone UOJTime::$time_now)->modify('- 1 day') <= $last_visit_time) : ?>
-								<?= HTML::relative_time_str($last_visit_time, 0) ?>)
+								<?= HTML::relative_time_str($last_visit_time->getTimestamp(), 0) ?>)
 							<?php else : ?>
 								<?= $last_visit_time->format('Y-m-d') ?>)
 							<?php endif ?>
