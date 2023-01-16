@@ -1019,14 +1019,10 @@ if ($cur_tab == 'index') {
 		dieWithAlert('删除成功！');
 	}
 
-	$change_user_image_total_size_limit_form = new UOJBs4Form('change_user_image_total_size_limit');
-	$change_user_image_total_size_limit_form->submit_button_config['align'] = 'compressed';
-	$change_user_image_total_size_limit_form->addInput(
-		'change_user_image_total_size_limit_username',
-		'text',
-		'用户名',
-		'',
-		function ($x, &$vdata) {
+	$change_user_image_total_size_limit_form = new UOJForm('change_user_image_total_size_limit');
+	$change_user_image_total_size_limit_form->addInput('change_user_image_total_size_limit_username', [
+		'label' => '用户名',
+		'validator_php' => function ($x, &$vdata) {
 			if (!validateUsername($x)) {
 				return '用户名不合法';
 			}
@@ -1039,14 +1035,13 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$change_user_image_total_size_limit_form->addInput(
-		'change_user_image_total_size_limit_limit',
-		'text',
-		'存储限制（单位：Byte）',
-		'104857600',
-		function ($x, &$vdata) {
+	]);
+	$change_user_image_total_size_limit_form->addInput('change_user_image_total_size_limit_limit', [
+		'div_class' => 'mt-3',
+		'label' => '存储限制',
+		'default_value' => '104857600',
+		'help' => '限制单位为 Byte。',
+		'validator_php' => function ($x, &$vdata) {
 			if (!validateUInt($x, 10)) {
 				return '限制不合法';
 			}
@@ -1059,8 +1054,7 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
+	]);
 	$change_user_image_total_size_limit_form->handle = function (&$vdata) {
 		DB::update([
 			"update user_info",
@@ -1083,7 +1077,6 @@ if ($cur_tab == 'index') {
 <h1>
 	<?= UOJLocale::get('system manage') ?>
 </h1>
-
 
 <div class="row mt-4">
 	<!-- left col -->
