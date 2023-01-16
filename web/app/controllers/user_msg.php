@@ -150,7 +150,7 @@ if (isset($_POST['user_msg'])) {
 					<button id="goBack" class="btn-close position-absolute" aria-label="关闭对话"></button>
 					<div id="conversation-name" class="text-center"></div>
 				</div>
-				<div class="card-body overflow-auto">
+				<div class="card-body overflow-auto" id="history-list-container">
 					<div id="history-list" style="min-height: 200px;"></div>
 				</div>
 				<div class="card-footer bg-transparent">
@@ -376,6 +376,7 @@ if (isset($_POST['user_msg'])) {
 		}, REFRESH_INTERVAL);
 		$('#history').show();
 		$('#conversations').addClass('d-none d-md-block')
+		$("#history-list-container").scrollTop($("#history-list").height());
 		$('#input-message').unbind('keydown').keydown(function(e) {
 			if (e.keyCode == 13 && e.ctrlKey) {
 				$('#message-submit').click();
@@ -386,6 +387,7 @@ if (isset($_POST['user_msg'])) {
 			page = 1;
 			changeAble = refreshHistory(conversationName, page);
 			refreshConversations();
+			$("#history-list-container").scrollTop($("#history-list").height());
 			return false;
 		});
 		$('#goBack').unbind("click").click(function() {
