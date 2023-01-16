@@ -371,6 +371,7 @@ if (isset($_POST['user_msg'])) {
 		var slideTime = 300;
 		var page = 1;
 		var changeAble = refreshHistory(conversationName, page);
+		clearInterval(intervalId);
 		intervalId = setInterval(function() {
 			changeAble = refreshHistory(conversationName, page);
 		}, REFRESH_INTERVAL);
