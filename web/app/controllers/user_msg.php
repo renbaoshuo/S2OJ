@@ -260,7 +260,7 @@ if (isset($_POST['user_msg'])) {
 	function addBubble(content, send_time, read_time, msgId, conversation, page, type) {
 		$("#history-list").append(
 			'<div class="d-flex align-items-end mt-3" style="' + (type ? 'margin-left:20%;' : 'margin-right:20%;') + '">' +
-			(type ? '' : '<img class="flex-shrink-0 me-2" width="32" height="32" src="' + conversations[conversation][1] + '" />') +
+			(type ? '' : '<img class="flex-shrink-0 me-2 rounded" width="32" height="32" src="' + conversations[conversation][1] + '" />') +
 			'<div class="card flex-grow-1">' +
 			'<div class="card-body px-3 py-2" style="white-space:pre-wrap">' +
 			htmlspecialchars(content) +
@@ -271,10 +271,10 @@ if (isset($_POST['user_msg'])) {
 			'</span>' +
 			(read_time == null ?
 				'<span class="float-end" data-bs-toggle="tooltip" data-bs-title="未读"><i class="bi bi-check2"></i></span>' :
-				'<span class="float-end" data-bs-toggle="tooltip" data-bs-title="' + read_time + '"><i class="bi bi-check2-all"></i></span>') +
+				'<span class="float-end" data-bs-toggle="tooltip" data-bs-title="查看时间: ' + read_time + '"><i class="bi bi-check2-all"></i></span>') +
 			'</div>' +
 			'</div>' +
-			(type ? '<img class="flex-shrink-0 ms-2" width="32" height="32" src="' + user_avatar + '" />' : '') +
+			(type ? '<img class="flex-shrink-0 ms-2 rounded" width="32" height="32" src="' + user_avatar + '" />' : '') +
 			'</div>'
 		);
 	}
