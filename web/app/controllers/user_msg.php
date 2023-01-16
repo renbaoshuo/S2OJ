@@ -205,9 +205,11 @@ if (isset($_POST['user_msg'])) {
 </script>
 
 <script type="text/javascript">
+	<?php $enter_user = UOJRequest::user(UOJRequest::GET, 'enter'); ?>
 	var conversations = {};
 	var intervalId = 0;
 	var user_avatar = '<?= HTML::avatar_addr(Auth::user(), 80) ?>';
+	var enter_user = ['<?= $enter_user['username'] ?>', '<?= UOJUser::getRealname($enter_user) ?>', '<?= UOJUser::getUserColor($enter_user) ?>'];
 
 	function formatDate(date) {
 		var d = new Date(date),
@@ -309,7 +311,7 @@ if (isset($_POST['user_msg'])) {
 	function refreshHistory(conversation, page) {
 		$("#history-list").empty();
 		var ret = false;
-		$('#conversation-name').html(getUserLink(conversation, conversations[conversation][2], conversations[conversation][3]));
+		$('#conversation-name').html(getUserLink(conversation, conversation == enter_user[0] ? enter_user[1] : conversations[conversation][2], conversation == enter_user[0] ? enter_user[2] : conversations[conversation][3]));
 		$('#pageShow').text("第" + page.toString() + "页");
 		$.get('/user_msg', {
 			getHistory: '',
