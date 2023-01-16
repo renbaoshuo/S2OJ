@@ -32,7 +32,7 @@ $submission_result = UOJSubmission::cur()->getResult();
 $problem = UOJProblem::info();
 
 if ($can_see_minor) {
-	$minor_rejudge_form = new UOJBs4Form('minor_rejudge');
+	$minor_rejudge_form = new UOJForm('minor_rejudge');
 	$minor_rejudge_form->handle = function () {
 		UOJSubmission::rejudgeById(UOJSubmission::info('id'), [
 			'reason_text' => '管理员偷偷重测该提交记录',
@@ -41,9 +41,9 @@ if ($can_see_minor) {
 		$tid = DB::insert_id();
 		redirectTo(UOJSubmission::cur()->getUriForNewTID($tid));
 	};
-	$minor_rejudge_form->submit_button_config['class_str'] = 'btn btn-sm btn-primary';
-	$minor_rejudge_form->submit_button_config['text'] = '偷偷重新测试';
-	$minor_rejudge_form->submit_button_config['align'] = 'right';
+	$minor_rejudge_form->config['submit_button']['class'] = 'btn btn-sm btn-primary';
+	$minor_rejudge_form->config['submit_button']['text'] = '偷偷重新测试';
+	$minor_rejudge_form->config['submit_container']['class'] = 'd-inline-block text-end';
 	$minor_rejudge_form->runAtServer();
 }
 
@@ -89,38 +89,38 @@ if (UOJSubmission::cur()->isLatest()) {
 	}
 
 	if (UOJSubmission::cur()->userCanRejudge(Auth::user())) {
-		$rejudge_form = new UOJBs4Form('rejudge');
+		$rejudge_form = new UOJForm('rejudge');
 		$rejudge_form->handle = function () {
 			UOJSubmission::rejudgeById(UOJSubmission::info('id'));
 		};
-		$rejudge_form->submit_button_config['class_str'] = 'btn btn-sm btn-primary';
-		$rejudge_form->submit_button_config['text'] = '重新测试';
-		$rejudge_form->submit_button_config['align'] = 'end';
+		$rejudge_form->config['submit_button']['class'] = 'btn btn-sm btn-primary';
+		$rejudge_form->config['submit_button']['text'] = '重新测试';
+		$rejudge_form->config['submit_container']['class'] = 'text-end d-inline-block';
 		$rejudge_form->runAtServer();
 	}
 
 	if (UOJSubmission::cur()->userCanDelete(Auth::user())) {
-		$delete_form = new UOJBs4Form('delete');
+		$delete_form = new UOJForm('delete');
 		$delete_form->handle = function () {
 			UOJSubmission::cur()->delete();
 		};
-		$delete_form->submit_button_config['class_str'] = 'btn btn-sm btn-danger';
-		$delete_form->submit_button_config['text'] = '删除此提交记录';
-		$delete_form->submit_button_config['align'] = 'end';
-		$delete_form->submit_button_config['smart_confirm'] = '';
+		$delete_form->config['submit_button']['class'] = 'btn btn-sm btn-danger';
+		$delete_form->config['submit_button']['text'] = '删除此提交记录';
+		$delete_form->config['submit_container']['class'] = 'text-end d-inline-block';
+		$delete_form->config['confirm']['smart'] = true;
 		$delete_form->succ_href = "/submissions";
 		$delete_form->runAtServer();
 	}
 } else {
 	if (UOJSubmission::cur()->userCanDelete(Auth::user()) && !UOJSubmission::cur()->isMajor()) {
-		$delete_form = new UOJBs4Form('delete');
+		$delete_form = new UOJForm('delete');
 		$delete_form->handle = function () {
 			UOJSubmission::cur()->deleteThisMinorVersion();
 		};
-		$delete_form->submit_button_config['class_str'] = 'btn btn-sm btn-danger';
-		$delete_form->submit_button_config['text'] = '删除当前历史记录（保留其他历史记录）';
-		$delete_form->submit_button_config['align'] = 'end';
-		$delete_form->submit_button_config['smart_confirm'] = '';
+		$delete_form->config['submit_button']['class'] = 'btn btn-sm btn-danger';
+		$delete_form->config['submit_button']['text'] = '删除当前历史记录（保留其他历史记录）';
+		$delete_form->config['submit_container']['class'] = 'text-end d-inline-block';
+		$delete_form->config['confirm']['smart'] = true;
 		$delete_form->succ_href = UOJSubmission::cur()->getUriForLatest();
 		$delete_form->runAtServer();
 	}
