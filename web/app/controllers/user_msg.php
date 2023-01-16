@@ -138,14 +138,22 @@ if (isset($_POST['user_msg'])) {
 
 <h1>私信</h1>
 
-<div class="card overflow-hidden" style="height: calc(100vh - 10rem);">
+<style>
+	@media (min-width: 768px) {
+		.chat-container {
+			height: calc(100ch - 10rem);
+		}
+	}
+</style>
+
+<div class="card overflow-hidden-md chat-container">
 	<div class="row gx-0 flex-grow-1 h-100">
-		<div class="col-md-3 border-end h-100">
+		<div class="col-md-3 border-end h-md-100">
 			<div class="list-group list-group-flush h-100 overflow-auto" id="conversations"></div>
 		</div>
 
 		<div class="col-md-9 h-100" id="history" style="display: none">
-			<div class="card h-100 border-0 rounded-0 h-100">
+			<div class="card h-100 border-0 rounded-0">
 				<div class="card-header">
 					<button id="goBack" class="btn-close position-absolute" aria-label="关闭对话"></button>
 					<div id="conversation-name" class="text-center"></div>
