@@ -49,11 +49,11 @@ function getConversations() {
 				continue;
 			}
 
-			$ret[$msg['sender']] = [$msg['send_time'], ($msg['read_time'] == null)];
+			$ret[$msg['sender']] = [$msg['send_time'], ($msg['read_time'] == null), $msg['message']];
 		} else {
 			if (isset($ret[$msg['receiver']])) continue;
 
-			$ret[$msg['receiver']] = [$msg['send_time'], 0];
+			$ret[$msg['receiver']] = [$msg['send_time'], 0, $msg['message']];
 		}
 	}
 	$res = [];
@@ -66,6 +66,7 @@ function getConversations() {
 			HTML::avatar_addr($user, 128),
 			UOJUser::getRealname($user),
 			UOJUser::getUserColor($user),
+			$con[2],
 		];
 	}
 
@@ -232,7 +233,7 @@ if (isset($_POST['user_msg'])) {
 		return [hour, minute].join(':');
 	}
 
-	function addButton(conversationName, send_time, type, avatar_addr, realname, color) {
+	function addButton(conversationName, send_time, type, avatar_addr, realname, color, last_message) {
 		var now = new Date();
 		var time = new Date(send_time);
 		var timeStr = formatDate(send_time);
@@ -242,16 +243,21 @@ if (isset($_POST['user_msg'])) {
 		}
 
 		$("#conversations").append(
-			'<div class="list-group-item list-group-item-action p-2 d-flex ' + (type ? 'list-group-item-warning' : '') + '" style="cursor: pointer;" ' +
+			'<div class="list-group-item list-group-item-action p-2 d-flex ' + (type ? 'list-group-item-warning' : '') + '" style="cursor: pointer; user-select: none;" ' +
 			'onclick="enterConversation(\'' + conversationName + '\')">' +
 			'<div class="flex-shrink-0 me-3">' +
 			'<img class="rounded" width="56" height="56" src="' + avatar_addr + '" />' +
 			'</div>' +
-			'<div class="flex-grow-1">' +
+			'<div class="flex-grow-1 overflow-hidden">' +
+			'<div>' +
 			getUserSpan(conversationName, realname, color) +
 			'<span class="float-end text-muted">' +
 			timeStr +
 			'</span>' +
+			'</div>' +
+			'<div class="text-muted text-nowrap text-truncate">' +
+			htmlspecialchars(last_message) +
+			'</div>' +
 			'</div>' +
 			'</div>'
 		);
@@ -341,14 +347,14 @@ if (isset($_POST['user_msg'])) {
 			for (i in result) {
 				var conversation = result[i];
 				if (conversation[1] == 1) {
-					addButton(conversation[2], conversation[0], conversation[1], conversation[3], conversation[4], conversation[5]);
+					addButton(conversation[2], conversation[0], conversation[1], conversation[3], conversation[4], conversation[5], conversation[6]);
 				}
 				conversations[conversation[2]] = [conversation[0], conversation[3], conversation[4], conversation[5]];
 			}
 			for (i in result) {
 				var conversation = result[i];
 				if (conversation[1] == 0) {
-					addButton(conversation[2], conversation[0], conversation[1], conversation[3], conversation[4], conversation[5]);
+					addButton(conversation[2], conversation[0], conversation[1], conversation[3], conversation[4], conversation[5], conversation[6]);
 				}
 			}
 		});
