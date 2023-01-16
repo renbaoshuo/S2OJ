@@ -317,13 +317,10 @@ if ($cur_tab == 'index') {
 		$user_list_cond = '1';
 	}
 
-	$register_form = new UOJBs4Form('register');
-	$register_form->addVInput(
-		'new_username',
-		'text',
-		'用户名',
-		'',
-		function ($username, &$vdata) {
+	$register_form = new UOJForm('register');
+	$register_form->addInput('new_username', [
+		'label' => '用户名',
+		'validator_php' => function ($username, &$vdata) {
 			if (!validateUsername($username)) {
 				return '用户名不合法';
 			}
@@ -336,27 +333,24 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$register_form->addVInput(
-		'new_password',
-		'password',
-		'密码',
-		'',
-		function ($password, &$vdata) {
+	]);
+	$register_form->addInput('new_password', [
+		'div_class' => 'mt-3',
+		'type' => 'password',
+		'label' => '密码',
+		'validator_php' => function ($password, &$vdata) {
 			$vdata['password'] = $password;
 
 			return '';
 		},
-		'validatePassword'
-	);
-	$register_form->addVInput(
-		'new_email',
-		'text',
-		'电子邮件（选填）',
-		'',
-		function ($email, &$vdata) {
-			if ($email && !validateEmail($email)) {
+		'validator_js' => 'validatePassword',
+	]);
+	$register_form->addInput('new_email', [
+		'div_class' => 'mt-3',
+		'label' => '电子邮件',
+		'help' => '选填项。填写电子邮件后用户可自主进行密码重置。',
+		'validator_php' => function ($email, &$vdata) {
+			if (!validateEmail($email)) {
 				return '邮件地址不合法';
 			}
 
@@ -364,32 +358,27 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$register_form->addVInput(
-		'new_realname',
-		'text',
-		'真实姓名（选填）',
-		'',
-		function ($realname, &$vdata) {
+	]);
+	$register_form->addInput('new_realname', [
+		'div_class' => 'mt-3',
+		'label' => '真实姓名',
+		'help' => '选填项。',
+		'validator_php' => function ($realname, &$vdata) {
 			$vdata['realname'] = $realname;
 
 			return '';
 		},
-		null
-	);
-	$register_form->addVInput(
-		'new_school',
-		'text',
-		'学校名称（选填）',
-		'',
-		function ($school, &$vdata) {
+	]);
+	$register_form->addInput('new_school', [
+		'div_class' => 'mt-3',
+		'label' => '学校名称',
+		'help' => '选填项。常用名称：<code>石家庄市第二中学</code>、<code>石家庄二中实验学校</code>。',
+		'validator_php' => function ($school, &$vdata) {
 			$vdata['school'] = $school;
 
 			return '';
 		},
-		null
-	);
+	]);
 	$register_form->handle = function (&$vdata) {
 		$user = [
 			'username' => $vdata['username'],
@@ -421,16 +410,13 @@ if ($cur_tab == 'index') {
 
 			$(window).scrollTop(0);
 		}
-EOD);
+	EOD);
 	$register_form->runAtServer();
 
-	$register_tmp_user_form = new UOJBs4Form('register_tmp_user');
-	$register_tmp_user_form->addVInput(
-		'new_tmp_username',
-		'text',
-		'用户名',
-		'',
-		function ($username, &$vdata) {
+	$register_tmp_user_form = new UOJForm('register_tmp_user');
+	$register_tmp_user_form->addInput('new_tmp_username', [
+		'label' => '用户名',
+		'validator_php' => function ($username, &$vdata) {
 			if (!validateUsername($username)) {
 				return '用户名不合法';
 			}
@@ -443,26 +429,23 @@ EOD);
 
 			return '';
 		},
-		null
-	);
-	$register_tmp_user_form->addVInput(
-		'new_tmp_password',
-		'password',
-		'密码',
-		'',
-		function ($password, &$vdata) {
+	]);
+	$register_tmp_user_form->addInput('new_tmp_password', [
+		'div_class' => 'mt-3',
+		'type' => 'password',
+		'label' => '密码',
+		'validator_php' => function ($password, &$vdata) {
 			$vdata['password'] = $password;
 
 			return '';
 		},
-		'validatePassword'
-	);
-	$register_tmp_user_form->addVInput(
-		'new_tmp_email',
-		'text',
-		'电子邮件（选填）',
-		'',
-		function ($email, &$vdata) {
+		'validator_js' => 'validatePassword',
+	]);
+	$register_tmp_user_form->addInput('new_tmp_email', [
+		'div_class' => 'mt-3',
+		'label' => '电子邮件',
+		'help' => '选填项。',
+		'validator_php' => function ($email, &$vdata) {
 			if ($email && !validateEmail($email)) {
 				return '邮件地址不合法';
 			}
@@ -471,48 +454,42 @@ EOD);
 
 			return '';
 		},
-		null
-	);
-	$register_tmp_user_form->addVInput(
-		'new_tmp_realname',
-		'text',
-		'真实姓名（选填）',
-		'',
-		function ($realname, &$vdata) {
+	]);
+	$register_tmp_user_form->addInput('new_tmp_realname', [
+		'div_class' => 'mt-3',
+		'label' => '真实姓名',
+		'help' => '选填项。',
+		'validator_php' => function ($realname, &$vdata) {
 			$vdata['realname'] = $realname;
 
 			return '';
 		},
-		null
-	);
-	$register_tmp_user_form->addVInput(
-		'new_tmp_school',
-		'text',
-		'学校名称（选填）',
-		'',
-		function ($school, &$vdata) {
+	]);
+	$register_tmp_user_form->addInput('new_tmp_school', [
+		'div_class' => 'mt-3',
+		'label' => '学校名称',
+		'help' => '选填项。',
+		'validator_php' => function ($school, &$vdata) {
 			$vdata['school'] = $school;
 
 			return '';
 		},
-		null
-	);
-	$register_tmp_user_form->addVInput(
-		'new_tmp_expiration_time',
-		'text',
-		'过期时间',
-		UOJTime::time2str((new DateTime())->add(new DateInterval('P7D'))->setTime(0, 0, 0)),
-		function ($str, &$vdata) {
+	]);
+	$register_tmp_user_form->addInput('new_tmp_expiration_time', [
+		'div_class' => 'mt-3',
+		'label' => '过期时间',
+		'help' => '选填项。默认过期时间为 7 天后。',
+		'default_value' => UOJTime::time2str((new DateTime())->add(new DateInterval('P7D'))->setTime(0, 0, 0)),
+		'validator_php' => function ($expiration_time, &$vdata) {
 			try {
-				$vdata['expiration_time'] = new DateTime($str);
+				$vdata['expiration_time'] = new DateTime($expiration_time);
 			} catch (Exception $e) {
 				return '无效时间格式';
 			}
 
 			return '';
 		},
-		null
-	);
+	]);
 	$register_tmp_user_form->handle = function (&$vdata) {
 		$user = [
 			'username' => $vdata['username'],
@@ -545,15 +522,13 @@ EOD);
 
 			$(window).scrollTop(0);
 		}
-EOD);
+	EOD);
 	$register_tmp_user_form->runAtServer();
 
-	$change_password_form = new UOJBs4Form('change_password');
-	$change_password_form->addVInput(
-		'p_username',
-		'text',
-		'用户名',
-		'',
+	$change_password_form = new UOJForm('change_password');
+	$change_password_form->addInput('p_username', [
+		'label' => '用户名',
+		'validator_php' =>
 		function ($username, &$vdata) {
 			if (!validateUsername($username)) {
 				return '用户名不合法';
@@ -567,20 +542,18 @@ EOD);
 
 			return '';
 		},
-		null
-	);
-	$change_password_form->addVInput(
-		'p_password',
-		'password',
-		'密码',
-		'',
-		function ($password, &$vdata) {
+	]);
+	$change_password_form->addInput('p_password', [
+		'div_class' => 'mt-3',
+		'type' => 'password',
+		'label' => '密码',
+		'validator_php' => function ($password, &$vdata) {
 			$vdata['password'] = $password;
 
 			return '';
 		},
-		'validatePassword'
-	);
+		'validator_js' => 'validatePassword',
+	]);
 	$change_password_form->handle = function (&$vdata) {
 		$password = hash_hmac('md5', $vdata['password'], getPasswordClientSalt());
 
@@ -596,8 +569,9 @@ EOD);
 
 		dieWithJsonData(['status' => 'success', 'message' => '用户 ' . $vdata['username'] . ' 的密码已经被成功重置。']);
 	};
-	$change_password_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
-	$change_password_form->submit_button_config['text'] = '重置';
+	$change_password_form->config['submit_button']['class'] = 'btn btn-secondary';
+	$change_password_form->config['submit_button']['text'] = '重置密码';
+	$change_password_form->config['confirm']['smart'] = true;
 	$change_password_form->setAjaxSubmit(<<<EOD
 		function(res) {
 			if (res.status === 'success') {
@@ -616,16 +590,13 @@ EOD);
 
 			$(window).scrollTop(0);
 		}
-EOD);
+	EOD);
 	$change_password_form->runAtServer();
 
-	$change_usergroup_form = new UOJBs4Form('change_usergroup');
-	$change_usergroup_form->addVInput(
-		'username',
-		'text',
-		'用户名',
-		'',
-		function ($username, &$vdata) {
+	$change_usergroup_form = new UOJForm('change_usergroup');
+	$change_usergroup_form->addInput('username', [
+		'label' => '用户名',
+		'validator_php' => function ($username, &$vdata) {
 			if (!validateUsername($username)) {
 				return '用户名不合法';
 			}
@@ -638,14 +609,17 @@ EOD);
 
 			return '';
 		},
-		null
-	);
-	$change_usergroup_form->addVSelect('op_type', [
-		'banneduser' => '设为封禁用户',
-		'tempuser' => '设为临时用户',
-		'normaluser' => '设为普通用户',
-		'superuser' => '设为超级用户',
-	], '操作类型', '');
+	]);
+	$change_usergroup_form->addSelect('op_type', [
+		'div_class' => 'mt-3',
+		'label' => '操作类型',
+		'options' => [
+			'banneduser' => '设为封禁用户',
+			'tempuser' => '设为临时用户',
+			'normaluser' => '设为普通用户',
+			'superuser' => '设为超级用户',
+		],
+	]);
 	$change_usergroup_form->handle = function ($vdata) {
 		$username = $vdata['username'];
 		$usergroup = '';
@@ -664,7 +638,9 @@ EOD);
 					],
 				]);
 				$usergroup = '被封禁的用户，该用户将无法再次登录系统';
+
 				break;
+
 			case 'tempuser':
 				DB::update([
 					"update user_info",
@@ -678,7 +654,9 @@ EOD);
 					],
 				]);
 				$usergroup = '临时用户，请前往个人信息编辑页面修改过期时间';
+
 				break;
+
 			case 'normaluser':
 				DB::update([
 					"update user_info",
@@ -692,6 +670,7 @@ EOD);
 					],
 				]);
 				$usergroup = '普通用户';
+
 				break;
 			case 'superuser':
 				DB::update([
@@ -705,7 +684,9 @@ EOD);
 						"username" => $username,
 					],
 				]);
+
 				$usergroup = '超级用户';
+
 				break;
 		}
 
@@ -729,7 +710,7 @@ EOD);
 
 			$(window).scrollTop(0);
 		}
-EOD);
+	EOD);
 	$change_usergroup_form->runAtServer();
 
 	$users_default_permissions = UOJContext::getMeta('users_default_permissions');
@@ -888,7 +869,7 @@ EOD);
 
 			$(window).scrollTop(0);
 		}
-EOD);
+	EOD);
 	$update_users_default_permissions_form->config['confirm']['text'] = '你确定要修改所有用户的默认权限吗？';
 	$update_users_default_permissions_form->handle = function () {
 		$new_permissions = [
