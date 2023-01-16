@@ -154,7 +154,7 @@ if (isset($_POST['user_msg'])) {
 					<div id="history-list" style="min-height: 200px;"></div>
 				</div>
 				<div class="card-footer bg-transparent">
-					<ul class="pagination pagination-sm justify-content-between">
+					<ul class="pagination pagination-sm justify-content-between mt-1">
 						<li class="page-item">
 							<button class="page-link rounded" id="pageLeft">
 								<i class="bi bi-chevron-left"></i>
