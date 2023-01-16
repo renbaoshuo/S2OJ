@@ -252,9 +252,9 @@ if (isset($_POST['user_msg'])) {
 			'<img class="rounded" width="56" height="56" src="' + avatar_addr + '" />' +
 			'</div>' +
 			'<div class="flex-grow-1 overflow-hidden">' +
-			'<div>' +
-			getUserSpan(conversationName, realname, color) +
-			'<span class="float-end text-muted">' +
+			'<div class="d-flex justify-content-between">' +
+			getUserSpan(conversationName, '', color) +
+			'<span class="float-end text-muted small flex-shrink-0 lh-lg">' +
 			timeStr +
 			'</span>' +
 			'</div>' +
