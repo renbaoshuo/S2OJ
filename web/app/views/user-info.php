@@ -143,9 +143,8 @@
 				<?php endif ?>
 			</ul>
 			<div class="card-footer bg-transparent">
-				<?php $last_visit_time = strtotime($user['last_visit_time']) ?>
-				<?php if (time() - $last_visit_time < 60 * 15) : // 15 mins 
-				?>
+				<?php $last_visit_time = UOJTime::str2time($user['last_visit_time']) ?>
+				<?php if ((clone UOJTime::$time_now)->modify('- 15 mins') <= $last_visit_time) : ?>
 					<span class="text-success">
 						<i class="bi bi-circle-fill me-1"></i>
 						<?= UOJLocale::get('user::online') ?>
@@ -158,7 +157,11 @@
 					<?php if ($last_visit_time > 0) : ?>
 						<span class="text-muted small">
 							(<?= UOJLocale::get('user::last active at') ?>
-							<?= HTML::relative_time_str($last_visit_time, 0) ?>)
+							<?php if ((clone UOJTime::$time_now)->modify('- 1 day') <= $last_visit_time) : ?>
+								<?= HTML::relative_time_str($last_visit_time, 0) ?>)
+							<?php else : ?>
+								<?= $last_visit_time->format('Y-m-d') ?>)
+							<?php endif ?>
 						</span>
 					<?php endif ?>
 				<?php endif ?>
