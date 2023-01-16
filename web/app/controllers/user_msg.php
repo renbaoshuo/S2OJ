@@ -147,9 +147,7 @@ if (isset($_POST['user_msg'])) {
 		<div class="col-md-9 h-100" id="history" style="display: none">
 			<div class="card h-100 border-0 rounded-0 h-100">
 				<div class="card-header">
-					<button type="button" id="goBack" class="bg-transparent border-0 position-absolute text-muted">
-						<i class="bi bi-x-lg"></i>
-					</button>
+					<button id="goBack" class="btn-close position-absolute" aria-label="关闭对话"></button>
 					<div id="conversation-name" class="text-center"></div>
 				</div>
 				<div class="card-body overflow-auto">
