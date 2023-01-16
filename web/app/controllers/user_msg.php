@@ -140,8 +140,8 @@ if (isset($_POST['user_msg'])) {
 
 <div class="card overflow-hidden" style="height: calc(100vh - 10rem);">
 	<div class="row gx-0 flex-grow-1 h-100">
-		<div class="col-md-3 border-end">
-			<div class="list-group list-group-flush" id="conversations"></div>
+		<div class="col-md-3 border-end h-100">
+			<div class="list-group list-group-flush h-100 overflow-auto" id="conversations"></div>
 		</div>
 
 		<div class="col-md-9 h-100" id="history" style="display: none">
