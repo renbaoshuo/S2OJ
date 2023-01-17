@@ -60,15 +60,15 @@ $friend_links = DB::selectAll([
 			</div>
 		</div>
 		<?php if (Auth::check()) : ?>
-			<div class="mt-4 card">
-				<div class="card-body">
-					<h4 class="card-title mb-2"><?= UOJLocale::get('top solver') ?></h4>
-					<?php UOJRanklist::printHTML(['top10' => true]) ?>
-					<div class="text-center mt-2">
-						<a href="/solverlist" class="text-decoration-none">
-							<?= UOJLocale::get('view all') ?>
-						</a>
-					</div>
+			<div class="card mt-4">
+				<div class="card-header bg-transparent">
+					<h4 class="mb-0"><?= UOJLocale::get('top solver') ?></h4>
+				</div>
+				<?php UOJRanklist::printHTML(['top10' => true, 'flush' => true]) ?>
+				<div class="card-footer bg-transparent text-center">
+					<a href="/solverlist">
+						<?= UOJLocale::get('view all') ?>
+					</a>
 				</div>
 			</div>
 		<?php else : ?>
