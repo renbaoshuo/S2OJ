@@ -13,7 +13,7 @@ UOJProblem::cur()->userCanManage(Auth::user()) || UOJResponse::page403();
 $problem = UOJProblem::info();
 $problem_extra_config = UOJProblem::cur()->getExtraConfig();
 
-$data_dir = "/var/uoj_data/${problem['id']}";
+$data_dir = "/var/uoj_data/{$problem['id']}";
 
 function echoFileNotFound($file_name) {
 	echo '<h5>', htmlspecialchars($file_name), '</h5>';
