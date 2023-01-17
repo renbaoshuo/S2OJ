@@ -118,6 +118,12 @@ if (UOJProblem::cur()->userCanManage(Auth::user()) || UOJProblem::cur()->userPer
 
 			$blog_id = DB::insert_id();
 
+			DB::insert([
+				"insert into problems_solutions",
+				DB::bracketed_fields(["problem_id", "blog_id"]),
+				"values", DB::tuple([UOJProblem::info('id'), $blog_id]),
+			]);
+
 			redirectTo(HTML::blog_url(Auth::id(), "/post/{$blog_id}/write"));
 			die();
 		};
