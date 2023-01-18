@@ -130,17 +130,39 @@ if (isset($_POST['update-status'])) {
 	die();
 }
 
-$problem_ban_list = DB::selectAll([
+$assignCond = [];
+
+$problem_ban_list = array_map(fn ($x) => $x['id'], DB::selectAll([
 	"select id from problems",
 	"where", [
 		["assigned_to_judger", "!=", "any"],
 		["assigned_to_judger", "!=", $_POST['judger_name']]
 	]
-]);
-foreach ($problem_ban_list as &$val) {
-	$val = $val['id'];
+]));
+
+if ($problem_ban_list) {
+	$assignCond[] = ["problem_id", "not in", DB::rawtuple($problem_ban_list)];
 }
-$assignCond = $problem_ban_list ? [["problem_id", "not in", DB::rawtuple($problem_ban_list)]] : [];
+
+if ($_POST['judger_name'] == "remote_judger") {
+	$problem_ban_list = array_map(fn ($x) => $x['id'], DB::selectAll([
+		"select id from problems",
+		"where", [
+			["judge_type", "!=", "remote"],
+		],
+	]));
+} else {
+	$problem_ban_list = array_map(fn ($x) => $x['id'], DB::selectAll([
+		"select id from problems",
+		"where", [
+			["judge_type", "!=", "local"],
+		],
+	]));
+}
+
+if ($problem_ban_list) {
+	$assignCond[] = ["problem_id", "not in", DB::rawtuple($problem_ban_list)];
+}
 
 $submission = null;
 $hack = null;
