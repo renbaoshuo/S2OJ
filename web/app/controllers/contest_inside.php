@@ -54,10 +54,10 @@ if ($is_manager) {
 isset($tabs_info[$cur_tab]) || UOJResponse::page404();
 
 if (UOJContest::cur()->userCanStartFinalTest(Auth::user())) {
-	if (CONTEST_PENDING_FINAL_TEST <= $contest['cur_progress']) {
+	if (CONTEST_PENDING_FINAL_TEST == $contest['cur_progress']) {
 		$start_test_form = new UOJBs4Form('start_test');
 		$start_test_form->handle = function () {
-			UOJContest::finalTest();
+			UOJContest::cur()->finalTest();
 		};
 		$start_test_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
 		$start_test_form->submit_button_config['smart_confirm'] = '';
