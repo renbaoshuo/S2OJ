@@ -463,3 +463,8 @@ form.uoj-bs4-form-compressed button {
 	--bs-btn-hover-bg: #d3d4d570;
 	--bs-btn-hover-border-color: transparent;
 }
+
+.remote-content center > img + span {
+	display: block;
+    font-size: 90%;
+}

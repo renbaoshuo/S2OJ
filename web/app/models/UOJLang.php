@@ -65,7 +65,7 @@ class UOJLang {
 		}
 		$is_avail = [];
 		$dep_list = [
-			['C++', 'C++11', 'C++14', 'C++17', 'C++20'],
+			['C++98', 'C++03', 'C++11', 'C++', 'C++17', 'C++20'],
 			['Java8', 'Java11', 'Java17']
 		];
 		foreach ($list as $lang) {

@@ -148,14 +148,14 @@ if ($_POST['judger_name'] == "remote_judger") {
 	$problem_ban_list = array_map(fn ($x) => $x['id'], DB::selectAll([
 		"select id from problems",
 		"where", [
-			["judge_type", "!=", "remote"],
+			["type", "!=", "remote"],
 		],
 	]));
 } else {
 	$problem_ban_list = array_map(fn ($x) => $x['id'], DB::selectAll([
 		"select id from problems",
 		"where", [
-			["judge_type", "!=", "local"],
+			["type", "!=", "local"],
 		],
 	]));
 }

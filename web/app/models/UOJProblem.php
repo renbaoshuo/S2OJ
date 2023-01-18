@@ -344,6 +344,10 @@ class UOJProblem {
 		$this->info = $info;
 	}
 
+	public function type() {
+		return $this->info['type'];
+	}
+
 	public function getTitle(array $cfg = []) {
 		$cfg += [
 			'with' => 'id',
@@ -380,6 +384,22 @@ class UOJProblem {
 
 	public function getUploaderLink() {
 		return UOJUser::getLink($this->info['uploader'] ?: "root");
+	}
+
+	public function getProviderLink() {
+		if ($this->type() == 'local') {
+			return HTML::tag('a', ['href' => HTML::url('/')], UOJConfig::$data['profile']['oj-name-short']);
+		}
+
+		$remote_oj = $this->getExtraConfig('remote_online_judge');
+
+		if (!$remote_oj || !array_key_exists($remote_oj, UOJRemoteProblem::$providers)) {
+			return 'Error';
+		}
+
+		$provider = UOJRemoteProblem::$providers[$remote_oj];
+
+		return HTML::tag('a', ['href' => $provider['url'], 'target' => '_blank'], $provider['name']);
 	}
 
 	public function getDifficultyHTML() {

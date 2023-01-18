@@ -423,7 +423,7 @@ class HTML {
 		return implode("&", $r);
 	}
 
-	public static function purifier() {
+	public static function purifier($extra_allowed_html = []) {
 		$config = HTMLPurifier_Config::createDefault();
 		$config->set('Output.Newline', true);
 		$def = $config->getHTMLDefinition(true);
@@ -435,14 +435,14 @@ class HTML {
 		$def->addElement('header',  'Block', 'Flow', 'Common');
 		$def->addElement('footer',  'Block', 'Flow', 'Common');
 
-		$extra_allowed_html = [
+		mergeConfig($extra_allowed_html, [
 			'span' => [
 				'class' => 'Enum#uoj-username',
 				'data-realname' => 'Text',
 				'data-color' => 'Color',
 			],
 			'img' => ['width' => 'Text'],
-		];
+		]);
 
 		foreach ($extra_allowed_html as $element => $attributes) {
 			foreach ($attributes as $attribute => $type) {
