@@ -95,6 +95,9 @@ function getProblemTR($info) {
 	if ($problem->isUserOwnProblem(Auth::user())) {
 		$html .= ' <a href="/problems?my=on"><span class="badge text-white bg-info">' . UOJLocale::get('problems::my problem') . '</span></a> ';
 	}
+	if ($info['type'] == 'remote') {
+		$html .= ' ' . HTML::tag('span', ['class' => 'badge text-bg-success'], '远端评测题');
+	}
 	if ($info['is_hidden']) {
 		$html .= ' <a href="/problems?is_hidden=on"><span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span></a> ';
 	}
