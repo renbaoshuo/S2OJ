@@ -68,8 +68,8 @@ $new_remote_problem_form->handle = function (&$vdata) {
 
 	DB::insert([
 		"insert into problems",
-		"(title, uploader, is_hidden, submission_requirement, extra_config, type)",
-		"values", DB::tuple([$data['title'], Auth::id(), 1, $enc_submission_requirement, $enc_extra_config, "remote"])
+		"(title, uploader, is_hidden, submission_requirement, extra_config, difficulty, type)",
+		"values", DB::tuple([$data['title'], Auth::id(), 1, $enc_submission_requirement, $enc_extra_config, $data['difficulty'] ?: -1, "remote"])
 	]);
 
 	$id = DB::insert_id();
