@@ -117,7 +117,7 @@ $new_remote_problem_form->runAtServer();
 		</div>
 	</div>
 	<div class="col-md-3">
-		TODO: 侧边栏
+		<?php uojIncludeView('sidebar') ?>
 	</div>
 </div>
 
