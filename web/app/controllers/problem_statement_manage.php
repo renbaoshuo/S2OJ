@@ -65,9 +65,12 @@ $problem_editor->runAtServer();
 
 $difficulty_form = new UOJForm('difficulty');
 $difficulty_form->addSelect('difficulty', [
+	'div_class' => 'flex-grow-1',
 	'options' => [-1 => '暂无评定'] + array_combine(UOJProblem::$difficulty, UOJProblem::$difficulty),
 	'default_value' => UOJProblem::info('difficulty'),
 ]);
+$difficulty_form->config['form']['class'] = 'd-flex';
+$difficulty_form->config['submit_container']['class'] = 'ms-2';
 $difficulty_form->handle = function () {
 	DB::update([
 		"update problems",
@@ -80,6 +83,170 @@ $difficulty_form->handle = function () {
 	]);
 };
 $difficulty_form->runAtServer();
+
+if (UOJProblem::info('type') == 'remote') {
+	$remote_online_judge = UOJProblem::cur()->getExtraConfig('remote_online_judge');
+	$remote_problem_id = UOJProblem::cur()->getExtraConfig('remote_problem_id');
+	$remote_provider = UOJRemoteProblem::$providers[$remote_online_judge];
+
+	$re_crawl_form = new UOJForm('re_crawl');
+	$re_crawl_form->appendHTML(<<<EOD
+		<ul>
+			<li>远程题库：{$remote_provider['name']}</li>
+			<li>远程题号：{$remote_problem_id}</li>
+		</ul>
+	EOD);
+	$re_crawl_form->config['submit_button']['text'] = '重新爬取';
+	$re_crawl_form->handle = function () use ($remote_online_judge, $remote_problem_id, $remote_provider) {
+		try {
+			$data = UOJRemoteProblem::getProblemBasicInfo($remote_online_judge, $remote_problem_id);
+		} catch (Exception $e) {
+			$data = null;
+			UOJLog::error($e->getMessage());
+		}
+
+		if ($data === null) {
+			UOJResponse::page500('题目抓取失败，可能是题目不存在或者没有题面！如果题目没有问题，请稍后再试。<a href="">返回</a>');
+		}
+
+		$submission_requirement = [
+			[
+				"name" => "answer",
+				"type" => "source code",
+				"file_name" => "answer.code",
+				"languages" => $remote_provider['languages'],
+			]
+		];
+		$enc_submission_requirement = json_encode($submission_requirement);
+
+		$extra_config = [
+			'remote_online_judge' => $remote_online_judge,
+			'remote_problem_id' => $remote_problem_id,
+			'time_limit' => $data['time_limit'],
+			'memory_limit' => $data['memory_limit'],
+		];
+		$enc_extra_config = json_encode($extra_config);
+
+		DB::update([
+			"update problems",
+			"set", [
+				"title" => $data['title'],
+				"submission_requirement" => $enc_submission_requirement,
+				"extra_config" => $enc_extra_config,
+				"difficulty" => $data['difficulty'] ?: -1,
+			],
+			"where", [
+				"id" => UOJProblem::info('id'),
+			],
+		]);
+
+		DB::update([
+			"update problems_contents",
+			"set", [
+				"remote_content" => HTML::purifier()->purify($data['statement']),
+			],
+			"where", [
+				"id" => UOJProblem::info('id'),
+			],
+		]);
+
+		redirectTo(UOJProblem::cur()->getUri());
+	};
+	$re_crawl_form->runAtServer();
+}
+
+$view_type_form = new UOJForm('view_type');
+$view_type_form->addSelect('view_content_type', [
+	'div_class' => 'row align-items-center g-0',
+	'label_class' => 'form-label col-auto m-0 flex-grow-1',
+	'select_class' => 'col-auto form-select w-auto',
+	'label' => '查看提交文件',
+	'options' => [
+		'NONE' => '禁止',
+		'ALL_AFTER_AC' => 'AC 后',
+		'ALL' => '所有人',
+	],
+	'default_value' => $problem_extra_config['view_content_type'],
+]);
+$view_type_form->addSelect('view_all_details_type', [
+	'div_class' => 'row align-items-center g-0 mt-3',
+	'label_class' => 'form-label col-auto m-0 flex-grow-1',
+	'select_class' => 'col-auto form-select w-auto',
+	'label' => '查看全部详细信息',
+	'options' => [
+		'NONE' => '禁止',
+		'SELF' => '仅自己',
+		'ALL_AFTER_AC' => 'AC 后',
+		'ALL' => '所有人'
+	],
+	'default_value' => $problem_extra_config['view_all_details_type'],
+]);
+$view_type_form->addSelect('view_details_type', [
+	'div_class' => 'row align-items-center g-0 mt-3',
+	'label_class' => 'form-label col-auto m-0 flex-grow-1',
+	'select_class' => 'col-auto form-select w-auto',
+	'label' => '查看测试点详细信息',
+	'options' => [
+		'NONE' => '禁止',
+		'SELF' => '仅自己',
+		'ALL_AFTER_AC' => 'AC 后',
+		'ALL' => '所有人',
+	],
+	'default_value' => $problem_extra_config['view_details_type'],
+]);
+$view_type_form->handle = function () {
+	$config = UOJProblem::cur()->getExtraConfig();
+	$config['view_content_type'] = $_POST['view_content_type'];
+	$config['view_all_details_type'] = $_POST['view_all_details_type'];
+	$config['view_details_type'] = $_POST['view_details_type'];
+	$esc_config = json_encode($config);
+
+	DB::update([
+		"update problems",
+		"set", ["extra_config" => $esc_config],
+		"where", ["id" => UOJProblem::info('id')]
+	]);
+};
+$view_type_form->runAtServer();
+
+$solution_view_type_form = new UOJForm('solution_view_type');
+$solution_view_type_form->addSelect('view_solution_type', [
+	'div_class' => 'row align-items-center g-0',
+	'label_class' => 'form-label col-auto m-0 flex-grow-1',
+	'select_class' => 'col-auto form-select w-auto',
+	'label' => '查看题解',
+	'options' => [
+		'NONE' => '禁止',
+		'ALL_AFTER_AC' => 'AC 后',
+		'ALL' => '所有人',
+	],
+	'default_value' => $problem_extra_config['view_solution_type'],
+]);
+$solution_view_type_form->addSelect('submit_solution_type', [
+	'div_class' => 'row align-items-center g-0 mt-3',
+	'label_class' => 'form-label col-auto m-0 flex-grow-1',
+	'select_class' => 'col-auto form-select w-auto',
+	'label' => '提交题解',
+	'options' => [
+		'NONE' => '禁止',
+		'ALL_AFTER_AC' => 'AC 后',
+		'ALL' => '所有人',
+	],
+	'default_value' => $problem_extra_config['submit_solution_type'],
+]);
+$solution_view_type_form->handle = function () {
+	$config = UOJProblem::cur()->getExtraConfig();
+	$config['view_solution_type'] = $_POST['view_solution_type'];
+	$config['submit_solution_type'] = $_POST['submit_solution_type'];
+	$esc_config = json_encode($config);
+
+	DB::update([
+		"update problems",
+		"set", ["extra_config" => $esc_config],
+		"where", ["id" => UOJProblem::info('id')]
+	]);
+};
+$solution_view_type_form->runAtServer();
 ?>
 
 <?php echoUOJPageHeader('题面编辑 - ' . HTML::stripTags(UOJProblem::info('title'))) ?>
@@ -102,11 +269,13 @@ $difficulty_form->runAtServer();
 					管理者
 				</a>
 			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="/problem/<?= UOJProblem::info('id') ?>/manage/data" role="tab">
-					数据
-				</a>
-			</li>
+			<?php if (UOJProblem::info('type') == 'local') : ?>
+				<li class="nav-item">
+					<a class="nav-link" href="/problem/<?= UOJProblem::info('id') ?>/manage/data" role="tab">
+						数据
+					</a>
+				</li>
+			<?php endif ?>
 		</ul>
 
 		<div class="card card-default">
@@ -259,6 +428,35 @@ $difficulty_form->runAtServer();
 			</div>
 			<div class="card-body">
 				<?php $difficulty_form->printHTML() ?>
+			</div>
+		</div>
+
+		<?php if (UOJProblem::info('type') == 'remote') : ?>
+			<div class="card mt-3">
+				<div class="card-header fw-bold">
+					重新爬取题目信息
+				</div>
+				<div class="card-body">
+					<?php $re_crawl_form->printHTML() ?>
+				</div>
+			</div>
+		<?php endif ?>
+
+		<div class="card mt-3">
+			<div class="card-header fw-bold">
+				提交记录可视权限
+			</div>
+			<div class="card-body">
+				<?php $view_type_form->printHTML() ?>
+			</div>
+		</div>
+
+		<div class="card mt-3">
+			<div class="card-header fw-bold">
+				题解可视权限
+			</div>
+			<div class="card-body">
+				<?php $solution_view_type_form->printHTML() ?>
 			</div>
 		</div>
 	</aside>

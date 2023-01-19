@@ -120,6 +120,53 @@ class UOJForm {
 		$this->add($name, $html, $validator_php, $validator_js);
 	}
 
+	public function addInput($name, $config) {
+		$config += [
+			'type' => 'text',
+			'div_class' => '',
+			'input_class' => 'form-control',
+			'default_value' => '',
+			'label' => '',
+			'label_class' => 'form-label',
+			'placeholder' => '',
+			'help' => '',
+			'help_class' => 'form-text',
+			'validator_php' => function ($x) {
+				return '';
+			},
+			'validator_js' => null,
+		];
+
+		$html = '';
+		$html .= HTML::tag_begin('div', ['class' => $config['div_class'], 'id' => "div-$name"]);
+
+		if ($config['label']) {
+			$html .= HTML::tag('label', [
+				'class' => $config['label_class'],
+				'for' => "input-$name",
+				'id' => "label-$name"
+			], $config['label']);
+		}
+
+		$html .= HTML::empty_tag('input', [
+			'class' => $config['input_class'],
+			'type' => $config['type'],
+			'name' => $name,
+			'id' => "input-$name",
+			'value' => $config['default_value'],
+			'placeholder' => $config['placeholder'],
+		]);
+		$html .= HTML::tag('div', ['class' => 'invalid-feedback', 'id' => "help-$name"], '');
+
+		if ($config['help']) {
+			$html .= HTML::tag('div', ['class' => $config['help_class']], $config['help']);
+		}
+
+		$html .= HTML::tag_end('div');
+
+		$this->add($name, $html, $config['validator_php'], $config['validator_js']);
+	}
+
 	public function addCheckbox($name, $config) {
 		$config += [
 			'checked' => false,

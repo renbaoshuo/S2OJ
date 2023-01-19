@@ -3,7 +3,10 @@
         "gregwar/captcha": "^1.1",
         "phpmailer/phpmailer": "^6.6",
         "ezyang/htmlpurifier": "^4.16",
-        "erusev/parsedown": "^1.7"
+        "erusev/parsedown": "^1.7",
+        "php-curl-class/php-curl-class": "^2.0",
+        "ext-dom": "20031129",
+        "ivopetkov/html5-dom-document-php": "2.*"
     },
 	"autoload": {
 		"classmap": [

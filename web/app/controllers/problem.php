@@ -223,7 +223,6 @@ if (UOJContest::cur()) {
 <div class="row">
 	<!-- Left col -->
 	<div class="col-lg-9">
-
 		<?php if (isset($tabs_info)) : ?>
 			<!-- 比赛导航 -->
 			<div class="mb-2">
@@ -233,7 +232,6 @@ if (UOJContest::cur()) {
 
 		<div class="card card-default mb-2">
 			<div class="card-body">
-
 				<h1 class="card-title text-center">
 					<?php if (UOJContest::cur()) : ?>
 						<?= UOJProblem::cur()->getTitle(['with' => 'letter', 'simplify' => true]) ?>
@@ -243,8 +241,13 @@ if (UOJContest::cur()) {
 				</h1>
 
 				<?php
-				$time_limit = $conf instanceof UOJProblemConf ? $conf->getVal('time_limit', 1) : null;
-				$memory_limit = $conf instanceof UOJProblemConf ? $conf->getVal('memory_limit', 256) : null;
+				if (UOJProblem::info('type') == 'local') {
+					$time_limit = $conf instanceof UOJProblemConf ? $conf->getVal('time_limit', 1) : null;
+					$memory_limit = $conf instanceof UOJProblemConf ? $conf->getVal('memory_limit', 256) : null;
+				} else if (UOJProblem::info('type') == 'remote') {
+					$time_limit = UOJProblem::cur()->getExtraConfig('time_limit');
+					$memory_limit = UOJProblem::cur()->getExtraConfig('memory_limit');
+				}
 				?>
 				<div class="text-center small">
 					时间限制: <?= $time_limit ? "$time_limit s" : "N/A" ?>
@@ -259,6 +262,12 @@ if (UOJContest::cur()) {
 						<article class="mt-3 markdown-body">
 							<?= $problem_content['statement'] ?>
 						</article>
+
+						<?php if (UOJProblem::info('type') == 'remote') : ?>
+							<article class="mt-3 markdown-body remote-content">
+								<?= UOJProblem::cur()->queryContent()['remote_content'] ?>
+							</article>
+						<?php endif ?>
 					</div>
 					<div class="tab-pane" id="submit">
 						<?php if ($pre_submit_check_ret !== true) : ?>
@@ -390,6 +399,14 @@ if (UOJContest::cur()) {
 					</span>
 					<span>
 						<?= UOJProblem::cur()->getUploaderLink() ?>
+					</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span class="flex-shrink-0">
+						题目来源
+					</span>
+					<span>
+						<?= UOJProblem::cur()->getProviderLink() ?>
 					</span>
 				</li>
 				<?php if (!UOJContest::cur() || UOJContest::cur()->progress() >= CONTEST_FINISHED) : ?>

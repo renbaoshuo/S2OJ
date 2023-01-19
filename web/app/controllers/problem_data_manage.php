@@ -10,6 +10,7 @@ requirePHPLib('data');
 
 UOJProblem::init(UOJRequest::get('id')) || UOJResponse::page404();
 UOJProblem::cur()->userCanManage(Auth::user()) || UOJResponse::page403();
+UOJProblem::info('type') === 'local' || UOJResponse::page404();
 $problem = UOJProblem::info();
 $problem_extra_config = UOJProblem::cur()->getExtraConfig();
 
@@ -466,93 +467,6 @@ $rejudgege97_form->submit_button_config['class_str'] = 'btn btn-danger d-block w
 $rejudgege97_form->submit_button_config['text'] = '重测 >=97 的程序';
 $rejudgege97_form->submit_button_config['smart_confirm'] = '';
 
-$view_type_form = new UOJBs4Form('view_type');
-$view_type_form->addVSelect(
-	'view_content_type',
-	array(
-		'NONE' => '禁止',
-		'ALL_AFTER_AC' => 'AC后',
-		'ALL' => '所有人'
-	),
-	'查看提交文件:',
-	$problem_extra_config['view_content_type']
-);
-$view_type_form->addVSelect(
-	'view_all_details_type',
-	array(
-		'NONE' => '禁止',
-		'SELF' => '仅自己',
-		'ALL_AFTER_AC' => 'AC后',
-		'ALL' => '所有人'
-	),
-	'查看全部详细信息:',
-	$problem_extra_config['view_all_details_type']
-);
-$view_type_form->addVSelect(
-	'view_details_type',
-	array(
-		'NONE' => '禁止',
-		'SELF' => '仅自己',
-		'ALL_AFTER_AC' => 'AC后',
-		'ALL' => '所有人'
-	),
-	'查看测试点详细信息:',
-	$problem_extra_config['view_details_type']
-);
-$view_type_form->handle = function () {
-	global $problem, $problem_extra_config;
-
-	$config = $problem_extra_config;
-	$config['view_content_type'] = $_POST['view_content_type'];
-	$config['view_all_details_type'] = $_POST['view_all_details_type'];
-	$config['view_details_type'] = $_POST['view_details_type'];
-	$esc_config = json_encode($config);
-
-	DB::update([
-		"update problems",
-		"set", ["extra_config" => $esc_config],
-		"where", ["id" => $problem['id']]
-	]);
-};
-$view_type_form->submit_button_config['class_str'] = 'btn btn-warning d-block w-100 mt-2';
-
-$solution_view_type_form = new UOJBs4Form('solution_view_type');
-$solution_view_type_form->addVSelect(
-	'view_solution_type',
-	array(
-		'NONE' => '禁止',
-		'ALL_AFTER_AC' => 'AC后',
-		'ALL' => '所有人'
-	),
-	'查看题解:',
-	$problem_extra_config['view_solution_type']
-);
-$solution_view_type_form->addVSelect(
-	'submit_solution_type',
-	array(
-		'NONE' => '禁止',
-		'ALL_AFTER_AC' => 'AC后',
-		'ALL' => '所有人'
-	),
-	'提交题解:',
-	$problem_extra_config['submit_solution_type']
-);
-$solution_view_type_form->handle = function () {
-	global $problem, $problem_extra_config;
-
-	$config = $problem_extra_config;
-	$config['view_solution_type'] = $_POST['view_solution_type'];
-	$config['submit_solution_type'] = $_POST['submit_solution_type'];
-	$esc_config = json_encode($config);
-
-	DB::update([
-		"update problems",
-		"set", ["extra_config" => $esc_config],
-		"where", ["id" => $problem['id']]
-	]);
-};
-$solution_view_type_form->submit_button_config['class_str'] = 'btn btn-warning d-block w-100 mt-2';
-
 if ($problem['hackable']) {
 	$test_std_form = new UOJBs4Form('test_std');
 	$test_std_form->handle = function () use ($problem, $data_disp) {
@@ -618,8 +532,6 @@ if ($problem['hackable']) {
 }
 
 $hackable_form->runAtServer();
-$view_type_form->runAtServer();
-$solution_view_type_form->runAtServer();
 $data_form->runAtServer();
 $clear_data_form->runAtServer();
 $rejudge_form->runAtServer();
@@ -753,18 +665,6 @@ $info_form->runAtServer();
 					<?php $test_std_form->printHTML() ?>
 				</div>
 			<?php endif ?>
-			<div class="mt-2">
-				<button id="button-display_view_type" type="button" class="btn btn-primary d-block w-100" onclick="$('#div-view_type').toggle('fast');">提交记录可视权限</button>
-				<div class="mt-2" id="div-view_type" style="display:none; padding-left:5px; padding-right:5px;">
-					<?php $view_type_form->printHTML(); ?>
-				</div>
-			</div>
-			<div class="mt-2">
-				<button id="button-solution_view_type" type="button" class="btn btn-primary d-block w-100" onclick="$('#div-solution_view_type').toggle('fast');">题解可视权限</button>
-				<div class="mt-2" id="div-solution_view_type" style="display:none; padding-left:5px; padding-right:5px;">
-					<?php $solution_view_type_form->printHTML(); ?>
-				</div>
-			</div>
 			<div class="mt-2">
 				<?php $data_form->printHTML(); ?>
 			</div>

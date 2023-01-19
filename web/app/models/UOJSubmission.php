@@ -87,11 +87,18 @@ class UOJSubmission {
 		$judge_reason = '';
 
 		$content['config'][] = ['problem_id', UOJProblem::info('id')];
+
+		if (UOJProblem::info('type') == 'remote') {
+			$content['config'][] = ['remote_online_judge', UOJProblem::cur()->getExtraConfig('remote_online_judge')];
+			$content['config'][] = ['remote_problem_id', UOJProblem::cur()->getExtraConfig('remote_problem_id')];
+		}
+
 		if ($is_contest_submission && UOJContestProblem::cur()->getJudgeTypeInContest() == 'sample') {
 			$content['final_test_config'] = $content['config'];
 			$content['config'][] = ['test_sample_only', 'on'];
 			$judge_reason = json_encode(['text' => '样例测评']);
 		}
+
 		$content_json = json_encode($content);
 
 		$language = static::getAndRememberSubmissionLanguage($content);
@@ -407,9 +414,14 @@ class UOJSubmission {
 	}
 
 	public function userCanRejudge(array $user = null) {
+		if ($this->problem->info['type'] == 'remote') {
+			return false;
+		}
+
 		if (isSuperUser($user)) {
 			return true;
 		}
+
 		return $this->userCanManageProblemOrContest($user) && $this->hasFullyJudged();
 	}
 
