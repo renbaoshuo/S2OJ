@@ -42,6 +42,20 @@ services:
       - SOCKET_PORT=2333
       - SOCKET_PASSWORD=_judger_socket_password_
   
+  uoj-remote-judger:
+    build:
+      context: ./remote_judger/
+      dockerfile: Dockerfile
+      args:
+        - USE_MIRROR=1
+    container_name: uoj-remote-judger
+    restart: always
+    volumes:
+      - ./uoj_data/judger/log:/opt/uoj_judger/log
+    environment:
+      - UOJ_PROTOCOL=http
+      - UOJ_HOST=uoj-web
+  
   uoj-web:
     build:
       context: ./

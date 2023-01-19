@@ -1,0 +1,32 @@
+{
+  "name": "s2oj-remote-judger",
+  "version": "0.0.0",
+  "description": "Remote judger of S2OJ.",
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "node dist/entrypoint.js"
+  },
+  "type": "module",
+  "repository": "https://github.com/renbaoshuo/S2OJ",
+  "author": "Baoshuo <i@baoshuo.ren>",
+  "license": "AGPL-3.0",
+  "private": true,
+  "dependencies": {
+    "jsdom": "^21.0.0",
+    "math-sum": "^2.0.0",
+    "reggol": "^1.3.4",
+    "superagent": "^8.0.6",
+    "superagent-prefix": "^0.0.2",
+    "superagent-proxy": "^3.0.0",
+    "xml-js": "^1.6.11"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.5",
+    "@types/jsdom": "^20.0.1",
+    "@types/node": "^18.11.18",
+    "@types/superagent": "^4.1.16",
+    "@types/superagent-proxy": "^3.0.0",
+    "js-yaml": "^4.1.0",
+    "typescript": "^4.9.4"
+  }
+}

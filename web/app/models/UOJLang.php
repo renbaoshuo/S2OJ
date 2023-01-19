@@ -64,21 +64,21 @@ class UOJLang {
 			return [];
 		}
 		$is_avail = [];
-		$dep_list = [
-			['C++98', 'C++03', 'C++11', 'C++', 'C++17', 'C++20'],
-			['Java8', 'Java11', 'Java17']
-		];
+		// $dep_list = [
+		// 	['C++98', 'C++03', 'C++11', 'C++', 'C++17', 'C++20'],
+		// 	['Java8', 'Java11', 'Java17']
+		// ];
 		foreach ($list as $lang) {
 			$lang = static::getUpgradedLangCode($lang);
-			foreach ($dep_list as $dep) {
-				$ok = false;
-				foreach ($dep as $d) {
-					if ($ok || $d == $lang) {
-						$is_avail[$d] = true;
-						$ok = true;
-					}
-				}
-			}
+			// foreach ($dep_list as $dep) {
+			// 	$ok = false;
+			// 	foreach ($dep as $d) {
+			// 		if ($ok || $d == $lang) {
+			// 			$is_avail[$d] = true;
+			// 			$ok = true;
+			// 		}
+			// 	}
+			// }
 			$is_avail[$lang] = true;
 		}
 

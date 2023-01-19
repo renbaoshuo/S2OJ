@@ -86,9 +86,6 @@ Route::group(
 
 		Route::any('/super_manage(?:/{tab})?', '/super_manage.php');
 
-		Route::any('/download/problem/{id}/data.zip', '/download.php?type=problem');
-		Route::any('/download/problem/{id}/attachment.zip', '/download.php?type=attachment');
-
 		Route::any('/check-notice', '/check_notice.php');
 		Route::any('/click-zan', '/click_zan.php');
 
