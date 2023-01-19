@@ -82,11 +82,13 @@ if (isSuperUser(Auth::user())) {
 					管理者
 				</a>
 			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="/problem/<?= UOJProblem::info('id') ?>/manage/data" role="tab">
-					数据
-				</a>
-			</li>
+			<?php if (UOJProblem::cur()->type() == 'local') : ?>
+				<li class="nav-item">
+					<a class="nav-link" href="/problem/<?= UOJProblem::info('id') ?>/manage/data" role="tab">
+						数据
+					</a>
+				</li>
+			<?php endif ?>
 		</ul>
 
 		<div class="card card-default">
