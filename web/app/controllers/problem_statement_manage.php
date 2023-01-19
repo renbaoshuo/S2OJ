@@ -84,7 +84,7 @@ $difficulty_form->handle = function () {
 };
 $difficulty_form->runAtServer();
 
-if (UOJProblem::cur()->type() == 'remote') {
+if (UOJProblem::info('type') == 'remote') {
 	$remote_online_judge = UOJProblem::cur()->getExtraConfig('remote_online_judge');
 	$remote_problem_id = UOJProblem::cur()->getExtraConfig('remote_problem_id');
 	$remote_provider = UOJRemoteProblem::$providers[$remote_online_judge];
@@ -269,7 +269,7 @@ $solution_view_type_form->runAtServer();
 					管理者
 				</a>
 			</li>
-			<?php if (UOJProblem::cur()->type() == 'local') : ?>
+			<?php if (UOJProblem::info('type') == 'local') : ?>
 				<li class="nav-item">
 					<a class="nav-link" href="/problem/<?= UOJProblem::info('id') ?>/manage/data" role="tab">
 						数据
@@ -431,7 +431,7 @@ $solution_view_type_form->runAtServer();
 			</div>
 		</div>
 
-		<?php if (UOJProblem::cur()->type() == 'remote') : ?>
+		<?php if (UOJProblem::info('type') == 'remote') : ?>
 			<div class="card mt-3">
 				<div class="card-header fw-bold">
 					重新爬取题目信息

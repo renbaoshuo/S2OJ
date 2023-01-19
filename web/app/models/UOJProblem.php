@@ -344,10 +344,6 @@ class UOJProblem {
 		$this->info = $info;
 	}
 
-	public function type() {
-		return $this->info['type'];
-	}
-
 	public function getTitle(array $cfg = []) {
 		$cfg += [
 			'with' => 'id',
@@ -387,7 +383,7 @@ class UOJProblem {
 	}
 
 	public function getProviderLink() {
-		if ($this->type() == 'local') {
+		if ($this->info['type'] == 'local') {
 			return HTML::tag('a', ['href' => HTML::url('/')], UOJConfig::$data['profile']['oj-name-short']);
 		}
 
@@ -464,7 +460,7 @@ class UOJProblem {
 		return $key === null ? $extra_config : $extra_config[$key];
 	}
 	public function getCustomTestRequirement() {
-		if ($this->type() == 'remote') {
+		if ($this->info['type'] == 'remote') {
 			return [];
 		}
 

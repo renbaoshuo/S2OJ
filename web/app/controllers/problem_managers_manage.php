@@ -82,7 +82,7 @@ if (isSuperUser(Auth::user())) {
 					管理者
 				</a>
 			</li>
-			<?php if (UOJProblem::cur()->type() == 'local') : ?>
+			<?php if (UOJProblem::info('type') === 'local') : ?>
 				<li class="nav-item">
 					<a class="nav-link" href="/problem/<?= UOJProblem::info('id') ?>/manage/data" role="tab">
 						数据
