@@ -95,7 +95,7 @@ $view_type_form->addSelect('view_content_type', [
 		'ALL_AFTER_AC' => 'AC 后',
 		'ALL' => '所有人',
 	],
-	'default_value' => $problem_extra_config['view_content_type'],
+	'default_value' => UOJProblem::cur()->getExtraConfig('view_content_type'),
 ]);
 $view_type_form->addSelect('view_all_details_type', [
 	'div_class' => 'row align-items-center g-0 mt-3',
@@ -108,7 +108,7 @@ $view_type_form->addSelect('view_all_details_type', [
 		'ALL_AFTER_AC' => 'AC 后',
 		'ALL' => '所有人'
 	],
-	'default_value' => $problem_extra_config['view_all_details_type'],
+	'default_value' => UOJProblem::cur()->getExtraConfig('view_all_details_type'),
 ]);
 $view_type_form->addSelect('view_details_type', [
 	'div_class' => 'row align-items-center g-0 mt-3',
@@ -121,7 +121,7 @@ $view_type_form->addSelect('view_details_type', [
 		'ALL_AFTER_AC' => 'AC 后',
 		'ALL' => '所有人',
 	],
-	'default_value' => $problem_extra_config['view_details_type'],
+	'default_value' => UOJProblem::cur()->getExtraConfig('view_details_type'),
 ]);
 $view_type_form->handle = function () {
 	$config = UOJProblem::cur()->getExtraConfig();
@@ -149,7 +149,7 @@ $solution_view_type_form->addSelect('view_solution_type', [
 		'ALL_AFTER_AC' => 'AC 后',
 		'ALL' => '所有人',
 	],
-	'default_value' => $problem_extra_config['view_solution_type'],
+	'default_value' => UOJProblem::cur()->getExtraConfig('view_solution_type'),
 ]);
 $solution_view_type_form->addSelect('submit_solution_type', [
 	'div_class' => 'row align-items-center g-0 mt-3',
@@ -161,7 +161,7 @@ $solution_view_type_form->addSelect('submit_solution_type', [
 		'ALL_AFTER_AC' => 'AC 后',
 		'ALL' => '所有人',
 	],
-	'default_value' => $problem_extra_config['submit_solution_type'],
+	'default_value' =>  UOJProblem::cur()->getExtraConfig('submit_solution_type'),
 ]);
 $solution_view_type_form->handle = function () {
 	$config = UOJProblem::cur()->getExtraConfig();
