@@ -464,28 +464,33 @@ class UOJProblem {
 		return $key === null ? $extra_config : $extra_config[$key];
 	}
 	public function getCustomTestRequirement() {
+		if ($this->type() == 'remote') {
+			return [];
+		}
+
 		$extra_config = json_decode($this->info['extra_config'], true);
+
 		if (isset($extra_config['custom_test_requirement'])) {
 			return $extra_config['custom_test_requirement'];
-		} else {
-			$answer = [
-				'name' => 'answer',
-				'type' => 'source code',
-				'file_name' => 'answer.code'
-			];
-			foreach ($this->getSubmissionRequirement() as $req) {
-				if ($req['name'] == 'answer' && $req['type'] == 'source code' && isset($req['languages'])) {
-					$answer['languages'] = $req['languages'];
-				}
-			}
-			return [
-				$answer, [
-					'name' => 'input',
-					'type' => 'text',
-					'file_name' => 'input.txt'
-				]
-			];
 		}
+
+		$answer = [
+			'name' => 'answer',
+			'type' => 'source code',
+			'file_name' => 'answer.code'
+		];
+		foreach ($this->getSubmissionRequirement() as $req) {
+			if ($req['name'] == 'answer' && $req['type'] == 'source code' && isset($req['languages'])) {
+				$answer['languages'] = $req['languages'];
+			}
+		}
+		return [
+			$answer, [
+				'name' => 'input',
+				'type' => 'text',
+				'file_name' => 'input.txt'
+			]
+		];
 	}
 
 	public function userCanView(array $user = null, array $cfg = []) {
