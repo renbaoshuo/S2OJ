@@ -392,6 +392,7 @@ class UOJProblem {
 		}
 
 		$remote_oj = $this->getExtraConfig('remote_online_judge');
+		$remote_id = $this->getExtraConfig('remote_problem_id');
 
 		if (!$remote_oj || !array_key_exists($remote_oj, UOJRemoteProblem::$providers)) {
 			return 'Error';
@@ -399,7 +400,10 @@ class UOJProblem {
 
 		$provider = UOJRemoteProblem::$providers[$remote_oj];
 
-		return HTML::tag('a', ['href' => $provider['url'], 'target' => '_blank'], $provider['name']);
+		return HTML::tag('a', [
+			'href' => UOJRemoteProblem::getProblemRemoteUrl($remote_oj, $remote_id),
+			'target' => '_blank'
+		], $provider['name']);
 	}
 
 	public function getDifficultyHTML() {

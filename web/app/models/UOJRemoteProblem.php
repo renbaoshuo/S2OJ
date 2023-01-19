@@ -6,7 +6,6 @@ class UOJRemoteProblem {
 			'name' => 'Codeforces',
 			'short_name' => 'CF',
 			'url' => 'https://codeforces.com',
-			'host' => 'https://codeforces.com',
 			'not_exists_texts' => [
 				'<th>Actions</th>',
 				'Statement is not available on English language',
@@ -16,16 +15,19 @@ class UOJRemoteProblem {
 		],
 	];
 
+	static function getCodeforcesProblemUrl($id) {
+		return static::$providers['codeforces']['url'] . '/problemset/problem/' . preg_replace_callback('/([1-9][0-9]{0,5})([A-Z][1-9]?)/', fn ($matches) => $matches[1] . '/' . $matches[2], $id);
+	}
+
 	// 传入 ID 需确保有效
 	static function getCodeforcesProblemBasicInfo($id) {
 		$curl = new Curl();
 		$curl->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0');
 
 		$remote_provider = static::$providers['codeforces'];
-		$url_id = preg_replace_callback('/([1-9][0-9]{0,5})([A-Z][1-9]?)/', fn ($matches) => $matches[1] . '/' . $matches[2], $id);
 
-		$html = retry_loop(function () use ($curl, $url_id, $remote_provider) {
-			$curl->get($remote_provider['host'] . '/problemset/problem/' . $url_id);
+		$html = retry_loop(function () use ($curl, $id) {
+			$curl->get(static::getCodeforcesProblemUrl($id));
 
 			if ($curl->error) {
 				return false;
@@ -124,6 +126,14 @@ class UOJRemoteProblem {
 			'difficulty' => $difficulty,
 			'statement' => $statement_dom->innerHTML,
 		];
+	}
+
+	public static function getProblemRemoteUrl($oj, $id) {
+		if ($oj === 'codeforces') {
+			return static::getCodeforcesProblemUrl($id);
+		}
+
+		return null;
 	}
 
 	public static function getProblemBasicInfo($oj, $id) {
