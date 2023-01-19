@@ -65,9 +65,12 @@ $problem_editor->runAtServer();
 
 $difficulty_form = new UOJForm('difficulty');
 $difficulty_form->addSelect('difficulty', [
+	'div_class' => 'flex-grow-1',
 	'options' => [-1 => '暂无评定'] + array_combine(UOJProblem::$difficulty, UOJProblem::$difficulty),
 	'default_value' => UOJProblem::info('difficulty'),
 ]);
+$difficulty_form->config['form']['class'] = 'd-flex';
+$difficulty_form->config['submit_container']['class'] = 'ms-2';
 $difficulty_form->handle = function () {
 	DB::update([
 		"update problems",
