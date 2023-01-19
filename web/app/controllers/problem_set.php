@@ -55,7 +55,7 @@ if (UOJProblem::userCanCreateProblem(Auth::user())) {
 如有，在此处填写其他于题意或数据相关的说明。
 
 EOD;
-	$new_problem_form = new UOJBs4Form('new_problem');
+	$new_problem_form = new UOJForm('new_problem');
 	$new_problem_form->handle = function () use ($default_statement) {
 		DB::insert([
 			"insert into problems",
@@ -77,11 +77,10 @@ EOD;
 		redirectTo("/problem/{$id}/manage/statement");
 		die();
 	};
-	$new_problem_form->submit_button_config['align'] = 'right';
-	$new_problem_form->submit_button_config['class_str'] = 'btn btn-primary';
-	$new_problem_form->submit_button_config['text'] = UOJLocale::get('problems::add new');
-	$new_problem_form->submit_button_config['smart_confirm'] = '';
-
+	$new_problem_form->config['submit_container']['class'] = '';
+	$new_problem_form->config['submit_button']['class'] = 'bg-transparent border-0 d-block w-100 px-3 py-2 text-start';
+	$new_problem_form->config['submit_button']['text'] = '<i class="bi bi-plus-lg"></i> 新建本地题目';
+	$new_problem_form->config['confirm']['text'] = '添加新题';
 	$new_problem_form->runAtServer();
 }
 
@@ -257,42 +256,34 @@ $pag = new Paginator([
 	<!-- left col -->
 	<div class="col-md-9">
 		<!-- title -->
-		<div class="d-flex justify-content-between">
+		<div class="d-flex justify-content-between flex-wrap">
 			<h1>
 				<?= UOJLocale::get('problems') ?>
 			</h1>
 
-			<?php if (isset($new_problem_form)) : ?>
-				<div class="text-end">
-					<?php $new_problem_form->printHTML(); ?>
-				</div>
-			<?php endif ?>
-
+			<div>
+				<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
+			</div>
 		</div>
 		<!-- end title -->
 
-		<div class="row">
-			<div class="col-sm-4 col-12">
-				<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
-			</div>
-			<div class="text-end p-2 col-12 col-sm-8">
-				<div class="form-check d-inline-block me-2">
-					<input type="checkbox" id="input-show_tags_mode" class="form-check-input" <?= isset($_COOKIE['show_tags_mode']) ? 'checked="checked" ' : '' ?> />
-					<label class="form-check-label" for="input-show_tags_mode">
-						<?= UOJLocale::get('problems::show tags') ?>
-					</label>
-				</div>
+		<?= $pag->pagination() ?>
 
-				<div class="form-check d-inline-block">
-					<input type="checkbox" id="input-show_submit_mode" class="form-check-input" <?= isset($_COOKIE['show_submit_mode']) ? 'checked="checked" ' : '' ?> />
-					<label class="form-check-label" for="input-show_submit_mode">
-						<?= UOJLocale::get('problems::show statistics') ?>
-					</label>
-				</div>
+		<div class="text-end">
+			<div class="form-check d-inline-block me-2">
+				<input type="checkbox" id="input-show_tags_mode" class="form-check-input" <?= isset($_COOKIE['show_tags_mode']) ? 'checked="checked" ' : '' ?> />
+				<label class="form-check-label" for="input-show_tags_mode">
+					<?= UOJLocale::get('problems::show tags') ?>
+				</label>
+			</div>
+
+			<div class="form-check d-inline-block">
+				<input type="checkbox" id="input-show_submit_mode" class="form-check-input" <?= isset($_COOKIE['show_submit_mode']) ? 'checked="checked" ' : '' ?> />
+				<label class="form-check-label" for="input-show_submit_mode">
+					<?= UOJLocale::get('problems::show statistics') ?>
+				</label>
 			</div>
 		</div>
-
-		<?= $pag->pagination() ?>
 
 		<script type="text/javascript">
 			$('#input-show_tags_mode').click(function() {
@@ -392,6 +383,23 @@ $pag = new Paginator([
 				$('#form-problem_search').submit();
 			});
 		</script>
+
+		<?php if (UOJProblem::userCanCreateProblem(Auth::user())) : ?>
+			<div class="card mb-3">
+				<div class="card-header fw-bold">
+					新建题目
+				</div>
+				<div class="list-group list-group-flush">
+					<div class="list-group-item list-group-item-action p-0">
+						<?php $new_problem_form->printHTML() ?>
+					</div>
+					<a class="list-group-item list-group-item-action" href="/problems/new/remote">
+						<i class="bi bi-cloud-plus"></i>
+						新建远端评测题目
+					</a>
+				</div>
+			</div>
+		<?php endif ?>
 
 		<!-- sidebar -->
 		<?php uojIncludeView('sidebar') ?>
