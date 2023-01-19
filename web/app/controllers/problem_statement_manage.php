@@ -65,9 +65,12 @@ $problem_editor->runAtServer();
 
 $difficulty_form = new UOJForm('difficulty');
 $difficulty_form->addSelect('difficulty', [
+	'div_class' => 'flex-grow-1',
 	'options' => [-1 => '暂无评定'] + array_combine(UOJProblem::$difficulty, UOJProblem::$difficulty),
 	'default_value' => UOJProblem::info('difficulty'),
 ]);
+$difficulty_form->config['form']['class'] = 'd-flex';
+$difficulty_form->config['submit_container']['class'] = 'ms-2';
 $difficulty_form->handle = function () {
 	DB::update([
 		"update problems",
@@ -151,6 +154,99 @@ if (UOJProblem::cur()->type() == 'remote') {
 	};
 	$re_crawl_form->runAtServer();
 }
+
+$view_type_form = new UOJForm('view_type');
+$view_type_form->addSelect('view_content_type', [
+	'div_class' => 'row align-items-center g-0',
+	'label_class' => 'form-label col-auto m-0 flex-grow-1',
+	'select_class' => 'col-auto form-select w-auto',
+	'label' => '查看提交文件',
+	'options' => [
+		'NONE' => '禁止',
+		'ALL_AFTER_AC' => 'AC 后',
+		'ALL' => '所有人',
+	],
+	'default_value' => $problem_extra_config['view_content_type'],
+]);
+$view_type_form->addSelect('view_all_details_type', [
+	'div_class' => 'row align-items-center g-0 mt-3',
+	'label_class' => 'form-label col-auto m-0 flex-grow-1',
+	'select_class' => 'col-auto form-select w-auto',
+	'label' => '查看全部详细信息',
+	'options' => [
+		'NONE' => '禁止',
+		'SELF' => '仅自己',
+		'ALL_AFTER_AC' => 'AC 后',
+		'ALL' => '所有人'
+	],
+	'default_value' => $problem_extra_config['view_all_details_type'],
+]);
+$view_type_form->addSelect('view_details_type', [
+	'div_class' => 'row align-items-center g-0 mt-3',
+	'label_class' => 'form-label col-auto m-0 flex-grow-1',
+	'select_class' => 'col-auto form-select w-auto',
+	'label' => '查看测试点详细信息',
+	'options' => [
+		'NONE' => '禁止',
+		'SELF' => '仅自己',
+		'ALL_AFTER_AC' => 'AC 后',
+		'ALL' => '所有人',
+	],
+	'default_value' => $problem_extra_config['view_details_type'],
+]);
+$view_type_form->handle = function () {
+	$config = UOJProblem::cur()->getExtraConfig();
+	$config['view_content_type'] = $_POST['view_content_type'];
+	$config['view_all_details_type'] = $_POST['view_all_details_type'];
+	$config['view_details_type'] = $_POST['view_details_type'];
+	$esc_config = json_encode($config);
+
+	DB::update([
+		"update problems",
+		"set", ["extra_config" => $esc_config],
+		"where", ["id" => UOJProblem::info('id')]
+	]);
+};
+$view_type_form->runAtServer();
+
+$solution_view_type_form = new UOJForm('solution_view_type');
+$solution_view_type_form->addSelect('view_solution_type', [
+	'div_class' => 'row align-items-center g-0',
+	'label_class' => 'form-label col-auto m-0 flex-grow-1',
+	'select_class' => 'col-auto form-select w-auto',
+	'label' => '查看题解',
+	'options' => [
+		'NONE' => '禁止',
+		'ALL_AFTER_AC' => 'AC 后',
+		'ALL' => '所有人',
+	],
+	'default_value' => $problem_extra_config['view_solution_type'],
+]);
+$solution_view_type_form->addSelect('submit_solution_type', [
+	'div_class' => 'row align-items-center g-0 mt-3',
+	'label_class' => 'form-label col-auto m-0 flex-grow-1',
+	'select_class' => 'col-auto form-select w-auto',
+	'label' => '提交题解',
+	'options' => [
+		'NONE' => '禁止',
+		'ALL_AFTER_AC' => 'AC 后',
+		'ALL' => '所有人',
+	],
+	'default_value' => $problem_extra_config['submit_solution_type'],
+]);
+$solution_view_type_form->handle = function () {
+	$config = UOJProblem::cur()->getExtraConfig();
+	$config['view_solution_type'] = $_POST['view_solution_type'];
+	$config['submit_solution_type'] = $_POST['submit_solution_type'];
+	$esc_config = json_encode($config);
+
+	DB::update([
+		"update problems",
+		"set", ["extra_config" => $esc_config],
+		"where", ["id" => UOJProblem::info('id')]
+	]);
+};
+$solution_view_type_form->runAtServer();
 ?>
 
 <?php echoUOJPageHeader('题面编辑 - ' . HTML::stripTags(UOJProblem::info('title'))) ?>
@@ -345,6 +441,24 @@ if (UOJProblem::cur()->type() == 'remote') {
 				</div>
 			</div>
 		<?php endif ?>
+
+		<div class="card mt-3">
+			<div class="card-header fw-bold">
+				提交记录可视权限
+			</div>
+			<div class="card-body">
+				<?php $view_type_form->printHTML() ?>
+			</div>
+		</div>
+
+		<div class="card mt-3">
+			<div class="card-header fw-bold">
+				题解可视权限
+			</div>
+			<div class="card-body">
+				<?php $solution_view_type_form->printHTML() ?>
+			</div>
+		</div>
 	</aside>
 </div>
 
