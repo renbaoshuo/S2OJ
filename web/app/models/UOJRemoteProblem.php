@@ -84,14 +84,12 @@ class UOJRemoteProblem {
 			$elem->outerHTML = '<h3>' . $elem->innerHTML . '</h3>';
 		}
 
-		$sample_cnt = 0;
+		$sample_input_cnt = 0;
+		$sample_output_cnt = 0;
 
-		foreach ($statement_dom->querySelectorAll('.sample-test') as &$sample) {
-			$sample_cnt++;
-			$input_dom = &$sample->querySelector('.input');
-			$output_dom = &$sample->querySelector('.output');
+		foreach ($statement_dom->querySelectorAll('.input') as &$input_dom) {
+			$sample_input_cnt++;
 			$input_text = '';
-			$output_text = '';
 
 			if ($input_dom->querySelector('.test-example-line')) {
 				foreach ($input_dom->querySelectorAll('.test-example-line') as &$line) {
@@ -101,6 +99,13 @@ class UOJRemoteProblem {
 				$input_text = HTML::stripTags($input_dom->querySelector('pre')->innerHTML);
 			}
 
+			$input_dom->outerHTML = HTML::tag('h4', [], "Input #{$sample_input_cnt}") . HTML::tag('pre', [], HTML::tag('code', [], $input_text));
+		}
+
+		foreach ($statement_dom->querySelectorAll('.output') as &$output_dom) {
+			$sample_output_cnt++;
+			$output_text = '';
+
 			if ($output_dom->querySelector('.test-example-line')) {
 				foreach ($output_dom->querySelectorAll('.test-example-line') as &$line) {
 					$output_text .= HTML::stripTags($line->innerHTML) . "\n";
@@ -109,8 +114,7 @@ class UOJRemoteProblem {
 				$output_text = HTML::stripTags($output_dom->querySelector('pre')->innerHTML);
 			}
 
-			$input_dom->outerHTML = HTML::tag('h4', [], "Input #{$sample_cnt}") . HTML::tag('pre', [], HTML::tag('code', [], $input_text));
-			$output_dom->outerHTML = HTML::tag('h4', [], "Output #{$sample_cnt}") . HTML::tag('pre', [], HTML::tag('code', [], $output_text));
+			$output_dom->outerHTML = HTML::tag('h4', [], "Output #{$sample_output_cnt}") . HTML::tag('pre', [], HTML::tag('code', [], $output_text));
 		}
 
 		return [

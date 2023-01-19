@@ -105,7 +105,7 @@ $new_remote_problem_form->runAtServer();
 						<ul>
 							<li>
 								<p>目前支持导入以下题库的题目作为远端评测题：</p>
-								<ul>
+								<ul class="mb-3">
 									<li>Codeforces</li>
 								</ul>
 							</li>
