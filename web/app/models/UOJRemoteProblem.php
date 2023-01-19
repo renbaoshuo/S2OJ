@@ -58,7 +58,7 @@ class UOJRemoteProblem {
 		foreach ($dom->querySelectorAll('.tag-box') as &$elem) {
 			$matches = [];
 
-			if (preg_match('/\*([0-9]{3,4})/', trim($elem->innerHTML), $matches) !== false) {
+			if (preg_match('/\*([0-9]{3,4})/', trim($elem->innerHTML), $matches)) {
 				$difficulty = intval($matches[1]);
 
 				break;
