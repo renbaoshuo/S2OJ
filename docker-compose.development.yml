@@ -50,8 +50,6 @@ services:
         - USE_MIRROR=1
     container_name: uoj-remote-judger
     restart: always
-    volumes:
-      - ./uoj_data/judger/log:/opt/uoj_judger/log
     env_file:
       - remote-judger.development.env
     environment:
