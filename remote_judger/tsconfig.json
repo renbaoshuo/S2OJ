@@ -13,9 +13,6 @@
     "isolatedModules": true,
     "incremental": true,
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    },
     "outDir": "./dist"
   },
   "include": ["**/*.ts"],

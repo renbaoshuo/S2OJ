@@ -9,4 +9,4 @@ COPY . .
 
 RUN npm run build
 
-CMD [ "node", "dist/entrypoint.js" ]
+CMD [ "node", "--experimental-specifier-resolution=node", "dist/entrypoint.js" ]

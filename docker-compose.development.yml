@@ -52,9 +52,14 @@ services:
     restart: always
     volumes:
       - ./uoj_data/judger/log:/opt/uoj_judger/log
+    env_file:
+      - remote-judger.development.env
     environment:
+      - DEV=true
       - UOJ_PROTOCOL=http
       - UOJ_HOST=uoj-web
+      - UOJ_JUDGER_NAME=remote_judger
+      - UOJ_JUDGER_PASSWORD=_judger_password_
   
   uoj-web:
     build:
