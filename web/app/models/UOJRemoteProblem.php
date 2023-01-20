@@ -39,9 +39,10 @@ class UOJRemoteProblem {
 		}
 
 		$statement_dom = $dom->querySelector('.problem-statement');
-		$title_prefix = str_starts_with($id, 'GYM') ? '' : 'CF';
+		$title_prefix = str_starts_with($id, 'GYM') ? 'Gym' : 'CF';
 		$title = explode('. ', trim($statement_dom->querySelector('.title')->innerHTML))[1];
-		$title = "【{$title_prefix}{$id}】{$title}";
+		$title_id = str_starts_with($id, 'GYM') ? substr($id, 3) : $id;
+		$title = "【{$title_prefix}{$title_id}】{$title}";
 		$time_limit = intval(substr($statement_dom->querySelector('.time-limit')->innerHTML, 53));
 		$memory_limit = intval(substr($statement_dom->querySelector('.memory-limit')->innerHTML, 55));
 		$difficulty = -1;
@@ -141,8 +142,9 @@ class UOJRemoteProblem {
 		if (str_starts_with($res['content-type'], 'text/html')) {
 			return static::getCodeforcesProblemBasicInfoFromHtml($id, $res['response']);
 		} else if (str_starts_with($res['content-type'], 'application/pdf')) {
-			$title_prefix = str_starts_with($id, 'GYM') ? '' : 'CF';
-			$title = "【{$title_prefix}{$id}】{$title_prefix}{$id}";
+			$title_prefix = str_starts_with($id, 'GYM') ? 'Gym' : 'CF';
+			$title_id = str_starts_with($id, 'GYM') ? substr($id, 3) : $id;
+			$title = "【{$title_prefix}{$title_id}】{$title_prefix}{$title_id}";
 
 			return [
 				'type' => 'pdf',
