@@ -65,6 +65,24 @@ export default async function daemon(config: UOJConfig) {
         const config = Object.fromEntries(content.config);
         const tmpdir = `/tmp/s2oj_rmj/${id}/`;
 
+        if (config.test_sample_only === 'on') {
+          await request('/submit', {
+            submit: true,
+            fetch_new: false,
+            id,
+            result: JSON.stringify({
+              status: 'Judged',
+              score: 100,
+              time: 0,
+              memory: 0,
+              details: '<info-block>Sample test is not available.</info-block>',
+            }),
+            judge_time,
+          });
+
+          continue;
+        }
+
         fs.ensureDirSync(tmpdir);
 
         const reportError = async (error: string, details: string) => {
