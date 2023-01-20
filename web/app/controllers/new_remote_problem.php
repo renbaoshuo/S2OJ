@@ -9,18 +9,27 @@ UOJProblem::userCanCreateProblem(Auth::user()) || UOJResponse::page403();
 $new_remote_problem_form = new UOJForm('new_remote_problem');
 $new_remote_problem_form->addSelect('remote_online_judge', [
 	'label' => '远程 OJ',
-	'options' => [
-		'codeforces' => 'Codeforces',
-	],
+	'options' => array_map(fn ($provider) => $provider['name'], UOJRemoteProblem::$providers),
 ]);
 $new_remote_problem_form->addInput('remote_problem_id', [
 	'div_class' => 'mt-3',
 	'label' => '远程 OJ 上的题目 ID',
 	'validator_php' => function ($id, &$vdata) {
-		if ($_POST['remote_online_judge'] === 'codeforces') {
+		$remote_oj = $_POST['remote_online_judge'];
+		if ($remote_oj === 'codeforces') {
 			$id = trim(strtoupper($id));
 
 			if (!validateCodeforcesProblemId($id)) {
+				return '不合法的题目 ID';
+			}
+
+			$vdata['remote_problem_id'] = $id;
+
+			return '';
+		} else if ($remote_oj === 'atcoder') {
+			$id = trim(strtolower($id));
+
+			if (!validateString($id)) {
 				return '不合法的题目 ID';
 			}
 
@@ -78,7 +87,7 @@ $new_remote_problem_form->handle = function (&$vdata) {
 		"insert into problems_contents",
 		"(id, remote_content, statement, statement_md)",
 		"values",
-		DB::tuple([$id, HTML::purifier()->purify($data['statement']), '', ''])
+		DB::tuple([$id, HTML::purifier(['a' => ['target' => 'Enum#_blank']])->purify($data['statement']), '', ''])
 	]);
 	dataNewProblem($id);
 

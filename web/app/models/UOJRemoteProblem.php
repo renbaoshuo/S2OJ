@@ -13,6 +13,16 @@ class UOJRemoteProblem {
 			],
 			'languages' => ['C', 'C++', 'C++17', 'C++20', 'Java17', 'Pascal', 'Python2', 'Python3'],
 		],
+		'atcoder' => [
+			'name' => 'AtCoder',
+			'short_name' => 'AT',
+			'url' => 'https://atcoder.jp',
+			'not_exists_texts' => [
+				'Task not found',
+				'指定されたタスクが見つかりません',
+			],
+			'languages' => ['C', 'C++', 'Java11', 'Python3', 'Pascal'],
+		],
 	];
 
 	static function getCodeforcesProblemUrl($id) {
@@ -21,6 +31,18 @@ class UOJRemoteProblem {
 		}
 
 		return static::$providers['codeforces']['url'] . '/problemset/problem/' . preg_replace_callback('/([1-9][0-9]{0,5})([A-Z][1-9]?)/', fn ($matches) => $matches[1] . '/' . $matches[2], $id);
+	}
+
+	static function getAtcoderProblemUrl($id) {
+		return static::$providers['atcoder']['url'] . '/contests/' . preg_replace_callback('/(\w+)([a-z][1-9]?)/', function ($matches) {
+			$contest = str_replace('_', '', $matches[1]);
+
+			if (str_ends_with($matches[1], '_')) {
+				return "{$contest}/tasks/{$matches[1]}{$matches[2]}";
+			}
+
+			return "{$contest}/tasks/{$matches[1]}_{$matches[2]}";
+		}, $id);
 	}
 
 	static function getCodeforcesProblemBasicInfoFromHtml($id, $html) {
@@ -119,7 +141,6 @@ class UOJRemoteProblem {
 		];
 	}
 
-	// 传入 ID 需确保有效
 	static function getCodeforcesProblemBasicInfo($id) {
 		$curl = new Curl();
 		$curl->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0');
@@ -166,17 +187,108 @@ class UOJRemoteProblem {
 		}
 	}
 
+	static function getAtcoderProblemBasicInfo($id) {
+		$curl = new Curl();
+		$curl->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0');
+		$curl->setCookie('language', 'en');
+
+		$res = retry_loop(function () use (&$curl, $id) {
+			$curl->get(static::getAtcoderProblemUrl($id));
+
+			if ($curl->error) {
+				return false;
+			}
+
+			return $curl->response;
+		});
+
+		if (!$res) return null;
+
+		$dom = new \IvoPetkov\HTML5DOMDocument();
+		$dom->loadHTML($res);
+		$container_dom = $dom->querySelectorAll('#main-container > div.row > div.col-sm-12')->item(1);
+
+		if (!$container_dom) return null;
+
+		$title_dom = $container_dom->querySelector('span.h2');
+		$title = '【' . strtoupper($id) . '】' . preg_replace('/([A-Z][1-9]?) - (.*)/', '$2', explode("\n", trim($title_dom->textContent))[0]);
+
+		$limit_dom = $container_dom->querySelector('p');
+
+		$time_limit_matches = [];
+		preg_match('/Time Limit: (\d+)/', $limit_dom->textContent, $time_limit_matches);
+		$time_limit = intval($time_limit_matches[1]);
+
+		$memory_limit_matches = [];
+		preg_match('/Memory Limit: (\d+)/', $limit_dom->textContent, $memory_limit_matches);
+		$memory_limit = intval($memory_limit_matches[1]);
+
+		$statement_container_dom = $container_dom->querySelector('#task-statement');
+		$statement_dom = $statement_container_dom->querySelector('.lang-en');
+
+		if (!$statement_dom) {
+			$statement_dom = $statement_container_dom->querySelector('.lang-ja');
+		}
+
+		$statement_first_child = $statement_dom->querySelector('p');
+		$first_child_content = trim($statement_first_child->textContent);
+
+		if (str_starts_with($first_child_content, 'Score :') || str_starts_with($first_child_content, '配点 :')) {
+			$statement_dom->removeChild($statement_first_child);
+		}
+
+		foreach ($statement_dom->querySelectorAll('var') as &$elem) {
+			$html = $elem->innerHTML;
+
+			// <sub> => _{
+			$html = str_replace('<sub>', '_{', $html);
+
+			// </sub> => }
+			$html = str_replace('</sub>', '}', $html);
+
+			// <sup> => ^{
+			$html = str_replace('<sup>', '^{', $html);
+
+			// </sup> => }
+			$html = str_replace('</sup>', '}', $html);
+
+			$elem->innerHTML = $html;
+		}
+
+		$statement = $statement_dom->innerHTML;
+
+		// <var> => $
+		$statement = str_replace('<var>', '\\(', $statement);
+
+		// </var> => $
+		$statement = str_replace('</var>', '\\)', $statement);
+
+		return [
+			'type' => 'html',
+			'title' => $title,
+			'time_limit' => $time_limit,
+			'memory_limit' => $memory_limit,
+			'difficulty' => -1,
+			'statement' => $statement,
+		];
+	}
+
 	public static function getProblemRemoteUrl($oj, $id) {
 		if ($oj === 'codeforces') {
 			return static::getCodeforcesProblemUrl($id);
+		} else if ($oj === 'atcoder') {
+			return static::getAtcoderProblemUrl($id);
 		}
 
 		return null;
 	}
 
+	// 传入 ID 需确保有效
 	public static function getProblemBasicInfo($oj, $id) {
 		if ($oj === 'codeforces') {
 			return static::getCodeforcesProblemBasicInfo($id);
+		} else if ($oj === 'atcoder') {
+			return static::getAtcoderProblemBasicInfo($id);
 		}
 
 		return null;
