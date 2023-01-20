@@ -16,27 +16,15 @@ class UOJRemoteProblem {
 	];
 
 	static function getCodeforcesProblemUrl($id) {
+		if (str_starts_with($id, 'GYM')) {
+			return static::$providers['codeforces']['url'] . '/gym/' . preg_replace_callback('/GYM([1-9][0-9]{0,5})([A-Z][1-9]?)/', fn ($matches) => $matches[1] . '/problem/' . $matches[2], $id);
+		}
+
 		return static::$providers['codeforces']['url'] . '/problemset/problem/' . preg_replace_callback('/([1-9][0-9]{0,5})([A-Z][1-9]?)/', fn ($matches) => $matches[1] . '/' . $matches[2], $id);
 	}
 
-	// 传入 ID 需确保有效
-	static function getCodeforcesProblemBasicInfo($id) {
-		$curl = new Curl();
-		$curl->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0');
-
+	static function getCodeforcesProblemBasicInfoFromHtml($id, $html) {
 		$remote_provider = static::$providers['codeforces'];
-
-		$html = retry_loop(function () use ($curl, $id) {
-			$curl->get(static::getCodeforcesProblemUrl($id));
-
-			if ($curl->error) {
-				return false;
-			}
-
-			return $curl->response;
-		});
-
-		if (!$html) return null;
 
 		$html = preg_replace('/\$\$\$/', '$', $html);
 		$dom = new \IvoPetkov\HTML5DOMDocument();
@@ -51,8 +39,9 @@ class UOJRemoteProblem {
 		}
 
 		$statement_dom = $dom->querySelector('.problem-statement');
+		$title_prefix = str_starts_with($id, 'GYM') ? '' : 'CF';
 		$title = explode('. ', trim($statement_dom->querySelector('.title')->innerHTML))[1];
-		$title = "【{$remote_provider['short_name']}{$id}】{$title}";
+		$title = "【{$title_prefix}{$id}】{$title}";
 		$time_limit = intval(substr($statement_dom->querySelector('.time-limit')->innerHTML, 53));
 		$memory_limit = intval(substr($statement_dom->querySelector('.memory-limit')->innerHTML, 55));
 		$difficulty = -1;
@@ -120,12 +109,59 @@ class UOJRemoteProblem {
 		}
 
 		return [
+			'type' => 'html',
 			'title' => $title,
 			'time_limit' => $time_limit,
 			'memory_limit' => $memory_limit,
 			'difficulty' => $difficulty,
 			'statement' => $statement_dom->innerHTML,
 		];
+	}
+
+	// 传入 ID 需确保有效
+	static function getCodeforcesProblemBasicInfo($id) {
+		$curl = new Curl();
+		$curl->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0');
+
+		$res = retry_loop(function () use (&$curl, $id) {
+			$curl->get(static::getCodeforcesProblemUrl($id));
+
+			if ($curl->error) {
+				return false;
+			}
+
+			return [
+				'content-type' => $curl->response_headers['Content-Type'],
+				'response' => $curl->response,
+			];
+		});
+
+		if (!$res) return null;
+
+		if (str_starts_with($res['content-type'], 'text/html')) {
+			return static::getCodeforcesProblemBasicInfoFromHtml($id, $res['response']);
+		} else if (str_starts_with($res['content-type'], 'application/pdf')) {
+			$title_prefix = str_starts_with($id, 'GYM') ? '' : 'CF';
+			$title = "【{$title_prefix}{$id}】{$title_prefix}{$id}";
+
+			return [
+				'type' => 'pdf',
+				'title' => $title,
+				'time_limit' => null,
+				'memory_limit' => null,
+				'difficulty' => -1,
+				'statement' => HTML::tag('h3', [], '提示') .
+					HTML::tag(
+						'p',
+						[],
+						'本题题面为 PDF 题面，请' .
+							HTML::tag('a', ['href' => static::getCodeforcesProblemUrl($id), 'target' => '_blank'], '点此') .
+							'以查看题面。'
+					),
+			];
+		} else {
+			return null;
+		}
 	}
 
 	public static function getProblemRemoteUrl($oj, $id) {

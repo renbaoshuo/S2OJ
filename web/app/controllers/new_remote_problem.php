@@ -107,6 +107,7 @@ $new_remote_problem_form->runAtServer();
 								<p>目前支持导入以下题库的题目作为远端评测题：</p>
 								<ul class="mb-3">
 									<li>Codeforces</li>
+									<li>Codeforces::Gym（题号前加 <code>GYM</code>）</li>
 								</ul>
 							</li>
 							<li>在导入题目前请先搜索题库中是否已经存在相应题目，避免重复添加。</li>
