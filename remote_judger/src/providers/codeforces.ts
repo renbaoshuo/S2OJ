@@ -26,6 +26,11 @@ const langs_map = {
     id: 54,
     comment: '//',
   },
+  'C++20': {
+    name: 'GNU G++20 11.2.0 (64 bit, winlibs)',
+    id: 73,
+    comment: '//',
+  },
   Pascal: {
     name: 'Free Pascal 3.0.2',
     id: 4,
