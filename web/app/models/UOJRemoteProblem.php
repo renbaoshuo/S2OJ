@@ -30,7 +30,7 @@ class UOJRemoteProblem {
 			'not_exist_texts' => [
 				'未找到该页面',
 			],
-			'languages' => ['C', 'C++03', 'C++11', 'C++14', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java8', 'Java11', 'Java17', 'Pascal'],
+			'languages' => ['C', 'C++03', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java8', 'Java11', 'Java17', 'Pascal'],
 		],
 	];
 

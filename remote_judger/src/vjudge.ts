@@ -31,7 +31,9 @@ class AccountService {
         'update-status': true,
         fetch_new: false,
         id,
-        status: `Judging Test #${payload.test_id}`,
+        status:
+          payload.status ||
+          (payload.test_id ? `Judging Test #${payload.test_id}` : 'Judging'),
       });
     };
 
@@ -151,6 +153,7 @@ export async function apply(request: any) {
 
   await vjudge.addProvider('codeforces');
   await vjudge.addProvider('atcoder');
+  await vjudge.addProvider('uoj');
 
   return vjudge;
 }
