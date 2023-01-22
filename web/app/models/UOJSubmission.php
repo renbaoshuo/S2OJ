@@ -407,6 +407,10 @@ class UOJSubmission {
 	}
 
 	public function userCanSeeMinorVersions(array $user = null) {
+		if ($this->problem->info['type'] == 'remote') {
+			return false;
+		}
+
 		if (isSuperUser($user)) {
 			return true;
 		}
@@ -414,10 +418,6 @@ class UOJSubmission {
 	}
 
 	public function userCanRejudge(array $user = null) {
-		if ($this->problem->info['type'] == 'remote') {
-			return false;
-		}
-
 		if (isSuperUser($user)) {
 			return true;
 		}
