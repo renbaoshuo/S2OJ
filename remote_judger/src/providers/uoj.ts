@@ -156,12 +156,19 @@ export default class UOJProvider implements IBasicProvider {
     return text;
   }
 
-  async submitProblem(id: string, lang: string, code: string, info) {
+  async submitProblem(
+    id: string,
+    lang: string,
+    code: string,
+    submissionId: number,
+    next,
+    end
+  ) {
     const programType = langs_map[lang] || langs_map['C++'];
     const comment = programType.comment;
 
     if (comment) {
-      const msg = `S2OJ Submission #${info.rid} @ ${new Date().getTime()}`;
+      const msg = `S2OJ Submission #${submissionId} @ ${new Date().getTime()}`;
       if (typeof comment === 'string') code = `${comment} ${msg}\n${code}`;
       else if (comment instanceof Array)
         code = `${comment[0]} ${msg} ${comment[1]}\n${code}`;
