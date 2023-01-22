@@ -23,6 +23,15 @@ class UOJRemoteProblem {
 			],
 			'languages' => ['C', 'C++', 'Java11', 'Python3', 'Pascal'],
 		],
+		'uoj' => [
+			'name' => 'UniversalOJ',
+			'short_name' => 'UOJ',
+			'url' => 'https://uoj.ac',
+			'not_exist_texts' => [
+				'未找到该页面',
+			],
+			'languages' => ['C', 'C++03', 'C++11', 'C++14', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java8', 'Java11', 'Java17', 'Pascal'],
+		],
 	];
 
 	static function getCodeforcesProblemUrl($id) {
@@ -43,6 +52,10 @@ class UOJRemoteProblem {
 
 			return "{$contest}/tasks/{$matches[1]}_{$matches[2]}";
 		}, $id);
+	}
+
+	static function getUojProblemUrl($id) {
+		return static::$providers['uoj']['url'] . '/problem/' . $id;
 	}
 
 	static function getCodeforcesProblemBasicInfoFromHtml($id, $html) {
@@ -273,11 +286,59 @@ class UOJRemoteProblem {
 		];
 	}
 
+	static function getUojProblemBasicInfo($id) {
+		$remote_provider = static::$providers['uoj'];
+		$curl = new Curl();
+		$curl->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0');
+
+		$res = retry_loop(function () use (&$curl, $id) {
+			$curl->get(static::getUojProblemUrl($id));
+
+			if ($curl->error) {
+				return false;
+			}
+
+			return $curl->response;
+		});
+
+		if (!$res) return null;
+
+		$dom = new \IvoPetkov\HTML5DOMDocument();
+		$dom->loadHTML($res);
+
+		$title_dom = $dom->querySelector('.page-header');
+		$title_matches = [];
+		preg_match('/^#[1-9][0-9]*\. (.*)$/', trim($title_dom->textContent), $title_matches);
+		$title = "【{$remote_provider['short_name']}{$id}】{$title_matches[1]}";
+
+		$statement_dom = $dom->querySelector('.uoj-article');
+		$statement = HTML::tag('h3', [], '题目描述');
+
+		foreach ($statement_dom->querySelectorAll('a') as &$elem) {
+			$href = $elem->getAttribute('href');
+			$href = getAbsoluteUrl($href, $remote_provider['url']);
+			$elem->setAttribute('href',  $href);
+		}
+
+		$statement .= $statement_dom->innerHTML;
+
+		return [
+			'type' => 'html',
+			'title' => $title,
+			'time_limit' => null,
+			'memory_limit' => null,
+			'difficulty' => -1,
+			'statement' => $statement,
+		];
+	}
+
 	public static function getProblemRemoteUrl($oj, $id) {
 		if ($oj === 'codeforces') {
 			return static::getCodeforcesProblemUrl($id);
 		} else if ($oj === 'atcoder') {
 			return static::getAtcoderProblemUrl($id);
+		} else if ($oj === 'uoj') {
+			return static::getUojProblemUrl($id);
 		}
 
 		return null;
@@ -289,6 +350,8 @@ class UOJRemoteProblem {
 			return static::getCodeforcesProblemBasicInfo($id);
 		} else if ($oj === 'atcoder') {
 			return static::getAtcoderProblemBasicInfo($id);
+		} else if ($oj === 'uoj') {
+			return static::getUojProblemBasicInfo($id);
 		}
 
 		return null;
