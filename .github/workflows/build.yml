@@ -27,13 +27,13 @@ jobs:
         include:
           - image_name: db
             context: db
-            dockerfile: Dockerfile
+            dockerfile: db/Dockerfile
           - image_name: judger
             context: judger
-            dockerfile: Dockerfile
+            dockerfile: judger/Dockerfile
           - image_name: remote-judger
             context: remote_judger
-            dockerfile: Dockerfile
+            dockerfile: remote_judger/Dockerfile
           - image_name: web
             context: .
             dockerfile: web/Dockerfile
@@ -48,7 +48,7 @@ jobs:
           sed -i "s/'s2oj-version' => 'dev'/'s2oj-version' => '$(echo "${{ github.sha }}" | cut -c1-7)'/g" web/app/.default-config.php
 
       - name: Log in to the Container registry
-        uses: docker/login-action@v2.0.0
+        uses: docker/login-action@v2.1.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -56,7 +56,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v4.0.1
+        uses: docker/metadata-action@v4.3.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_BASENAME }}-${{ matrix.image_name }}
           tags: |
@@ -68,7 +68,7 @@ jobs:
             type=sha,prefix=
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3.1.1
+        uses: docker/build-push-action@v3.3.0
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
