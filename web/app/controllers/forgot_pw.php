@@ -38,8 +38,12 @@ $forgot_form->handle = function (&$vdata) {
 	$password = $user["password"];
 
 	if (!isset($_SESSION['phrase']) || !PhraseBuilder::comparePhrases($_SESSION['phrase'], $_POST['captcha'])) {
+		unset($_SESSION['phrase']);
+
 		becomeMsgPage('验证码错误！');
 	}
+
+	unset($_SESSION['phrase']);
 
 	if (!$user['email']) {
 		becomeMsgPage('用户未填写邮件地址，请联系管理员重置！');
@@ -99,7 +103,6 @@ EOD;
 	}
 };
 $forgot_form->submit_button_config['align'] = 'offset';
-
 $forgot_form->runAtServer();
 ?>
 <?php echoUOJPageHeader('找回密码') ?>

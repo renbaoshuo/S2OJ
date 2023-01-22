@@ -36,8 +36,12 @@ if ($_POST['image_upload_file_submit'] == 'submit') {
 	}
 
 	if (!isset($_SESSION['phrase']) || !PhraseBuilder::comparePhrases($_SESSION['phrase'], $_POST['captcha'])) {
+		unset($_SESSION['phrase']);
+
 		throwError("bad_captcha");
 	}
+
+	unset($_SESSION['phrase']);
 
 	if ($_FILES["image_upload_file"]["error"] > 0) {
 		throwError($_FILES["image_upload_file"]["error"]);
