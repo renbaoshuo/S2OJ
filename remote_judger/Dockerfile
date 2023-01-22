@@ -3,7 +3,7 @@ FROM node:18.13.0
 WORKDIR /opt/s2oj_remote_judger
 COPY package*.json ./
 
-RUN npm ci --only=production
+RUN npm ci
 
 COPY . .
 
