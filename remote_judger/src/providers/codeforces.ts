@@ -233,7 +233,7 @@ export default class CodeforcesProvider implements IBasicProvider {
       `(S2OJ Submission #${submissionId})`
     );
     // TODO: check submit time to ensure submission
-    const { text: submit } = await this.post(
+    const { text: submit, error } = await this.post(
       `/${
         type !== 'GYM' ? 'problemset' : `gym/${contestId}`
       }/submit?csrf_token=${csrf}`
@@ -256,6 +256,17 @@ export default class CodeforcesProvider implements IBasicProvider {
             submittedProblemIndex: problemId,
           }),
     });
+
+    if (error) {
+      end({
+        error: true,
+        status: 'Judgment Failed',
+        message: 'Failed to submit code.',
+      });
+
+      return null;
+    }
+
     const {
       window: { document: statusDocument },
     } = new JSDOM(submit);
@@ -264,10 +275,12 @@ export default class CodeforcesProvider implements IBasicProvider {
       .join('')
       .replace(/&nbsp;/g, ' ')
       .trim();
+
     if (message) {
       end({ error: true, status: 'Compile Error', message });
       return null;
     }
+
     const { text: status } = await this.get(
       type !== 'GYM' ? '/problemset/status?my=on' : `/gym/${contestId}/my`
     ).retry(3);
@@ -282,17 +295,27 @@ export default class CodeforcesProvider implements IBasicProvider {
       .getAttribute('data-submission-id');
   }
 
-  async waitForSubmission(id: string, next, end) {
-    let i = 1;
+  async waitForSubmission(problem_id: string, id: string, next, end) {
+    let i = 0;
 
     while (true) {
+      if (++i > 60) {
+        return await end({
+          id,
+          error: true,
+          status: 'Judgment Failed',
+          message: 'Failed to fetch submission details.',
+        });
+      }
+
       await sleep(3000);
-      const { body } = await this.post('/data/submitSource')
+      const { body, error } = await this.post('/data/submitSource')
         .send({
           csrf_token: this.csrf,
           submissionId: id,
         })
         .retry(3);
+      if (error) continue;
       if (body.compilationError === 'true') {
         return await end({
           id,

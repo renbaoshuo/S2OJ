@@ -20,6 +20,7 @@ export interface IBasicProvider {
     end: NextFunction
   ): Promise<string | void>;
   waitForSubmission(
+    problem_id: string,
     id: string,
     next: NextFunction,
     end: NextFunction

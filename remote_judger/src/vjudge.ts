@@ -86,7 +86,7 @@ class AccountService {
 
       if (!rid) return;
 
-      await this.api.waitForSubmission(rid, next, end);
+      await this.api.waitForSubmission(problem_id, rid, next, end);
     } catch (e) {
       logger.error(e);
       await end({ error: true, message: e.message });
@@ -150,6 +150,7 @@ export async function apply(request: any) {
   const vjudge = new VJudge(request);
 
   await vjudge.addProvider('codeforces');
+  await vjudge.addProvider('atcoder');
 
   return vjudge;
 }
