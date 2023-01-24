@@ -36,7 +36,15 @@ $new_remote_problem_form->addInput('remote_problem_id', [
 			$vdata['remote_problem_id'] = $id;
 
 			return '';
-		} elseif ($remote_oj === 'uoj') {
+		} else if ($remote_oj === 'uoj') {
+			if (!validateUInt($id)) {
+				return '不合法的题目 ID';
+			}
+
+			$vdata['remote_problem_id'] = $id;
+
+			return '';
+		} else if ($remote_oj === 'loj') {
 			if (!validateUInt($id)) {
 				return '不合法的题目 ID';
 			}
@@ -123,8 +131,11 @@ $new_remote_problem_form->runAtServer();
 							<li>
 								<p>目前支持导入以下题库的题目作为远端评测题：</p>
 								<ul class="mb-3">
-									<li>Codeforces</li>
-									<li>Codeforces::Gym（题号前加 <code>GYM</code>）</li>
+									<li><a href="https://codeforces.com/problemset">Codeforces</a></li>
+									<li><a href="https://codeforces.com/gyms">Codeforces::Gym</a>（题号前加 <code>GYM</code>）</li>
+									<li><a href="https://atcoder.jp/contests/archive">AtCoder</a></li>
+									<li><a href="https://uoj.ac/problems">UniversalOJ</a></li>
+									<li><a href="https://loj.ac/p">LibreOJ</a></li>
 								</ul>
 							</li>
 							<li>在导入题目前请先搜索题库中是否已经存在相应题目，避免重复添加。</li>

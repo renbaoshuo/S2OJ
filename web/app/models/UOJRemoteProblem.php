@@ -32,6 +32,12 @@ class UOJRemoteProblem {
 			],
 			'languages' => ['C', 'C++03', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java8', 'Java11', 'Java17', 'Pascal'],
 		],
+		'loj' => [
+			'name' => 'LibreOJ',
+			'short_name' => 'LOJ',
+			'url' => 'https://loj.ac',
+			'languages' => ['C', 'C++03', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java8', 'Java11', 'Java17', 'Pascal'],
+		],
 	];
 
 	static function getCodeforcesProblemUrl($id) {
@@ -56,6 +62,10 @@ class UOJRemoteProblem {
 
 	static function getUojProblemUrl($id) {
 		return static::$providers['uoj']['url'] . '/problem/' . $id;
+	}
+
+	static function getLojProblemUrl($id) {
+		return static::$providers['loj']['url'] . '/p/' . $id;
 	}
 
 	static function getCodeforcesProblemBasicInfoFromHtml($id, $html) {
@@ -332,6 +342,72 @@ class UOJRemoteProblem {
 		];
 	}
 
+	static function getLojProblemBasicInfo($id) {
+		$remote_provider = static::$providers['loj'];
+		$curl = new Curl();
+		$curl->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0');
+		$curl->setHeader('Content-Type', 'application/json');
+
+		$res = retry_loop(function () use (&$curl, $id) {
+			$curl->post('https://api.loj.ac.cn/api/problem/getProblem', json_encode([
+				'displayId' => (int)$id,
+				'localizedContentsOfLocale' => 'zh_CN',
+				'samples' => true,
+				'judgeInfo' => true,
+			]));
+
+			if ($curl->error) {
+				return false;
+			}
+
+			return $curl->response;
+		});
+
+		if (!$res) return null;
+
+		// Convert stdClass to array
+		$res = json_decode(json_encode($res), true);
+
+		if (isset($res['error'])) return null;
+
+		$localized_contents = $res['localizedContentsOfLocale'];
+		$statement = '';
+
+		foreach ($localized_contents['contentSections'] as $section) {
+			$statement .= "\n###" . $section['sectionTitle'] . "\n\n";
+
+			if ($section['type'] === 'Text') {
+				$statement .= $section['text'] . "\n";
+			} else if ($section['type'] === 'Sample') {
+				// assert($res['samples'][$section['sampleId']]);
+				$display_sample_id = $section['sampleId'] + 1;
+				$sample = $res['samples'][$section['sampleId']];
+
+				$statement .= "\n#### 样例输入 #{$display_sample_id}\n\n";
+				$statement .= "\n```text\n{$sample['inputData']}\n```\n\n";
+
+				$statement .= "\n#### 样例输出 #{$display_sample_id}\n\n";
+				$statement .= "\n```text\n{$sample['outputData']}\n```\n\n";
+
+				if (trim($section['text'])) {
+					$statement .= "\n#### 样例解释 #{$display_sample_id}\n\n";
+					$statement .= $section['text'] . "\n";
+				}
+			} else {
+				// do nothing...
+			}
+		}
+
+		return [
+			'type' => 'html',
+			'title' => "【{$remote_provider['short_name']}{$id}】{$localized_contents['title']}",
+			'time_limit' => (float)$res['judgeInfo']['timeLimit'] / 1000.0,
+			'memory_limit' => $res['judgeInfo']['memoryLimit'],
+			'difficulty' => -1,
+			'statement' => HTML::purifier()->purify(HTML::parsedown()->text($statement)),
+		];
+	}
+
 	public static function getProblemRemoteUrl($oj, $id) {
 		if ($oj === 'codeforces') {
 			return static::getCodeforcesProblemUrl($id);
@@ -339,6 +415,8 @@ class UOJRemoteProblem {
 			return static::getAtcoderProblemUrl($id);
 		} else if ($oj === 'uoj') {
 			return static::getUojProblemUrl($id);
+		} else if ($oj === 'loj') {
+			return static::getLojProblemUrl($id);
 		}
 
 		return null;
@@ -352,6 +430,8 @@ class UOJRemoteProblem {
 			return static::getAtcoderProblemBasicInfo($id);
 		} else if ($oj === 'uoj') {
 			return static::getUojProblemBasicInfo($id);
+		} else if ($oj === 'loj') {
+			return static::getLojProblemBasicInfo($id);
 		}
 
 		return null;
