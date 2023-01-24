@@ -36,7 +36,7 @@ class UOJRemoteProblem {
 			'name' => 'LibreOJ',
 			'short_name' => 'LOJ',
 			'url' => 'https://loj.ac',
-			'languages' => ['C', 'C++03', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java8', 'Java11', 'Java17', 'Pascal'],
+			'languages' => ['C', 'C++03', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java17', 'Pascal'],
 		],
 	];
 

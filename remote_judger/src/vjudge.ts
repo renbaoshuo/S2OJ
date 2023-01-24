@@ -154,6 +154,7 @@ export async function apply(request: any) {
   await vjudge.addProvider('codeforces');
   await vjudge.addProvider('atcoder');
   await vjudge.addProvider('uoj');
+  await vjudge.addProvider('loj');
 
   return vjudge;
 }
