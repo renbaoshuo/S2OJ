@@ -2,7 +2,7 @@ import { JSDOM } from 'jsdom';
 import superagent from 'superagent';
 import proxy from 'superagent-proxy';
 import Logger from '../utils/logger';
-import { IBasicProvider, RemoteAccount } from '../interface';
+import { IBasicProvider, RemoteAccount, USER_AGENT } from '../interface';
 import { parseTimeMS, parseMemoryMB } from '../utils/parse';
 import sleep from '../utils/sleep';
 
@@ -106,7 +106,10 @@ export default class UOJProvider implements IBasicProvider {
     logger.debug('get', url);
     if (!url.includes('//'))
       url = `${this.account.endpoint || 'https://uoj.ac'}${url}`;
-    const req = superagent.get(url).set('Cookie', this.cookie);
+    const req = superagent
+      .get(url)
+      .set('Cookie', this.cookie)
+      .set('User-Agent', USER_AGENT);
     if (this.account.proxy) return req.proxy(this.account.proxy);
     return req;
   }
@@ -115,7 +118,11 @@ export default class UOJProvider implements IBasicProvider {
     logger.debug('post', url, this.cookie);
     if (!url.includes('//'))
       url = `${this.account.endpoint || 'https://uoj.ac'}${url}`;
-    const req = superagent.post(url).set('Cookie', this.cookie).type('form');
+    const req = superagent
+      .post(url)
+      .set('Cookie', this.cookie)
+      .set('User-Agent', USER_AGENT)
+      .type('form');
     if (this.account.proxy) return req.proxy(this.account.proxy);
     return req;
   }

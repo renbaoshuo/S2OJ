@@ -2,7 +2,7 @@ import { JSDOM } from 'jsdom';
 import superagent from 'superagent';
 import proxy from 'superagent-proxy';
 import sleep from '../utils/sleep';
-import { IBasicProvider, RemoteAccount } from '../interface';
+import { IBasicProvider, RemoteAccount, USER_AGENT } from '../interface';
 import Logger from '../utils/logger';
 
 proxy(superagent);
@@ -84,10 +84,7 @@ export default class AtcoderProvider implements IBasicProvider {
       .redirects(0)
       .ok(res => res.status < 400)
       .set('Cookie', this.cookie)
-      .set(
-        'User-Agent',
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0'
-      );
+      .set('User-Agent', USER_AGENT);
     if (this.account.proxy) return req.proxy(this.account.proxy);
     return req;
   }
@@ -101,10 +98,7 @@ export default class AtcoderProvider implements IBasicProvider {
       .redirects(0)
       .ok(res => res.status < 400)
       .set('Cookie', this.cookie)
-      .set(
-        'User-Agent',
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0'
-      );
+      .set('User-Agent', USER_AGENT);
     if (this.account.proxy) return req.proxy(this.account.proxy);
     return req;
   }
