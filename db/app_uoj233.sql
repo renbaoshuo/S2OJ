@@ -622,8 +622,10 @@ CREATE TABLE `problems` (
   `ac_num` int NOT NULL DEFAULT '0',
   `submit_num` int NOT NULL DEFAULT '0',
   `difficulty` int NOT NULL DEFAULT '-1',
+  `type` varchar(20) NOT NULL DEFAULT 'local',
   `assigned_to_judger` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'any',
   PRIMARY KEY (`id`),
+  KEY `type` (`type`),
   KEY `assigned_to_judger` (`assigned_to_judger`),
   KEY `uploader` (`uploader`),
   KEY `difficulty` (`difficulty`),
@@ -648,6 +650,7 @@ UNLOCK TABLES;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `problems_contents` (
   `id` int NOT NULL,
+  `remote_content` longtext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `statement` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `statement_md` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
@@ -989,7 +992,8 @@ INSERT INTO `upgrades` (`name`, `status`, `updated_at`) VALUES
   ('16_list_v3', 'up', now()),
   ('18_user_permissions', 'up', now()),
   ('20_problem_difficulty', 'up', now()),
-  ('21_problem_difficulty', 'up', now());
+  ('21_problem_difficulty', 'up', now()),
+  ('28_remote_judge', 'up', now());
 /*!40000 ALTER TABLE `upgrades` ENABLE KEYS */;
 UNLOCK TABLES;
 

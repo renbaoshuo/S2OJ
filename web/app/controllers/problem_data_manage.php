@@ -10,6 +10,7 @@ requirePHPLib('data');
 
 UOJProblem::init(UOJRequest::get('id')) || UOJResponse::page404();
 UOJProblem::cur()->userCanManage(Auth::user()) || UOJResponse::page403();
+UOJProblem::info('type') === 'local' || UOJResponse::page404();
 $problem = UOJProblem::info();
 $problem_extra_config = UOJProblem::cur()->getExtraConfig();
 

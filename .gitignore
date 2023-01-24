@@ -6,3 +6,5 @@ docker-compose.local.yml
 .config.php
 .config.development.php
 .config.local.php
+*.development.env
+*.local.env

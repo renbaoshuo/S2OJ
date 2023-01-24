@@ -84,6 +84,81 @@ $difficulty_form->handle = function () {
 };
 $difficulty_form->runAtServer();
 
+if (UOJProblem::info('type') == 'remote') {
+	$remote_online_judge = UOJProblem::cur()->getExtraConfig('remote_online_judge');
+	$remote_problem_id = UOJProblem::cur()->getExtraConfig('remote_problem_id');
+	$remote_provider = UOJRemoteProblem::$providers[$remote_online_judge];
+
+	$re_crawl_form = new UOJForm('re_crawl');
+	$re_crawl_form->appendHTML(<<<EOD
+		<ul>
+			<li>远程题库：{$remote_provider['name']}</li>
+			<li>远程题号：{$remote_problem_id}</li>
+		</ul>
+	EOD);
+	$re_crawl_form->config['submit_button']['text'] = '重新爬取';
+	$re_crawl_form->handle = function () use ($remote_online_judge, $remote_problem_id, $remote_provider) {
+		try {
+			$data = UOJRemoteProblem::getProblemBasicInfo($remote_online_judge, $remote_problem_id);
+		} catch (Exception $e) {
+			$data = null;
+			UOJLog::error($e->getMessage());
+		}
+
+		if ($data === null) {
+			UOJResponse::page500('题目抓取失败，可能是题目不存在或者没有题面！如果题目没有问题，请稍后再试。<a href="">返回</a>');
+		}
+
+		if ($data['difficulty'] == -1) {
+			$data['difficulty'] = UOJProblem::info('difficulty');
+		}
+
+		$submission_requirement = [
+			[
+				"name" => "answer",
+				"type" => "source code",
+				"file_name" => "answer.code",
+				"languages" => $remote_provider['languages'],
+			]
+		];
+		$enc_submission_requirement = json_encode($submission_requirement);
+
+		$extra_config = [
+			'remote_online_judge' => $remote_online_judge,
+			'remote_problem_id' => $remote_problem_id,
+			'time_limit' => $data['time_limit'],
+			'memory_limit' => $data['memory_limit'],
+		];
+		$enc_extra_config = json_encode($extra_config);
+
+		DB::update([
+			"update problems",
+			"set", [
+				"title" => $data['title'],
+				"submission_requirement" => $enc_submission_requirement,
+				"extra_config" => $enc_extra_config,
+				"difficulty" => $data['difficulty'] ?: -1,
+			],
+			"where", [
+				"id" => UOJProblem::info('id'),
+			],
+		]);
+
+		DB::update([
+			"update problems_contents",
+			"set", [
+				"remote_content" => HTML::purifier()->purify($data['statement']),
+			],
+			"where", [
+				"id" => UOJProblem::info('id'),
+			],
+		]);
+
+		redirectTo(UOJProblem::cur()->getUri());
+	};
+	$re_crawl_form->runAtServer();
+}
+
 $view_type_form = new UOJForm('view_type');
 $view_type_form->addSelect('view_content_type', [
 	'div_class' => 'row align-items-center g-0',
@@ -198,11 +273,13 @@ $solution_view_type_form->runAtServer();
 					管理者
 				</a>
 			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="/problem/<?= UOJProblem::info('id') ?>/manage/data" role="tab">
-					数据
-				</a>
-			</li>
+			<?php if (UOJProblem::info('type') == 'local') : ?>
+				<li class="nav-item">
+					<a class="nav-link" href="/problem/<?= UOJProblem::info('id') ?>/manage/data" role="tab">
+						数据
+					</a>
+				</li>
+			<?php endif ?>
 		</ul>
 
 		<div class="card card-default">
@@ -357,6 +434,17 @@ $solution_view_type_form->runAtServer();
 				<?php $difficulty_form->printHTML() ?>
 			</div>
 		</div>
+
+		<?php if (UOJProblem::info('type') == 'remote') : ?>
+			<div class="card mt-3">
+				<div class="card-header fw-bold">
+					重新爬取题目信息
+				</div>
+				<div class="card-body">
+					<?php $re_crawl_form->printHTML() ?>
+				</div>
+			</div>
+		<?php endif ?>
 
 		<div class="card mt-3">
 			<div class="card-header fw-bold">

@@ -17,6 +17,7 @@ Route::group(
 		Route::any('/', '/index.php');
 		Route::any('/problems', '/problem_set.php');
 		Route::any('/problems/template', '/problem_set.php?tab=template');
+		Route::any('/problems/new/remote', '/new_remote_problem.php');
 		Route::any('/problem/{id}', '/problem.php');
 		Route::any('/problem/{id}/solutions', '/problem_solutions.php');
 		Route::any('/problem/{id}/statistics', '/problem_statistics.php');
@@ -84,9 +85,6 @@ Route::group(
 		Route::any('/user/{username}/system_msg', '/user_system_msg.php');
 
 		Route::any('/super_manage(?:/{tab})?', '/super_manage.php');
-
-		Route::any('/download/problem/{id}/data.zip', '/download.php?type=problem');
-		Route::any('/download/problem/{id}/attachment.zip', '/download.php?type=attachment');
 
 		Route::any('/check-notice', '/check_notice.php');
 		Route::any('/click-zan', '/click_zan.php');

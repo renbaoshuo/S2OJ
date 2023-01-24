@@ -61,6 +61,36 @@ steps:
 ---
 kind: pipeline
 type: docker
+name: Build Docker Image (s2oj-remote-judger)
+
+trigger:
+  branch:
+  - master
+
+steps:
+  - name: tags
+    image: alpine
+    commands:
+      - echo -n "latest, $DRONE_BRANCH, ${DRONE_COMMIT_SHA:0:8}" > .tags
+
+  - name: docker
+    image: plugins/docker
+    settings:
+      registry: git.m.ac
+      repo: git.m.ac/baoshuo/s2oj-remote-judger
+      context: remote_judger
+      dockerfile: remote_judger/Dockerfile
+      username: baoshuo
+      password:
+        from_secret: GITMAC_SECRET
+      cache_from: git.m.ac/baoshuo/s2oj-remote-judger:latest
+    when:
+      event: push
+      branch: master
+
+---
+kind: pipeline
+type: docker
 name: Build Docker Image (s2oj-web)
 
 trigger:

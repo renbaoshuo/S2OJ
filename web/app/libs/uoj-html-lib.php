@@ -687,7 +687,7 @@ class JudgmentDetailsPrinter {
 				}
 				echo '<h4 class="mb-2">', $node->getAttribute("title"), ":</h4>";
 			}
-			echo '<pre>', "\n";
+			echo '<pre class="bg-light p-3 rounded">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 			echo '</div>';

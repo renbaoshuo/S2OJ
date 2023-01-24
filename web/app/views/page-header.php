@@ -175,6 +175,9 @@ if (!isset($ShowPageHeader)) {
 						['\\(', '\\)']
 					],
 					processEscapes: true
+				},
+				options: {
+					skipHtmlTags: { '[-]': ['pre'] },
 				}
 			};
 		</script>

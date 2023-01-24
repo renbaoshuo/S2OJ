@@ -75,3 +75,7 @@ function validateUserAndStoreByUsername($username, &$vdata) {
 function is_short_string($str) {
 	return is_string($str) && strlen($str) <= 256;
 }
+
+function validateCodeforcesProblemId($str) {
+	return preg_match('/(|GYM)[1-9][0-9]{0,5}[A-Z][1-9]?/', $str) !== true;
+}
