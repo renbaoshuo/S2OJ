@@ -109,6 +109,10 @@ if (UOJProblem::info('type') == 'remote') {
 			UOJResponse::page500('题目抓取失败，可能是题目不存在或者没有题面！如果题目没有问题，请稍后再试。<a href="">返回</a>');
 		}
 
+		if ($data['difficulty'] == -1) {
+			$data['difficulty'] = UOJProblem::info('difficulty');
+		}
+
 		$submission_requirement = [
 			[
 				"name" => "answer",
