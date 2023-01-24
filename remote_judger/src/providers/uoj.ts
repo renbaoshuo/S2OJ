@@ -83,7 +83,7 @@ export function getAccountInfoFromEnv(): RemoteAccount | null {
   if (!UOJ_HANDLE || !UOJ_PASSWORD) return null;
 
   const account: RemoteAccount = {
-    type: 'codeforces',
+    type: 'uoj',
     handle: UOJ_HANDLE,
     password: UOJ_PASSWORD,
     endpoint: UOJ_ENDPOINT,
