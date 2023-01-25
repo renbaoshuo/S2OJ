@@ -177,7 +177,9 @@ if (!isset($ShowPageHeader)) {
 					processEscapes: true
 				},
 				options: {
-					skipHtmlTags: { '[-]': ['pre'] },
+					skipHtmlTags: {
+						'[-]': ['pre']
+					},
 				}
 			};
 		</script>
@@ -267,7 +269,10 @@ if (!isset($ShowPageHeader)) {
 			}
 		});
 	</script>
+
+	<script defer data-domain="sjzezoj.com" src="https://stat.u.sb/js/script.js"></script>
 </head>
+
 <?php if (isset($REQUIRE_LIB['bootstrap5'])) : ?>
 
 	<body class="d-flex flex-column min-vh-100
