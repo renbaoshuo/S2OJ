@@ -107,6 +107,13 @@ $new_remote_problem_form->handle = function (&$vdata) {
 	]);
 	dataNewProblem($id);
 
+	DB::insert([
+		"insert into problems_tags",
+		"(problem_id, tag)",
+		"values",
+		DB::tuple([$id, $remote_provider['name']]),
+	]);
+
 	redirectTo("/problem/{$id}");
 	die();
 };
