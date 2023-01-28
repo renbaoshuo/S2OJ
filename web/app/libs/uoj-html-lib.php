@@ -485,7 +485,7 @@ class JudgmentDetailsPrinter {
 			echo 				'<h3 class="fs-5">', 'Subtask #', $subtask_num, ': ', '</h3>';
 			echo 			'</div>';
 
-			if ($this->styler->show_score) {
+			if ($this->styler->show_score && $subtask_score !== '') {
 				echo 		'<div class="col-sm-2">';
 				echo        '<i class="bi bi-clipboard-check"></i> ', $subtask_score, ' pts';
 				echo 		'</div>';
@@ -555,7 +555,7 @@ class JudgmentDetailsPrinter {
 			}
 			echo '</div>';
 
-			if ($this->styler->show_score) {
+			if ($this->styler->show_score && $test_score !== '') {
 				echo '<div class="col-sm-2">';
 				echo '<i class="bi bi-clipboard-check"></i> ', $test_score, ' pts';
 				echo '</div>';
