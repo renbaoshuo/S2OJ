@@ -77,15 +77,7 @@ $pag_config = [
 	'page_len' => 20,
 	'col_names' => [
 		'best_ac_submissions.submission_id as submission_id',
-		'problems.id as id',
-		'problems.is_hidden as is_hidden',
-		'problems.title as title',
-		'problems.submit_num as submit_num',
-		'problems.ac_num as ac_num',
-		'problems.zan as zan',
-		'problems.difficulty as difficulty',
-		'problems.extra_config as extra_config',
-		'problems.uploader as uploader',
+		'problems.*',
 	],
 	'table_name' => [
 		"problems",
