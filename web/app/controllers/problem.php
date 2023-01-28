@@ -263,9 +263,9 @@ if (UOJContest::cur()) {
 							<?= $problem_content['statement'] ?>
 						</article>
 
-						<hr>
-
 						<?php if (UOJProblem::info('type') == 'remote') : ?>
+							<hr>
+
 							<article class="mt-3 markdown-body remote-content">
 								<?= UOJProblem::cur()->queryContent()['remote_content'] ?>
 							</article>

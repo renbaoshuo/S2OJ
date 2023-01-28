@@ -157,6 +157,36 @@ if (UOJProblem::info('type') == 'remote') {
 		redirectTo(UOJProblem::cur()->getUri());
 	};
 	$re_crawl_form->runAtServer();
+
+	$convert_local_form = new UOJForm('convert_local');
+	$convert_local_form->handle = function () {
+		DB::update([
+			"update problems",
+			"set", [
+				"type" => 'local',
+				"submission_requirement" => "{}",
+				"extra_config" => "{}",
+			],
+			"where", [
+				"id" => UOJProblem::info('id'),
+			],
+		]);
+
+		DB::update([
+			"update problems_contents",
+			"set", [
+				"remote_content" => '',
+			],
+			"where", [
+				"id" => UOJProblem::info('id'),
+			],
+		]);
+	};
+	$convert_local_form->config['submit_container']['class'] = '';
+	$convert_local_form->config['submit_button']['class'] = 'btn btn-danger';
+	$convert_local_form->config['submit_button']['text'] = '将本题转换为本地题目（不可逆）';
+	$convert_local_form->config['confirm']['text'] = '您真的要*不可逆*地将本题转换为本地题目吗？';
+	$convert_local_form->runAtServer();
 }
 
 $view_type_form = new UOJForm('view_type');
@@ -442,6 +472,15 @@ $solution_view_type_form->runAtServer();
 				</div>
 				<div class="card-body">
 					<?php $re_crawl_form->printHTML() ?>
+				</div>
+			</div>
+
+			<div class="card mt-3 border-danger">
+				<div class="card-header fw-bold text-bg-danger border-danger">
+					转换为本地题目
+				</div>
+				<div class="card-body border-danger">
+					<?php $convert_local_form->printHTML() ?>
 				</div>
 			</div>
 		<?php endif ?>
