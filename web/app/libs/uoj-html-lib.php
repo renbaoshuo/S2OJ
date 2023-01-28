@@ -664,6 +664,11 @@ class JudgmentDetailsPrinter {
 			echo '<pre class="bg-light p-3 rounded">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
+		} elseif ($node->nodeName == 'ans') {
+			echo '<h4 class="fs-6"><span>answer: </span></h4>';
+			echo '<pre class="bg-light p-3 rounded">', "\n";
+			$this->_print_c($node);
+			echo "\n</pre>";
 		} elseif ($node->nodeName == 'res') {
 			echo '<h4 class="fs-6"><span>result: </span></h4>';
 			echo '<pre class="bg-light p-3 rounded">', "\n";

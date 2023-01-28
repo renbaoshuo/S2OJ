@@ -12,6 +12,7 @@
   "license": "AGPL-3.0",
   "private": true,
   "dependencies": {
+    "crlf-normalize": "^1.0.18",
     "fs-extra": "^11.1.0",
     "jsdom": "^21.0.0",
     "math-sum": "^2.0.0",

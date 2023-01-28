@@ -67,10 +67,11 @@ class AccountService {
           time: payload.time,
           memory: payload.memory,
           details:
+            payload.details ||
             '<div>' +
-            `<info-block>ID = ${payload.id || 'None'}</info-block>` +
-            `<info-block>VERDICT = ${payload.status}</info-block>` +
-            '</div>',
+              `<info-block>ID = ${payload.id || 'None'}</info-block>` +
+              `<info-block>VERDICT = ${payload.status}</info-block>` +
+              '</div>',
         }),
         judge_time,
       });

@@ -1,6 +1,7 @@
 import { JSDOM } from 'jsdom';
 import superagent from 'superagent';
 import proxy from 'superagent-proxy';
+import { crlf, LF } from 'crlf-normalize';
 import sleep from '../utils/sleep';
 import mathSum from 'math-sum';
 import { IBasicProvider, RemoteAccount, USER_AGENT } from '../interface';
@@ -313,9 +314,9 @@ export default class CodeforcesProvider implements IBasicProvider {
       if (body.compilationError === 'true') {
         return await end({
           id,
-          error: 1,
+          error: true,
           status: 'Compile Error',
-          message: body['checkerStdoutAndStderr#1'],
+          message: crlf(body['checkerStdoutAndStderr#1'], LF),
         });
       }
       const time = mathSum(
@@ -331,16 +332,52 @@ export default class CodeforcesProvider implements IBasicProvider {
         ) / 1024;
       await next({ test_id: body.testCount });
       if (body.waiting === 'true') continue;
+
+      const testCount = +body.testCount;
       const status =
         VERDICT[
           Object.keys(VERDICT).find(k => normalize(body.verdict).includes(k))
         ];
+      let tests: string[] = [];
+
+      for (let i = 1; i <= testCount; i++) {
+        let test_info = '';
+        let info_text =
+          VERDICT[
+            Object.keys(VERDICT).find(k =>
+              normalize(body[`verdict#${i}`]).includes(k)
+            )
+          ];
+
+        test_info += `<test num="${i}" info="${info_text}" time="${
+          body[`timeConsumed#${i}`]
+        }" memory="${body[`memoryConsumed#${i}`]}">`;
+
+        const parse = (id: string) => crlf(body[id], LF);
+
+        test_info += `<in>${parse(`input#${i}`)}</in>\n`;
+        test_info += `<out>${parse(`output#${i}`)}</out>\n`;
+        test_info += `<ans>${parse(`answer#${i}`)}</ans>\n`;
+        test_info += `<res>${parse(`checkerStdoutAndStderr#${i}`)}</res>\n`;
+
+        test_info += '</test>';
+
+        tests.push(test_info);
+      }
+
+      const details =
+        '<div>' +
+        `<info-block>REMOTE_SUBMISSION_ID = ${id}\nVERDICT = ${status}</info-block>` +
+        `<tests>${tests.join('\n')}</tests>` +
+        '</div>';
+
       return await end({
         id,
         status,
         score: status === 'Accepted' ? 100 : 0,
         time,
         memory,
+        details,
       });
     }
   }
