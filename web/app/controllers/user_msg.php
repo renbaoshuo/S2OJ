@@ -148,7 +148,7 @@ if (isset($_POST['user_msg'])) {
 
 <div class="card overflow-hidden-md chat-container">
 	<div class="row gx-0 flex-grow-1 h-100">
-		<div class="col-md-3 border-end h-md-100">
+		<div class="col-md-3 border-end h-100">
 			<div class="list-group list-group-flush h-100 overflow-auto" id="conversations"></div>
 		</div>
 
