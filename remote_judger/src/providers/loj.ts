@@ -5,6 +5,7 @@ import sleep from '../utils/sleep';
 import { IBasicProvider, RemoteAccount, USER_AGENT } from '../interface';
 import Logger from '../utils/logger';
 import { normalize, VERDICT } from '../verdict';
+import { crlf, LF } from 'crlf-normalize';
 
 proxy(superagent);
 const logger = new Logger('remote/loj');
@@ -303,12 +304,149 @@ export default class LibreojProvider implements IBasicProvider {
         });
       }
 
+      const parse = (str: string) => crlf(str, LF);
+
+      const getSubtaskStatusDisplayText = (testcases: any): string => {
+        let result: string = null;
+
+        for (const testcase of testcases) {
+          if (!testcase.testcaseHash) {
+            result = 'Skipped';
+
+            break;
+          } else if (
+            body.progress.testcaseResult[testcase.testcaseHash].status !==
+            'Accepted'
+          ) {
+            result = body.progress.testcaseResult[testcase.testcaseHash].status;
+
+            break;
+          }
+        }
+
+        result ||= 'Accepted';
+        result =
+          VERDICT[
+            Object.keys(VERDICT).find(k => normalize(result).includes(k))
+          ];
+
+        return result;
+      };
+
+      const getTestcaseBlock = (id: string, index: number): string => {
+        const testcase = body.progress.testcaseResult[id];
+
+        if (!testcase) return '';
+
+        const status =
+          VERDICT[
+            Object.keys(VERDICT).find(k =>
+              normalize(testcase.status).includes(k)
+            )
+          ];
+        let test_info = '';
+
+        test_info += `<test num="${
+          index + 1
+        }" info="${status}" time="${Math.round(testcase.time || 0)}" memory="${
+          testcase.memory
+        }">`;
+
+        if (testcase.input) {
+          if (typeof testcase.input === 'string') {
+            test_info += `<in>${parse(testcase.input)}</in>\n`;
+          } else {
+            test_info += `<in>${parse(testcase.input.data)}\n\n(${
+              testcase.input.omittedLength
+            } bytes omitted)</in>\n`;
+          }
+        }
+
+        if (testcase.userOutput) {
+          if (typeof testcase.userOutput === 'string') {
+            test_info += `<out>${parse(testcase.userOutput)}</out>\n`;
+          } else {
+            test_info += `<out>${parse(testcase.userOutput.data)}\n\n(${
+              testcase.userOutput.omittedLength
+            } bytes omitted)</out>\n`;
+          }
+        }
+
+        if (testcase.output) {
+          if (typeof testcase.output === 'string') {
+            test_info += `<ans>${parse(testcase.output)}</ans>\n`;
+          } else {
+            test_info += `<ans>${parse(testcase.output.data)}\n\n(${
+              testcase.output.omittedLength
+            } bytes omitted)</ans>\n`;
+          }
+        }
+
+        if (testcase.checkerMessage) {
+          if (typeof testcase.checkerMessage === 'string') {
+            test_info += `<res>${parse(testcase.checkerMessage)}</res>\n`;
+          } else {
+            test_info += `<res>${parse(testcase.checkerMessage.data)}\n\n(${
+              testcase.checkerMessage.omittedLength
+            } bytes omitted)</res>\n`;
+          }
+        }
+
+        test_info += '</test>';
+
+        return test_info;
+      };
+
+      let details = '';
+
+      details += `<info-block>REMOTE_SUBMISSION_ID = ${id}\nVERDICT = ${status}</info-block>`;
+
+      // Samples
+      if (body.progress.samples) {
+        details += `<subtask title="Samples" info="${getSubtaskStatusDisplayText(
+          body.progress.samples
+        )}" num="0">${body.progress.samples
+          .map((item, index) =>
+            item.testcaseHash
+              ? getTestcaseBlock(item.testcaseHash, index)
+              : `<test num="${index + 1}" info="Skipped"></test>`
+          )
+          .join('\n')}</subtask>`;
+      }
+
+      // Tests
+      if (body.progress.subtasks.length === 1) {
+        details += `<tests>${body.progress.subtasks[0].testcases
+          .map((item, index) =>
+            item.testcaseHash
+              ? getTestcaseBlock(item.testcaseHash, index)
+              : `<test num="${index + 1}" info="Skipped"></test>`
+          )
+          .join('\n')}</tests>`;
+      } else {
+        details += `<tests>${body.progress.subtasks
+          .map(
+            (subtask, index) =>
+              `<subtask num="${index + 1}" info="${getSubtaskStatusDisplayText(
+                subtask.testcases
+              )}">${subtask.testcases
+                .map((item, index) =>
+                  item.testcaseHash
+                    ? getTestcaseBlock(item.testcaseHash, index)
+                    : `<test num="${index + 1}" info="Skipped"></test>`
+                )
+                .join('\n')}</subtask>`
+          )
+          .join('\n')}</tests>`;
+      }
+
       return await end({
         id,
         status: body.meta.status,
         score: body.meta.score,
         time: body.meta.timeUsed,
         memory: body.meta.memoryUsed,
+        details: `<div>${details}</div>`,
       });
     }
   }
