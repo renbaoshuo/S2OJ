@@ -233,6 +233,11 @@ h6,
 	border-left: 0.25em solid #d0d7de;
 }
 
+.markdown-body ol,
+.markdown-body ul {
+	margin-bottom: 1em;
+}
+
 form.uoj-bs4-form-inline {
 	display: inline-block;
 	margin-right: 0.3em;
@@ -466,5 +471,5 @@ form.uoj-bs4-form-compressed button {
 
 .remote-content center > img + span {
 	display: block;
-    font-size: 90%;
+	font-size: 90%;
 }
