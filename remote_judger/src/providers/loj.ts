@@ -270,7 +270,7 @@ export default class LibreojProvider implements IBasicProvider {
 
       if (body.progress.progressType !== 'Finished') {
         await next({
-          status: `${body.progress.progressType}: ${body.progress.status}`,
+          status: `${body.progress.progressType}`,
         });
 
         continue;
