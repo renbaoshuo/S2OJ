@@ -482,6 +482,9 @@ $solution_view_type_form->runAtServer();
 				<div class="card-body border-danger">
 					<?php $convert_local_form->printHTML() ?>
 				</div>
+				<div class="card-footer bg-transparent small text-muted border-danger">
+					转换为本地题目之后可以上传自行准备的测试数据进行评测。转换后不再将代码提交至远端 OJ 进行评测。该操作不可逆。
+				</div>
 			</div>
 		<?php endif ?>
 
