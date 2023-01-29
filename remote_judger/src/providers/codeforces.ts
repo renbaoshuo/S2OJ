@@ -351,7 +351,7 @@ export default class CodeforcesProvider implements IBasicProvider {
 
         test_info += `<test num="${i}" info="${info_text}" time="${
           body[`timeConsumed#${i}`]
-        }" memory="${body[`memoryConsumed#${i}`]}">`;
+        }" memory="${+body[`memoryConsumed#${i}`] / 1024}">`;
 
         const parse = (id: string) => crlf(body[id], LF);
 
