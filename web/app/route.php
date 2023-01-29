@@ -17,7 +17,8 @@ Route::group(
 		Route::any('/', '/index.php');
 		Route::any('/problems', '/problem_set.php');
 		Route::any('/problems/template', '/problem_set.php?tab=template');
-		Route::any('/problems/new/remote', '/new_remote_problem.php');
+		Route::any('/problems/remote', '/problem_set.php?tab=remote');
+		Route::any('/problems/remote/new', '/new_remote_problem.php');
 		Route::any('/problem/{id}', '/problem.php');
 		Route::any('/problem/{id}/solutions', '/problem_solutions.php');
 		Route::any('/problem/{id}/statistics', '/problem_statistics.php');

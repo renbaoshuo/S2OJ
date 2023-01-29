@@ -4,6 +4,7 @@ return [
 	'problem list' => 'Problem List',
 	'all problems' => 'All Problems',
 	'template problems' => 'Template Problems',
+	'remote problems' => 'Remote Problems',
 	'add new' => 'Add new problem',
 	'add new list' => 'Add new problem list',
 	'my problem' => 'My problem',

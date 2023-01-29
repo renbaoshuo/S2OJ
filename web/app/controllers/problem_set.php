@@ -95,7 +95,7 @@ function getProblemTR($info) {
 		$html .= ' <a href="/problems?my=on"><span class="badge text-white bg-info">' . UOJLocale::get('problems::my problem') . '</span></a> ';
 	}
 	if ($info['type'] == 'remote') {
-		$html .= ' ' . HTML::tag('span', ['class' => 'badge text-bg-success'], '远端评测题');
+		$html .= ' ' . HTML::tag('a', ['class' => 'badge text-bg-success', 'href' => '/problems/remote'], '远端评测题');
 	}
 	if ($info['is_hidden']) {
 		$html .= ' <a href="/problems?is_hidden=on"><span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span></a> ';
@@ -144,6 +144,8 @@ $search_is_effective = false;
 $cur_tab = UOJRequest::get('tab', 'is_string', 'all');
 if ($cur_tab == 'template') {
 	$search_tag = "模板题";
+} else if ($cur_tab == 'remote') {
+	$cond['type'] = 'remote';
 }
 if (is_string($search_tag)) {
 	$cond[] = [
@@ -202,16 +204,20 @@ $header .= '<th class="text-center" style="width:4em;">' . UOJLocale::get('probl
 $header .= '<th class="text-center" style="width:50px;">' . UOJLocale::get('appraisal') . '</th>';
 $header .= '</tr>';
 
-$tabs_info = array(
-	'all' => array(
+$tabs_info = [
+	'all' => [
 		'name' => UOJLocale::get('problems::all problems'),
 		'url' => "/problems"
-	),
-	'template' => array(
+	],
+	'template' => [
 		'name' => UOJLocale::get('problems::template problems'),
 		'url' => "/problems/template"
-	)
-);
+	],
+	'remote' => [
+		'name' => UOJLocale::get('problems::remote problems'),
+		'url' => "/problems/remote"
+	],
+];
 
 $pag = new Paginator([
 	'col_names' => ['*'],
@@ -393,7 +399,7 @@ $pag = new Paginator([
 					<div class="list-group-item list-group-item-action p-0">
 						<?php $new_problem_form->printHTML() ?>
 					</div>
-					<a class="list-group-item list-group-item-action" href="/problems/new/remote">
+					<a class="list-group-item list-group-item-action" href="/problems/remote/new">
 						<i class="bi bi-cloud-plus"></i>
 						新建远端评测题目
 					</a>

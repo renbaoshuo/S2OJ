@@ -21,7 +21,7 @@ function getProblemTR($info) {
 		$html .= ' <span class="badge text-white bg-info">' . UOJLocale::get('problems::my problem') . '</span> ';
 	}
 	if ($info['type'] == 'remote') {
-		$html .= ' ' . HTML::tag('span', ['class' => 'badge text-bg-success'], '远端评测题');
+		HTML::tag('a', ['class' => 'badge text-bg-success', 'href' => '/problems/remote'], '远端评测题');
 	}
 	if ($info['is_hidden']) {
 		$html .= ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span> ';
