@@ -20,6 +20,20 @@ export const VERDICT = new Proxy<Record<string, string>>(
 
     // Codeforces
     'HAPPY_NEW_YEAR!': 'Accepted',
+
+    // LibreOJ
+    COMPILATIONERROR: 'Compile Error',
+    COMPILEERROR: 'Compile Error',
+    FILEERROR: 'File Error',
+    RUNTIMEERROR: 'Runtime Error',
+    TIMELIMITEXCEEDED: 'Time Limit Exceeded',
+    MEMORYLIMITEXCEEDED: 'Memory Limit Exceeded',
+    OUTPUTLIMITEXCEEDED: 'Output Limit Exceeded',
+    WRONGANSWER: 'Wrong Answer',
+    PARTIALLYCORRECT: 'Partially Correct',
+    JUDGEMENTFAILED: 'Judgment Failed',
+    SYSTEMERROR: 'Judgment Failed',
+    CONFIGURATIONERROR: 'Judgment Failed',
   },
   {
     get(self, key) {

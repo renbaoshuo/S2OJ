@@ -1,8 +1,10 @@
 import superagent from 'superagent';
 import proxy from 'superagent-proxy';
+import { stripVTControlCharacters } from 'util';
 import sleep from '../utils/sleep';
 import { IBasicProvider, RemoteAccount, USER_AGENT } from '../interface';
 import Logger from '../utils/logger';
+import { normalize, VERDICT } from '../verdict';
 
 proxy(superagent);
 const logger = new Logger('remote/loj');
@@ -261,38 +263,43 @@ export default class LibreojProvider implements IBasicProvider {
         });
       }
 
-      await sleep(2000);
+      await sleep(1000);
       const { body, error } = await this.post('/submission/getSubmissionDetail')
         .send({ submissionId: String(id), locale: 'zh_CN' })
         .retry(3);
 
       if (error) continue;
 
-      if (body.progress.progressType !== 'Finished') {
-        await next({
-          status: `${body.progress.progressType}`,
-        });
+      await next({
+        status: `${body.progress.progressType}`,
+      });
 
+      if (body.progress.progressType !== 'Finished') {
         continue;
       }
 
-      if (body.meta.status === 'CompilationError') {
+      const status =
+        VERDICT[
+          Object.keys(VERDICT).find(k =>
+            normalize(body.meta.status).includes(k)
+          )
+        ];
+
+      if (status === 'Compile Error') {
         await end({
           error: true,
           id,
           status: 'Compile Error',
+          message: stripVTControlCharacters(body.progress.compile.message),
         });
       }
 
-      if (
-        ['SystemError', 'JudgementFailed', 'ConfigurationError'].includes(
-          body.meta.status
-        )
-      ) {
+      if (status === 'Judgment Failed') {
         await end({
           error: true,
           id,
           status: 'Judgment Failed',
+          message: 'Error occurred on remote online judge.',
         });
       }
 
