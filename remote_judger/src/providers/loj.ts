@@ -271,6 +271,12 @@ export default class LibreojProvider implements IBasicProvider {
 
       if (error) continue;
 
+      if (!body.progress) {
+        await next({ status: 'Waiting for Remote Judge' });
+
+        continue;
+      }
+
       await next({
         status: `${body.progress.progressType}`,
       });
