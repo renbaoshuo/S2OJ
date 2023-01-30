@@ -467,23 +467,24 @@ if (UOJContest::cur()) {
 		</div>
 
 		<!-- 附件 -->
-		<div class="card card-default mb-2">
-			<ul class="nav nav-fill flex-column">
+		<div class="card mb-2">
+			<div class="card-header fw-bold">附件</div>
+			<div class="list-group list-group-flush">
 				<?php if (UOJProblem::cur()->userCanDownloadTestData(Auth::user())) : ?>
-					<li class="nav-item text-start">
-						<a class="nav-link" href="<?= HTML::url("/download/problem/{$problem['id']}/data.zip") ?>">
-							<i class="bi bi-hdd-stack"></i>
-							测试数据
-						</a>
-					</li>
-				<?php endif ?>
-				<li class="nav-item text-start">
-					<a class="nav-link" href="<?= HTML::url("/download/problem/{$problem['id']}/attachment.zip") ?>">
-						<i class="bi bi-download"></i>
-						附件下载
+					<a class="list-group-item list-group-item-action" href="<?= HTML::url(UOJProblem::cur()->getMainDataUri()) ?>">
+						<i class="bi bi-hdd-stack"></i>
+						测试数据
 					</a>
-				</li>
-			</ul>
+				<?php endif ?>
+				<a class="list-group-item list-group-item-action" href="<?= HTML::url(UOJProblem::cur()->getAttachmentUri()) ?>">
+					<i class="bi bi-download"></i>
+					附件下载
+				</a>
+				<a class="list-group-item list-group-item-action" href="<?= HTML::url(UOJProblem::cur()->getResourcesBaseUri()) ?>">
+					<i class="bi bi-folder2-open"></i>
+					相关资源
+				</a>
+			</div>
 		</div>
 
 		<?php
