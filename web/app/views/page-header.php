@@ -44,7 +44,7 @@ if (!isset($ShowPageHeader)) {
 	<title><?= isset($PageTitle) ? $PageTitle : UOJConfig::$data['profile']['oj-name-short'] ?> - <?= $PageMainTitle ?></title>
 
 	<script type="text/javascript">
-		uojHome = ''; // '<?= HTML::url('/') ?>'
+		uojHome = ''; // '<?= HTML::url('/') ?>';
 	</script>
 
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])) : ?>
@@ -270,7 +270,7 @@ if (!isset($ShowPageHeader)) {
 		});
 	</script>
 
-	<script defer data-domain="sjzezoj.com" src="https://stat.u.sb/js/script.js"></script>
+	<script async data-domain="sjzezoj.com" src="https://stat.u.sb/js/script.js"></script>
 </head>
 
 <?php if (isset($REQUIRE_LIB['bootstrap5'])) : ?>

@@ -91,9 +91,8 @@ Route::group(
 		Route::any('/click-zan', '/click_zan.php');
 
 		// Apps
-		Route::any('/image_hosting', '/app/image_hosting/index.php');
-		Route::get('/image_hosting/{image_name}.png', '/app/image_hosting/get_image.php');
-		Route::any('/html2markdown', '/app/html2markdown.php');
+		Route::any('/apps/image_hosting', '/apps/image_hosting.php');
+		Route::any('/apps/html2markdown', '/apps/html2markdown.php');
 	}
 );
 

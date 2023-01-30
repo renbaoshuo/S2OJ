@@ -412,7 +412,7 @@ $pag = new Paginator($pag_config);
 	<?php foreach ($pag->get() as $idx => $row) : ?>
 		<div class="col">
 			<div class="card">
-				<img src="<?= $row['path'] ?>" class="card-img-top" height="200" style="object-fit: contain">
+				<img src="<?= $row['path'] ?>" class="card-img-top" height="200" style="object-fit: contain" loading="lazy" decoding="async">
 				<div class="card-footer bg-transparent small px-2">
 					<div class="d-flex flex-wrap justify-content-between">
 						<time><?= $row['upload_time'] ?></time>
@@ -470,10 +470,6 @@ $pag = new Paginator($pag_config);
 </div>
 
 <script>
-	$(document).ready(function() {
-		[...document.querySelectorAll('[data-bs-toggle="tooltip"]')].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-	});
-
 	var copy_url_toast = new bootstrap.Toast('#copy-url-toast', {
 		delay: 2000
 	});

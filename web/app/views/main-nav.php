@@ -111,13 +111,13 @@ mb-4" role="navigation">
 						</a>
 						<ul class="dropdown-menu">
 							<li>
-								<a class="dropdown-item" href="<?= HTML::url('/image_hosting') ?>">
+								<a class="dropdown-item" href="<?= HTML::url('/apps/image_hosting') ?>">
 									<i class="bi bi-images"></i>
 									<?= UOJLocale::get('image hosting') ?>
 								</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href="<?= HTML::url('/html2markdown') ?>">
+								<a class="dropdown-item" href="<?= HTML::url('/apps/html2markdown') ?>">
 									<i class="bi bi-markdown"></i>
 									<?= UOJLocale::get('html to markdown') ?>
 								</a>

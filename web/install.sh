@@ -49,7 +49,7 @@ setLAMPConf(){
 UOJEOF
     #Enable modules and make UOJ site conf enabled
     a2ensite 000-uoj.conf && a2dissite 000-default.conf
-    a2enmod rewrite headers && sed -i -e '172s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+    a2enmod rewrite headers expires && sed -i -e '172s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
     #Create UOJ session save dir and make PHP extensions available
     mkdir --mode=733 /var/lib/php/uoj_sessions && chmod +t /var/lib/php/uoj_sessions
 	sed -i 's|;sys_temp_dir = "/tmp"|sys_temp_dir = "/tmp"|g' /etc/php/7.4/apache2/php.ini

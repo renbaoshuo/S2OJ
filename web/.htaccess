@@ -16,6 +16,20 @@ DirectorySlash Off
 
 DirectoryIndex
 
+<filesMatch "\.(ico|gif|jpg|png)$">
+  ExpiresActive On
+  ExpiresDefault "access plus 6 month"
+  Header append Cache-Control "public"
+</filesMatch>
+
+<filesMatch "\.(css|js)$">
+  ExpiresActive On
+  ExpiresDefault "access plus 1 week"
+  Header append Cache-Control "public"
+</filesMatch>
+
+RequestHeader append X-Author "Baoshuo ( https://baoshuo.ren )"
+
 RewriteEngine On
 
 RewriteCond %{QUERY_STRING} ^$
