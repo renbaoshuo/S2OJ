@@ -98,6 +98,12 @@ $new_remote_problem_form->handle = function (&$vdata) {
 	]);
 
 	$id = DB::insert_id();
+	dataNewProblem($id);
+
+	if ($data['type'] == 'pdf') {
+		file_put_contents(UOJContext::storagePath() , "/problem_resources/$id/statement.pdf", $data['pdf_data']);
+		$data['statement'] = "<div data-pdf data-src=\"/problem/$id/resources/statement.pdf\"></div>\n" . $data['statement'];
+	}
 
 	DB::insert([
 		"insert into problems_contents",
@@ -105,7 +111,6 @@ $new_remote_problem_form->handle = function (&$vdata) {
 		"values",
 		DB::tuple([$id, HTML::purifier(['a' => ['target' => 'Enum#_blank']])->purify($data['statement']), '', ''])
 	]);
-	dataNewProblem($id);
 
 	DB::insert([
 		"insert into problems_tags",

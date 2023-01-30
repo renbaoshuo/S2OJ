@@ -144,6 +144,11 @@ if (UOJProblem::info('type') == 'remote') {
 			],
 		]);
 
+		if ($data['type'] == 'pdf') {
+			file_put_contents(UOJContext::storagePath() . "/problem_resources/" . UOJProblem::info('id') . "/statement.pdf", $data['pdf_data']);
+			$data['statement'] = '<div data-pdf data-src="/problem/' . UOJProblem::info('id') . '/resources/statement.pdf"></div>' . "\n" . $data['statement'];
+		}
+
 		DB::update([
 			"update problems_contents",
 			"set", [

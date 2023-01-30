@@ -9,7 +9,7 @@ class UOJBlogEditor {
 	public $post_data = [];
 	public $show_editor = true;
 	public $show_tags = true;
-	
+
 	public $label_text = [
 		'title' => '标题',
 		'tags' => '标签（多个标签用逗号隔开）',
@@ -19,15 +19,15 @@ class UOJBlogEditor {
 		'private' => '未公开',
 		'public' => '公开'
 	];
-	
+
 	public $validator = array();
-	
+
 	function __construct() {
 		global $REQUIRE_LIB;
 		$REQUIRE_LIB['blog-editor'] = '';
-		
+
 		$this->validator = [
-			'title' => function(&$title) {
+			'title' => function (&$title) {
 				if ($title == '') {
 					return '标题不能为空';
 				}
@@ -39,13 +39,13 @@ class UOJBlogEditor {
 				}
 				return '';
 			},
-			'content_md' => function(&$content_md) {
+			'content_md' => function (&$content_md) {
 				if (strlen($content_md) > 1000000) {
 					return '内容过长';
 				}
 				return '';
 			},
-			'tags' => function(&$tags) {
+			'tags' => function (&$tags) {
 				$tags = str_replace('，', ',', $tags);
 				$tags_raw = explode(',', $tags);
 				if (count($tags_raw) > 10) {
@@ -58,10 +58,10 @@ class UOJBlogEditor {
 						continue;
 					}
 					if (strlen($tag) > 30) {
-						return '标签 “' . HTML::escape($tag) .'” 太长';
+						return '标签 “' . HTML::escape($tag) . '” 太长';
 					}
 					if (in_array($tag, $tags, true)) {
-						return '标签 “' . HTML::escape($tag) .'” 重复出现';
+						return '标签 “' . HTML::escape($tag) . '” 重复出现';
 					}
 					$tags[] = $tag;
 				}
@@ -69,7 +69,7 @@ class UOJBlogEditor {
 			}
 		];
 	}
-	
+
 	public function validate($name) {
 		if (!isset($_POST["{$this->name}_{$name}"])) {
 			return '不能为空';
@@ -98,14 +98,14 @@ class UOJBlogEditor {
 			die(json_encode($errors));
 		}
 		crsf_defend();
-		
+
 		$this->post_data['is_hidden'] = isset($_POST["{$this->name}_is_hidden"]) ? 1 : 0;
-		
+
 		$purifier = HTML::purifier();
 		$parsedown = HTML::parsedown();
-		
+
 		$this->post_data['title'] = HTML::escape($this->post_data['title']);
-		
+
 		if ($this->show_editor) {
 			if ($this->type == 'blog') {
 				$this->post_data['content'] = $parsedown->text($this->post_data['content_md']);
@@ -113,7 +113,7 @@ class UOJBlogEditor {
 				if (preg_match('/^.*<!--.*readmore.*-->.*$/m', $this->post_data['content'], $matches, PREG_OFFSET_CAPTURE)) {
 					$content_less = substr($this->post_data['content'], 0, $matches[0][1]);
 					$content_more = substr($this->post_data['content'], $matches[0][1] + strlen($matches[0][0]));
-					$this->post_data['content'] = $purifier->purify($content_less).'<!-- readmore -->'.$purifier->purify($content_more);
+					$this->post_data['content'] = $purifier->purify($content_less) . '<!-- readmore -->' . $purifier->purify($content_more);
 				} else {
 					$this->post_data['content'] = $purifier->purify($this->post_data['content']);
 				}
@@ -122,20 +122,22 @@ class UOJBlogEditor {
 				if ($content_array === false || !is_array($content_array)) {
 					die(json_encode(array('content_md' => '不合法的 YAML 格式')));
 				}
-			
-				$marked = function($md) use ($parsedown, $purifier) {
+
+				$marked = function ($md) use ($parsedown, $purifier) {
 					$dom = new DOMDocument;
 					$dom->loadHTML(mb_convert_encoding($parsedown->text($md), 'HTML-ENTITIES', 'UTF-8'));
 					$elements = $dom->getElementsByTagName('li');
-					
+
 					foreach ($elements as $element) {
-						$element->setAttribute('class', 
-							$element->getAttribute('class') . ' fragment');
+						$element->setAttribute(
+							'class',
+							$element->getAttribute('class') . ' fragment'
+						);
 					}
 
 					return $purifier->purify($dom->saveHTML());
 				};
-			
+
 				$config = array();
 				$this->post_data['content'] = '';
 				foreach ($content_array as $slide_name => $slide_content) {
@@ -147,9 +149,9 @@ class UOJBlogEditor {
 						}
 						continue;
 					}
-				
+
 					$this->post_data['content'] .= '<section>';
-				
+
 					if (is_string($slide_content)) {
 						$this->post_data['content'] .= $marked($slide_content);
 					} elseif (is_array($slide_content)) {
@@ -167,7 +169,7 @@ class UOJBlogEditor {
 			}
 		}
 	}
-	
+
 	public function handleSave() {
 		global $REQUIRE_LIB;
 
@@ -177,11 +179,14 @@ class UOJBlogEditor {
 		if (!$ret) {
 			$ret = array();
 		}
-		
+
 		if (isset($_POST['need_preview'])) {
 			ob_start();
 			if ($this->type == 'blog') {
-				$req_lib = array('mathjax' => '');
+				$req_lib = [
+					'mathjax' => '',
+					'pdf.js' => '',
+				];
 
 				if (isset($REQUIRE_LIB['bootstrap5'])) {
 					$req_lib['bootstrap5'] = '';
@@ -210,10 +215,10 @@ class UOJBlogEditor {
 			$ret['html'] = ob_get_contents();
 			ob_end_clean();
 		}
-		
+
 		die(json_encode($ret));
 	}
-	
+
 	public function runAtServer() {
 		if (isset($_POST["save-{$this->name}"])) {
 			$this->handleSave();
@@ -221,7 +226,7 @@ class UOJBlogEditor {
 	}
 	public function printHTML() {
 		global $REQUIRE_LIB;
-		
+
 		uojIncludeView('blog-editor', ['editor' => $this, 'REQUIRE_LIB' => $REQUIRE_LIB]);
 	}
 }

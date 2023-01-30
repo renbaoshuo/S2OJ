@@ -196,13 +196,14 @@ class UOJRemoteProblem {
 				'time_limit' => null,
 				'memory_limit' => null,
 				'difficulty' => -1,
+				'pdf_data' => $res['response'],
 				'statement' => HTML::tag('h3', [], '提示') .
 					HTML::tag(
 						'p',
 						[],
-						'本题题面为 PDF 题面，请' .
+						'若无法正常加载 PDF，请' .
 							HTML::tag('a', ['href' => static::getCodeforcesProblemUrl($id), 'target' => '_blank'], '点此') .
-							'以查看题面。'
+							'查看原题面。'
 					),
 			];
 		} else {

@@ -436,6 +436,10 @@ class HTML {
 		$def->addElement('footer',  'Block', 'Flow', 'Common');
 
 		mergeConfig($extra_allowed_html, [
+			'div' => [
+				'data-pdf' => 'Text',
+				'data-src' => 'URI',
+			],
 			'span' => [
 				'class' => 'Enum#uoj-username',
 				'data-realname' => 'Text',
