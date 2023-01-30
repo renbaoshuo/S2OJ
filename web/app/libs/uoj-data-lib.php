@@ -5,6 +5,7 @@
 function dataNewProblem($id) {
 	mkdir("/var/uoj_data/upload/$id");
 	mkdir("/var/uoj_data/$id");
+	mkdir(UOJContext::storagePath() . "/problem_resources/$id");
 
 	UOJLocalRun::execAnd([
 		['cd', '/var/uoj_data'],
