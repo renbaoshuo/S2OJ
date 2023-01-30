@@ -671,6 +671,22 @@ class UOJProblem {
 		return "{$this->getDataFolderPath()}/$name";
 	}
 
+	public function getResourcesFolderPath() {
+		return UOJContext::storagePath() . "/problem_resources/" . $this->info['id'];
+	}
+
+	public function getResourcesPath($name = '') {
+		return "{$this->getResourcesFolderPath()}/$name";
+	}
+
+	public function getResourcesBaseUri() {
+		return "/problem/{$this->info['id']}/resources";
+	}
+
+	public function getResourcesUri($name = '') {
+		return "{$this->getResourcesBaseUri()}/{$name}";
+	}
+
 	public function getProblemConfArray(string $where = 'data') {
 		if ($where === 'data') {
 			return getUOJConf($this->getDataFilePath('problem.conf'));

@@ -28,6 +28,12 @@ DirectoryIndex
   Header append Cache-Control "public"
 </filesMatch>
 
+<filesMatch "\.(pdf)$">
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+  Header append Cache-Control "public"
+</filesMatch>
+
 RequestHeader append X-Author "Baoshuo ( https://baoshuo.ren )"
 
 RewriteEngine On

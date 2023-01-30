@@ -82,6 +82,7 @@ initProgress(){
 	mkdir -p /opt/uoj/web/app/storage/submission
 	mkdir -p /opt/uoj/web/app/storage/tmp
 	mkdir -p /opt/uoj/web/app/storage/image_hosting
+	mkdir -p /opt/uoj/web/app/storage/problem_resources
 	chmod -R 777 /opt/uoj/web/app/storage
 	#Using cli upgrade to latest
 	sleep 15 # Wait for uoj-db

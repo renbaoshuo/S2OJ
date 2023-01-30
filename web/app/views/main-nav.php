@@ -12,11 +12,14 @@ bg-white shadow-sm
 <?php else: ?>
 bg-light
 <?php endif ?>
-mb-4" role="navigation">
+<?php if (!isset($disable_navbar_margin_bottom)): ?>
+mb-4
+<?php endif ?>
+" role="navigation">
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 	<div class="container">
 	<?php endif ?>
-		<a class="navbar-brand" href="<?= HTML::url('/') ?>">
+		<a class="navbar-brand fw-normal" href="<?= HTML::url('/') ?>">
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 				<img src="<?= HTML::url('/images/logo_small.png') ?>" alt="Logo" width="24" height="24" class="d-inline-block align-text-top"/>
 			<?php endif ?>

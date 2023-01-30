@@ -8,6 +8,7 @@ Route::pattern('tab', '\S{1,20}');
 Route::pattern('rand_str_id', '[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]{20}');
 Route::pattern('image_name', '[0-9a-z]{1,20}');
 Route::pattern('upgrade_name', '[a-zA-Z0-9_]{1,50}');
+Route::pattern('sub_path', '.*');
 
 Route::group(
 	[
@@ -22,6 +23,7 @@ Route::group(
 		Route::any('/problem/{id}', '/problem.php');
 		Route::any('/problem/{id}/solutions', '/problem_solutions.php');
 		Route::any('/problem/{id}/statistics', '/problem_statistics.php');
+		Route::any('/problem/{id}/resources(?:/{sub_path})?', '/problem_resources.php');
 		Route::any('/problem/{id}/manage/statement', '/problem_statement_manage.php');
 		Route::any('/problem/{id}/manage/managers', '/problem_managers_manage.php');
 		Route::any('/problem/{id}/manage/data', '/problem_data_manage.php');

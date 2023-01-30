@@ -197,8 +197,13 @@ if (!isset($ShowPageHeader)) {
 	<?php endif ?>
 
 	<?php if (isset($REQUIRE_LIB['jquery.query'])) : ?>
-		<!-- ckeditor -->
+		<!-- jquery.query -->
 		<?= HTML::js_src('/js/jquery.query-object.js') ?>
+	<?php endif ?>
+
+	<?php if (isset($REQUIRE_LIB['jquery.datatables'])) : ?>
+		<!-- jquery.datatable -->
+		<?= HTML::js_src('/js/jquery.datatables.min.js') ?>
 	<?php endif ?>
 
 	<?php if (isset($REQUIRE_LIB['colorhelpers'])) : ?>
@@ -253,6 +258,11 @@ if (!isset($ShowPageHeader)) {
 		<!-- jquery-calendar-heatmap -->
 		<?= HTML::css_link('/css/jquery.calendar_heatmap.min.css') ?>
 		<?= HTML::js_src('/js/jquery.calendar_heatmap.min.js') ?>
+	<?php endif ?>
+
+	<?php if (isset($REQUIRE_LIB['fontawesome'])) : ?>
+		<!-- fontawesome -->
+		<?= HTML::css_link('/css/font-awesome.min.css') ?>
 	<?php endif ?>
 
 	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
