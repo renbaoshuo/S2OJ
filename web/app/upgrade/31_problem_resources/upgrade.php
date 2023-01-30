@@ -6,8 +6,8 @@ return function ($type) {
 
 		$problems = DB::selectAll("select id from problems");
 
-		foreach ($problems as $id) {
-			mkdir(UOJContext::storagePath() . "/problem_resources/$id");
+		foreach ($problems as $row) {
+			mkdir(UOJContext::storagePath() . "/problem_resources/{$row['id']}");
 		}
 	}
 };
