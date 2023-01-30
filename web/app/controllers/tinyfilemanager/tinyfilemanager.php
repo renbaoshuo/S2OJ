@@ -1172,7 +1172,7 @@ if (isset($_GET['upload']) && !FM_READONLY) {
         return '';
     }
     ?>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css" rel="stylesheet">
+    <?= HTML::css_link('/css/dropzone.min.css') ?>
     <div class="path">
 
         <div class="card mb-2 fm-upload-wrapper <?php echo fm_get_theme(); ?>">
@@ -1214,7 +1214,7 @@ if (isset($_GET['upload']) && !FM_READONLY) {
             </div>
         </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+    <?= HTML::js_src('/js/dropzone.min.js') ?>
     <script>
         Dropzone.options.fileUploader = {
             chunking: true,
