@@ -101,7 +101,7 @@ $new_remote_problem_form->handle = function (&$vdata) {
 	dataNewProblem($id);
 
 	if ($data['type'] == 'pdf') {
-		file_put_contents(UOJContext::storagePath() , "/problem_resources/$id/statement.pdf", $data['pdf_data']);
+		file_put_contents(UOJContext::storagePath(), "/problem_resources/$id/statement.pdf", $data['pdf_data']);
 		$data['statement'] = "<div data-pdf data-src=\"/problem/$id/resources/statement.pdf\"></div>\n" . $data['statement'];
 	}
 
@@ -118,6 +118,8 @@ $new_remote_problem_form->handle = function (&$vdata) {
 		"values",
 		DB::tuple([$id, $remote_provider['name']]),
 	]);
+
+	UOJRemoteProblem::downloadImagesInRemoteContent(strval($id));
 
 	redirectTo("/problem/{$id}");
 	die();

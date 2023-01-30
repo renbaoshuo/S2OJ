@@ -152,12 +152,14 @@ if (UOJProblem::info('type') == 'remote') {
 		DB::update([
 			"update problems_contents",
 			"set", [
-				"remote_content" => HTML::purifier()->purify($data['statement']),
+				"remote_content" => HTML::purifier(['a' => ['target' => 'Enum#_blank']])->purify($data['statement']),
 			],
 			"where", [
 				"id" => UOJProblem::info('id'),
 			],
 		]);
+
+		UOJRemoteProblem::downloadImagesInRemoteContent(UOJProblem::info('id'));
 
 		redirectTo(UOJProblem::cur()->getUri());
 	};

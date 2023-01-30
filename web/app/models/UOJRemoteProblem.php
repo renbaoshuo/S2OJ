@@ -1,6 +1,8 @@
 <?php
 
 class UOJRemoteProblem {
+	const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0';
+
 	static $providers = [
 		'codeforces' => [
 			'name' => 'Codeforces',
@@ -39,6 +41,26 @@ class UOJRemoteProblem {
 			'languages' => ['C', 'C++03', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java17', 'Pascal'],
 		],
 	];
+
+	static function curl_get($url) {
+		$curl = new Curl\Curl();
+		$curl->setUserAgent(static::USER_AGENT);
+
+		$res = retry_loop(function () use (&$curl, $url) {
+			$curl->get($url);
+
+			if ($curl->error) {
+				return false;
+			}
+
+			return [
+				'content-type' => $curl->response_headers['Content-Type'],
+				'response' => $curl->response,
+			];
+		});
+
+		return $res;
+	}
 
 	static function getCodeforcesProblemUrl($id) {
 		if (str_starts_with($id, 'GYM')) {
@@ -165,21 +187,7 @@ class UOJRemoteProblem {
 	}
 
 	static function getCodeforcesProblemBasicInfo($id) {
-		$curl = new Curl();
-		$curl->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0');
-
-		$res = retry_loop(function () use (&$curl, $id) {
-			$curl->get(static::getCodeforcesProblemUrl($id));
-
-			if ($curl->error) {
-				return false;
-			}
-
-			return [
-				'content-type' => $curl->response_headers['Content-Type'],
-				'response' => $curl->response,
-			];
-		});
+		$res = static::curl_get(static::getCodeforcesProblemUrl($id));
 
 		if (!$res) return null;
 
@@ -212,19 +220,7 @@ class UOJRemoteProblem {
 	}
 
 	static function getAtcoderProblemBasicInfo($id) {
-		$curl = new Curl();
-		$curl->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0');
-		$curl->setCookie('language', 'en');
-
-		$res = retry_loop(function () use (&$curl, $id) {
-			$curl->get(static::getAtcoderProblemUrl($id));
-
-			if ($curl->error) {
-				return false;
-			}
-
-			return $curl->response;
-		});
+		$res = static::curl_get(static::getAtcoderProblemUrl($id));
 
 		if (!$res) return null;
 
@@ -299,18 +295,7 @@ class UOJRemoteProblem {
 
 	static function getUojProblemBasicInfo($id) {
 		$remote_provider = static::$providers['uoj'];
-		$curl = new Curl();
-		$curl->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0');
-
-		$res = retry_loop(function () use (&$curl, $id) {
-			$curl->get(static::getUojProblemUrl($id));
-
-			if ($curl->error) {
-				return false;
-			}
-
-			return $curl->response;
-		});
+		$res = static::curl_get(static::getUojProblemUrl($id));
 
 		if (!$res) return null;
 
@@ -345,8 +330,8 @@ class UOJRemoteProblem {
 
 	static function getLojProblemBasicInfo($id) {
 		$remote_provider = static::$providers['loj'];
-		$curl = new Curl();
-		$curl->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36 S2OJ/3.1.0');
+		$curl = new Curl\Curl();
+		$curl->setUserAgent(static::USER_AGENT);
 		$curl->setHeader('Content-Type', 'application/json');
 
 		$res = retry_loop(function () use (&$curl, $id) {
@@ -405,7 +390,7 @@ class UOJRemoteProblem {
 			'time_limit' => (float)$res['judgeInfo']['timeLimit'] / 1000.0,
 			'memory_limit' => $res['judgeInfo']['memoryLimit'],
 			'difficulty' => -1,
-			'statement' => HTML::purifier()->purify(HTML::parsedown()->text($statement)),
+			'statement' => HTML::parsedown()->text($statement),
 		];
 	}
 
@@ -436,5 +421,39 @@ class UOJRemoteProblem {
 		}
 
 		return null;
+	}
+
+	public static function downloadImagesInRemoteContent($problem_id) {
+		$curl = new Curl\Curl();
+		$curl->setUserAgent(static::USER_AGENT);
+		$curl->setRetry(5);
+
+		$problem = UOJProblem::query($problem_id);
+
+		if ($problem->info['type'] != 'remote') return;
+
+		$remote_provider = static::$providers[$problem->getExtraConfig('remote_online_judge')];
+		$remote_content = $problem->queryContent()['remote_content'];
+
+		$dom = new IvoPetkov\HTML5DOMDocument();
+		$dom->loadHTML($remote_content);
+
+		foreach ($dom->querySelectorAll('img') as &$elem) {
+			$src = $elem->getAttribute('src');
+			$url = getAbsoluteUrl($src, $remote_provider['url']);
+			$filename = 'remote_image_' . hash('md5', $url);
+			$curl->download($url, $problem->getResourcesPath($filename));
+			$elem->setAttribute('src', $problem->getResourcesUri($filename));
+		}
+
+		DB::update([
+			"update problems_contents",
+			"set", [
+				"remote_content" => HTML::purifier(['a' => ['target' => 'Enum#_blank']])->purify($dom->saveHTML()),
+			],
+			"where", [
+				"id" => $problem->info['id'],
+			],
+		]);
 	}
 }

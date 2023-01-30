@@ -4,7 +4,7 @@
         "phpmailer/phpmailer": "^6.6",
         "ezyang/htmlpurifier": "^4.16",
         "erusev/parsedown": "^1.7",
-        "php-curl-class/php-curl-class": "^2.0",
+        "php-curl-class/php-curl-class": "^9.13",
         "ext-dom": "20031129",
         "ivopetkov/html5-dom-document-php": "2.*"
     },

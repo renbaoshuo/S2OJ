@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'd6997b84758fbe52d9d90a2d5fe2f2e06806b176',
+        'reference' => 'aa6bf6a363501f9836d2bb26a513c2ac3985de83',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'd6997b84758fbe52d9d90a2d5fe2f2e06806b176',
+            'reference' => 'aa6bf6a363501f9836d2bb26a513c2ac3985de83',
             'dev_requirement' => false,
         ),
         'erusev/parsedown' => array(
@@ -56,12 +56,12 @@
             'dev_requirement' => false,
         ),
         'php-curl-class/php-curl-class' => array(
-            'pretty_version' => '2.0.0',
-            'version' => '2.0.0.0',
+            'pretty_version' => '9.13.1',
+            'version' => '9.13.1.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../php-curl-class/php-curl-class',
             'aliases' => array(),
-            'reference' => '24a93bdc51058ad50d219842b63f7f2e0cb350ac',
+            'reference' => '1fa71f639275987092c60ac117ff5c8a3771898d',
             'dev_requirement' => false,
         ),
         'phpmailer/phpmailer' => array(

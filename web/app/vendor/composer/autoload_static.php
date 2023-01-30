@@ -27,6 +27,10 @@ class ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900
         array (
             'Gregwar\\' => 8,
         ),
+        'C' => 
+        array (
+            'Curl\\' => 5,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -45,6 +49,10 @@ class ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900
         'Gregwar\\' => 
         array (
             0 => __DIR__ . '/..' . '/gregwar/captcha/src/Gregwar',
+        ),
+        'Curl\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl',
         ),
     );
 
@@ -67,9 +75,7 @@ class ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900
 
     public static $classMap = array (
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
-        'CaseInsensitiveArray' => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl.class.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'Curl' => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl.class.php',
         'ParsedownMath' => __DIR__ . '/..' . '/parsedown-math/ParsedownMath.php',
         'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
