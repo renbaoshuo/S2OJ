@@ -2,10 +2,10 @@ Options -Indexes
 
 php_value session.save_path /var/lib/php/uoj_sessions
 php_value session.gc_maxlifetime 172800
-php_value session.cookie_lifetime 31536000
+php_value session.cookie_lifetime 604800
 
-php_value post_max_size 1000M
-php_value upload_max_filesize 1000M
+php_value post_max_size 1024M
+php_value upload_max_filesize 1024M
 
 php_value session.gc_probability 1
 php_value session.gc_divisor 1000

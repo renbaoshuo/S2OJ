@@ -42,7 +42,7 @@ function handleLoginPost() {
 		return 'account:' . $account_status;
 	}
 
-	Auth::login($user['username']);
+	Auth::login($user['username'], false);
 	return "ok";
 }
 
