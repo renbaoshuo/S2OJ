@@ -419,105 +419,6 @@ function(res) {
 }
 EOD);
 	$rule_form->runAtServer();
-
-	$blog_link_contests = new UOJBs4Form('blog_link_contests');
-	$blog_link_contests->addVInput(
-		'blog_id',
-		'text',
-		'博客 ID',
-		'',
-		function ($blog_id, &$vdata) {
-			if (!validateUInt($blog_id)) {
-				return 'ID 不合法';
-			}
-
-			if (!queryBlog($blog_id)) {
-				return '博客不存在';
-			}
-
-			$vdata['blog_id'] = $blog_id;
-
-			return '';
-		},
-		null
-	);
-	$blog_link_contests->addVInput(
-		'title',
-		'text',
-		'名称',
-		'',
-		function ($title, &$vdata) {
-			if ($title == '') {
-				return '名称不能为空';
-			}
-
-			if (strlen($title) > 40) {
-				return '名称过长';
-			}
-
-			$title = HTML::escape($title);
-			if ($title === '') {
-				return '无效编码';
-			}
-
-			$vdata['title'] = $title;
-
-			return '';
-		},
-		null
-	);
-	$blog_link_contests->addVSelect('op_type', [
-		'add' => '添加',
-		'del' => '移除',
-	], '操作类型', '');
-	$blog_link_contests->handle = function ($vdata) use ($contest) {
-		if ($_POST['op_type'] == 'add') {
-			if (!isset($contest['extra_config']['links'])) {
-				$contest['extra_config']['links'] = [];
-			}
-
-			$contest['extra_config']['links'][] = [$vdata['title'], $vdata['blog_id']];
-		} elseif ($_POST['op_type'] == 'del') {
-			$n = count($contest['extra_config']['links']);
-			for ($i = 0; $i < $n; $i++) {
-				if ($contest['extra_config']['links'][$i][1] == $vdata['blog_id']) {
-					$contest['extra_config']['links'][$i] = $contest['extra_config']['links'][$n - 1];
-					unset($contest['extra_config']['links'][$n - 1]);
-					break;
-				}
-			}
-
-			if (!count($contest['extra_config']['links'])) {
-				unset($contest['extra_config']['links']);
-			}
-		}
-
-		$esc_extra_config = json_encode($contest['extra_config']);
-		$esc_extra_config = DB::escape($esc_extra_config);
-		DB::update("UPDATE contests set extra_config = '$esc_extra_config' where id = {$contest['id']}");
-
-		dieWithJsonData(['status' => 'success', 'message' => '修改成功']);
-	};
-	$blog_link_contests->setAjaxSubmit(<<<EOD
-function(res) {
-	if (res.status === 'success') {
-		$('#blogs-result-alert')
-			.html('操作成功！')
-			.addClass('alert-success')
-			.removeClass('alert-danger')
-			.show();
-	} else {
-		$('#blogs-result-alert')
-			.html('操作失败。' + (res.message || ''))
-			.removeClass('alert-success')
-			.addClass('alert-danger')
-			.show();
-	}
-
-	$(window).scrollTop(0);
-}
-EOD);
-	$blog_link_contests->runAtServer();
 }
 
 ?>
@@ -714,9 +615,6 @@ EOD);
 						<li class="nav-item">
 							<a class="nav-link active" href="#type" data-bs-toggle="tab" data-bs-target="#type">规则</a>
 						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="#blogs" data-bs-toggle="tab" data-bs-target="#blogs">比赛资料</a>
-						</li>
 					</ul>
 				</div>
 				<div class="card-body tab-content">
@@ -736,20 +634,6 @@ EOD);
 								<h5>常见问题</h5>
 								<ul class="mb-0">
 									<li>暂无</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-					<div class="tab-pane" id="blogs">
-						<div id="blogs-result-alert" class="alert" role="alert" style="display: none"></div>
-						<div class="row row-cols-1 row-cols-md-2">
-							<div class="col">
-								<?php $blog_link_contests->printHTML(); ?>
-							</div>
-							<div class="col mt-3 mt-md-0">
-								<h5>注意事项</h5>
-								<ul class="mb-0">
-									<li>添加比赛资料前请确认博客是否处于公开状态。</li>
 								</ul>
 							</div>
 						</div>
