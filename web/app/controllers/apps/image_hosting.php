@@ -458,32 +458,40 @@ $pag = new Paginator($pag_config);
 	<?= $pag->pagination() ?>
 </div>
 
-<div class="toast-container position-fixed bottom-0 start-0 ms-3 mb-4">
-	<div id="copy-url-toast" class="toast text-bg-success align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
-		<div class="d-flex">
-			<div class="toast-body">
-				复制成功！
-			</div>
-			<button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-		</div>
-	</div>
-</div>
-
 <script>
-	var copy_url_toast = new bootstrap.Toast('#copy-url-toast', {
-		delay: 2000
-	});
-
 	$('.image-copy-url-button').click(function() {
+		var _this = this;
 		var url = new URL($(this).data('image-path'), location.origin);
-		navigator.clipboard.writeText(url);
-		copy_url_toast.show();
+
+		navigator.clipboard.writeText(url).then(function() {
+			$(_this).addClass('btn-success');
+			$(_this).removeClass('btn-outline-secondary');
+			$(_this).html('<i class="bi bi-check2"></i>');
+
+			setTimeout(function() {
+				$(_this).addClass('btn-outline-secondary');
+				$(_this).removeClass('btn-success');
+				$(_this).html('<i class="bi bi-clipboard"></i>');
+			}, 1000);
+		});
 	});
 
 	$('.image-copy-md-button').click(function() {
+		var _this = this;
 		var url = new URL($(this).data('image-path'), location.origin);
-		navigator.clipboard.writeText('![](' + url + ')');
-		copy_url_toast.show();
+
+		navigator.clipboard.writeText('![](' + url + ')').then(function() {
+			$(_this).addClass('btn-success');
+			$(_this).removeClass('btn-outline-secondary');
+			$(_this).html('<i class="bi bi-check2"></i>');
+
+			setTimeout(function() {
+				$(_this).addClass('btn-outline-secondary');
+				$(_this).removeClass('btn-success');
+				$(_this).html('<i class="bi bi-markdown"></i>');
+			}, 1000);
+		});
+
 	});
 </script>
 
