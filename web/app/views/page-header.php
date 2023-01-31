@@ -180,7 +180,50 @@ if (!isset($ShowPageHeader)) {
 					skipHtmlTags: {
 						'[-]': ['pre']
 					},
-				}
+					renderActions: {
+						addCopyText: [
+							155,
+							(doc) => {
+								for (const math of doc.math) {
+									MathJax.config.addCopyText(math, doc);
+								}
+							},
+							function(math, doc) {
+								MathJax.config.addCopyText(math, doc);
+							}
+						]
+					},
+				},
+				addCopyText(math, doc) {
+					doc.adaptor.append(
+						math.typesetRoot,
+						doc.adaptor.node(
+							'mjx-copytext', {
+								'aria-hidden': true,
+							},
+							[
+								doc.adaptor.text(
+									math.start.delim +
+									math.math +
+									math.end.delim)
+							]
+						)
+					);
+				},
+				startup: {
+					ready() {
+						MathJax._.output.chtml_ts.CHTML.commonStyles['mjx-copytext'] = {
+							display: 'inline-block',
+							position: 'absolute',
+							top: 0,
+							left: 0,
+							width: 0,
+							height: 0,
+							opacity: 0,
+						};
+						MathJax.startup.defaultReady();
+					}
+				},
 			};
 		</script>
 		<script id="MathJax-script" src="<?= HTML::url('/js/mathjax3/tex-mml-chtml.js') ?>"></script>
