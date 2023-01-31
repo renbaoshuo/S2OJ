@@ -54,7 +54,7 @@ class UOJRemoteProblem {
 			}
 
 			return [
-				'content-type' => $curl->response_headers['Content-Type'],
+				'content-type' => $curl->responseHeaders['Content-Type'],
 				'response' => $curl->response,
 			];
 		});
