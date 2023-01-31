@@ -465,6 +465,7 @@ class JudgmentDetailsPrinter {
 			echo '</div>';
 		} elseif ($node->nodeName == 'subtask') {
 			$subtask_info = $node->getAttribute('info');
+			$subtask_title = $node->getAttribute('title');
 			$subtask_num = $node->getAttribute('num');
 			$subtask_score = $node->getAttribute('score');
 			$subtask_time = $this->_get_attr($node, 'time', -1);
@@ -482,10 +483,14 @@ class JudgmentDetailsPrinter {
 
 			echo 		'<div class="row">';
 			echo 			'<div class="col-sm-4">';
-			echo 				'<h3 class="fs-5">', 'Subtask #', $subtask_num, ': ', '</h3>';
+			if ($subtask_title !== '') {
+				echo 		    '<h3 class="fs-5">', $subtask_title, ': ', '</h3>';
+			} else {
+				echo 			'<h3 class="fs-5">', 'Subtask #', $subtask_num, ': ', '</h3>';
+			}
 			echo 			'</div>';
 
-			if ($this->styler->show_score) {
+			if ($this->styler->show_score && $subtask_score !== '') {
 				echo 		'<div class="col-sm-2">';
 				echo        '<i class="bi bi-clipboard-check"></i> ', $subtask_score, ' pts';
 				echo 		'</div>';
@@ -494,7 +499,7 @@ class JudgmentDetailsPrinter {
 				echo 			htmlspecialchars($subtask_info);
 				echo 		'</div>';
 			} else {
-				echo 		'<div class="col-sm-4">';
+				echo 		'<div class="col-sm-4 uoj-status-text">';
 				echo		$this->styler->getTestInfoIcon($subtask_info);
 				echo 			htmlspecialchars($subtask_info);
 				echo 		'</div>';
@@ -541,6 +546,9 @@ class JudgmentDetailsPrinter {
 				$accordion_parent .= "_collapse_subtask_{$this->subtask_num}_accordion";
 			}
 			$accordion_collapse = "{$accordion_parent}_collapse_test_{$test_num}";
+			if ($this->subtask_num != null) {
+				$accordion_collapse .= "_in_subtask_{$this->subtask_num}";
+			}
 			if (!$this->styler->shouldFadeDetails($test_info)) {
 				echo '<div class="card-header uoj-submission-result-item bg-transparent rounded-0 border-0" data-bs-toggle="collapse" data-bs-parent="#', $accordion_parent, '" data-bs-target="#', $accordion_collapse, '">';
 			} else {
@@ -555,7 +563,7 @@ class JudgmentDetailsPrinter {
 			}
 			echo '</div>';
 
-			if ($this->styler->show_score) {
+			if ($this->styler->show_score && $test_score !== '') {
 				echo '<div class="col-sm-2">';
 				echo '<i class="bi bi-clipboard-check"></i> ', $test_score, ' pts';
 				echo '</div>';
@@ -664,6 +672,11 @@ class JudgmentDetailsPrinter {
 			echo '<pre class="bg-light p-3 rounded">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
+		} elseif ($node->nodeName == 'ans') {
+			echo '<h4 class="fs-6"><span>answer: </span></h4>';
+			echo '<pre class="bg-light p-3 rounded">', "\n";
+			$this->_print_c($node);
+			echo "\n</pre>";
 		} elseif ($node->nodeName == 'res') {
 			echo '<h4 class="fs-6"><span>result: </span></h4>';
 			echo '<pre class="bg-light p-3 rounded">', "\n";
@@ -687,7 +700,7 @@ class JudgmentDetailsPrinter {
 				}
 				echo '<h4 class="mb-2">', $node->getAttribute("title"), ":</h4>";
 			}
-			echo '<pre>', "\n";
+			echo '<pre class="bg-light p-3 rounded">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 			echo '</div>';
@@ -757,7 +770,7 @@ class SubmissionDetailsStyler {
 		}
 	}
 	public function shouldFadeDetails($info) {
-		return $this->fade_all_details || $info == 'Extra Test Passed';
+		return $this->fade_all_details || $info == 'Extra Test Passed' || $info == 'Skipped';
 	}
 }
 class CustomTestSubmissionDetailsStyler {

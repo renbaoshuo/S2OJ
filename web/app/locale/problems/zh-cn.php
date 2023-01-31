@@ -4,6 +4,7 @@ return [
 	'problem list' => '题单',
 	'all problems' => '总题库',
 	'template problems' => '模板题库',
+	'remote problems' => '远程题库',
 	'add new' => '添加新题',
 	'add new list' => '添加新题单',
 	'my problem' => '我的题目',

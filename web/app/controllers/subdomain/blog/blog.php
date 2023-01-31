@@ -2,6 +2,7 @@
 requireLib('bootstrap5');
 requireLib('mathjax');
 requireLib('hljs');
+requireLib('pdf.js');
 requirePHPLib('form');
 
 Auth::check() || redirectToLogin();

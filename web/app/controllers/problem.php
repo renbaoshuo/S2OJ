@@ -2,6 +2,7 @@
 requireLib('bootstrap5');
 requireLib('hljs');
 requireLib('mathjax');
+requireLib('pdf.js');
 requirePHPLib('form');
 requirePHPLib('judger');
 
@@ -223,7 +224,6 @@ if (UOJContest::cur()) {
 <div class="row">
 	<!-- Left col -->
 	<div class="col-lg-9">
-
 		<?php if (isset($tabs_info)) : ?>
 			<!-- 比赛导航 -->
 			<div class="mb-2">
@@ -233,7 +233,6 @@ if (UOJContest::cur()) {
 
 		<div class="card card-default mb-2">
 			<div class="card-body">
-
 				<h1 class="card-title text-center">
 					<?php if (UOJContest::cur()) : ?>
 						<?= UOJProblem::cur()->getTitle(['with' => 'letter', 'simplify' => true]) ?>
@@ -243,8 +242,13 @@ if (UOJContest::cur()) {
 				</h1>
 
 				<?php
-				$time_limit = $conf instanceof UOJProblemConf ? $conf->getVal('time_limit', 1) : null;
-				$memory_limit = $conf instanceof UOJProblemConf ? $conf->getVal('memory_limit', 256) : null;
+				if (UOJProblem::info('type') == 'local') {
+					$time_limit = $conf instanceof UOJProblemConf ? $conf->getVal('time_limit', 1) : null;
+					$memory_limit = $conf instanceof UOJProblemConf ? $conf->getVal('memory_limit', 256) : null;
+				} else if (UOJProblem::info('type') == 'remote') {
+					$time_limit = UOJProblem::cur()->getExtraConfig('time_limit');
+					$memory_limit = UOJProblem::cur()->getExtraConfig('memory_limit');
+				}
 				?>
 				<div class="text-center small">
 					时间限制: <?= $time_limit ? "$time_limit s" : "N/A" ?>
@@ -259,6 +263,14 @@ if (UOJContest::cur()) {
 						<article class="mt-3 markdown-body">
 							<?= $problem_content['statement'] ?>
 						</article>
+
+						<?php if (UOJProblem::info('type') == 'remote') : ?>
+							<hr>
+
+							<article class="mt-3 markdown-body remote-content">
+								<?= UOJProblem::cur()->queryContent()['remote_content'] ?>
+							</article>
+						<?php endif ?>
 					</div>
 					<div class="tab-pane" id="submit">
 						<?php if ($pre_submit_check_ret !== true) : ?>
@@ -392,6 +404,14 @@ if (UOJContest::cur()) {
 						<?= UOJProblem::cur()->getUploaderLink() ?>
 					</span>
 				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span class="flex-shrink-0">
+						题目来源
+					</span>
+					<span>
+						<?= UOJProblem::cur()->getProviderLink() ?>
+					</span>
+				</li>
 				<?php if (!UOJContest::cur() || UOJContest::cur()->progress() >= CONTEST_FINISHED) : ?>
 					<li class="list-group-item d-flex justify-content-between align-items-center">
 						<span class="flex-shrink-0">
@@ -448,23 +468,24 @@ if (UOJContest::cur()) {
 		</div>
 
 		<!-- 附件 -->
-		<div class="card card-default mb-2">
-			<ul class="nav nav-fill flex-column">
+		<div class="card mb-2">
+			<div class="card-header fw-bold">附件</div>
+			<div class="list-group list-group-flush">
 				<?php if (UOJProblem::cur()->userCanDownloadTestData(Auth::user())) : ?>
-					<li class="nav-item text-start">
-						<a class="nav-link" href="<?= HTML::url("/download/problem/{$problem['id']}/data.zip") ?>">
-							<i class="bi bi-hdd-stack"></i>
-							测试数据
-						</a>
-					</li>
-				<?php endif ?>
-				<li class="nav-item text-start">
-					<a class="nav-link" href="<?= HTML::url("/download/problem/{$problem['id']}/attachment.zip") ?>">
-						<i class="bi bi-download"></i>
-						附件下载
+					<a class="list-group-item list-group-item-action" href="<?= HTML::url(UOJProblem::cur()->getMainDataUri()) ?>">
+						<i class="bi bi-hdd-stack"></i>
+						测试数据
 					</a>
-				</li>
-			</ul>
+				<?php endif ?>
+				<a class="list-group-item list-group-item-action" href="<?= HTML::url(UOJProblem::cur()->getAttachmentUri()) ?>">
+					<i class="bi bi-download"></i>
+					附件下载
+				</a>
+				<a class="list-group-item list-group-item-action" href="<?= HTML::url(UOJProblem::cur()->getResourcesBaseUri()) ?>">
+					<i class="bi bi-folder2-open"></i>
+					相关资源
+				</a>
+			</div>
 		</div>
 
 		<?php

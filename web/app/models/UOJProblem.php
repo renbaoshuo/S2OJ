@@ -382,6 +382,26 @@ class UOJProblem {
 		return UOJUser::getLink($this->info['uploader'] ?: "root");
 	}
 
+	public function getProviderLink() {
+		if ($this->info['type'] == 'local') {
+			return HTML::tag('a', ['href' => HTML::url('/')], UOJConfig::$data['profile']['oj-name-short']);
+		}
+
+		$remote_oj = $this->getExtraConfig('remote_online_judge');
+		$remote_id = $this->getExtraConfig('remote_problem_id');
+
+		if (!$remote_oj || !array_key_exists($remote_oj, UOJRemoteProblem::$providers)) {
+			return 'Error';
+		}
+
+		$provider = UOJRemoteProblem::$providers[$remote_oj];
+
+		return HTML::tag('a', [
+			'href' => UOJRemoteProblem::getProblemRemoteUrl($remote_oj, $remote_id),
+			'target' => '_blank'
+		], $provider['name']);
+	}
+
 	public function getDifficultyHTML() {
 		$difficulty = (int)$this->info['difficulty'];
 		$difficulty_text = in_array($difficulty, static::$difficulty) ? $difficulty : '?';
@@ -440,28 +460,33 @@ class UOJProblem {
 		return $key === null ? $extra_config : $extra_config[$key];
 	}
 	public function getCustomTestRequirement() {
+		if ($this->info['type'] == 'remote') {
+			return [];
+		}
+
 		$extra_config = json_decode($this->info['extra_config'], true);
+
 		if (isset($extra_config['custom_test_requirement'])) {
 			return $extra_config['custom_test_requirement'];
-		} else {
-			$answer = [
-				'name' => 'answer',
-				'type' => 'source code',
-				'file_name' => 'answer.code'
-			];
-			foreach ($this->getSubmissionRequirement() as $req) {
-				if ($req['name'] == 'answer' && $req['type'] == 'source code' && isset($req['languages'])) {
-					$answer['languages'] = $req['languages'];
-				}
-			}
-			return [
-				$answer, [
-					'name' => 'input',
-					'type' => 'text',
-					'file_name' => 'input.txt'
-				]
-			];
 		}
+
+		$answer = [
+			'name' => 'answer',
+			'type' => 'source code',
+			'file_name' => 'answer.code'
+		];
+		foreach ($this->getSubmissionRequirement() as $req) {
+			if ($req['name'] == 'answer' && $req['type'] == 'source code' && isset($req['languages'])) {
+				$answer['languages'] = $req['languages'];
+			}
+		}
+		return [
+			$answer, [
+				'name' => 'input',
+				'type' => 'text',
+				'file_name' => 'input.txt'
+			]
+		];
 	}
 
 	public function userCanView(array $user = null, array $cfg = []) {
@@ -644,6 +669,22 @@ class UOJProblem {
 	public function getDataFilePath($name = '') {
 		// return "zip://{$this->getDataZipPath()}#{$this->info['id']}/$name";
 		return "{$this->getDataFolderPath()}/$name";
+	}
+
+	public function getResourcesFolderPath() {
+		return UOJContext::storagePath() . "/problem_resources/" . $this->info['id'];
+	}
+
+	public function getResourcesPath($name = '') {
+		return "{$this->getResourcesFolderPath()}/$name";
+	}
+
+	public function getResourcesBaseUri() {
+		return "/problem/{$this->info['id']}/resources";
+	}
+
+	public function getResourcesUri($name = '') {
+		return "{$this->getResourcesBaseUri()}/{$name}";
 	}
 
 	public function getProblemConfArray(string $where = 'data') {

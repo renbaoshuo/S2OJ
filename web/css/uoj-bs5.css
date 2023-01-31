@@ -233,6 +233,15 @@ h6,
 	border-left: 0.25em solid #d0d7de;
 }
 
+.markdown-body ol,
+.markdown-body ul {
+	margin-bottom: 1em;
+}
+
+.pdf-page-canvas {
+	width: 100% !important;
+}
+
 form.uoj-bs4-form-inline {
 	display: inline-block;
 	margin-right: 0.3em;
@@ -462,4 +471,9 @@ form.uoj-bs4-form-compressed button {
 .uoj-back-btn {
 	--bs-btn-hover-bg: #d3d4d570;
 	--bs-btn-hover-border-color: transparent;
+}
+
+.remote-content center > img + span {
+	display: block;
+	font-size: 90%;
 }

@@ -134,16 +134,15 @@ UOJGroup::cur()->userCanView(Auth::user(), ['ensure' => true]);
 			</div>
 		</div>
 
-		<div class="card card-default mb-3">
-			<div class="card-body">
-				<h2 class="card-title h3">
-					<?= UOJLocale::get('top solver') ?>
-				</h2>
-				<?php UOJRanklist::printHTML([
-					'page_len' => 15,
-					'group_id' => UOJGroup::info('id'),
-				]) ?>
+		<div class="card mb-3">
+			<div class="card-header bg-transparent">
+				<h2 class="h3 mb-0"><?= UOJLocale::get('top solver') ?></h2>
 			</div>
+			<?php UOJRanklist::printHTML([
+				'page_len' => 15,
+				'group_id' => UOJGroup::info('id'),
+				'flush' => true,
+			]) ?>
 		</div>
 		<!-- end left col -->
 	</div>

@@ -1116,12 +1116,12 @@ function showCommentReplies(id, replies) {
 
 // Tooltip
 $(document).ready(function() {
-	[...document.querySelectorAll('[data-bs-toggle="tooltip"]')].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+	bootstrap.Tooltip.jQueryInterface.call($('[data-bs-toggle="tooltip"]'));
 });
 
 // Popovers
 $(document).ready(function() {
-	[...document.querySelectorAll('[data-bs-toggle="popover"]')].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+	bootstrap.Popover.jQueryInterface.call($('[data-bs-toggle="popover"]'));
 });
 
 // Copy button

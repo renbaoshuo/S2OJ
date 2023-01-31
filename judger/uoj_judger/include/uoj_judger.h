@@ -133,6 +133,9 @@ string file_preview(const string &name, const int &len = 100) {
 		return "";
 	}
 
+	struct stat stat_buf;
+	stat(name.c_str(), &stat_buf);
+
 	string res = "";
 	if (len == -1) {
 		int c;
@@ -145,8 +148,9 @@ string file_preview(const string &name, const int &len = 100) {
 			res += c;
 		}
 		if ((int)res.size() > len + 3) {
+			int omitted = (int)stat_buf.st_size - len;
 			res.resize(len);
-			res += "...";
+			res += "\n\n(" + to_string(omitted) + " bytes omitted)";
 		}
 	}
 	fclose(f);

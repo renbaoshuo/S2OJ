@@ -12,11 +12,14 @@ bg-white shadow-sm
 <?php else: ?>
 bg-light
 <?php endif ?>
-mb-4" role="navigation">
+<?php if (!isset($disable_navbar_margin_bottom)): ?>
+mb-4
+<?php endif ?>
+" role="navigation">
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 	<div class="container">
 	<?php endif ?>
-		<a class="navbar-brand" href="<?= HTML::url('/') ?>">
+		<a class="navbar-brand fw-normal" href="<?= HTML::url('/') ?>">
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 				<img src="<?= HTML::url('/images/logo_small.png') ?>" alt="Logo" width="24" height="24" class="d-inline-block align-text-top"/>
 			<?php endif ?>
@@ -111,13 +114,13 @@ mb-4" role="navigation">
 						</a>
 						<ul class="dropdown-menu">
 							<li>
-								<a class="dropdown-item" href="<?= HTML::url('/image_hosting') ?>">
+								<a class="dropdown-item" href="<?= HTML::url('/apps/image_hosting') ?>">
 									<i class="bi bi-images"></i>
 									<?= UOJLocale::get('image hosting') ?>
 								</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href="<?= HTML::url('/html2markdown') ?>">
+								<a class="dropdown-item" href="<?= HTML::url('/apps/html2markdown') ?>">
 									<i class="bi bi-markdown"></i>
 									<?= UOJLocale::get('html to markdown') ?>
 								</a>
@@ -135,20 +138,6 @@ mb-4" role="navigation">
 						<?= UOJLocale::get('help') ?>
 					</a>
 				</li>
-				<?php if (!isset($REQUIRE_LIB['bootstrap5'])): ?>
-					<li class="nav-item">
-						<a class="nav-link" href="#" id="try-bs5">
-							<span class="glyphicon glyphicon-share"></span>
-							体验新版
-						</a>
-						<script>
-							$('#try-bs5').click(function() {
-								$.removeCookie('bootstrap4', { path: '/' });
-								location.reload();
-							});
-						</script>
-					</li>
-				<?php endif ?>
 			</ul>
 			<?php if (isset($REQUIRE_LIB['bootstrap5'])): ?>
 			<hr class="d-md-none text-muted">

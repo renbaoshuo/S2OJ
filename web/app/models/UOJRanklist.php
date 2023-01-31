@@ -5,9 +5,12 @@ class UOJRanklist {
 		$cfg += [
 			'top10' => false,
 			'card' => false,
+			'flush' => false,
 			'group_id' => null,
 			'page_len' => 50,
 		];
+
+		$cfg['flush'] |= $cfg['card'];
 
 		$conds = [];
 
@@ -86,6 +89,9 @@ class UOJRanklist {
 
 		if ($cfg['card']) {
 			echo '<div class="card my-3">';
+		}
+
+		if ($cfg['flush']) {
 			echo '<div class="list-group list-group-flush">';
 		} else {
 			echo '<div class="list-group">';
@@ -104,7 +110,18 @@ class UOJRanklist {
 		if ($cfg['card']) {
 			echo '</div>';
 		}
-		echo $pag->pagination();
+
+		if ($pag->n_pages > 1) {
+			if ($cfg['flush']) {
+				echo '<div class="list-group-item">';
+			}
+
+			echo $pag->pagination();
+
+			if ($cfg['flush']) {
+				echo '</div>';
+			}
+		}
 	}
 
 	/**

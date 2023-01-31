@@ -29,6 +29,16 @@ services:
       - SOCKET_PORT=2333
       - SOCKET_PASSWORD=_judger_socket_password_
   
+  uoj-remote-judger:
+    image: git.m.ac/baoshuo/s2oj-remote-judger
+    container_name: uoj-remote-judger
+    restart: always
+    environment:
+      - UOJ_PROTOCOL=http
+      - UOJ_HOST=uoj-web
+      - UOJ_JUDGER_NAME=remote_judger
+      - UOJ_JUDGER_PASSWORD=_judger_password_
+  
   uoj-web:
     image: git.m.ac/baoshuo/s2oj-web
     container_name: uoj-web

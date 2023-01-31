@@ -107,8 +107,8 @@ $blog_editor->runAtServer();
 		<ol>
 			<li>题解发布后还需要返回对应题目的题解页面 <b>手动输入博客 ID</b> 来将本文添加到题目的题解列表中（博客 ID 可以在右上角找到）；</li>
 			<li>请勿引用不稳定的外部资源（如来自个人服务器的图片或文档等），以便备份及后期维护；</li>
-			<li>请勿在博文中直接插入大段 HTML 代码，这可能会破坏页面的显示，可以考虑使用 <a class="text-decoration-none" href="/html2markdown" target="_blank">转换工具</a> 转换后再作修正；</li>
-			<li>图片上传推荐使用 <a class="text-decoration-none" href="/image_hosting" target="_blank">S2OJ 图床</a>，以免后续产生外链图片大量失效的情况。</li>
+			<li>请勿在博文中直接插入大段 HTML 代码，这可能会破坏页面的显示，可以考虑使用 <a class="text-decoration-none" href="/apps/html2markdown" target="_blank">转换工具</a> 转换后再作修正；</li>
+			<li>图片上传推荐使用 <a class="text-decoration-none" href="/apps/image_hosting" target="_blank">S2OJ 图床</a>，以免后续产生外链图片大量失效的情况。</li>
 		</ol>
 		<p class="card-text">
 			帮助：<a class="text-decoration-none" href="http://uoj.ac/blog/7">UOJ 博客使用教程</a>。

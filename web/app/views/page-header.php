@@ -44,7 +44,7 @@ if (!isset($ShowPageHeader)) {
 	<title><?= isset($PageTitle) ? $PageTitle : UOJConfig::$data['profile']['oj-name-short'] ?> - <?= $PageMainTitle ?></title>
 
 	<script type="text/javascript">
-		uojHome = ''; // '<?= HTML::url('/') ?>'
+		uojHome = ''; // '<?= HTML::url('/') ?>';
 	</script>
 
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])) : ?>
@@ -175,6 +175,11 @@ if (!isset($ShowPageHeader)) {
 						['\\(', '\\)']
 					],
 					processEscapes: true
+				},
+				options: {
+					skipHtmlTags: {
+						'[-]': ['pre']
+					},
 				}
 			};
 		</script>
@@ -192,8 +197,13 @@ if (!isset($ShowPageHeader)) {
 	<?php endif ?>
 
 	<?php if (isset($REQUIRE_LIB['jquery.query'])) : ?>
-		<!-- ckeditor -->
+		<!-- jquery.query -->
 		<?= HTML::js_src('/js/jquery.query-object.js') ?>
+	<?php endif ?>
+
+	<?php if (isset($REQUIRE_LIB['jquery.datatables'])) : ?>
+		<!-- jquery.datatable -->
+		<?= HTML::js_src('/js/jquery.datatables.min.js') ?>
 	<?php endif ?>
 
 	<?php if (isset($REQUIRE_LIB['colorhelpers'])) : ?>
@@ -250,6 +260,59 @@ if (!isset($ShowPageHeader)) {
 		<?= HTML::js_src('/js/jquery.calendar_heatmap.min.js') ?>
 	<?php endif ?>
 
+	<?php if (isset($REQUIRE_LIB['fontawesome'])) : ?>
+		<!-- fontawesome -->
+		<?= HTML::css_link('/css/font-awesome.min.css') ?>
+	<?php endif ?>
+
+	<?php if (isset($REQUIRE_LIB['pdf.js'])) : ?>
+		<!-- pdf.js -->
+		<?= HTML::js_src('/js/pdf.js') ?>
+		<script>
+			pdfjsLib.GlobalWorkerOptions.workerSrc = '/js/pdf.worker.js';
+
+			function randstr(prefix) {
+				return Math.random().toString(36).replace('0.', prefix || '');
+			}
+
+			$(document).ready(function() {
+				$('div[data-pdf]').each(function() {
+					var _this = $(this);
+					var pdf_src = $(this).data('src');
+
+					$(this).css('width', '100%').css('height', '100%');
+
+					var task = pdfjsLib.getDocument(pdf_src);
+					var id = 'pdf_' + task.docId;
+
+					$(this).attr('id', id + '_container');
+
+					task.promise.then(function(pdf) {
+						for (var i = 1; i <= pdf.numPages; i++) {
+							$(_this).append('<canvas id="' + id + '_page_' + i + '" class="pdf-page-canvas"></canvas>');
+
+							pdf.getPage(i).then(function(page) {
+								var viewport = page.getViewport({
+									scale: 2,
+								});
+
+								var canvas = document.getElementById(id + '_page_' + page.pageNumber);
+
+								canvas.height = viewport.height;
+								canvas.width = viewport.width;
+
+								page.render({
+									canvasContext: canvas.getContext('2d'),
+									viewport: viewport,
+								});
+							});
+						}
+					});
+				});
+			});
+		</script>
+	<?php endif ?>
+
 	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!--[if lt IE 9]>
 			<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -264,7 +327,10 @@ if (!isset($ShowPageHeader)) {
 			}
 		});
 	</script>
+
+	<script async data-domain="sjzezoj.com" src="https://stat.u.sb/js/script.js"></script>
 </head>
+
 <?php if (isset($REQUIRE_LIB['bootstrap5'])) : ?>
 
 	<body class="d-flex flex-column min-vh-100

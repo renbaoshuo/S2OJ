@@ -588,11 +588,11 @@ EOD);
 								</tr>
 							EOD,
 							function ($row) {
-								$problem = UOJProblem::query($row['problem_id']);
+								$problem = UOJContestProblem::query($row['problem_id'], UOJContest::cur());
 								echo '<tr>';
 								echo '<td>', $row['problem_id'], '</td>';
 								echo '<td>', $problem->getLink(['with' => 'none']), '</td>';
-								echo '<td>', isset($contest['extra_config']["problem_{$problem->info['id']}"]) ? $contest['extra_config']["problem_{$problem->info['id']}"] : 'default', '</td>';
+								echo '<td>', $problem->getJudgeTypeInContest(), '</td>';
 								echo '<td>';
 								echo '<form class="d-inline-block" method="POST" target="_self" onsubmit=\'return confirm("你确定要将题目 #', $problem->info['id'], ' 从比赛中移除吗？")\'>';
 								echo '<input type="hidden" name="_token" value="', crsf_token(), '">';

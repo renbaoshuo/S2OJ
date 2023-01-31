@@ -20,6 +20,9 @@ function getProblemTR($info) {
 	if ($problem->isUserOwnProblem(Auth::user())) {
 		$html .= ' <span class="badge text-white bg-info">' . UOJLocale::get('problems::my problem') . '</span> ';
 	}
+	if ($info['type'] == 'remote') {
+		HTML::tag('a', ['class' => 'badge text-bg-success', 'href' => '/problems/remote'], '远端评测题');
+	}
 	if ($info['is_hidden']) {
 		$html .= ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span> ';
 	}
@@ -74,15 +77,7 @@ $pag_config = [
 	'page_len' => 20,
 	'col_names' => [
 		'best_ac_submissions.submission_id as submission_id',
-		'problems.id as id',
-		'problems.is_hidden as is_hidden',
-		'problems.title as title',
-		'problems.submit_num as submit_num',
-		'problems.ac_num as ac_num',
-		'problems.zan as zan',
-		'problems.difficulty as difficulty',
-		'problems.extra_config as extra_config',
-		'problems.uploader as uploader',
+		'problems.*',
 	],
 	'table_name' => [
 		"problems",

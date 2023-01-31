@@ -7,9 +7,12 @@ class UOJMarkdown extends ParsedownMath {
 
 		$this->options['username_with_color'] = $options['username_with_color'] ?: false;
 
+		// Special Block
+		$this->inlineMarkerList .= '@';
+		$this->InlineTypes['@'][] = 'SpecialBlock';
+
 		// https://gist.github.com/ShNURoK42/b5ce8baa570975db487c
 		$this->InlineTypes['@'][] = 'UserMention';
-		$this->inlineMarkerList .= '@';
 	}
 
 	// https://github.com/taufik-nurrohman/parsedown-extra-plugin/blob/1653418c5a9cf5277cd28b0b23ba2d95d18e9bc4/ParsedownExtraPlugin.php#L340-L345
@@ -84,5 +87,36 @@ class UOJMarkdown extends ParsedownMath {
 				'markup' => $matches[0],
 			];
 		}
+	}
+
+	protected function inlineSpecialBlock($Excerpt) {
+		if (!isset($Excerpt['text'][1]) or $Excerpt['text'][1] !== '[') {
+			return;
+		}
+
+		$Excerpt['text'] = substr($Excerpt['text'], 1);
+
+		$Link = $this->inlineLink($Excerpt);
+
+		if ($Link === null) {
+			return;
+		}
+
+		$Inline = [
+			'extent' => $Link['extent'] + 1,
+			'element' => [
+				'name' => 'div',
+				'attributes' => [
+					'data-src' => $Link['element']['attributes']['href'],
+					"data-{$Link['element']['text']}" => $Link['element']['text'],
+				],
+			],
+		];
+
+		$Inline['element']['attributes'] += $Link['element']['attributes'];
+
+		unset($Inline['element']['attributes']['href']);
+
+		return $Inline;
 	}
 }
