@@ -136,7 +136,7 @@ if (isset($_POST['login'])) {
 
 			if (msg == 'ok') {
 				var prevUrl = document.referrer;
-				if (prevUrl == '' || /.*\/login.*/.test(prevUrl) || /.*\/logout.*/.test(prevUrl) || /.*\/register.*/.test(prevUrl) || /.*\/reset-password.*/.test(prevUrl)) {
+				if (prevUrl == '' || /.*\/login.*/.test(prevUrl) || /.*\/logout.*/.test(prevUrl) || /.*\/register.*/.test(prevUrl) || /.*\/reset_password.*/.test(prevUrl)) {
 					prevUrl = '/';
 				};
 				window.location.href = prevUrl;
@@ -165,7 +165,7 @@ if (isset($_POST['login'])) {
 				$('#div-username > .form-floating, #input-username').addClass('is-invalid');
 				$('#div-password').addClass('has-validation');
 				$('#div-password > .form-floating, #input-password').addClass('is-invalid');
-				$('#help-password').html('用户名或密码错误。<a href="/forgot-password">忘记密码？</a>');
+				$('#help-password').html('用户名或密码错误。<a href="/forgot_password">忘记密码？</a>');
 				refreshCaptcha();
 			}
 		});

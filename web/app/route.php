@@ -80,8 +80,8 @@ Route::group(
 		Route::any('/login', '/login.php');
 		Route::any('/logout', '/logout.php');
 		Route::any('/register', '/register.php');
-		Route::any('/forgot-password', '/forgot_pw.php');
-		Route::any('/reset-password', '/reset_pw.php');
+		Route::any('/forgot_password', '/forgot_pw.php');
+		Route::any('/reset_password', '/reset_pw.php');
 
 		Route::any('/user/{username}', '/user_info.php');
 		Route::any('/user/{username}/edit(?:/{tab})?', '/user_info_edit.php');
