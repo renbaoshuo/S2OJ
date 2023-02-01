@@ -1,4 +1,4 @@
-<!-- Made with 💖 by Baoshuo -->
+<!-- Made with 💖 by Baoshuo ( https://baoshuo.ren ) -->
 <?php
 if (!isset($REQUIRE_LIB['bootstrap5'])) {
 	$new_user_msg_num = DB::selectCount("select count(*) from user_msg where receiver = '" . Auth::id() . "' and read_time is null");
@@ -369,6 +369,15 @@ if (!isset($ShowPageHeader)) {
 				return before_window_unload_message;
 			}
 		});
+	</script>
+
+	<script>
+		console.log(
+			'S2OJ (build: <?= UOJConfig::$data['profile']['s2oj-version'] ?>)\n' +
+			'https://github.com/renbaoshuo/S2OJ\n' +
+			'\n' +
+			'Made with 💖 by Baoshuo ( https://baoshuo.ren )\n'
+		);
 	</script>
 
 	<script async data-domain="sjzezoj.com" src="https://stat.u.sb/js/script.js"></script>
