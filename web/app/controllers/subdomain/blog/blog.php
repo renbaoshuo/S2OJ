@@ -91,7 +91,7 @@ $reply_form->addHidden(
 			return '您要回复的对象不存在';
 		}
 		$comment = UOJBlogComment::query($reply_id);
-		if (!$comment || $comment['blog_id'] != $blog['id']) {
+		if (!$comment || $comment->info['blog_id'] != $blog['id']) {
 			return '您要回复的对象不存在';
 		}
 		$vdata['parent'] = $comment;
