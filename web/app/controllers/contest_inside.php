@@ -54,25 +54,24 @@ if ($is_manager) {
 isset($tabs_info[$cur_tab]) || UOJResponse::page404();
 
 if (UOJContest::cur()->userCanStartFinalTest(Auth::user())) {
-	if (CONTEST_PENDING_FINAL_TEST <= $contest['cur_progress']) {
-		$start_test_form = new UOJBs4Form('start_test');
+	if (CONTEST_PENDING_FINAL_TEST == $contest['cur_progress']) {
+		$start_test_form = new UOJForm('start_test');
 		$start_test_form->handle = function () {
-			UOJContest::finalTest();
+			UOJContest::cur()->finalTest();
 		};
-		$start_test_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
-		$start_test_form->submit_button_config['smart_confirm'] = '';
-		$start_test_form->submit_button_config['text'] = UOJContest::cur()->labelForFinalTest();
+		$start_test_form->config['submit_button']['class'] = 'btn btn-danger d-block w-100';
+		$start_test_form->config['submit_button']['text'] = UOJContest::cur()->labelForFinalTest();
+		$start_test_form->config['confirm']['smart'] = true;
 		$start_test_form->runAtServer();
 	}
-	if ($contest['cur_progress'] >= CONTEST_TESTING) {
-		$publish_result_form = new UOJBs4Form('publish_result');
+	if ($contest['cur_progress'] >= CONTEST_TESTING && UOJContest::cur()->queryJudgeProgress()['fully_judged']) {
+		$publish_result_form = new UOJForm('publish_result');
 		$publish_result_form->handle = function () {
 			UOJContest::announceOfficialResults();
 		};
-		$publish_result_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
-		$publish_result_form->submit_button_config['smart_confirm'] = '';
-		$publish_result_form->submit_button_config['text'] = '公布成绩';
-
+		$publish_result_form->config['submit_button']['class'] = 'btn btn-danger d-block w-100';
+		$publish_result_form->config['submit_button']['text'] = '公布成绩';
+		$publish_result_form->config['confirm']['smart'] = true;
 		$publish_result_form->runAtServer();
 	}
 }
