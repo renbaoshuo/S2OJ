@@ -22,10 +22,10 @@ return [
 	'statistics' => '统计',
 	'solutions' => '题解',
 	'run' => '运行',
-	'source code' => '源文件',
+	'source code' => '源代码',
 	'text file' => '文本文件',
 	'zip file upload introduction' => function($str) {
-		return "上传一个zip压缩文件，包含 {$str}：";
+		return "上传一个 zip 压缩文件，包含 {$str}：";
 	},
 	'or upload files one by one' => '或者逐个上传：',
 	'accepted submissions' => '满分提交',

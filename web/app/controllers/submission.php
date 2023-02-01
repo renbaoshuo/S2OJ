@@ -49,16 +49,18 @@ if ($can_see_minor) {
 
 if (UOJSubmission::cur()->isLatest()) {
 	if (UOJSubmission::cur()->preHackCheck()) {
-		$hack_form = new UOJBs4Form('hack');
-
-		$hack_form->addTextFileInput('input', '输入数据');
-		$hack_form->addCheckBox('use_formatter', '帮我整理文末回车、行末空格、换行符', true);
+		$hack_form = new UOJForm('hack');
+		$hack_form->addTextFileInput('input', ['filename' => 'input.txt']);
+		$hack_form->addCheckBox('use_formatter', [
+			'label' => '帮我整理文末回车、行末空格、换行符',
+			'checked' => true,
+		]);
 		$hack_form->handle = function (&$vdata) {
 			global $problem, $submission;
 			Auth::check() || redirectToLogin();
 
 			if ($_POST["input_upload_type"] == 'file') {
-				$tmp_name = UOJBs4Form::uploadedFileTmpName("input_file");
+				$tmp_name = UOJForm::uploadedFileTmpName("input_file");
 				if ($tmp_name == null) {
 					UOJResponse::message('你在干啥……怎么什么都没交过来……？');
 				}
@@ -81,10 +83,9 @@ if (UOJSubmission::cur()->isLatest()) {
 				])
 			]);
 		};
-		$hack_form->max_post_size = 25 * 1024 * 1024;
-		$hack_form->max_file_size_mb = 20;
+		$hack_form->config['max_post_size'] = 25 * 1024 * 1024;
+		$hack_form->config['max_file_size_mb'] = 25;
 		$hack_form->succ_href = "/hacks";
-
 		$hack_form->runAtServer();
 	}
 
@@ -174,13 +175,16 @@ if ($perm['manager_view']) {
 
 	<?php if (isset($hack_form)) : ?>
 		<p class="text-center">
-			这程序好像有点Bug，我给组数据试试？ <button id="button-display-hack" type="button" class="btn btn-danger btn-xs">Hack!</button>
+			这程序好像有点 Bug，我给组数据试试？ <button id="button-display-hack" type="button" class="btn btn-danger btn-xs">Hack!</button>
 		</p>
-		<div id="div-form-hack" style="display:none" class="mb-3">
-			<p class="text-center text-danger">
+		<div class="card mb-3" id="div-form-hack" style="display: none">
+			<div class="card-header">提交 Hack</div>
+			<div class="card-body">
+				<?php $hack_form->printHTML() ?>
+			</div>
+			<div class="card-footer bg-transparent small text-center text-danger">
 				Hack 功能是给大家互相查错用的。请勿故意提交错误代码，然后自己 Hack 自己、贼喊捉贼哦（故意贼喊捉贼会予以封禁处理）
-			</p>
-			<?php $hack_form->printHTML() ?>
+			</div>
 		</div>
 		<script type="text/javascript">
 			$(document).ready(function() {

@@ -384,6 +384,109 @@ class UOJForm {
 		);
 	}
 
+	public function addSourceCodeInput($name, $config) {
+		$config += [
+			'filename' => '',
+			'languages' => UOJLang::getAvailableLanguages(),
+			'preferred_lang' => null,
+		];
+
+		$this->add(
+			"{$name}_upload_type",
+			'',
+			function ($type) use ($name) {
+				if ($type == 'editor') {
+					if (!isset($_POST["{$name}_editor"])) {
+						return '你在干啥……怎么什么都没交过来……？';
+					}
+				} elseif ($type == 'file') {
+				} else {
+					return '……居然既不是用编辑器上传也不是用文件上传的……= =……';
+				}
+
+				return '';
+			},
+			'always_ok'
+		);
+		$this->addNoVal("{$name}_editor", '');
+		$this->addNoVal("{$name}_file", '');
+		$this->add(
+			"{$name}_language",
+			'',
+			function ($lang) use ($config) {
+				if (!isset($config['languages'][$lang])) {
+					return '该语言不被支持';
+				}
+
+				return '';
+			},
+			'always_ok'
+		);
+
+		if ($config['preferred_lang'] == null || !isset($languages[$config['preferred_lang']])) {
+			$preferred_lang = Cookie::get('uoj_preferred_language');
+		}
+
+		if ($config['preferred_lang'] == null || !isset($languages[$config['preferred_lang']])) {
+			$preferred_lang = UOJLang::$default_preferred_language;
+		}
+
+		$langs_options_str = '';
+		foreach ($config['languages'] as $lang_code => $lang_display) {
+			$langs_options_str .= HTML::option($lang_code, $lang_display, $lang_code === $preferred_lang);
+		}
+
+		$text = json_encode(UOJLocale::get('problems::source code') . ': ' . HTML::tag('code', [], $config['filename']));
+		$langs_options_json = json_encode($langs_options_str);
+
+		$this->appendHTML(<<<EOD
+			<div class="form-group mb-3" id="form-group-$name"></div>
+			<script type="text/javascript">
+				$('#form-group-$name').source_code_form_group('$name', $text, $langs_options_json);
+			</script>
+		EOD);
+
+		$this->config['is_big'] = true;
+		$this->config['has_file'] = true;
+	}
+
+	public function addTextFileInput($name, $config) {
+		$config += [
+			'filename' => '',
+		];
+
+		$this->add(
+			"{$name}_upload_type",
+			'',
+			function ($type, &$vdata) use ($name) {
+				if ($type == 'editor') {
+					if (!isset($_POST["{$name}_editor"])) {
+						return '你在干啥……怎么什么都没交过来……？';
+					}
+				} elseif ($type == 'file') {
+				} else {
+					return '……居然既不是用编辑器上传也不是用文件上传的……= =……';
+				}
+			},
+			'always_ok'
+		);
+
+		$this->addNoVal("{$name}_editor", '');
+		$this->addNoVal("{$name}_file", '');
+
+		$text = json_encode(UOJLocale::get('problems::text file') . ': ' . HTML::tag('code', [], $config['filename']));
+
+		$this->appendHTML(<<<EOD
+			<div class="form-group mb-3" id="form-group-$name"></div>
+			<script type="text/javascript">
+				$('#form-group-$name').text_file_form_group('$name', $text);
+			</script>
+		EOD);
+
+		$this->config['is_big'] = true;
+		$this->config['has_file'] = true;
+	}
+
 	public function printHTML() {
 		echo HTML::tag_begin('form', [
 			'action' => UOJContext::requestURI(),
@@ -501,17 +604,17 @@ class UOJForm {
 		foreach ($this->data as $field) {
 			if ($field['validator_js'] != 'always_ok') {
 				echo <<<EOD
-					if (${field['name']}_err) {
-						$('#div-${field['name']}').addClass('has-validation has-error');
-						$('#div-${field['name']}').addClass('is-invalid');
-						$('#input-${field['name']}').addClass('is-invalid');
-						$('#help-${field['name']}').text(${field['name']}_err);
+					if ({$field['name']}_err) {
+						$('#div-{$field['name']}').addClass('has-validation has-error');
+						$('#div-{$field['name']}').addClass('is-invalid');
+						$('#input-{$field['name']}').addClass('is-invalid');
+						$('#help-{$field['name']}').text({$field['name']}_err);
 						ok = false;
 					} else {
-						$('#div-${field['name']}').removeClass('has-validation has-error');
-						$('#div-${field['name']}').removeClass('is-invalid');
-						$('#input-${field['name']}').removeClass('is-invalid');
-						$('#help-${field['name']}').text('');
+						$('#div-{$field['name']}').removeClass('has-validation has-error');
+						$('#div-{$field['name']}').removeClass('is-invalid');
+						$('#input-{$field['name']}').removeClass('is-invalid');
+						$('#help-{$field['name']}').text('');
 					}
 				EOD;
 			}
@@ -606,6 +709,14 @@ class UOJForm {
 			if (isset($_POST[$type])) {
 				$handler();
 			}
+		}
+	}
+
+	static public function uploadedFileTmpName($name) {
+		if (isset($_FILES[$name]) && is_uploaded_file($_FILES[$name]['tmp_name'])) {
+			return $_FILES[$name]['tmp_name'];
+		} else {
+			return null;
 		}
 	}
 }

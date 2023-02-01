@@ -687,13 +687,18 @@ function newAddDelCmdForm($form_name, $validate, $handle, $final = null) {
 }
 
 function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle) {
-	$form = new UOJBs4Form($form_name);
+	$form = new UOJForm($form_name);
 	foreach ($requirement as $req) {
 		if ($req['type'] == "source code") {
 			$languages = UOJLang::getAvailableLanguages(isset($req['languages']) ? $req['languages'] : null);
-			$form->addSourceCodeInput("{$form_name}_{$req['name']}", UOJLocale::get('problems::source code') . ':' . $req['name'], $languages);
-		} elseif ($req['type'] == "text") {
-			$form->addTextFileInput("{$form_name}_{$req['name']}", UOJLocale::get('problems::text file') . ':' . $req['file_name']);
+			$form->addSourceCodeInput("{$form_name}_{$req['name']}", [
+				'filename' => $req['name'],
+				'languages' => $languages,
+			]);
+		} else if ($req['type'] == "text") {
+			$form->addTextFileInput("{$form_name}_{$req['name']}", [
+				'filename' => $req['file_name'],
+			]);
 		}
 	}
 
@@ -712,9 +717,9 @@ function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle
 			UOJResponse::message('提交失败');
 		}
 
-		$content = array();
+		$content = [];
 		$content['file_name'] = $zip_file_name;
-		$content['config'] = array();
+		$content['config'] = [];
 		foreach ($requirement as $req) {
 			if ($req['type'] == "source code") {
 				$content['config'][] = ["{$req['name']}_language", $_POST["{$form_name}_{$req['name']}_language"]];
@@ -725,7 +730,7 @@ function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle
 			if ($_POST["{$form_name}_{$req['name']}_upload_type"] == 'editor') {
 				$zip_file->addFromString($req['file_name'], $_POST["{$form_name}_{$req['name']}_editor"]);
 			} else {
-				$tmp_name = UOJBs4Form::uploadedFileTmpName("{$form_name}_{$req['name']}_file");
+				$tmp_name = UOJForm::uploadedFileTmpName("{$form_name}_{$req['name']}_file");
 				if ($tmp_name == null) {
 					$zip_file->addFromString($req['file_name'], '');
 				} else {
@@ -739,7 +744,7 @@ function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle
 				if ($stat['size'] > $max_size * 1024) {
 					$zip_file->close();
 					unlink(UOJContext::storagePath() . $zip_file_name);
-					UOJResponse::message("源代码长度不能超过 {$max_size}KB。");
+					UOJResponse::message("源代码长度不能超过 {$max_size} kB。");
 				}
 			}
 
@@ -752,6 +757,7 @@ function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle
 	};
 	return $form;
 }
+
 function newZipSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle) {
 	$form = new UOJBs4Form($form_name);
 	$name = "zip_ans_{$form_name}";
