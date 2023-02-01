@@ -135,7 +135,7 @@ if (isset($_POST['login'])) {
 			$('#help-username, #help-passwor, #help-captcha').html('');
 
 			if (msg == 'ok') {
-				var prevUrl = document.referrer;
+				var prevUrl = new URLSearchParams(location.search).get('to') || document.referrer;
 				if (prevUrl == '' || /.*\/login.*/.test(prevUrl) || /.*\/logout.*/.test(prevUrl) || /.*\/register.*/.test(prevUrl) || /.*\/reset_password.*/.test(prevUrl)) {
 					prevUrl = '/';
 				};

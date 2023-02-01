@@ -69,9 +69,9 @@ function permanentlyRedirectToHTTP() {
 }
 function redirectToLogin() {
 	if (UOJContext::isAjax()) {
-		die('please <a href="' . HTML::url('/login') . '">login</a>');
+		die('please <a href="' . HTML::url('/login', ['params' => ['to' => UOJContext::requestPath()]]) . '">login</a>');
 	} else {
-		header('Location: ' . HTML::url('/login'));
+		header('Location: ' . HTML::url('/login', ['params' => ['to' => UOJContext::requestPath()]]));
 		die();
 	}
 }
