@@ -54,10 +54,10 @@ if ($is_manager) {
 isset($tabs_info[$cur_tab]) || UOJResponse::page404();
 
 if (UOJContest::cur()->userCanStartFinalTest(Auth::user())) {
-	if (CONTEST_PENDING_FINAL_TEST <= $contest['cur_progress']) {
+	if (CONTEST_PENDING_FINAL_TEST == $contest['cur_progress']) {
 		$start_test_form = new UOJForm('start_test');
 		$start_test_form->handle = function () {
-			UOJContest::finalTest();
+			UOJContest::cur()->finalTest();
 		};
 		$start_test_form->config['submit_container']['class'] = 'mt-2';
 		$start_test_form->config['submit_button']['class'] = 'btn btn-danger d-block w-100';
@@ -65,7 +65,7 @@ if (UOJContest::cur()->userCanStartFinalTest(Auth::user())) {
 		$start_test_form->config['confirm']['smart'] = true;
 		$start_test_form->runAtServer();
 	}
-	if ($contest['cur_progress'] >= CONTEST_TESTING) {
+	if ($contest['cur_progress'] >= CONTEST_TESTING && UOJContest::cur()->queryJudgeProgress()['fully_judged']) {
 		$publish_result_form = new UOJForm('publish_result');
 		$publish_result_form->handle = function () {
 			UOJContest::announceOfficialResults();
