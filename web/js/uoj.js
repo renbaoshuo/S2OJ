@@ -1030,13 +1030,13 @@ function showCommentReplies(id, replies) {
 		function(reply) {
 			return $('<tr id="' + 'comment-' + reply.id + '" />').append(
 				$('<td />').append(
-					$('<div class="comtbox6">' + getUserLink(reply.poster, reply.poster_realname, reply.poster_username_color) + '：' + reply.content + '</div>')
+					$('<div class="comment-content">' + getUserLink(reply.poster, reply.poster_realname, reply.poster_username_color) + '：' + reply.content + '</div>')
 				).append(
-					$('<ul class="' + (isBootstrap5Page ? 'text-end mb-0' : 'text-right bot-buffer-no') + ' list-inline" />').append(
-						'<li>' + '<small class="text-muted">' + reply.post_time + '</small>' + '</li>'
+					$('<ul class="text-end mb-0 list-inline" />').append(
+						'<li class="list-inline-item small text-muted">' + reply.post_time + '</li>'
 					).append(
-						$('<li />').append(
-							$('<a class=" ' + (isBootstrap5Page ? ' text-decoration-none ' : '') + ' " href="#">回复</a>').click(function (e) {
+						$('<li class="list-inline-item" />').append(
+							$('<a href="#">回复</a>').click(function (e) {
 								e.preventDefault();
 								toggleFormReply(reply.id, '回复 @' + reply.poster + '：');
 							})
@@ -1045,7 +1045,7 @@ function showCommentReplies(id, replies) {
 				)
 			).uoj_highlight();
 		}, {
-			table_classes: ['table', 'table-condensed'],
+			table_classes: ['table'],
 			page_len: 5,
 			prevent_focus_on_click: true
 		}

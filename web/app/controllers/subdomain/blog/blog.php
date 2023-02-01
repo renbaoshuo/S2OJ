@@ -204,31 +204,33 @@ $comments_pag = new Paginator([
 		?>
 			<div id="comment-<?= $comment['id'] ?>" class="list-group-item">
 				<div class="d-flex">
-					<div class="comtposterbox mr-3 flex-shrink-0">
+					<div class="mr-3 flex-shrink-0">
 						<a href="<?= HTML::url('/user/' . $poster['username']) ?>" class="d-none d-sm-block text-decoration-none">
-							<img class="media-object img-rounded" src="<?= $asrc ?>" alt="avatar" />
+							<img class="media-object img-rounded" src="<?= $asrc ?>" alt="Avatar of <?= $poster['username'] ?>" width="64" height="64" />
 						</a>
 					</div>
-					<div id="comment-body-<?= $comment['id'] ?>" class="comtbox flex-grow-1 ms-3">
-						<div class="row">
-							<div class="col-sm-6"><?= UOJUser::getLink($poster['username']) ?></div>
-							<div class="col-sm-6 text-end"><?= ClickZans::getBlock('BC', $comment['id'], $comment['zan']) ?></div>
+					<div id="comment-body-<?= $comment['id'] ?>" class="flex-grow-1 ms-3">
+						<div class="row justify-content-between flex-wrap">
+							<div class="col-auto">
+								<?= UOJUser::getLink($poster['username']) ?>
+							</div>
+							<div class="col-auto">
+								<?= ClickZans::getBlock('BC', $comment['id'], $comment['zan']) ?>
+							</div>
 						</div>
-						<div class="comtbox1"><?= $comment['content'] ?></div>
+						<div class="comment-content my-2"><?= $comment['content'] ?></div>
 						<ul class="list-inline mb-0 text-end">
-							<li>
-								<small class="text-muted">
-									<?= $comment['post_time'] ?>
-								</small>
+							<li class="list-inline-item small text-muted">
+								<?= $comment['post_time'] ?>
 							</li>
-							<li>
+							<li class="list-inline-item">
 								<a class="text-decoration-none" id="reply-to-<?= $comment['id'] ?>" href="#">
 									回复
 								</a>
 							</li>
 						</ul>
 						<?php if ($replies) : ?>
-							<div id="replies-<?= $comment['id'] ?>" class="comtbox5"></div>
+							<div id="replies-<?= $comment['id'] ?>" class="rounded bg-secondary bg-opacity-10 border"></div>
 						<?php endif ?>
 						<script type="text/javascript">
 							showCommentReplies('<?= $comment['id'] ?>', <?= $replies_json ?>);
