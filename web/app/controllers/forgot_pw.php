@@ -1,37 +1,38 @@
 <?php
+requireLib('bootstrap5');
 requirePHPLib('form');
 
 use Gregwar\Captcha\PhraseBuilder;
 
-$forgot_form = new UOJBs4Form('forgot');
-$forgot_form->addInput(
-	'username',
-	'text',
-	'用户名',
-	'',
-	function ($username, &$vdata) {
+$forgot_form = new UOJForm('forgot');
+$forgot_form->addInput('username', [
+	'div_class' => '',
+	'label' => '用户名',
+	'validator_php' => function ($username, &$vdata) {
 		if (!validateUsername($username)) {
 			return '用户名不合法';
 		}
+
 		$vdata['user'] = UOJUser::query($username);
+
 		if (!$vdata['user']) {
 			return '该用户不存在';
 		}
+
 		return '';
 	},
-	null
-);
+]);
+$enter_verification_code_text = UOJLocale::get('enter verification code');
 $forgot_form->appendHTML(<<<EOD
-<div id="div-captcha" class="form-group">
-	<label for="input-captcha" class="col-sm-2 control-label">验证码</label>
-	<div class="col-sm-3" style="max-width: 60%">
-		<input type="text" class="form-control" id="input-captcha" name="captcha" placeholder="请输入验证码" maxlength="20" style="display: inline-block; width: 12em;" />
-		<div style="display: inline-block; margin-left: 8px; position: relative; top: -2px; cursor: pointer;">
-			<img id="captcha" src="" />
+	<div id="div-captcha" class="form-group mt-3">
+		<label for="input-captcha" class="col-sm-2 control-label">验证码</label>
+		<div class="input-group">
+			<input type="text" class="form-control" id="input-captcha" name="captcha" placeholder="{$enter_verification_code_text}" maxlength="20" />
+			<span class="input-group-text p-0">
+				<img id="captcha" class="col w-100 h-100" src="/captcha">
+			</span>
 		</div>
-		<span class="help-block" id="help-captcha" style="display: block"></span>
 	</div>
-</div>
 EOD);
 $forgot_form->handle = function (&$vdata) {
 	$user = $vdata['user'];
@@ -53,7 +54,7 @@ $forgot_form->handle = function (&$vdata) {
 	$oj_name_short = UOJConfig::$data['profile']['oj-name-short'];
 	$check_code = md5($user['username'] . "+" . $password . '+' . UOJTime::$time_now_str);
 	$sufs = base64url_encode($user['username'] . "." . $check_code);
-	$url = HTML::url("/reset-password", ['params' => ['p' => $sufs]]);
+	$url = HTML::url("/reset_password", ['params' => ['p' => $sufs]]);
 	$oj_url = HTML::url('/');
 	$name = $user['username'];
 	$remote_addr = UOJContext::remoteAddr();
@@ -85,9 +86,19 @@ EOD;
 	$mailer->addAddress($user['email'], $user['username']);
 	$mailer->Subject = $oj_name_short . " 密码找回";
 	$mailer->msgHTML($html);
-	if (!$mailer->send()) {
-		error_log($mailer->ErrorInfo);
-		becomeMsgPage('<div class="text-center"><h2>邮件发送失败，请重试！</h2></div>');
+
+	$res = retry_loop(function () use (&$mailer) {
+		$res = $mailer->send();
+
+		if ($res) return true;
+
+		UOJLog::error($mailer->ErrorInfo);
+
+		return false;
+	});
+
+	if (!$res) {
+		becomeMsgPage('<div class="text-center"><h2>邮件发送失败，请重试！</h2><a href="">返回</a></div>');
 	} else {
 		DB::update([
 			"update user_info",
@@ -102,13 +113,19 @@ EOD;
 		becomeMsgPage('<div class="text-center"><h2>邮件发送成功，请检查收件箱！</h2><span>如果邮件未出现在收件箱中，请检查垃圾箱。</span></div>');
 	}
 };
-$forgot_form->submit_button_config['align'] = 'offset';
 $forgot_form->runAtServer();
 ?>
+
 <?php echoUOJPageHeader('找回密码') ?>
-<h2 class="page-header">找回密码</h2>
-<h4>请输入需要找回密码的用户名：</h4>
-<?php $forgot_form->printHTML(); ?>
+
+<div class="card mw-100 mx-auto" style="width:600px">
+	<div class="card-body">
+		<h1 class="text-center mb-3">找回密码</h1>
+
+		<?php $forgot_form->printHTML() ?>
+	</div>
+</div>
+
 <script>
 	function refreshCaptcha() {
 		var timestamp = new Date().getTime();
@@ -116,11 +133,10 @@ $forgot_form->runAtServer();
 	}
 
 	$(document).ready(function() {
-		refreshCaptcha();
-
 		$("#captcha").click(function(e) {
 			refreshCaptcha();
 		});
 	});
 </script>
+
 <?php echoUOJPageFooter() ?>

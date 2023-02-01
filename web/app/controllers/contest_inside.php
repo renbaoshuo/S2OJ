@@ -59,6 +59,7 @@ if (UOJContest::cur()->userCanStartFinalTest(Auth::user())) {
 		$start_test_form->handle = function () {
 			UOJContest::cur()->finalTest();
 		};
+		$start_test_form->config['submit_container']['class'] = 'mt-2';
 		$start_test_form->config['submit_button']['class'] = 'btn btn-danger d-block w-100';
 		$start_test_form->config['submit_button']['text'] = UOJContest::cur()->labelForFinalTest();
 		$start_test_form->config['confirm']['smart'] = true;
@@ -69,6 +70,7 @@ if (UOJContest::cur()->userCanStartFinalTest(Auth::user())) {
 		$publish_result_form->handle = function () {
 			UOJContest::announceOfficialResults();
 		};
+		$publish_result_form->config['submit_container']['class'] = 'mt-2';
 		$publish_result_form->config['submit_button']['class'] = 'btn btn-danger d-block w-100';
 		$publish_result_form->config['submit_button']['text'] = '公布成绩';
 		$publish_result_form->config['confirm']['smart'] = true;
@@ -78,12 +80,10 @@ if (UOJContest::cur()->userCanStartFinalTest(Auth::user())) {
 
 if ($cur_tab == 'dashboard') {
 	if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) {
-		$post_question = new UOJBs4Form('post_question');
-		$post_question->addVTextArea(
-			'qcontent',
-			'问题',
-			'',
-			function ($content, &$vdata) {
+		$post_question = new UOJForm('post_question');
+		$post_question->addTextArea('qcontent', [
+			'label' => '问题',
+			'validator_php' => function ($content, &$vdata) {
 				if (!Auth::check()) {
 					return '您尚未登录';
 				}
@@ -98,12 +98,11 @@ if ($cur_tab == 'dashboard') {
 
 				return '';
 			},
-			null
-		);
+		]);
 		$post_question->handle = function (&$vdata) use ($contest) {
 			DB::insert([
 				"insert into contests_asks",
-				"(contest_id, question, answer, username, post_time, is_hidden)",
+				DB::bracketed_fields(["contest_id", "question", "answer", "username", "post_time", "is_hidden"]),
 				"values", DB::tuple([$contest['id'], $vdata['content'], '', Auth::id(), DB::now(), 1])
 			]);
 		};
@@ -113,13 +112,11 @@ if ($cur_tab == 'dashboard') {
 	}
 } elseif ($cur_tab == 'backstage') {
 	if ($is_manager) {
-		$post_notice = new UOJBs4Form('post_notice');
-		$post_notice->addInput(
-			'title',
-			'text',
-			'标题',
-			'',
-			function ($title, &$vdata) {
+		$post_notice = new UOJForm('post_notice');
+		$post_notice->addInput('title', [
+			'div_class' => 'mb-3',
+			'label' => '标题',
+			'validator_php' => function ($title, &$vdata) {
 				if (!$title) {
 					return '标题不能为空';
 				}
@@ -128,13 +125,10 @@ if ($cur_tab == 'dashboard') {
 
 				return '';
 			},
-			null
-		);
-		$post_notice->addTextArea(
-			'content',
-			'正文',
-			'',
-			function ($content, &$vdata) {
+		]);
+		$post_notice->addTextArea('content', [
+			'label' => '正文',
+			'validator_php' => function ($content, &$vdata) {
 				if (!$content) {
 					return '公告不能为空';
 				}
@@ -143,8 +137,7 @@ if ($cur_tab == 'dashboard') {
 
 				return '';
 			},
-			null
-		);
+		]);
 		$post_notice->handle = function (&$vdata) use ($contest) {
 			DB::insert([
 				"insert into contests_notice",
@@ -158,7 +151,7 @@ if ($cur_tab == 'dashboard') {
 	}
 
 	if ($is_manager) {
-		$reply_question = new UOJBs4Form('reply_question');
+		$reply_question = new UOJForm('reply_question');
 		$reply_question->addHidden(
 			'rid',
 			'0',
@@ -181,18 +174,21 @@ if ($cur_tab == 'dashboard') {
 			},
 			null
 		);
-		$reply_question->addVSelect('rtype', [
-			'public' => '公开（如果该问题反复被不同人提出，或指出了题目中的错误，请选择该项）',
-			'private' => '非公开',
-			'statement' => '请仔细阅读题面（非公开）',
-			'no_comment' => '无可奉告（非公开）',
-			'no_play' => '请认真比赛（非公开）',
-		], '回复类型', 'private');
-		$reply_question->addVTextArea(
-			'rcontent',
-			'回复',
-			'',
-			function ($content, &$vdata) {
+		$reply_question->addSelect('rtype', [
+			'div_class' => 'mb-3',
+			'label' => '回复类型',
+			'default' => 'private',
+			'options' => [
+				'public' => '公开（如果该问题反复被不同人提出，或指出了题目中的错误，请选择该项）',
+				'private' => '非公开',
+				'statement' => '请仔细阅读题面（非公开）',
+				'no_comment' => '无可奉告（非公开）',
+				'no_play' => '请认真比赛（非公开）',
+			],
+		]);
+		$reply_question->addTextArea('rcontent', [
+			'label' => '回复',
+			'validator_php' => function ($content, &$vdata) {
 				if (!Auth::check()) {
 					return '您尚未登录';
 				}
@@ -207,9 +203,8 @@ if ($cur_tab == 'dashboard') {
 				$vdata['content'] = HTML::escape($content);
 				return '';
 			},
-			null
-		);
-		$reply_question->handle = function (&$vdata) use ($contest) {
+		]);
+		$reply_question->handle = function (&$vdata) {
 			$content = $vdata['content'];
 			$is_hidden = 1;
 			switch ($_POST['rtype']) {
@@ -243,8 +238,8 @@ if ($cur_tab == 'dashboard') {
 	}
 } elseif ($cur_tab == 'self_reviews') {
 	if (UOJContest::cur()->userHasMarkedParticipated(Auth::user())) {
-		$self_reviews_update_form = new UOJBs4Form('self_review_update');
-		$self_reviews_update_form->ctrl_enter_submit = true;
+		$self_reviews_update_form = new UOJForm('self_review_update');
+		$self_reviews_update_form->config['ctrl_enter_submit'] = true;
 
 		$contest_problems = DB::selectAll([
 			"select problem_id",
@@ -266,20 +261,18 @@ if ($cur_tab == 'dashboard') {
 					"poster" => Auth::id(),
 				],
 			]);
-			$self_reviews_update_form->addVTextArea(
-				'self_review_update__problem_' . $contest_problems[$i]['problem']->getLetter(),
-				'<b>' . $contest_problems[$i]['problem']->getLetter() . '</b>: ' . $contest_problems[$i]['problem']->info['title'],
-				$content,
-				function ($content) {
+			$self_reviews_update_form->addTextArea('self_review_update__problem_' . $contest_problems[$i]['problem']->getLetter(), [
+				'div_class' => 'mb-3',
+				'label' => '<b>' . $contest_problems[$i]['problem']->getLetter() . '</b>: ' . $contest_problems[$i]['problem']->info['title'],
+				'default_value' => $content,
+				'validator_php' => function ($content) {
 					if (strlen($content) > 200) {
 						return '总结不能超过200字';
 					}
 
 					return '';
 				},
-				null,
-				true
-			);
+			]);
 		}
 
 		$content = DB::selectSingle([
@@ -291,20 +284,17 @@ if ($cur_tab == 'dashboard') {
 				"poster" => Auth::id(),
 			],
 		]);
-		$self_reviews_update_form->addVTextArea(
-			'self_review_update__overall',
-			'比赛总结',
-			$content,
-			function ($content) {
+		$self_reviews_update_form->addTextArea('self_review_update__overall', [
+			'label' => '比赛总结',
+			'default_value' => $content,
+			'validator_php' => function ($content) {
 				if (strlen($content) > 200) {
 					return '总结不能超过200字';
 				}
 
 				return '';
 			},
-			null,
-			true
-		);
+		]);
 
 		$self_reviews_update_form->handle = function () use ($contest, $contest_problems) {
 			for ($i = 0; $i < count($contest_problems); $i++) {

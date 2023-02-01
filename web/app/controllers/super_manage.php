@@ -83,13 +83,11 @@ if ($cur_tab == 'index') {
 		"order by level desc, important_blogs.blog_id desc",
 	]);
 
-	$add_announcement_form = new UOJBs4Form('add_announcement');
-	$add_announcement_form->addInput(
-		'blog_id',
-		'text',
-		'博客 ID',
-		'',
-		function ($id, &$vdata) {
+	$add_announcement_form = new UOJForm('add_announcement');
+	$add_announcement_form->addInput('blog_id', [
+		'div_class' => 'col-auto',
+		'label' => '博客 ID',
+		'validator_php' => function ($id, &$vdata) {
 			if (!validateUInt($id)) {
 				return '博客 ID 无效';
 			}
@@ -102,14 +100,12 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$add_announcement_form->addInput(
-		'blog_level',
-		'text',
-		'置顶级别',
-		'0',
-		function ($x, &$vdata) {
+	]);
+	$add_announcement_form->addInput('blog_level', [
+		'div_class' => 'col-auto',
+		'label' => '置顶级别',
+		'default_value' => '0',
+		'validator_php' => function ($x, &$vdata) {
 			if (!validateUInt($x)) {
 				return '数字不合法';
 			}
@@ -122,8 +118,7 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
+	]);
 	$add_announcement_form->handle = function (&$vdata) {
 		$blog_id = $vdata['blog_id'];
 		$blog_level = $vdata['level'];
@@ -152,8 +147,9 @@ if ($cur_tab == 'index') {
 			]);
 		}
 	};
-	$add_announcement_form->submit_button_config['align'] = 'compressed';
-	$add_announcement_form->submit_button_config['text'] = '提交';
+	$add_announcement_form->config['form']['class'] = 'row gy-2 gx-3 align-items-end';
+	$add_announcement_form->config['submit_container']['class'] = 'col-auto';
+	$add_announcement_form->config['submit_button']['text'] = '提交';
 	$add_announcement_form->succ_href = '/super_manage/index#announcements';
 	$add_announcement_form->runAtServer();
 
@@ -183,13 +179,11 @@ if ($cur_tab == 'index') {
 		"order by end_time asc",
 	]);
 
-	$add_countdown_form = new UOJBs4Form('add_countdown');
-	$add_countdown_form->addInput(
-		'countdown_title',
-		'text',
-		'标题',
-		'',
-		function ($title, &$vdata) {
+	$add_countdown_form = new UOJForm('add_countdown');
+	$add_countdown_form->addInput('countdown_title', [
+		'div_class' => 'col-auto',
+		'label' => '标题',
+		'validator_php' => function ($title, &$vdata) {
 			if ($title == '') {
 				return '标题不能为空';
 			}
@@ -198,14 +192,12 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$add_countdown_form->addInput(
-		'countdown_end_time',
-		'text',
-		'结束时间',
-		date("Y-m-d H:i:s"),
-		function ($end_time, &$vdata) {
+	]);
+	$add_countdown_form->addInput('countdown_end_time', [
+		'div_class' => 'col-auto',
+		'label' => '结束时间',
+		'default_value' => UOJTime::$time_now_str,
+		'validator_php' => function ($end_time, &$vdata) {
 			try {
 				$vdata['end_time'] = new DateTime($end_time);
 			} catch (Exception $e) {
@@ -214,8 +206,7 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
+	]);
 	$add_countdown_form->handle = function (&$vdata) {
 		DB::insert([
 			"insert into countdowns",
@@ -224,8 +215,9 @@ if ($cur_tab == 'index') {
 			DB::tuple([$vdata['title'], $vdata['end_time']->format('Y-m-d H:i:s')]),
 		]);
 	};
-	$add_countdown_form->submit_button_config['align'] = 'compressed';
-	$add_countdown_form->submit_button_config['text'] = '添加';
+	$add_countdown_form->config['form']['class'] = 'row gy-2 gx-3 align-items-end';
+	$add_countdown_form->config['submit_container']['class'] = 'col-auto';
+	$add_countdown_form->config['submit_button']['text'] = '添加';
 	$add_countdown_form->succ_href = '/super_manage/index#countdowns';
 	$add_countdown_form->runAtServer();
 
@@ -255,13 +247,11 @@ if ($cur_tab == 'index') {
 		"order by level desc, id asc",
 	]);
 
-	$add_link_form = new UOJBs4Form('add_link');
-	$add_link_form->addInput(
-		'link_title',
-		'text',
-		'标题',
-		'',
-		function ($title, &$vdata) {
+	$add_link_form = new UOJForm('add_link');
+	$add_link_form->addInput('link_title', [
+		'div_class' => 'col-auto',
+		'label' => '标题',
+		'validator_php' => function ($title, &$vdata) {
 			if ($title == '') {
 				return '标题不能为空';
 			}
@@ -270,14 +260,11 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$add_link_form->addInput(
-		'link_url',
-		'text',
-		'链接',
-		'',
-		function ($url, &$vdata) {
+	]);
+	$add_link_form->addInput('link_url', [
+		'div_class' => 'col-auto',
+		'label' => '链接',
+		'validator_php' => function ($url, &$vdata) {
 			if (!validateURL($url)) {
 				return '链接不合法';
 			}
@@ -286,14 +273,12 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$add_link_form->addInput(
-		'link_level',
-		'text',
-		'权重',
-		'10',
-		function ($level, &$vdata) {
+	]);
+	$add_link_form->addInput('link_level', [
+		'div_class' => 'col-auto',
+		'label' => '权重',
+		'default_value' => '10',
+		'validator_php' => function ($level, &$vdata) {
 			if (!validateUInt($level)) {
 				return '数字不合法';
 			}
@@ -302,8 +287,7 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
+	]);
 	$add_link_form->handle = function (&$vdata) {
 		DB::insert([
 			"insert into friend_links",
@@ -312,8 +296,9 @@ if ($cur_tab == 'index') {
 			DB::tuple([$vdata['title'], $vdata['url'], $vdata['level']]),
 		]);
 	};
-	$add_link_form->submit_button_config['align'] = 'compressed';
-	$add_link_form->submit_button_config['text'] = '添加';
+	$add_link_form->config['form']['class'] = 'row gy-2 gx-3 align-items-end';
+	$add_link_form->config['submit_container']['class'] = 'col-auto';
+	$add_link_form->config['submit_button']['text'] = '添加';
 	$add_link_form->succ_href = '/super_manage/index#links';
 	$add_link_form->runAtServer();
 } elseif ($cur_tab == 'users') {
@@ -332,13 +317,10 @@ if ($cur_tab == 'index') {
 		$user_list_cond = '1';
 	}
 
-	$register_form = new UOJBs4Form('register');
-	$register_form->addVInput(
-		'new_username',
-		'text',
-		'用户名',
-		'',
-		function ($username, &$vdata) {
+	$register_form = new UOJForm('register');
+	$register_form->addInput('new_username', [
+		'label' => '用户名',
+		'validator_php' => function ($username, &$vdata) {
 			if (!validateUsername($username)) {
 				return '用户名不合法';
 			}
@@ -351,27 +333,24 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$register_form->addVInput(
-		'new_password',
-		'password',
-		'密码',
-		'',
-		function ($password, &$vdata) {
+	]);
+	$register_form->addInput('new_password', [
+		'div_class' => 'mt-3',
+		'type' => 'password',
+		'label' => '密码',
+		'validator_php' => function ($password, &$vdata) {
 			$vdata['password'] = $password;
 
 			return '';
 		},
-		'validatePassword'
-	);
-	$register_form->addVInput(
-		'new_email',
-		'text',
-		'电子邮件（选填）',
-		'',
-		function ($email, &$vdata) {
-			if ($email && !validateEmail($email)) {
+		'validator_js' => 'validatePassword',
+	]);
+	$register_form->addInput('new_email', [
+		'div_class' => 'mt-3',
+		'label' => '电子邮件',
+		'help' => '选填项。填写电子邮件后用户可自主进行密码重置。',
+		'validator_php' => function ($email, &$vdata) {
+			if (!validateEmail($email)) {
 				return '邮件地址不合法';
 			}
 
@@ -379,32 +358,27 @@ if ($cur_tab == 'index') {
 
 			return '';
 		},
-		null
-	);
-	$register_form->addVInput(
-		'new_realname',
-		'text',
-		'真实姓名（选填）',
-		'',
-		function ($realname, &$vdata) {
+	]);
+	$register_form->addInput('new_realname', [
+		'div_class' => 'mt-3',
+		'label' => '真实姓名',
+		'help' => '选填项。',
+		'validator_php' => function ($realname, &$vdata) {
 			$vdata['realname'] = $realname;
 
 			return '';
 		},
-		null
-	);
-	$register_form->addVInput(
-		'new_school',
-		'text',
-		'学校名称（选填）',
-		'',
-		function ($school, &$vdata) {
+	]);
+	$register_form->addInput('new_school', [
+		'div_class' => 'mt-3',
+		'label' => '学校名称',
+		'help' => '选填项。常用名称：<code>石家庄市第二中学</code>、<code>石家庄二中实验学校</code>。',
+		'validator_php' => function ($school, &$vdata) {
 			$vdata['school'] = $school;
 
 			return '';
 		},
-		null
-	);
+	]);
 	$register_form->handle = function (&$vdata) {
 		$user = [
 			'username' => $vdata['username'],
@@ -436,16 +410,13 @@ if ($cur_tab == 'index') {
 
 			$(window).scrollTop(0);
 		}
-EOD);
+	EOD);
 	$register_form->runAtServer();
 
-	$register_tmp_user_form = new UOJBs4Form('register_tmp_user');
-	$register_tmp_user_form->addVInput(
-		'new_tmp_username',
-		'text',
-		'用户名',
-		'',
-		function ($username, &$vdata) {
+	$register_tmp_user_form = new UOJForm('register_tmp_user');
+	$register_tmp_user_form->addInput('new_tmp_username', [
+		'label' => '用户名',
+		'validator_php' => function ($username, &$vdata) {
 			if (!validateUsername($username)) {
 				return '用户名不合法';
 			}
@@ -458,26 +429,23 @@ EOD);
 
 			return '';
 		},
-		null
-	);
-	$register_tmp_user_form->addVInput(
-		'new_tmp_password',
-		'password',
-		'密码',
-		'',
-		function ($password, &$vdata) {
+	]);
+	$register_tmp_user_form->addInput('new_tmp_password', [
+		'div_class' => 'mt-3',
+		'type' => 'password',
+		'label' => '密码',
+		'validator_php' => function ($password, &$vdata) {
 			$vdata['password'] = $password;
 
 			return '';
 		},
-		'validatePassword'
-	);
-	$register_tmp_user_form->addVInput(
-		'new_tmp_email',
-		'text',
-		'电子邮件（选填）',
-		'',
-		function ($email, &$vdata) {
+		'validator_js' => 'validatePassword',
+	]);
+	$register_tmp_user_form->addInput('new_tmp_email', [
+		'div_class' => 'mt-3',
+		'label' => '电子邮件',
+		'help' => '选填项。',
+		'validator_php' => function ($email, &$vdata) {
 			if ($email && !validateEmail($email)) {
 				return '邮件地址不合法';
 			}
@@ -486,48 +454,42 @@ EOD);
 
 			return '';
 		},
-		null
-	);
-	$register_tmp_user_form->addVInput(
-		'new_tmp_realname',
-		'text',
-		'真实姓名（选填）',
-		'',
-		function ($realname, &$vdata) {
+	]);
+	$register_tmp_user_form->addInput('new_tmp_realname', [
+		'div_class' => 'mt-3',
+		'label' => '真实姓名',
+		'help' => '选填项。',
+		'validator_php' => function ($realname, &$vdata) {
 			$vdata['realname'] = $realname;
 
 			return '';
 		},
-		null
-	);
-	$register_tmp_user_form->addVInput(
-		'new_tmp_school',
-		'text',
-		'学校名称（选填）',
-		'',
-		function ($school, &$vdata) {
+	]);
+	$register_tmp_user_form->addInput('new_tmp_school', [
+		'div_class' => 'mt-3',
+		'label' => '学校名称',
+		'help' => '选填项。',
+		'validator_php' => function ($school, &$vdata) {
 			$vdata['school'] = $school;
 
 			return '';
 		},
-		null
-	);
-	$register_tmp_user_form->addVInput(
-		'new_tmp_expiration_time',
-		'text',
-		'过期时间',
-		UOJTime::time2str((new DateTime())->add(new DateInterval('P7D'))->setTime(0, 0, 0)),
-		function ($str, &$vdata) {
+	]);
+	$register_tmp_user_form->addInput('new_tmp_expiration_time', [
+		'div_class' => 'mt-3',
+		'label' => '过期时间',
+		'help' => '选填项。默认过期时间为 7 天后。',
+		'default_value' => UOJTime::time2str((new DateTime())->add(new DateInterval('P7D'))->setTime(0, 0, 0)),
+		'validator_php' => function ($expiration_time, &$vdata) {
 			try {
-				$vdata['expiration_time'] = new DateTime($str);
+				$vdata['expiration_time'] = new DateTime($expiration_time);
 			} catch (Exception $e) {
 				return '无效时间格式';
 			}
 
 			return '';
 		},
-		null
-	);
+	]);
 	$register_tmp_user_form->handle = function (&$vdata) {
 		$user = [
 			'username' => $vdata['username'],
@@ -560,15 +522,13 @@ EOD);
 
 			$(window).scrollTop(0);
 		}
-EOD);
+	EOD);
 	$register_tmp_user_form->runAtServer();
 
-	$change_password_form = new UOJBs4Form('change_password');
-	$change_password_form->addVInput(
-		'p_username',
-		'text',
-		'用户名',
-		'',
+	$change_password_form = new UOJForm('change_password');
+	$change_password_form->addInput('p_username', [
+		'label' => '用户名',
+		'validator_php' =>
 		function ($username, &$vdata) {
 			if (!validateUsername($username)) {
 				return '用户名不合法';
@@ -582,20 +542,18 @@ EOD);
 
 			return '';
 		},
-		null
-	);
-	$change_password_form->addVInput(
-		'p_password',
-		'password',
-		'密码',
-		'',
-		function ($password, &$vdata) {
+	]);
+	$change_password_form->addInput('p_password', [
+		'div_class' => 'mt-3',
+		'type' => 'password',
+		'label' => '密码',
+		'validator_php' => function ($password, &$vdata) {
 			$vdata['password'] = $password;
 
 			return '';
 		},
-		'validatePassword'
-	);
+		'validator_js' => 'validatePassword',
+	]);
 	$change_password_form->handle = function (&$vdata) {
 		$password = hash_hmac('md5', $vdata['password'], getPasswordClientSalt());
 
@@ -611,8 +569,9 @@ EOD);
 
 		dieWithJsonData(['status' => 'success', 'message' => '用户 ' . $vdata['username'] . ' 的密码已经被成功重置。']);
 	};
-	$change_password_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
-	$change_password_form->submit_button_config['text'] = '重置';
+	$change_password_form->config['submit_button']['class'] = 'btn btn-secondary';
+	$change_password_form->config['submit_button']['text'] = '重置密码';
+	$change_password_form->config['confirm']['smart'] = true;
 	$change_password_form->setAjaxSubmit(<<<EOD
 		function(res) {
 			if (res.status === 'success') {
@@ -631,16 +590,13 @@ EOD);
 
 			$(window).scrollTop(0);
 		}
-EOD);
+	EOD);
 	$change_password_form->runAtServer();
 
-	$change_usergroup_form = new UOJBs4Form('change_usergroup');
-	$change_usergroup_form->addVInput(
-		'username',
-		'text',
-		'用户名',
-		'',
-		function ($username, &$vdata) {
+	$change_usergroup_form = new UOJForm('change_usergroup');
+	$change_usergroup_form->addInput('username', [
+		'label' => '用户名',
+		'validator_php' => function ($username, &$vdata) {
 			if (!validateUsername($username)) {
 				return '用户名不合法';
 			}
@@ -653,14 +609,17 @@ EOD);
 
 			return '';
 		},
-		null
-	);
-	$change_usergroup_form->addVSelect('op_type', [
-		'banneduser' => '设为封禁用户',
-		'tempuser' => '设为临时用户',
-		'normaluser' => '设为普通用户',
-		'superuser' => '设为超级用户',
-	], '操作类型', '');
+	]);
+	$change_usergroup_form->addSelect('op_type', [
+		'div_class' => 'mt-3',
+		'label' => '操作类型',
+		'options' => [
+			'banneduser' => '设为封禁用户',
+			'tempuser' => '设为临时用户',
+			'normaluser' => '设为普通用户',
+			'superuser' => '设为超级用户',
+		],
+	]);
 	$change_usergroup_form->handle = function ($vdata) {
 		$username = $vdata['username'];
 		$usergroup = '';
@@ -679,7 +638,9 @@ EOD);
 					],
 				]);
 				$usergroup = '被封禁的用户，该用户将无法再次登录系统';
+
 				break;
+
 			case 'tempuser':
 				DB::update([
 					"update user_info",
@@ -693,7 +654,9 @@ EOD);
 					],
 				]);
 				$usergroup = '临时用户，请前往个人信息编辑页面修改过期时间';
+
 				break;
+
 			case 'normaluser':
 				DB::update([
 					"update user_info",
@@ -707,6 +670,7 @@ EOD);
 					],
 				]);
 				$usergroup = '普通用户';
+
 				break;
 			case 'superuser':
 				DB::update([
@@ -720,7 +684,9 @@ EOD);
 						"username" => $username,
 					],
 				]);
+
 				$usergroup = '超级用户';
+
 				break;
 		}
 
@@ -744,7 +710,7 @@ EOD);
 
 			$(window).scrollTop(0);
 		}
-EOD);
+	EOD);
 	$change_usergroup_form->runAtServer();
 
 	$users_default_permissions = UOJContext::getMeta('users_default_permissions');
@@ -903,7 +869,7 @@ EOD);
 
 			$(window).scrollTop(0);
 		}
-EOD);
+	EOD);
 	$update_users_default_permissions_form->config['confirm']['text'] = '你确定要修改所有用户的默认权限吗？';
 	$update_users_default_permissions_form->handle = function () {
 		$new_permissions = [
@@ -958,64 +924,65 @@ EOD);
 		'page_len' => 10
 	]);
 
-	$custom_test_deleter = new UOJBs4Form('custom_test_deleter');
-	$custom_test_deleter->addInput(
-		'last',
-		'text',
-		'删除末尾记录',
-		'5',
-		function ($x, &$vdata) {
+	$custom_test_deleter = new UOJForm('custom_test_deleter');
+	$custom_test_deleter->addInput('last', [
+		'div_class' => 'col-auto',
+		'label' => '删除末尾记录',
+		'default_value' => '5',
+		'validator_php' => function ($x, &$vdata) {
 			if (!validateUInt($x)) {
 				return '不合法';
 			}
+
 			$vdata['last'] = $x;
+
 			return '';
 		},
-		null
-	);
+	]);
 	$custom_test_deleter->handle = function (&$vdata) {
 		$all = DB::selectAll("select * from custom_test_submissions order by id asc limit {$vdata['last']}");
+
 		foreach ($all as $submission) {
 			$content = json_decode($submission['content'], true);
 			unlink(UOJContext::storagePath() . $content['file_name']);
 		}
+
 		DB::delete("delete from custom_test_submissions order by id asc limit {$vdata['last']}");
 	};
-	$custom_test_deleter->submit_button_config['align'] = 'compressed';
+	$custom_test_deleter->config['form']['class'] = 'row gy-2 gx-3 align-items-end';
+	$custom_test_deleter->config['submit_container']['class'] = 'col-auto';
 	$custom_test_deleter->runAtServer();
 } elseif ($cur_tab == 'judger') {
-	$judger_adder = new UOJBs4Form('judger_adder');
-	$judger_adder->addInput(
-		'judger_adder_name',
-		'text',
-		'评测机名称',
-		'',
-		function ($x, &$vdata) {
+	$judger_adder = new UOJForm('judger_adder');
+	$judger_adder->addInput('judger_adder_name', [
+		'div_class' => 'col-auto',
+		'label' => '评测机名称',
+		'validator_php' => function ($x, &$vdata) {
 			if (!validateUsername($x)) {
 				return '不合法';
 			}
+
 			if (DB::selectCount("select count(*) from judger_info where judger_name='$x'") != 0) {
 				return '不合法';
 			}
+
 			$vdata['name'] = $x;
+
 			return '';
 		},
-		null
-	);
+	]);
 	$judger_adder->handle = function (&$vdata) {
 		$password = uojRandString(32);
-		DB::insert("insert into judger_info (judger_name,password) values('{$vdata['name']}','{$password}')");
+		DB::insert("insert into judger_info (judger_name, password) values('{$vdata['name']}', '{$password}')");
 	};
-	$judger_adder->submit_button_config['align'] = 'compressed';
+	$judger_adder->config['form']['class'] = 'row gy-2 gx-3 align-items-end';
+	$judger_adder->config['submit_container']['class'] = 'col-auto';
 	$judger_adder->runAtServer();
 
-	$judger_deleter = new UOJBs4Form('judger_deleter');
-	$judger_deleter->addInput(
-		'judger_deleter_name',
-		'text',
-		'评测机名称',
-		'',
-		function ($x, &$vdata) {
+	$judger_deleter = new UOJForm('judger_deleter');
+	$judger_deleter->addInput('judger_deleter_name', [
+		'div_class' => 'col-auto',
+		'label' => '评测机名称', 'validator_php' => function ($x, &$vdata) {
 			if (!validateUsername($x)) {
 				return '不合法';
 			}
@@ -1025,12 +992,12 @@ EOD);
 			$vdata['name'] = $x;
 			return '';
 		},
-		null
-	);
+	]);
 	$judger_deleter->handle = function (&$vdata) {
 		DB::delete("delete from judger_info where judger_name='{$vdata['name']}'");
 	};
-	$judger_deleter->submit_button_config['align'] = 'compressed';
+	$judger_deleter->config['form']['class'] = 'row gy-2 gx-3 align-items-end';
+	$judger_deleter->config['submit_container']['class'] = 'col-auto';
 	$judger_deleter->runAtServer();
 } elseif ($cur_tab == 'image_hosting') {
 	if (isset($_POST['submit-delete_image']) && $_POST['submit-delete_image'] == 'delete_image') {
@@ -1052,14 +1019,10 @@ EOD);
 		dieWithAlert('删除成功！');
 	}
 
-	$change_user_image_total_size_limit_form = new UOJBs4Form('change_user_image_total_size_limit');
-	$change_user_image_total_size_limit_form->submit_button_config['align'] = 'compressed';
-	$change_user_image_total_size_limit_form->addInput(
-		'change_user_image_total_size_limit_username',
-		'text',
-		'用户名',
-		'',
-		function ($x, &$vdata) {
+	$change_user_image_total_size_limit_form = new UOJForm('change_user_image_total_size_limit');
+	$change_user_image_total_size_limit_form->addInput('change_user_image_total_size_limit_username', [
+		'label' => '用户名',
+		'validator_php' => function ($x, &$vdata) {
 			if (!validateUsername($x)) {
 				return '用户名不合法';
 			}
@@ -1072,14 +1035,13 @@ EOD);
 
 			return '';
 		},
-		null
-	);
-	$change_user_image_total_size_limit_form->addInput(
-		'change_user_image_total_size_limit_limit',
-		'text',
-		'存储限制（单位：Byte）',
-		'104857600',
-		function ($x, &$vdata) {
+	]);
+	$change_user_image_total_size_limit_form->addInput('change_user_image_total_size_limit_limit', [
+		'div_class' => 'mt-3',
+		'label' => '存储限制',
+		'default_value' => '104857600',
+		'help' => '限制单位为 Byte。',
+		'validator_php' => function ($x, &$vdata) {
 			if (!validateUInt($x, 10)) {
 				return '限制不合法';
 			}
@@ -1092,8 +1054,7 @@ EOD);
 
 			return '';
 		},
-		null
-	);
+	]);
 	$change_user_image_total_size_limit_form->handle = function (&$vdata) {
 		DB::update([
 			"update user_info",
@@ -1116,7 +1077,6 @@ EOD);
 <h1>
 	<?= UOJLocale::get('system manage') ?>
 </h1>
-
 
 <div class="row mt-4">
 	<!-- left col -->

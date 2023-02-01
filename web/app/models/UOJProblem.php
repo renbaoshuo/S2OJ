@@ -690,7 +690,9 @@ class UOJProblem {
 
 	public function getProblemConfArray(string $where = 'data') {
 		if ($where === 'data') {
-			return getUOJConf($this->getDataFilePath('problem.conf'));
+			$conf = UOJProblemConf::getFromFile($this->getDataFilePath('problem.conf'));
+
+			return $conf instanceof UOJProblemConf ? $conf->conf : $conf;
 		} else {
 			return null;
 		}

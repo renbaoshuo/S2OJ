@@ -20,12 +20,10 @@ function getCommentContentToDisplay($comment) {
 	}
 }
 
-$comment_form = new UOJBs4Form('comment');
-$comment_form->addVTextArea(
-	'comment',
-	'内容',
-	'',
-	function ($comment) {
+$comment_form = new UOJForm('comment');
+$comment_form->addTextArea('comment', [
+	'label' => '内容',
+	'validator_php' => function ($comment) {
 		if (!Auth::check()) {
 			return '请先登录';
 		}
@@ -37,10 +35,9 @@ $comment_form->addVTextArea(
 		}
 		return '';
 	},
-	null
-);
+]);
 $comment_form->handle = function () {
-	global $myUser, $blog, $comment_form;
+	global $blog, $comment_form;
 	$comment = HTML::escape($_POST['comment']);
 
 	list($comment, $referrers) = uojHandleAtSign($comment, "/post/{$blog['id']}");
@@ -78,10 +75,10 @@ $comment_form->handle = function () {
 	UOJBlog::cur()->updateActiveTime();
 	$comment_form->succ_href = getLongTablePageRawUri($page);
 };
-$comment_form->ctrl_enter_submit = true;
+$comment_form->config['ctrl_enter_submit'] = true;
 $comment_form->runAtServer();
 
-$reply_form = new UOJBs4Form('reply');
+$reply_form = new UOJForm('reply');
 $reply_form->addHidden(
 	'reply_id',
 	'0',
@@ -99,11 +96,9 @@ $reply_form->addHidden(
 	},
 	null
 );
-$reply_form->addVTextArea(
-	'reply_comment',
-	'内容',
-	'',
-	function ($comment) {
+$reply_form->addTextArea('reply_comment', [
+	'label' => '内容',
+	'validator_php' => function ($comment) {
 		if (!Auth::check()) {
 			return '请先登录';
 		}
@@ -115,10 +110,9 @@ $reply_form->addVTextArea(
 		}
 		return '';
 	},
-	null
-);
+]);
 $reply_form->handle = function (&$vdata) {
-	global $myUser, $blog, $reply_form;
+	global $blog, $reply_form;
 	$comment = HTML::escape($_POST['reply_comment']);
 
 	list($comment, $referrers) = uojHandleAtSign($comment, "/post/{$blog['id']}");
@@ -167,8 +161,7 @@ $reply_form->handle = function (&$vdata) {
 
 	$reply_form->succ_href = getLongTablePageRawUri($page);
 };
-$reply_form->ctrl_enter_submit = true;
-
+$reply_form->config['ctrl_enter_submit'] = true;
 $reply_form->runAtServer();
 
 $comments_pag = new Paginator([

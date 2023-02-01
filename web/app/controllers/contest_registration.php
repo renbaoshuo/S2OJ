@@ -6,12 +6,12 @@ Auth::check() || redirectToLogin();
 UOJContest::init(UOJRequest::get('id')) || UOJResponse::page404();
 UOJContest::cur()->userCanRegister(Auth::user(), ['ensure' => true]);
 
-$register_form = new UOJBs4Form('register');
+$register_form = new UOJForm('register');
 $register_form->handle = function () {
 	UOJContest::cur()->userRegister(Auth::user());
 };
-$register_form->submit_button_config['class_str'] = 'btn btn-primary';
-$register_form->submit_button_config['text'] = '我已阅读规则，确认报名比赛';
+$register_form->config['submit_button']['class'] = 'btn btn-primary';
+$register_form->config['submit_button']['text'] = '我已阅读规则，确认报名比赛';
 
 if (UOJContest::cur()->progress() == CONTEST_IN_PROGRESS) {
 	$register_form->succ_href = '/contest/' . UOJContest::info('id') . '/confirm';
@@ -24,11 +24,15 @@ $register_form->runAtServer();
 
 <?php echoUOJPageHeader('报名 - ' . UOJContest::info('name')) ?>
 
-<div class="card mw-100 mx-auto" style="width:800px">
+<div class="card mw-100 mx-auto" style="width: 800px">
 	<div class="card-body">
-		<h1 class="card-title text-center mb-3">比赛规则</h1>
+		<h1 class="card-title text-center mb-3">
+			比赛规则
+		</h1>
 
-		<p class="card-text">您即将报名比赛 “<b><?= UOJContest::info('name') ?></b>”，请在报名前仔细阅读以下比赛规则：</p>
+		<p class="card-text">
+			您即将报名比赛 “<b><?= UOJContest::info('name') ?></b>”，请在报名前仔细阅读以下比赛规则：
+		</p>
 
 		<ul>
 			<?php if (UOJContest::cur()->progress() == CONTEST_IN_PROGRESS) : ?>

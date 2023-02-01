@@ -54,50 +54,51 @@ if (UOJRequest::post('submit-remove_solution') === 'remove_solution') {
 }
 
 if (UOJProblem::cur()->userCanManage(Auth::user()) || UOJProblem::cur()->userPermissionCodeCheck(Auth::user(), UOJProblem::cur()->getExtraConfig('submit_solution_type'))) {
-	$add_new_solution_form = new UOJBs4Form('add_new_solution');
-	$add_new_solution_form->addVInput(
+	$add_new_solution_form = new UOJForm('add_new_solution');
+	$add_new_solution_form->addInput(
 		'blog_id_2',
-		'text',
-		'博客 ID',
-		'',
-		function ($blog_id) {
-			$blog = UOJBlog::query($blog_id);
-			if (!$blog) {
-				return '博客不存在';
-			}
+		[
+			'placeholder' => '博客 ID',
+			'validator_php' => function ($blog_id, &$vdata) {
+				$blog = UOJBlog::query($blog_id);
 
-			if (!$blog->userCanManage(Auth::user())) {
-				if ($blog->info['poster'] != Auth::id()) {
-					if ($blog->info['is_hidden']) {
-						return '博客不存在';
+				if (!$blog) {
+					return '博客不存在';
+				}
+
+				if (!$blog->userCanManage(Auth::user())) {
+					if ($blog->info['poster'] != Auth::id()) {
+						if ($blog->info['is_hidden']) {
+							return '博客不存在';
+						}
+
+						return '只能提交本人撰写的博客';
 					}
-
-					return '只能提交本人撰写的博客';
 				}
-			}
 
-			if (!UOJProblem::cur()->userCanManage(Auth::user())) {
-				if ($blog->info['is_hidden']) {
-					return '只能提交公开的博客';
+				if (!UOJProblem::cur()->userCanManage(Auth::user())) {
+					if ($blog->info['is_hidden']) {
+						return '只能提交公开的博客';
+					}
 				}
-			}
 
-			if ($problem_id = $blog->getSolutionProblemId()) {
-				return "该博客已经是题目 #$problem_id 的题解";
-			}
+				if ($problem_id = $blog->getSolutionProblemId()) {
+					return "该博客已经是题目 #$problem_id 的题解";
+				}
 
-			return '';
-		},
-		null
+				$vdata['blog'] = $blog;
+
+				return '';
+			},
+		]
 	);
-	$add_new_solution_form->submit_button_config['text'] = '发布';
-	$add_new_solution_form->submit_button_config['align'] = 'center';
-	$add_new_solution_form->submit_button_config['class_str'] = 'btn btn-secondary';
-	$add_new_solution_form->handle = function () {
+	$add_new_solution_form->config['submit_button']['text'] = '发布';
+	$add_new_solution_form->config['submit_button']['class'] = 'btn btn-secondary';
+	$add_new_solution_form->handle = function (&$vdata) {
 		DB::insert([
 			"insert into problems_solutions",
 			DB::bracketed_fields(["problem_id", "blog_id"]),
-			"values", DB::tuple([UOJProblem::info('id'), $_POST['blog_id_2']]),
+			"values", DB::tuple([UOJProblem::info('id'), $vdata['blog']->info['id']]),
 		]);
 	};
 	$add_new_solution_form->runAtServer();

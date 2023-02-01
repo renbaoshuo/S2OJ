@@ -80,7 +80,7 @@ EOD;
 	$new_problem_form->config['submit_container']['class'] = '';
 	$new_problem_form->config['submit_button']['class'] = 'bg-transparent border-0 d-block w-100 px-3 py-2 text-start';
 	$new_problem_form->config['submit_button']['text'] = '<i class="bi bi-plus-lg"></i> 新建本地题目';
-	$new_problem_form->config['confirm']['text'] = '添加新题';
+	$new_problem_form->config['confirm']['text'] = '你真的要添加新题吗？';
 	$new_problem_form->runAtServer();
 }
 

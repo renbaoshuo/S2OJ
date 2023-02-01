@@ -25,13 +25,11 @@ if (!isset($tabs_info[$cur_tab])) {
 }
 
 if ($cur_tab == 'profile') {
-	$update_profile_form = new UOJBs4Form('update_profile');
-	$update_profile_form->addVInput(
-		'name',
-		'text',
-		'标题',
-		UOJList::info('title'),
-		function ($title, &$vdata) {
+	$update_profile_form = new UOJForm('update_profile');
+	$update_profile_form->addInput('name', [
+		'label' => '标题',
+		'default_value' => UOJList::info('title'),
+		'validator_php' => function ($title, &$vdata) {
 			if ($title == '') {
 				return '标题不能为空';
 			}
@@ -49,18 +47,23 @@ if ($cur_tab == 'profile') {
 
 			return '';
 		},
-		null
-	);
-	$update_profile_form->addVCheckboxes('is_hidden', [
-		'0' => '公开',
-		'1' => '隐藏',
-	], '可见性', UOJList::info('is_hidden'));
-	$update_profile_form->addVInput(
-		'tags',
-		'text',
-		'标签（多个标签用逗号隔开）',
-		implode(', ', UOJList::cur()->queryTags()),
-		function ($tags_str, &$vdata) {
+	]);
+	$update_profile_form->addCheckboxes('is_hidden', [
+		'div_class' => 'mt-3',
+		'label' => '可见性',
+		'label_class' => 'me-3',
+		'select_class' => 'd-inline-block',
+		'option_div_class' => 'form-check d-inline-block ms-2',
+		'default_value' => UOJList::info('is_hidden'),
+		'options' => [
+			0 => '公开',
+			1 => '隐藏',
+		],
+	]);
+	$update_profile_form->addInput('tags', [
+		'label' => '标签',
+		'default_value' => implode(', ', UOJList::cur()->queryTags()),
+		'validator_php' => function ($tags_str, &$vdata) {
 			$tags_raw = explode(',', str_replace('，', ',', $tags_str));
 			$tags = [];
 
@@ -90,14 +93,13 @@ if ($cur_tab == 'profile') {
 
 			return '';
 		},
-		null
-	);
-	$update_profile_form->addVTextArea(
-		'content_md',
-		'描述',
-		UOJList::cur()->queryContent()['content_md'],
-		function ($content_md, &$vdata) {
-			if (strlen($content_md) > 3000) {
+		'help' => '多个标签请使用逗号隔开。'
+	]);
+	$update_profile_form->addTextArea('content_md', [
+		'label' => '描述',
+		'default_value' => UOJList::cur()->queryContent()['content_md'],
+		'validator_php' => function ($content_md, &$vdata) {
+			if (strlen($content_md) > 5000) {
 				return '描述过长';
 			}
 
@@ -105,8 +107,7 @@ if ($cur_tab == 'profile') {
 
 			return '';
 		},
-		null
-	);
+	]);
 	$update_profile_form->handle = function ($vdata) {
 		DB::update([
 			"update lists",
@@ -135,26 +136,25 @@ if ($cur_tab == 'profile') {
 		dieWithJsonData(['status' => 'success', 'message' => '修改成功']);
 	};
 	$update_profile_form->setAjaxSubmit(<<<EOD
-function(res) {
-	if (res.status === 'success') {
-		$('#result-alert')
-			.html('题单信息修改成功！')
-			.addClass('alert-success')
-			.removeClass('alert-danger')
-			.show();
-	} else {
-		$('#result-alert')
-			.html('题单信息修改失败。' + (res.message || ''))
-			.removeClass('alert-success')
-			.addClass('alert-danger')
-			.show();
-	}
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert')
+					.html('题单信息修改成功！')
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert')
+					.html('题单信息修改失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
 
-	$(window).scrollTop(0);
-}
-EOD);
-	$update_profile_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
-	$update_profile_form->submit_button_config['text'] = '更新';
+			$(window).scrollTop(0);
+		}
+	EOD);
+	$update_profile_form->config['submit_button']['text'] = '更新';
 	$update_profile_form->runAtServer();
 } elseif ($cur_tab == 'problems') {
 	if (isset($_POST['submit-remove_problem']) && $_POST['submit-remove_problem'] == 'remove_problem') {
@@ -189,13 +189,10 @@ EOD);
 		],
 	]);
 
-	$add_new_problem_form = new UOJBs4Form('add_new_problem');
-	$add_new_problem_form->addVInput(
-		'problem_id',
-		'text',
-		'题目 ID',
-		'',
-		function ($problem_id, &$vdata) {
+	$add_new_problem_form = new UOJForm('add_new_problem');
+	$add_new_problem_form->addInput('problem_id', [
+		'label' => '题目 ID',
+		'validator_php' => function ($problem_id, &$vdata) {
 			$problem = UOJProblem::query($problem_id);
 
 			if (!$problem || !$problem->userCanView(Auth::user())) {
@@ -210,10 +207,8 @@ EOD);
 
 			return '';
 		},
-		null
-	);
-	$add_new_problem_form->submit_button_config['class_str'] = 'btn btn-secondary mt-3';
-	$add_new_problem_form->submit_button_config['text'] = '添加';
+	]);
+	$add_new_problem_form->config['submit_button']['text'] = '添加';
 	$add_new_problem_form->handle = function ($vdata) {
 		DB::insert([
 			"insert into lists_problems",
@@ -224,24 +219,24 @@ EOD);
 		dieWithJsonData(['status' => 'success', 'message' => '已将题目 #' . $vdata['problem']->info['id'] . ' 添加到题单 #' . UOJList::info('id') . ' 中']);
 	};
 	$add_new_problem_form->setAjaxSubmit(<<<EOD
-function(res) {
-	if (res.status === 'success') {
-		$('#result-alert')
-			.html('题目添加成功！' + (res.message || ''))
-			.addClass('alert-success')
-			.removeClass('alert-danger')
-			.show();
-	} else {
-		$('#result-alert')
-			.html('题目添加失败。' + (res.message || ''))
-			.removeClass('alert-success')
-			.addClass('alert-danger')
-			.show();
-	}
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert')
+					.html('题目添加成功！' + (res.message || ''))
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert')
+					.html('题目添加失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
 
-	$(window).scrollTop(0);
-}
-EOD);
+			$(window).scrollTop(0);
+		}
+	EOD);
 	$add_new_problem_form->runAtServer();
 }
 ?>

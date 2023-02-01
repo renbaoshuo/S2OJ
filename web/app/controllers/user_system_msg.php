@@ -13,8 +13,7 @@ if (!isSuperUser(Auth::user()) && Auth::id() != $user['username']) {
 }
 
 function newDeleteSystemMsgForm($id) {
-	$form = new UOJBs4Form('remove_system_msg_' . $id);
-
+	$form = new UOJForm('remove_system_msg_' . $id);
 	$form->addHidden("msg_id", $id, function ($msg_id) {
 		global $user;
 
@@ -33,10 +32,10 @@ function newDeleteSystemMsgForm($id) {
 		$msg_id = $_POST["msg_id"];
 		DB::delete("delete from user_system_msg where id = {$msg_id}");
 	};
-	$form->submit_button_config['text'] = '删除';
-	$form->submit_button_config['class_str'] = 'btn btn-link text-decoration-none text-danger p-0 mt-0';
-	$form->submit_button_config['align'] = 'inline';
-	$form->submit_button_config['smart_confirm'] = '';
+	$form->config['submit_button']['class'] = 'btn btn-link text-decoration-none text-danger p-0';
+	$form->config['submit_button']['text'] = '删除';
+	$form->config['submit_container']['class'] = 'd-inline';
+	$form->config['confirm']['smart'] = true;
 
 	return $form;
 }
@@ -98,7 +97,7 @@ foreach ($pag->get() as $idx => $msg) {
 					</li>
 				<?php endforeach ?>
 				<?php if ($pag->isEmpty()) : ?>
-					<div class="text-center">
+					<div class="text-center my-4">
 						<?= UOJLocale::get('none') ?>
 					</div>
 				<?php endif ?>

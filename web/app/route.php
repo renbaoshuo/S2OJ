@@ -27,6 +27,7 @@ Route::group(
 		Route::any('/problem/{id}/manage/statement', '/problem_statement_manage.php');
 		Route::any('/problem/{id}/manage/managers', '/problem_managers_manage.php');
 		Route::any('/problem/{id}/manage/data', '/problem_data_manage.php');
+		Route::any('/download/testlib.h', '/download.php?type=testlib.h');
 		Route::any('/download/problem/{id}/data.zip', '/download.php?type=problem');
 		Route::any('/download/problem/{id}/attachment.zip', '/download.php?type=attachment');
 
@@ -79,8 +80,8 @@ Route::group(
 		Route::any('/login', '/login.php');
 		Route::any('/logout', '/logout.php');
 		Route::any('/register', '/register.php');
-		Route::any('/forgot-password', '/forgot_pw.php');
-		Route::any('/reset-password', '/reset_pw.php');
+		Route::any('/forgot_password', '/forgot_pw.php');
+		Route::any('/reset_password', '/reset_pw.php');
 
 		Route::any('/user/{username}', '/user_info.php');
 		Route::any('/user/{username}/edit(?:/{tab})?', '/user_info_edit.php');

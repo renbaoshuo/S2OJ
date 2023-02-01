@@ -24,10 +24,6 @@ uojLocaleData = {
 		"en": "Bad",
 		"zh-cn": "差评"
 	},
-	"editor::use advanced editor": {
-		"en": "use advanced editor",
-		"zh-cn": "使用高级编辑器"
-	},
 	"editor::language": {
 		"en": "Language",
 		"zh-cn": "语言"
@@ -36,13 +32,17 @@ uojLocaleData = {
 		"en": "Browse",
 		"zh-cn": "浏览"
 	},
+	"editor::upload source": {
+		"en": "Source",
+		"zh-cn": "来源"
+	},
 	"editor::upload by editor": {
-		"en": "Upload by editor",
-		"zh-cn": "使用编辑器上传"
+		"en": "Editor",
+		"zh-cn": "编辑器"
 	},
 	"editor::upload from local": {
-		"en": "Upload from local",
-		"zh-cn": "从本地文件上传"
+		"en": "Local file",
+		"zh-cn": "本地文件"
 	}
 };
 
@@ -600,19 +600,27 @@ $.fn.long_table = function(data, cur_page, header_row, get_row_str, config) {
 	});
 };
 
-// code mirror
-function require_codemirror(config, callback) {
-	if ($('link[href="' + uojHome + '/js/codemirror/lib/codemirror.css' + '"]').length == 0) {
-		$('<link type="text/css" rel="stylesheet" href="' + uojHome + '/js/codemirror/lib/codemirror.css' + '" />').appendTo('head');
-	}
-	$LAB.script(uojHome + '/js/codemirror/lib/codemirror.js')
-		.wait()
-		.script(uojHome + '/js/codemirror/addon/mode/overlay.js')
-		.script(uojHome + '/js/codemirror/addon/selection/active-line.js')
-		.wait(callback)
+// monaco editor
+function require_monaco(config, callback) {
+	window.require = {
+		paths: {
+			vs: '/js/monaco-editor/min/vs',
+		},
+		"vs/nls": {
+			availableLanguages: {
+				'*': 'zh-cn',
+			},
+		},
+	};
+	$LAB.script('/js/monaco-editor/min/vs/loader.js').wait()
+		.script('/js/monaco-editor/min/vs/editor/editor.main.nls.js').wait()
+		.script('/js/monaco-editor/min/vs/editor/editor.main.nls.zh-cn.js').wait()
+		.script('/js/monaco-editor/min/vs/editor/editor.main.js').wait(function() {
+			$LAB.script('/js/monaco-themes.js').wait(callback);
+		});
 }
 
-function get_codemirror_mode(lang) {
+function get_monaco_mode(lang) {
 	switch (lang) {
 		case 'C++':
 		case 'C++11':
@@ -620,46 +628,25 @@ function get_codemirror_mode(lang) {
 		case 'C++20':
 		case 'C++98':
 		case 'C++03':
-			return 'text/x-c++src';
+			return 'cpp';
 		case 'C':
-			return 'text/x-csrc';
+			return 'c';
 		case 'Python2':
 		case 'Python2.7':
 		case 'Python3':
-			return 'text/x-python';
+			return 'python';
 		case 'Pascal':
-			return 'text/x-pascal';
+			return 'pascal';
 		case 'Java8':
 		case 'Java11':
 		case 'Java17':
-			return 'text/x-java';
+			return 'java';
 		case 'text':
-			return 'text/plain';
+			return 'text';
 		default:
-			return 'text/plain';
+			return 'text';
 	}
-};
-function require_codemirror_mode(mode, callback) {
-	var name = 'none';
-	switch (mode) {
-		case 'text/x-c++src':
-		case 'text/x-csrc':
-			name = 'clike';
-			break;
-		case 'text/x-python':
-			name = 'python';
-			break;
-		case 'text/x-pascal':
-			name = 'pascal';
-			break;
-	}
-	if (name !== 'none') {
-		$LAB.script(uojHome + '/js/codemirror/mode/' + name + '/' + name + '.js')
-			.wait(callback);
-	} else {
-		setTimeout(callback, 0);
-	}
-};
+}
 
 // auto save
 function autosave_locally(interval, name, target) {
@@ -680,82 +667,97 @@ function autosave_locally(interval, name, target) {
 	setTimeout(save, interval);
 }
 
+function autosave_locally_monaco(interval, name, monaco_instance) {
+	if (typeof(Storage) === "undefined") {
+		console.log('autosave_locally_monaco: Sorry! No Web Storage support..');
+		return;
+	}
+	var url = window.location.href;
+	var hp = url.indexOf('#');
+	var uri = hp == -1 ? url : url.substring(0, hp);
+	var full_name = name + '@' + uri;
+
+	monaco_instance.getModel().setValue(localStorage.getItem(full_name));
+	var save = function() {
+		localStorage.setItem(full_name, monaco_instance.getModel().getValue());
+		setTimeout(save, interval);
+	};
+	setTimeout(save, interval);
+}
+
 // source code form group
 $.fn.source_code_form_group = function(name, text, langs_options_html) {
 	return this.each(function() {
+		var input_upload_type_editor_id = 'input-' + name + '_upload_type_editor';
+		var input_upload_type_file_id = 'input-' + name + '_upload_type_file';
+		var input_upload_type_name = name + '_upload_type';
 		var input_language_id = 'input-' + name + '_language';
 		var input_language_name = name + '_language';
-		var input_upload_type_name = name + '_upload_type';
 		var input_editor_id = 'input-' + name + '_editor';
 		var input_editor_name = name + '_editor';
 		var input_file_id = 'input-' + name + '_file';
 		var input_file_name = name + '_file';
-
+		var spinner_id = 'spinner-' + name + '_editor';
 		var div_help_language_id = 'div-help-' + name + '_language';
 		var div_editor_id = 'div-' + name + '_editor';
 		var div_file_id = 'div-' + name + '_file';
-
 		var help_file_id = 'help-' + name + '_file';
 
 		var input_language =
-			$('<select id="' + input_language_id + '" name="' + input_language_name + '" class="form-control input-sm form-select"/>')
+			$('<select id="' + input_language_id + '" name="' + input_language_name + '" class="form-select form-select-sm d-inline-block"/>')
 				.html(langs_options_html);
-		var input_upload_type_editor = $('<input type="radio" name="' + input_upload_type_name + '" value="editor" />');
-		var input_upload_type_file = $('<input type="radio" name="' + input_upload_type_name + '" value="file" />');
-		var input_file = $('<input type="file" id="' + input_file_id + '" name="' + input_file_name + '" style="display: none" />');
-		var input_file_path = $('<input class="form-control" type="text" readonly="readonly" />');
-		var input_editor = $('<textarea class="form-control" id="' + input_editor_id + '" name="' + input_editor_name + '"></textarea>');
-		var input_use_advanced_editor = $('<input type="checkbox">');
-
+		var input_upload_type_editor = $('<input class="form-check-input" type="radio" id="' + input_upload_type_editor_id + '" name="' + input_upload_type_name + '" value="editor" />');
+		var input_upload_type_file = $('<input class="form-check-input" type="radio" id="' + input_upload_type_file_id + '" name="' + input_upload_type_name + '" value="file" />');
+		var input_file = $('<input type="file" class="form-control" id="' + input_file_id + '" name="' + input_file_name + '" />');
 		var div_editor =
-			$('<div id="' + div_editor_id + '" class="col-sm-12"/>')
-				.append(input_editor)
-				.append($('<div class="checkbox text-right" />')
-					.append($('<label />')
-						.append(input_use_advanced_editor)
-						.append(' ' + uojLocale('editor::use advanced editor'))
-					)
-				)
+			$('<div id="' + div_editor_id + '" style="height: 350px" />')
+				.append(
+					$('<div id="' + spinner_id + '" class="border d-flex justify-content-center align-items-center" style="width: 100%; height: 350px;" />')
+						.append('<div class="spinner-border text-muted" style="width: 3rem; height: 3rem;" />')
+					);
 		var div_file =
-			$('<div id="' + div_file_id + '" class="col-sm-12"/>')
+			$('<div id="' + div_file_id + '" />')
 				.append(input_file)
-				.append($('<div class="input-group"/>')
-					.append(input_file_path)
-					.append($('<span class="input-group-append"/>')
-						.append($('<button type="button" class="btn btn-primary">'+'<span class="glyphicon glyphicon-folder-open"></span> '+uojLocale('editor::browse')+'</button>')
-							.css('width', '100px')
-							.click(function() {
-								input_file.click();
-							})
-						)
-					)
-				)
 				.append($('<span class="help-block" id="' + help_file_id + '"></span>'))
-		var div_help_language = $('<div id="' + div_help_language_id + '" class="col-sm-12 text-warning top-buffer-sm">');
+		
+		var div_help_language = $('<div id="' + div_help_language_id + '" class="text-warning mb-2">');
 
-		var advanced_editor = null;
-		var advanced_editor_init = function() {
-			require_codemirror({}, function() {
-				var mode = get_codemirror_mode(input_language.val());
-				require_codemirror_mode(mode, function() {
-					if (advanced_editor != null) {
-						return;
-					}
-					advanced_editor = CodeMirror.fromTextArea(input_editor[0], {
-						mode: mode,
-						lineNumbers: true,
-						matchBrackets: true,
-						lineWrapping: true,
-						styleActiveLine: true,
-						indentUnit: 4,
-						indentWithTabs: true,
-						theme: 'default'
-					});
-					advanced_editor.on('change', function() {
-						advanced_editor.save();
-					});
-					$(advanced_editor.getWrapperElement()).css('box-shadow', '0 2px 10px rgba(0,0,0,0.2)');
-					advanced_editor.focus();
+		var show_help_lang = function() {
+			if ($(this).val().startsWith('Java')) {
+				div_help_language.text('注意：Java 程序源代码中不应指定所在的 package。我们会在源代码中找到第一个被定义的类并以它的 main 函数为程序入口点。');
+			} else {
+				div_help_language.text('');
+			}
+		};
+
+		var monaco_editor_instance = null;
+		var monaco_editor_init = function() {
+			require_monaco({}, function() {
+				if (monaco_editor_instance != null) {
+					return;
+				}
+
+				$(div_editor).html('');
+
+				var mode = get_monaco_mode(input_language.val());
+
+				monaco_editor_instance = monaco.editor.create(div_editor[0], {
+					language: mode,
+					automaticLayout: true,
+					fontSize: "14px",
+				});
+
+				$('#' + spinner_id).css('display', 'none !important');
+				$(div_editor).addClass('border overflow-hidden').show();
+				autosave_locally_monaco(2000, name, monaco_editor_instance);
+
+				$('#' + input_editor_id).val(monaco_editor_instance.getModel().getValue());
+				monaco_editor_instance.onDidChangeModelContent(function () {
+					$('#' + input_editor_id).val(monaco_editor_instance.getModel().getValue());
+				});
+				
+				input_language.change(function() {
+					monaco.editor.setModelLanguage(monaco_editor_instance.getModel(), get_monaco_mode(input_language.val()));
 				});
 			});
 		}
@@ -763,8 +765,6 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 		var save_prefer_upload_type = function(type) {
 			$.cookie('uoj_source_code_form_group_preferred_upload_type', type, { expires: 7, path: '/' });
 		};
-
-		autosave_locally(2000, name, input_editor);
 
 		var prefer_upload_type = $.cookie('uoj_source_code_form_group_preferred_upload_type');
 		if (prefer_upload_type === null) {
@@ -776,23 +776,11 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 		} else {
 			input_upload_type_editor[0].checked = true;
 			div_file.css('display', 'none');
-
-			if (prefer_upload_type == 'advanced') {
-				input_use_advanced_editor[0].checked = true;
-			}
 		}
 
-		input_language.change(function() {
-			if (advanced_editor != null) {
-				var mode = get_codemirror_mode(input_language.val());
-				require_codemirror_mode(mode, function() {
-					if (mode != get_codemirror_mode(input_language.val())) {
-						return;
-					}
-					advanced_editor.setOption('mode', mode);
-				});
-			}
-		})
+		input_language.each(show_help_lang);
+		input_language.change(show_help_lang);
+
 		input_upload_type_editor.click(function() {
 			div_editor.show('fast');
 			div_file.hide('fast');
@@ -803,128 +791,98 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 			div_editor.hide('fast');
 			save_prefer_upload_type('file');
 		});
-		input_file.change(function() {
-			input_file_path.val(input_file.val());
-		});
-		input_use_advanced_editor.click(function() {
-			if (this.checked) {
-				advanced_editor_init();
-				save_prefer_upload_type('advanced');
+
+		$(this).append(
+				$('<div class="row mb-2 align-items-center"/>')
+					.append($('<div class="col-sm-4 text-start">' + text + '</div>'))
+					.append(
+						$('<div class="col-sm-4 row align-items-center"/>')
+							.append($('<div class="col-auto" />').append('<label class="col-form-label px-1' +' " for="' + input_language_id + '">' + uojLocale('editor::language') + '</label>'))
+							.append($('<div class="col-auto" />').append(input_language))
+						)
+					.append($('<div class="col-sm-4 text-end"/>')
+						.append(uojLocale('editor::upload source') + ': ')
+						.append($('<div class="form-check d-inline-block">')
+							.append($('<label for="' + input_upload_type_editor_id + '" />')
+								.append(input_upload_type_editor)
+								.append(' ' + uojLocale('editor::upload by editor'))
+							)
+						)
+						.append($('<div class="form-check d-inline-block ms-3"/>')
+							.append(input_upload_type_file)
+							.append($('<label for="' + input_upload_type_file_id +'" />')
+								.append(' ' + uojLocale('editor::upload from local'))
+							)
+						))
+					)
+				.append(div_help_language)
+				.append(div_editor)
+				.append(div_file)
+				.append($('<input type="hidden" name="' + input_editor_name + '" id="' + input_editor_id + '"/>'));
+
+		var check_monaco_editor_init = function() {
+			if (div_editor.is(':visible')) {
+				monaco_editor_init();
 			} else {
-				if (advanced_editor != null) {
-					advanced_editor.toTextArea();
-					advanced_editor = null;
-					input_editor.focus();
-				}
-				save_prefer_upload_type('editor');
+				setTimeout(check_monaco_editor_init, 1);
 			}
-		});
-
-		$(this)
-			.append($('<div class="row col-sm-12"/>')
-			.append($('<label class="col-sm-4 control-label"><div class="'+(isBootstrap5Page ? ' text-start ' : ' text-left ')+'">' + text + '</div></label>'))
-			.append($('<label class="col-sm-1 control-label '+ (isBootstrap5Page ? ' px-1 ' : '') +' " for="' + input_language_name + '">'+uojLocale('editor::language')+'</label>'))
-			.append($('<div class="col-sm-2"/>')
-				.append(input_language)
-			)
-			.append($('<div class="col-sm-2 offset-sm-1 radio"/>')
-				.append($('<label/>')
-					.append(input_upload_type_editor)
-					.append(' '+uojLocale('editor::upload by editor'))
-				)
-			)
-			.append($('<div class="col-sm-2 radio"/>')
-				.append($('<label/>')
-					.append(input_upload_type_file)
-					.append(' '+uojLocale('editor::upload from local'))
-				)
-			))
-			.append(div_help_language)
-			.append(div_editor)
-			.append(div_file);
-
-		if (prefer_upload_type == 'advanced') {
-			var check_advanced_init = function() {
-				if (div_editor.is(':visible')) {
-					advanced_editor_init();
-				} else {
-					setTimeout(check_advanced_init, 1);
-				}
-			}
-			check_advanced_init();
 		}
+		check_monaco_editor_init();
 	});
 }
 
 // text file form group
 $.fn.text_file_form_group = function(name, text) {
 	return this.each(function() {
+		var input_upload_type_editor_id = 'input-' + name + '_upload_type_editor';
+		var input_upload_type_file_id = 'input-' + name + '_upload_type_file';
 		var input_upload_type_name = name + '_upload_type';
 		var input_editor_id = 'input-' + name + '_editor';
 		var input_editor_name = name + '_editor';
 		var input_file_id = 'input-' + name + '_file';
 		var input_file_name = name + '_file';
-
+		var spinner_id = 'spinner-' + name + '_editor';
 		var div_editor_id = 'div-' + name + '_editor';
 		var div_file_id = 'div-' + name + '_file';
 
 		var help_file_id = 'help-' + name + '_file';
 
-		var input_upload_type_editor = $('<input type="radio" name="' + input_upload_type_name + '" value="editor" />');
-		var input_upload_type_file = $('<input type="radio" name="' + input_upload_type_name + '" value="file" />');
-		var input_file = $('<input type="file" id="' + input_file_id + '" name="' + input_file_name + '" style="display: none" />');
-		var input_file_path = $('<input class="form-control" type="text" readonly="readonly" />');
-		var input_editor = $('<textarea class="form-control" id="' + input_editor_id + '" name="' + input_editor_name + '"></textarea>');
-		var input_use_advanced_editor = $('<input type="checkbox">');
+		var input_upload_type_editor = $('<input class="form-check-input" type="radio" id="' + input_upload_type_editor_id + '" name="' + input_upload_type_name + '" value="editor" />');
+		var input_upload_type_file = $('<input class="form-check-input" type="radio" id="' + input_upload_type_file_id + '" name="' + input_upload_type_name + '" value="file" />');
+		var input_file = $('<input type="file" class="form-control" id="' + input_file_id + '" name="' + input_file_name + '" />');
 
-		var div_editor =
-			$('<div id="' + div_editor_id + '" class="col-sm-12"/>')
-				.append(input_editor)
-				.append($('<div class="checkbox text-right" />')
-					.append($('<label />')
-						.append(input_use_advanced_editor)
-						.append(' ' + uojLocale('editor::use advanced editor'))
-					)
-				)
+		var div_editor = $('<div id="' + div_editor_id + '" style="height: 350px" />')
+			.append(
+				$('<div id="' + spinner_id + '" class="border d-flex justify-content-center align-items-center" style="width: 100%; height: 350px;" />')
+					.append('<div class="spinner-border text-muted" style="width: 3rem; height: 3rem;" />')
+				);
 		var div_file =
-			$('<div id="' + div_file_id + '" class="col-sm-12"/>')
+			$('<div id="' + div_file_id + '" />')
 				.append(input_file)
-				.append($('<div class="input-group"/>')
-					.append(input_file_path)
-					.append($('<div class="input-group-append"/>')
-						.append($('<button type="button" class="btn btn-primary">'+'<span class="glyphicon glyphicon-folder-open"></span> '+uojLocale('editor::browse')+'</button>')
-							.css('width', '100px')
-							.click(function() {
-								input_file.click();
-							})
-						)
-					)
-				)
 				.append($('<span class="help-block" id="' + help_file_id + '"></span>'))
 
-		var advanced_editor = null;
-		var advanced_editor_init = function() {
-			require_codemirror({}, function() {
-				var mode = get_codemirror_mode('text');
-				require_codemirror_mode(mode, function() {
-					if (advanced_editor != null) {
-						return;
-					}
-					advanced_editor = CodeMirror.fromTextArea(input_editor[0], {
-						mode: mode,
-						lineNumbers: true,
-						matchBrackets: true,
-						lineWrapping: true,
-						styleActiveLine: true,
-						indentUnit: 4,
-						indentWithTabs: true,
-						theme: 'default'
-					});
-					advanced_editor.on('change', function() {
-						advanced_editor.save();
-					});
-					$(advanced_editor.getWrapperElement()).css('box-shadow', '0 2px 10px rgba(0,0,0,0.2)');
-					advanced_editor.focus();
+		var monaco_editor_instance = null;
+		var monaco_editor_init = function() {
+			require_monaco({}, function() {
+				if (monaco_editor_instance != null) {
+					return;
+				}
+
+				$(div_editor).html('');
+
+				monaco_editor_instance = monaco.editor.create(div_editor[0], {
+					language: 'text',
+					automaticLayout: true,
+					fontSize: "14px",
+				});
+
+				$('#' + spinner_id).css('display', 'none !important');
+				$(div_editor).addClass('border overflow-hidden').show();
+				autosave_locally_monaco(2000, name, monaco_editor_instance);
+
+				$('#' + input_editor_id).val(monaco_editor_instance.getModel().getValue());
+				monaco_editor_instance.onDidChangeModelContent(function () {
+					$('#' + input_editor_id).val(monaco_editor_instance.getModel().getValue());
 				});
 			});
 		}
@@ -932,8 +890,6 @@ $.fn.text_file_form_group = function(name, text) {
 		var save_prefer_upload_type = function(type) {
 			$.cookie('uoj_text_file_form_group_preferred_upload_type', type, { expires: 7, path: '/' });
 		};
-
-		autosave_locally(2000, name, input_editor);
 
 		var prefer_upload_type = $.cookie('uoj_text_file_form_group_preferred_upload_type');
 		if (prefer_upload_type === null) {
@@ -945,10 +901,6 @@ $.fn.text_file_form_group = function(name, text) {
 		} else {
 			input_upload_type_editor[0].checked = true;
 			div_file.css('display', 'none');
-
-			if (prefer_upload_type == 'advanced') {
-				input_use_advanced_editor[0].checked = true;
-			}
 		}
 
 		input_upload_type_editor.click(function() {
@@ -961,51 +913,37 @@ $.fn.text_file_form_group = function(name, text) {
 			div_editor.hide('fast');
 			save_prefer_upload_type('file');
 		});
-		input_file.change(function() {
-			input_file_path.val(input_file.val());
-		});
-		input_use_advanced_editor.click(function() {
-			if (this.checked) {
-				advanced_editor_init();
-				save_prefer_upload_type('advanced');
-			} else {
-				if (advanced_editor != null) {
-					advanced_editor.toTextArea();
-					advanced_editor = null;
-					input_editor.focus();
-				}
-				save_prefer_upload_type('editor');
-			}
-		});
 
 		$(this)
-			.append($('<div class="row"/>')
-			.append($('<label class="col-sm-4 control-label"><div class="'+(isBootstrap5Page ? ' text-start ' : ' text-left ')+'">' + text + '</div></label>'))
-			.append($('<div class="col-sm-2 offset-sm-4 radio"/>')
-				.append($('<label/>')
-					.append(input_upload_type_editor)
-					.append(' '+uojLocale('editor::upload by editor'))
+			.append($('<div class="row justify-content-between mb-2" />')
+			.append($('<div class="col text-start">' + text + '</div>'))
+			.append($('<div class="col text-end"/>')
+				.append(uojLocale('editor::upload source') + ': ')
+				.append($('<div class="form-check d-inline-block">')
+					.append($('<label for="' + input_upload_type_editor_id + '" />')
+						.append(input_upload_type_editor)
+						.append(' ' + uojLocale('editor::upload by editor'))
+					)
 				)
-			)
-			.append($('<div class="col-sm-2 radio"/>')
-				.append($('<label/>')
+				.append($('<div class="form-check d-inline-block ms-3"/>')
 					.append(input_upload_type_file)
-					.append(' '+uojLocale('editor::upload from local'))
-				)
-			))
+					.append($('<label for="' + input_upload_type_file_id +'" />')
+						.append(' ' + uojLocale('editor::upload from local'))
+					)
+				))
+			)
 			.append(div_editor)
-			.append(div_file);
+			.append(div_file)
+			.append($('<input type="hidden" name="' + input_editor_name + '" id="' + input_editor_id + '"/>'));
 
-		if (prefer_upload_type == 'advanced') {
-			var check_advanced_init = function() {
-				if (div_editor.is(':visible')) {
-					advanced_editor_init();
-				} else {
-					setTimeout(check_advanced_init, 1);
-				}
+		var check_monaco_editor_init = function() {
+			if (div_editor.is(':visible')) {
+				monaco_editor_init();
+			} else {
+				setTimeout(check_monaco_editor_init, 1);
 			}
-			check_advanced_init();
 		}
+		check_monaco_editor_init();
 	});
 }
 

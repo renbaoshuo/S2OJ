@@ -7,9 +7,9 @@ UOJContest::init(UOJRequest::get('id')) || UOJResponse::page404();
 UOJContest::cur()->userCanParticipateNow(Auth::user()) || UOJResponse::page403();
 UOJContest::cur()->userHasMarkedParticipated(Auth::user()) && redirectTo(UOJContest::cur()->getUri());
 
-$confirm_form = new UOJBs4Form('confirm');
-$confirm_form->submit_button_config['class_str'] = 'btn btn-primary mt-3';
-$confirm_form->submit_button_config['text'] = '我已核对信息，确认参加比赛';
+$confirm_form = new UOJForm('confirm');
+$confirm_form->config['submit_button']['class'] = 'btn btn-primary';
+$confirm_form->config['submit_button']['text'] = '我已核对信息，确认参加比赛';
 $confirm_form->handle = function () {
 	UOJContest::cur()->markUserAsParticipated(Auth::user());
 };
@@ -21,11 +21,15 @@ $confirm_form->runAtServer();
 
 <div class="card mw-100 mx-auto" style="width:800px">
 	<div class="card-body">
-		<h1 class="card-title text-center mb-3">确认参赛</h1>
+		<h1 class="card-title text-center mb-3">
+			确认参赛
+		</h1>
 
-		<p class="card-text text-center">您即将参加比赛 “<b><?= UOJContest::info('name') ?></b>”，请在正式参赛前仔细核对以下比赛信息：</p>
+		<p class="card-text text-center">
+			您即将参加比赛 “<b><?= UOJContest::info('name') ?></b>”，请在正式参赛前仔细核对以下比赛信息：
+		</p>
 
-		<div class="table-responsive mx-auto" style="width:500px">
+		<div class="table-responsive mx-auto" style="width: 500px">
 			<table class="table">
 				<thead>
 					<tr>
