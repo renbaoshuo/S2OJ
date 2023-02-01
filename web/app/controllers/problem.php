@@ -101,7 +101,7 @@ if (UOJContest::cur()) {
 
 $submission_requirement = UOJProblem::cur()->getSubmissionRequirement();
 $custom_test_requirement = UOJProblem::cur()->getCustomTestRequirement();
-$custom_test_enabled = $custom_test_requirement && $pre_submit_check_ret === true;
+$custom_test_enabled = $custom_test_requirement && $pre_submit_check_ret === true && UOJProblem::info('type') != 'remote';
 
 function handleUpload($zip_file_name, $content, $tot_size) {
 	global $is_participating;
@@ -171,11 +171,8 @@ if ($custom_test_enabled) {
 	$custom_test_form->runAtServer();
 }
 
-$can_use_zip_upload = true;
-foreach ($submission_requirement as $req) {
-	if ($req['type'] == 'source code') {
-		$can_use_zip_upload = false;
-	}
+if (empty($submission_requirement)) {
+	$no_more_submission = '当前题目未配置提交文件，请联系管理员！';
 }
 
 if ($pre_submit_check_ret === true && !$no_more_submission) {
@@ -274,12 +271,12 @@ if (UOJContest::cur()) {
 					</div>
 					<div class="tab-pane" id="submit">
 						<?php if ($pre_submit_check_ret !== true) : ?>
-							<h3 class="text-warning"><?= $pre_submit_check_ret ?></h3>
+							<p class="text-warning h4"><?= $pre_submit_check_ret ?></p>
 						<?php elseif ($no_more_submission) : ?>
-							<h3 class="text-warning"><?= $no_more_submission ?></h3>
+							<p class="text-warning h4"><?= $no_more_submission ?></p>
 						<?php else : ?>
 							<?php if ($submission_warning) : ?>
-								<h3 class="text-warning"><?= $submission_warning ?></h3>
+								<p class="text-warning h4"><?= $submission_warning ?></p>
 							<?php endif ?>
 							<?php if (isset($zip_answer_form)) : ?>
 								<?php $zip_answer_form->printHTML(); ?>

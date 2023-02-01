@@ -460,10 +460,6 @@ class UOJProblem {
 		return $key === null ? $extra_config : $extra_config[$key];
 	}
 	public function getCustomTestRequirement() {
-		if ($this->info['type'] == 'remote') {
-			return [];
-		}
-
 		$extra_config = json_decode($this->info['extra_config'], true);
 
 		if (isset($extra_config['custom_test_requirement'])) {
@@ -559,11 +555,16 @@ class UOJProblem {
 	}
 
 	public function userCanUploadSubmissionViaZip(array $user = null) {
-		foreach ($this->getSubmissionRequirement() as $req) {
+		$submission_requirement = $this->getSubmissionRequirement();
+
+		if (empty($submission_requirement)) return false;
+
+		foreach ($submission_requirement as $req) {
 			if ($req['type'] == 'source code') {
 				return false;
 			}
 		}
+
 		return true;
 	}
 
