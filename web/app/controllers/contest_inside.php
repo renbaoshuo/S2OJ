@@ -238,8 +238,8 @@ if ($cur_tab == 'dashboard') {
 	}
 } elseif ($cur_tab == 'self_reviews') {
 	if (UOJContest::cur()->userHasMarkedParticipated(Auth::user())) {
-		$self_reviews_update_form = new UOJBs4Form('self_review_update');
-		$self_reviews_update_form->ctrl_enter_submit = true;
+		$self_reviews_update_form = new UOJForm('self_review_update');
+		$self_reviews_update_form->config['ctrl_enter_submit'] = true;
 
 		$contest_problems = DB::selectAll([
 			"select problem_id",
@@ -261,20 +261,18 @@ if ($cur_tab == 'dashboard') {
 					"poster" => Auth::id(),
 				],
 			]);
-			$self_reviews_update_form->addVTextArea(
-				'self_review_update__problem_' . $contest_problems[$i]['problem']->getLetter(),
-				'<b>' . $contest_problems[$i]['problem']->getLetter() . '</b>: ' . $contest_problems[$i]['problem']->info['title'],
-				$content,
-				function ($content) {
+			$self_reviews_update_form->addTextArea('self_review_update__problem_' . $contest_problems[$i]['problem']->getLetter(), [
+				'div_class' => 'mb-3',
+				'label' => '<b>' . $contest_problems[$i]['problem']->getLetter() . '</b>: ' . $contest_problems[$i]['problem']->info['title'],
+				'default_value' => $content,
+				'validator_php' => function ($content) {
 					if (strlen($content) > 200) {
 						return '总结不能超过200字';
 					}
 
 					return '';
 				},
-				null,
-				true
-			);
+			]);
 		}
 
 		$content = DB::selectSingle([
@@ -286,20 +284,17 @@ if ($cur_tab == 'dashboard') {
 				"poster" => Auth::id(),
 			],
 		]);
-		$self_reviews_update_form->addVTextArea(
-			'self_review_update__overall',
-			'比赛总结',
-			$content,
-			function ($content) {
+		$self_reviews_update_form->addTextArea('self_review_update__overall', [
+			'label' => '比赛总结',
+			'default_value' => $content,
+			'validator_php' => function ($content) {
 				if (strlen($content) > 200) {
 					return '总结不能超过200字';
 				}
 
 				return '';
 			},
-			null,
-			true
-		);
+		]);
 
 		$self_reviews_update_form->handle = function () use ($contest, $contest_problems) {
 			for ($i = 0; $i < count($contest_problems); $i++) {
