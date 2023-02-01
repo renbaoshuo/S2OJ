@@ -2,7 +2,7 @@
 
 class UOJProblemConf {
 	public array $conf;
-    
+
 	static function getFromFile($file_name) {
 		$reader = new StrictFileReader($file_name);
 		if ($reader->failed()) {
@@ -30,7 +30,7 @@ class UOJProblemConf {
 		$reader->close();
 		return new UOJProblemConf($conf);
 	}
-    
+
 	public function __construct($conf) {
 		$this->conf = $conf;
 	}
@@ -56,6 +56,22 @@ class UOJProblemConf {
 			}
 		}
 		return $default_val;
+	}
+
+	public function getInputFileName($num) {
+		return $this->getVal('input_pre', 'input') . $num . '.' . $this->getVal('input_suf', 'txt');
+	}
+
+	public function getOutputFileName($num) {
+		return $this->getVal('output_pre', 'output') . $num . '.' . $this->getVal('output_suf', 'txt');
+	}
+
+	public function getExtraInputFileName($num) {
+		return 'ex_' . $this->getInputFileName($num);
+	}
+
+	public function getExtraOutputFileName($num) {
+		return 'ex_' . $this->getOutputFileName($num);
 	}
 
 	public function isOn($key) {

@@ -126,11 +126,9 @@ if ($_POST['problem_settings_file_submit'] == 'submit') {
 }
 
 
-$info_form = new UOJBs4Form('info');
-$http_host = HTML::escape(UOJContext::httpHost());
+$info_form = new UOJForm('info');
 $attachment_url = UOJProblem::cur()->getAttachmentUri();
-$info_form->appendHTML(
-	<<<EOD
+$info_form->appendHTML(<<<EOD
 <div class="form-group row">
 	<label class="col-sm-3 control-label">problem_{$problem['id']}_attachment.zip</label>
 	<div class="col-sm-9">
@@ -139,11 +137,9 @@ $info_form->appendHTML(
 		</div>
 	</div>
 </div>
-EOD
-);
+EOD);
 $download_url = UOJProblem::cur()->getMainDataUri();
-$info_form->appendHTML(
-	<<<EOD
+$info_form->appendHTML(<<<EOD
 <div class="form-group row">
 	<label class="col-sm-3 control-label">problem_{$problem['id']}.zip</label>
 	<div class="col-sm-9">
@@ -152,92 +148,80 @@ $info_form->appendHTML(
 		</div>
 	</div>
 </div>
-EOD
-);
-$info_form->appendHTML(
-	<<<EOD
+EOD);
+$info_form->appendHTML(<<<EOD
 <div class="form-group row">
 	<label class="col-sm-3 control-label">testlib.h</label>
 	<div class="col-sm-9">
 		<div class="form-control-static">
-			<a class="text-decoration-none" href="/download.php?type=testlib.h">下载</a>
+			<a class="text-decoration-none" href="/download/testlib.h">下载</a>
 		</div>
 	</div>
 </div>
-EOD
-);
+EOD);
 
 $esc_submission_requirement = HTML::escape(json_encode(json_decode($problem['submission_requirement']), JSON_PRETTY_PRINT));
-$info_form->appendHTML(
-	<<<EOD
+$info_form->appendHTML(<<<EOD
 <div class="form-group row">
 	<label class="col-sm-3 control-label">提交文件配置</label>
 	<div class="col-sm-9">
-		<div class="form-control-static"><pre class="uoj-pre bg-light rounded">
+		<pre class="uoj-pre bg-light rounded">
 $esc_submission_requirement
 </pre>
-		</div>
 	</div>
 </div>
-EOD
-);
+EOD);
 $esc_extra_config = HTML::escape(json_encode(json_decode($problem['extra_config']), JSON_PRETTY_PRINT));
-$info_form->appendHTML(
-	<<<EOD
+$info_form->appendHTML(<<<EOD
 <div class="form-group row">
 	<label class="col-sm-3 control-label">其它配置</label>
 	<div class="col-sm-9">
-		<div class="form-control-static"><pre class="uoj-pre bg-light rounded">
+		<pre class="uoj-pre bg-light rounded">
 $esc_extra_config
 </pre>
-		</div>
 	</div>
 </div>
-EOD
-);
+EOD);
 if (isSuperUser(Auth::user())) {
-	$info_form->addVInput(
-		'submission_requirement',
-		'text',
-		'提交文件配置',
-		$problem['submission_requirement'],
-		function ($submission_requirement, &$vdata) {
+	$info_form->addTextArea('submission_requirement', [
+		'label' => '提交文件配置',
+		'input_class' => 'form-control font-monospace',
+		'default_value' => $problem['submission_requirement'],
+		'validator_php' => function ($submission_requirement, &$vdata) {
 			$submission_requirement = json_decode($submission_requirement, true);
 			if ($submission_requirement === null) {
 				return '不是合法的JSON';
 			}
 			$vdata['submission_requirement'] = json_encode($submission_requirement);
 		},
-		null
-	);
-	$info_form->addVInput(
-		'extra_config',
-		'text',
-		'其它配置',
-		$problem['extra_config'],
-		function ($extra_config, &$vdata) {
+	]);
+	$info_form->addTextArea('extra_config', [
+		'label' => '其他配置',
+		'input_class' => 'form-control font-monospace',
+		'default_value' => $problem['extra_config'],
+		'validator_php' => function ($extra_config, &$vdata) {
 			$extra_config = json_decode($extra_config, true);
 			if ($extra_config === null) {
 				return '不是合法的JSON';
 			}
 			$vdata['extra_config'] = json_encode($extra_config);
 		},
-		null
-	);
+	]);
 	$info_form->handle = function (&$vdata) use ($problem) {
 		DB::update([
 			"update problems",
 			"set", [
 				"submission_requirement" => $vdata['submission_requirement'],
-				"extra_config" => $vdata['extra_config']
-			], "where", ["id" => $problem['id']]
+				"extra_config" => $vdata['extra_config'],
+			], "where", [
+				"id" => $problem['id'],
+			]
 		]);
 	};
 } else {
-	$info_form->no_submit = true;
+	$info_form->config['no_submit'] = true;
 }
-
-$problem_conf = getUOJConf("$data_dir/problem.conf");
+$info_form->runAtServer();
 
 function displayProblemConf(UOJProblemDataDisplayer $self) {
 	global $info_form;
@@ -250,8 +234,8 @@ function displayProblemConf(UOJProblemDataDisplayer $self) {
 	$self->echoFilePre('problem.conf');
 }
 
-function addTestsTab(UOJProblemDataDisplayer $disp, array $problem_conf) {
-	$n_tests = getUOJConfVal($problem_conf, 'n_tests', 10);
+function addTestsTab(UOJProblemDataDisplayer $disp, UOJProblemConf $problem_conf) {
+	$n_tests = $problem_conf->getVal('n_tests', 10);
 	if (!validateUInt($n_tests)) {
 		$disp->setProblemConfRowStatus('n_tests', 'danger');
 		return false;
@@ -260,8 +244,8 @@ function addTestsTab(UOJProblemDataDisplayer $disp, array $problem_conf) {
 	$inputs = [];
 	$outputs = [];
 	for ($num = 1; $num <= $n_tests; $num++) {
-		$inputs[$num] = getUOJProblemInputFileName($problem_conf, $num);
-		$outputs[$num] = getUOJProblemOutputFileName($problem_conf, $num);
+		$inputs[$num] = $problem_conf->getInputFileName($num);
+		$outputs[$num] = $problem_conf->getOutputFileName($num);
 		unset($disp->rest_data_files[$inputs[$num]]);
 		unset($disp->rest_data_files[$outputs[$num]]);
 	}
@@ -281,14 +265,14 @@ function addTestsTab(UOJProblemDataDisplayer $disp, array $problem_conf) {
 	return true;
 }
 
-function addExTestsTab(UOJProblemDataDisplayer $disp, array $problem_conf) {
-	$has_extra_tests = !(isset($problem_conf['submit_answer']) && $problem_conf['submit_answer'] == 'on');
+function addExTestsTab(UOJProblemDataDisplayer $disp, UOJProblemConf $problem_conf) {
+	$has_extra_tests = $problem_conf->getNonTraditionalJudgeType() != 'submit_answer';
 
 	if (!$has_extra_tests) {
 		return false;
 	}
 
-	$n_ex_tests = getUOJConfVal($problem_conf, 'n_ex_tests', 0);
+	$n_ex_tests = $problem_conf->getVal('n_ex_tests', 0);
 	if (!validateUInt($n_ex_tests)) {
 		$disp->setProblemConfRowStatus('n_ex_tests', 'danger');
 		return false;
@@ -301,8 +285,8 @@ function addExTestsTab(UOJProblemDataDisplayer $disp, array $problem_conf) {
 	$inputs = [];
 	$outputs = [];
 	for ($num = 1; $num <= $n_ex_tests; $num++) {
-		$inputs[$num] = getUOJProblemExtraInputFileName($problem_conf, $num);
-		$outputs[$num] = getUOJProblemExtraOutputFileName($problem_conf, $num);
+		$inputs[$num] = $problem_conf->getExtraInputFileName($num);
+		$outputs[$num] = $problem_conf->getExtraOutputFileName($num);
 		unset($disp->rest_data_files[$inputs[$num]]);
 		unset($disp->rest_data_files[$outputs[$num]]);
 	}
@@ -341,7 +325,7 @@ function addSrcTab(UOJProblemDataDisplayer $disp, $tab_name, string $name) {
 function getDataDisplayer() {
 	$disp = new UOJProblemDataDisplayer(UOJProblem::cur());
 
-	$problem_conf = UOJProblem::cur()->getProblemConfArray();
+	$problem_conf = UOJProblem::cur()->getProblemConf();
 	if ($problem_conf === -1) {
 		return $disp->addTab('problem.conf', function ($self) {
 			global $info_form;
@@ -365,18 +349,18 @@ function getDataDisplayer() {
 		});
 	}
 
-	$disp->setProblemConf($problem_conf);
+	$disp->setProblemConf($problem_conf->conf);
 	unset($disp->rest_data_files['problem.conf']);
 	unset($disp->rest_data_files['download.zip']);
 	$disp->addTab('problem.conf', 'displayProblemConf');
 	addTestsTab($disp, $problem_conf);
 	addExTestsTab($disp, $problem_conf);
 
-	$judger_name = getUOJConfVal($problem_conf, 'use_builtin_judger', null);
+	$judger_name = $problem_conf->getVal('use_builtin_judger', null);
 	if ($judger_name === null) {
 		return $disp;
 	} elseif ($judger_name === 'on') {
-		if (!isset($problem_conf['interaction_mode'])) {
+		if ($problem_conf->isOn('interaction_mode')) {
 			if (isset($problem_conf['use_builtin_checker'])) {
 				$disp->addTab('checker', function ($self) {
 					echo '<h4>use builtin checker : ', $self->problem_conf['use_builtin_checker']['val'], '</h4>';
@@ -389,7 +373,7 @@ function getDataDisplayer() {
 			addSrcTab($disp, 'standard', 'std');
 			addSrcTab($disp, 'validator', 'val');
 		}
-		if (isset($problem_conf['interaction_mode'])) {
+		if (isset($problem_conf->conf['interaction_mode'])) {
 			addSrcTab($disp, 'interactor', 'interactor');
 		}
 		return $disp;
@@ -409,7 +393,7 @@ if (isset($_GET['display_file'])) {
 	die();
 }
 
-$hackable_form = new UOJBs4Form('hackable');
+$hackable_form = new UOJForm('hackable');
 $hackable_form->handle = function () use ($problem) {
 	$problem['hackable'] = !$problem['hackable'];
 	$ret = dataSyncProblemData($problem);
@@ -424,11 +408,13 @@ $hackable_form->handle = function () use ($problem) {
 		"where", ["id" => $problem['id']]
 	]);
 };
-$hackable_form->submit_button_config['class_str'] = 'btn btn-warning d-block w-100';
-$hackable_form->submit_button_config['text'] = $problem['hackable'] ? '禁用 Hack 功能' : '启用 Hack 功能';
-$hackable_form->submit_button_config['smart_confirm'] = '';
+$hackable_form->config['submit_container']['class'] = '';
+$hackable_form->config['submit_button']['class'] = 'btn btn-warning d-block w-100';
+$hackable_form->config['submit_button']['text'] = $problem['hackable'] ? '禁用 Hack 功能' : '启用 Hack 功能';
+$hackable_form->config['confirm']['smart'] = true;
+$hackable_form->runAtServer();
 
-$data_form = new UOJBs4Form('data');
+$data_form = new UOJForm('data');
 $data_form->handle = function () use ($problem) {
 	set_time_limit(60 * 5);
 	$ret = dataSyncProblemData($problem, Auth::user());
@@ -436,39 +422,46 @@ $data_form->handle = function () use ($problem) {
 		becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
 	}
 };
-$data_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
-$data_form->submit_button_config['text'] = '检验配置并同步数据';
-$data_form->submit_button_config['smart_confirm'] = '';
+$data_form->config['submit_container']['class'] = '';
+$data_form->config['submit_button']['class'] = 'btn btn-danger d-block w-100';
+$data_form->config['submit_button']['text'] = '检验配置并同步数据';
+$data_form->config['confirm']['smart'] = true;
+$data_form->runAtServer();
 
-$clear_data_form = new UOJBs4Form('clear_data');
-$clear_data_form->handle = function () {
-	global $problem;
+$clear_data_form = new UOJForm('clear_data');
+$clear_data_form->handle = function () use ($problem) {
 	dataClearProblemData($problem);
 };
-$clear_data_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
-$clear_data_form->submit_button_config['text'] = '清空题目数据';
-$clear_data_form->submit_button_config['smart_confirm'] = '';
+$clear_data_form->config['submit_container']['class'] = '';
+$clear_data_form->config['submit_button']['class'] = 'btn btn-danger d-block w-100';
+$clear_data_form->config['submit_button']['text'] = '清空题目数据';
+$clear_data_form->config['confirm']['smart'] = true;
+$clear_data_form->runAtServer();
 
-$rejudge_form = new UOJBs4Form('rejudge');
+$rejudge_form = new UOJForm('rejudge');
 $rejudge_form->handle = function () {
 	UOJSubmission::rejudgeProblem(UOJProblem::cur());
 };
 $rejudge_form->succ_href = "/submissions?problem_id={$problem['id']}";
-$rejudge_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
-$rejudge_form->submit_button_config['text'] = '重测该题';
-$rejudge_form->submit_button_config['smart_confirm'] = '';
+$rejudge_form->config['submit_container']['class'] = '';
+$rejudge_form->config['submit_button']['class'] = 'btn btn-danger d-block w-100';
+$rejudge_form->config['submit_button']['text'] = '重测该题';
+$rejudge_form->config['confirm']['smart'] = true;
+$rejudge_form->runAtServer();
 
-$rejudgege97_form = new UOJBs4Form('rejudgege97');
+$rejudgege97_form = new UOJForm('rejudgege97');
 $rejudgege97_form->handle = function () {
 	UOJSubmission::rejudgeProblemGe97(UOJProblem::cur());
 };
 $rejudgege97_form->succ_href = "/submissions?problem_id={$problem['id']}";
-$rejudgege97_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
-$rejudgege97_form->submit_button_config['text'] = '重测 >=97 的程序';
-$rejudgege97_form->submit_button_config['smart_confirm'] = '';
+$rejudgege97_form->config['submit_container']['class'] = '';
+$rejudgege97_form->config['submit_button']['class'] = 'btn btn-danger d-block w-100';
+$rejudgege97_form->config['submit_button']['text'] = '重测 >=97 的程序';
+$rejudgege97_form->config['confirm']['smart'] = true;
+$rejudgege97_form->runAtServer();
 
 if ($problem['hackable']) {
-	$test_std_form = new UOJBs4Form('test_std');
+	$test_std_form = new UOJForm('test_std');
 	$test_std_form->handle = function () use ($problem, $data_disp) {
 		$user_std = UOJUser::query('std');
 		if (!$user_std) {
@@ -480,7 +473,7 @@ if ($problem['hackable']) {
 
 		$src_std = UOJLang::findSourceCode('std', '', [$data_disp, 'isFile']);
 		if ($src_std === false) {
-			UOJResponse::message('未找到std！');
+			UOJResponse::message('未找到 std！');
 		}
 
 		$zip_file_name = FS::randomAvailableSubmissionFileName();
@@ -526,41 +519,35 @@ if ($problem['hackable']) {
 		]);
 	};
 	$test_std_form->succ_href = "/submissions?problem_id={$problem['id']}";
-	$test_std_form->submit_button_config['class_str'] = 'btn btn-danger d-block w-100';
-	$test_std_form->submit_button_config['text'] = '检验数据正确性';
+	$test_std_form->config['submit_container']['class'] = '';
+	$test_std_form->config['submit_button']['class'] = 'btn btn-warning d-block w-100';
+	$test_std_form->config['submit_button']['text'] = '检验数据正确性';
 	$test_std_form->runAtServer();
 }
-
-$hackable_form->runAtServer();
-$data_form->runAtServer();
-$clear_data_form->runAtServer();
-$rejudge_form->runAtServer();
-$rejudgege97_form->runAtServer();
-$info_form->runAtServer();
 ?>
 
-<?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - 数据 - 题目管理') ?>
+<?php echoUOJPageHeader('数据管理 - ' . UOJProblem::cur()->getTitle(['with' => 'id'])) ?>
 
 <div class="row">
 	<!-- left col -->
 	<div class="col-12 col-lg-9">
 		<h1>
-			#<?= $problem['id'] ?>. <?= $problem['title'] ?> 管理
+			<?= UOJProblem::cur()->getTitle(['with' => 'id']) ?> 管理
 		</h1>
 
 		<ul class="nav nav-pills my-3" role="tablist">
 			<li class="nav-item">
-				<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
+				<a class="nav-link" href="<?= UOJProblem::cur()->getUri('/manage/statement') ?>" role="tab">
 					题面
 				</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/managers" role="tab">
+				<a class="nav-link" href="<?= UOJProblem::cur()->getUri('/manage/managers') ?>" role="tab">
 					管理者
 				</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link active" href="/problem/<?= $problem['id'] ?>/manage/data" role="tab">
+				<a class="nav-link active" href="<?= UOJProblem::cur()->getUri('/manage/data') ?>" role="tab">
 					数据
 				</a>
 			</li>
@@ -607,7 +594,6 @@ $info_form->runAtServer();
 
 	<!-- right col -->
 	<aside class="col-12 col-lg-3 mt-3 mt-lg-0 d-flex flex-column">
-
 		<div class="card card-default mt-3 mt-lg-0 mb-2 order-2 order-lg-1">
 			<ul class="nav nav-pills nav-fill flex-column" role="tablist">
 				<li class="nav-item text-start">
@@ -717,6 +703,8 @@ $info_form->runAtServer();
 	</div>
 </div>
 
+<?php $problem_conf = UOJProblem::cur()->getProblemConf() ?>
+
 <div class="modal fade" id="ProblemSettingsFileModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
@@ -729,7 +717,7 @@ $info_form->runAtServer();
 					<div class="form-group row">
 						<label for="use_builtin_checker" class="col-sm-5 control-label">比对函数</label>
 						<div class="col-sm-7">
-							<?php $checker_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'use_builtin_checker', 'ownchk') : ""; ?>
+							<?php $checker_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('use_builtin_checker', 'ownchk') : ""; ?>
 							<select class="form-select" id="use_builtin_checker" name="use_builtin_checker">
 								<option value="ncmp" <?= $checker_value == "ncmp" ? 'selected' : '' ?>>ncmp: 整数序列</option>
 								<option value="wcmp" <?= $checker_value == "wcmp" ? 'selected' : '' ?>>wcmp: 字符串序列</option>
@@ -748,63 +736,63 @@ $info_form->runAtServer();
 					<div class="form-group row">
 						<label for="n_tests" class="col-sm-5 control-label">n_tests</label>
 						<div class="col-sm-7">
-							<?php $n_tests_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'n_tests', '') : ""; ?>
+							<?php $n_tests_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('n_tests', '') : ""; ?>
 							<input type="number" class="form-control" id="n_tests" name="n_tests" placeholder="数据点个数（必填）" value="<?= $n_tests_value ?>">
 						</div>
 					</div>
 					<div class="form-group row">
 						<label for="n_ex_tests" class="col-sm-5 control-label">n_ex_tests</label>
 						<div class="col-sm-7">
-							<?php $n_ex_tests_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'n_ex_tests', 0) : ""; ?>
+							<?php $n_ex_tests_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('n_ex_tests', 0) : ""; ?>
 							<input type="number" class="form-control" id="n_ex_tests" name="n_ex_tests" placeholder="额外数据点个数（默认为 0）" value="<?= $n_ex_tests_value ?>">
 						</div>
 					</div>
 					<div class="form-group row">
 						<label for="n_sample_tests" class="col-sm-5 control-label">n_sample_tests</label>
 						<div class="col-sm-7">
-							<?php $n_sample_tests_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'n_sample_tests', 0) : ""; ?>
+							<?php $n_sample_tests_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('n_sample_tests', 0) : ""; ?>
 							<input type="number" class="form-control" id="n_sample_tests" name="n_sample_tests" placeholder="样例测试点个数（默认为 0）" value="<?= $n_sample_tests_value ?>">
 						</div>
 					</div>
 					<div class="form-group row">
 						<label for="input_pre" class="col-sm-5 control-label">input_pre</label>
 						<div class="col-sm-7">
-							<?php $input_pre_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'input_pre', 'input') : ""; ?>
+							<?php $input_pre_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('input_pre', 'input') : ""; ?>
 							<input type="text" class="form-control" id="input_pre" name="input_pre" placeholder="输入文件名称（默认为 input）" value="<?= $input_pre_value ?>">
 						</div>
 					</div>
 					<div class="form-group row">
 						<label for="input_suf" class="col-sm-5 control-label">input_suf</label>
 						<div class="col-sm-7">
-							<?php $input_suf_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'input_suf', 'txt') : ""; ?>
+							<?php $input_suf_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('input_suf', 'txt') : ""; ?>
 							<input type="text" class="form-control" id="input_suf" name="input_suf" placeholder="输入文件后缀（默认为 txt）" value="<?= $input_suf_value ?>">
 						</div>
 					</div>
 					<div class="form-group row">
 						<label for="output_pre" class="col-sm-5 control-label">output_pre</label>
 						<div class="col-sm-7">
-							<?php $output_pre_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'output_pre', 'output') : ""; ?>
+							<?php $output_pre_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('output_pre', 'output') : ''; ?>
 							<input type="text" class="form-control" id="output_pre" name="output_pre" placeholder="输出文件名称（默认为 output）" value="<?= $output_pre_value ?>">
 						</div>
 					</div>
 					<div class="form-group row">
 						<label for="output_suf" class="col-sm-5 control-label">output_suf</label>
 						<div class="col-sm-7">
-							<?php $output_suf_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'output_suf', 'txt') : ""; ?>
+							<?php $output_suf_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('output_suf', 'txt') : ""; ?>
 							<input type="text" class="form-control" id="output_suf" name="output_suf" placeholder="输出文件后缀（默认为 txt）" value="<?= $output_suf_value ?>">
 						</div>
 					</div>
 					<div class="form-group row">
 						<label for="time_limit" class="col-sm-5 control-label">time_limit</label>
 						<div class="col-sm-7">
-							<?php $time_limit_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'time_limit', 1) : ""; ?>
+							<?php $time_limit_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('time_limit', 1) : ""; ?>
 							<input type="text" class="form-control" id="time_limit" name="time_limit" placeholder="时间限制（默认为 1s）" value="<?= $time_limit_value ?>">
 						</div>
 					</div>
 					<div class="form-group row">
 						<label for="memory_limit" class="col-sm-5 control-label">memory_limit</label>
 						<div class="col-sm-7">
-							<?php $memory_limit_value = is_array($problem_conf) ? getUOJConfVal($problem_conf, 'memory_limit', 256) : ""; ?>
+							<?php $memory_limit_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('memory_limit', 256) : ""; ?>
 							<input type="number" class="form-control" id="memory_limit" name="memory_limit" placeholder="内存限制（默认为 256 MB）" value="<?= $memory_limit_value ?>">
 						</div>
 					</div>
