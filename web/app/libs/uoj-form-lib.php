@@ -642,12 +642,11 @@ EOD;
 }
 
 function newAddDelCmdForm($form_name, $validate, $handle, $final = null) {
-	$form = new UOJBs4Form($form_name);
-	$form->addVTextArea(
-		$form_name . '_cmds',
-		'命令',
-		'',
-		function ($str, &$vdata) use ($validate) {
+	$form = new UOJForm($form_name);
+	$form->addTextArea("{$form_name}_cmds", [
+		'label' => '命令',
+		'input_class' => 'form-control font-monospace',
+		'validator_php' => function ($str, &$vdata) use ($validate) {
 			$cmds = array();
 			foreach (explode("\n", $str) as $line_id => $raw_line) {
 				$line = trim($raw_line);
@@ -667,8 +666,7 @@ function newAddDelCmdForm($form_name, $validate, $handle, $final = null) {
 			$vdata['cmds'] = $cmds;
 			return '';
 		},
-		null
-	);
+	]);
 	if (!isset($final)) {
 		$form->handle = function (&$vdata) use ($handle) {
 			foreach ($vdata['cmds'] as $cmd) {
@@ -759,28 +757,19 @@ function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle
 }
 
 function newZipSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle) {
-	$form = new UOJBs4Form($form_name);
+	$form = new UOJForm($form_name);
 	$name = "zip_ans_{$form_name}";
 	$text = UOJLocale::get('problems::zip file upload introduction', implode(', ', array_map(fn ($req) => $req['file_name'], $requirement)));
-	$browse_text = UOJLocale::get('browse');
 	$html = <<<EOD
 <div id="div-{$name}">
-<label for="input-{$name}">$text</label>
-<input type="file" id="input-{$name}" name="{$name}" style="display:none;" onchange="$('#input-{$name}_path').val($('#input-{$name}').val());" />
-<div class="input-group bot-buffer-md">
-	<input id="input-{$name}_path" class="form-control" type="text" readonly="readonly" />
-	<span class="input-group-append">
-		<button type="button" class="btn btn-primary" style="width:100px; !important" onclick="$('#input-{$name}').click();"><span class="glyphicon glyphicon-folder-open"></span> $browse_text</button>
-	</span>
-</div>
-<span class="help-block invalid-feedback" id="help-{$name}"></span>
+	<label class="form-label" for="input-{$name}">$text</label>
+	<input class="form-control" type="file" id="input-{$name}" name="{$name}" />
+	<span class="help-block invalid-feedback" id="help-{$name}"></span>
 </div>
 EOD;
-
 	$form->addNoVal($name, $html);
-	$form->is_big = true;
-	$form->has_file = true;
-
+	$form->config['is_big'] = true;
+	$form->config['has_file'] = true;
 	$form->handle = function () use ($name, $requirement, $zip_file_name_gen, $handle) {
 		global $myUser;
 
