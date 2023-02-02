@@ -87,11 +87,15 @@ class HTML {
 	}
 
 	public static function tablist($tabs_info, $cur, $type = 'nav-tabs') {
-		$html = '<ul class="nav ' . $type . '" role="tablist">';
+		$html = HTML::tag_begin('ul', ['class' => "nav $type", 'role' => 'tablist']);
 		foreach ($tabs_info as $id => $tab) {
-			$html .= '<li class="nav-item"><a class="nav-link' . ($cur == $id ? ' active' : '') . '" href="' . $tab['url'] . '" role="tab">' . $tab['name'] . '</a></li>';
+			$html .= HTML::tag('li', ['class' => 'nav-item'], HTML::tag('a', [
+				'class' => 'nav-link' . ($cur == $id ? ' active' : ''),
+				'href' => $tab['url'],
+				'role' => 'tab',
+			], $tab['name']));
 		}
-		$html .= '</ul>';
+		$html .= HTML::tag_end('ul');
 		return $html;
 	}
 

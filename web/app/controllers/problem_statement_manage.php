@@ -6,6 +6,27 @@ Auth::check() || redirectToLogin();
 
 UOJProblem::init(UOJRequest::get('id')) || UOJResponse::page404();
 UOJProblem::cur()->userCanManage(Auth::user()) || UOJResponse::page403();
+
+$tabs_info = [
+	'statement' => [
+		'name' => '题面',
+		'url' => UOJProblem::cur()->getUri('/manage/statement'),
+	],
+	'permissions' => [
+		'name' => '权限',
+		'url' => UOJProblem::cur()->getUri('/manage/permissions'),
+	],
+];
+
+if (UOJProblem::info('type') === 'local') {
+	$tabs_info['data'] = [
+		'name' => '数据',
+		'url' => UOJProblem::cur()->getUri('/manage/data'),
+	];
+} else if (UOJProblem::info('type') === 'remote') {
+	//
+}
+
 $problem_content = UOJProblem::cur()->queryContent();
 
 $problem_editor = new UOJBlogEditor();
@@ -195,102 +216,9 @@ if (UOJProblem::info('type') == 'remote') {
 	$convert_local_form->config['confirm']['text'] = '您真的要*不可逆*地将本题转换为本地题目吗？';
 	$convert_local_form->runAtServer();
 }
-
-$view_type_form = new UOJForm('view_type');
-$view_type_form->addSelect('view_content_type', [
-	'div_class' => 'row align-items-center g-0',
-	'label_class' => 'form-label col-auto m-0 flex-grow-1',
-	'select_class' => 'col-auto form-select w-auto',
-	'label' => '查看提交文件',
-	'options' => [
-		'NONE' => '禁止',
-		'ALL_AFTER_AC' => 'AC 后',
-		'ALL' => '所有人',
-	],
-	'default_value' => UOJProblem::cur()->getExtraConfig('view_content_type'),
-]);
-$view_type_form->addSelect('view_all_details_type', [
-	'div_class' => 'row align-items-center g-0 mt-3',
-	'label_class' => 'form-label col-auto m-0 flex-grow-1',
-	'select_class' => 'col-auto form-select w-auto',
-	'label' => '查看全部详细信息',
-	'options' => [
-		'NONE' => '禁止',
-		'SELF' => '仅自己',
-		'ALL_AFTER_AC' => 'AC 后',
-		'ALL' => '所有人'
-	],
-	'default_value' => UOJProblem::cur()->getExtraConfig('view_all_details_type'),
-]);
-$view_type_form->addSelect('view_details_type', [
-	'div_class' => 'row align-items-center g-0 mt-3',
-	'label_class' => 'form-label col-auto m-0 flex-grow-1',
-	'select_class' => 'col-auto form-select w-auto',
-	'label' => '查看测试点详细信息',
-	'options' => [
-		'NONE' => '禁止',
-		'SELF' => '仅自己',
-		'ALL_AFTER_AC' => 'AC 后',
-		'ALL' => '所有人',
-	],
-	'default_value' => UOJProblem::cur()->getExtraConfig('view_details_type'),
-]);
-$view_type_form->handle = function () {
-	$config = UOJProblem::cur()->getExtraConfig();
-	$config['view_content_type'] = $_POST['view_content_type'];
-	$config['view_all_details_type'] = $_POST['view_all_details_type'];
-	$config['view_details_type'] = $_POST['view_details_type'];
-	$esc_config = json_encode($config);
-
-	DB::update([
-		"update problems",
-		"set", ["extra_config" => $esc_config],
-		"where", ["id" => UOJProblem::info('id')]
-	]);
-};
-$view_type_form->runAtServer();
-
-$solution_view_type_form = new UOJForm('solution_view_type');
-$solution_view_type_form->addSelect('view_solution_type', [
-	'div_class' => 'row align-items-center g-0',
-	'label_class' => 'form-label col-auto m-0 flex-grow-1',
-	'select_class' => 'col-auto form-select w-auto',
-	'label' => '查看题解',
-	'options' => [
-		'NONE' => '禁止',
-		'ALL_AFTER_AC' => 'AC 后',
-		'ALL' => '所有人',
-	],
-	'default_value' => UOJProblem::cur()->getExtraConfig('view_solution_type'),
-]);
-$solution_view_type_form->addSelect('submit_solution_type', [
-	'div_class' => 'row align-items-center g-0 mt-3',
-	'label_class' => 'form-label col-auto m-0 flex-grow-1',
-	'select_class' => 'col-auto form-select w-auto',
-	'label' => '提交题解',
-	'options' => [
-		'NONE' => '禁止',
-		'ALL_AFTER_AC' => 'AC 后',
-		'ALL' => '所有人',
-	],
-	'default_value' =>  UOJProblem::cur()->getExtraConfig('submit_solution_type'),
-]);
-$solution_view_type_form->handle = function () {
-	$config = UOJProblem::cur()->getExtraConfig();
-	$config['view_solution_type'] = $_POST['view_solution_type'];
-	$config['submit_solution_type'] = $_POST['submit_solution_type'];
-	$esc_config = json_encode($config);
-
-	DB::update([
-		"update problems",
-		"set", ["extra_config" => $esc_config],
-		"where", ["id" => UOJProblem::info('id')]
-	]);
-};
-$solution_view_type_form->runAtServer();
 ?>
 
-<?php echoUOJPageHeader('题面编辑 - ' . HTML::stripTags(UOJProblem::info('title'))) ?>
+<?php echoUOJPageHeader('题面管理 - ' . HTML::stripTags(UOJProblem::info('title'))) ?>
 
 <div class="row">
 	<!-- left col -->
@@ -299,25 +227,9 @@ $solution_view_type_form->runAtServer();
 			<?= UOJProblem::cur()->getTitle(['with' => 'id']) ?> 管理
 		</h1>
 
-		<ul class="nav nav-pills my-3" role="tablist">
-			<li class="nav-item">
-				<a class="nav-link active" href="/problem/<?= UOJProblem::info('id') ?>/manage/statement" role="tab">
-					题面
-				</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="/problem/<?= UOJProblem::info('id') ?>/manage/managers" role="tab">
-					管理者
-				</a>
-			</li>
-			<?php if (UOJProblem::info('type') == 'local') : ?>
-				<li class="nav-item">
-					<a class="nav-link" href="/problem/<?= UOJProblem::info('id') ?>/manage/data" role="tab">
-						数据
-					</a>
-				</li>
-			<?php endif ?>
-		</ul>
+		<div class="my-3">
+			<?= HTML::tablist($tabs_info, 'statement', 'nav-pills') ?>
+		</div>
 
 		<div class="card card-default">
 			<div class="card-body">
@@ -330,7 +242,7 @@ $solution_view_type_form->runAtServer();
 			<div class="card-body">
 				<h2 class="h3 card-title">提示</h2>
 				<ol>
-					<li>请勿引用不稳定的外部资源（如来自个人服务器的图片或文档等），以便备份及后期维护；</li>
+					<li>请勿引用不稳定的外部资源（如来自个人服务器的图片或文档等），可以上传至 <a href="<?= UOJProblem::cur()->getUri('/resources') ?>">题目资源</a> 中，以便备份及后期维护；</li>
 					<li>请勿在题面中直接插入大段 HTML 代码，这可能会破坏页面的显示，可以考虑使用 <a class="text-decoration-none" href="/apps/html2markdown" target="_blank">转换工具</a> 转换后再作修正；</li>
 					<li>图片上传推荐使用 <a class="text-decoration-none" href="/apps/image_hosting" target="_blank">S2OJ 图床</a>，以免后续产生外链图片大量失效的情况。</li>
 				</ol>
@@ -494,24 +406,6 @@ $solution_view_type_form->runAtServer();
 				</div>
 			</div>
 		<?php endif ?>
-
-		<div class="card mt-3">
-			<div class="card-header fw-bold">
-				提交记录可视权限
-			</div>
-			<div class="card-body">
-				<?php $view_type_form->printHTML() ?>
-			</div>
-		</div>
-
-		<div class="card mt-3">
-			<div class="card-header fw-bold">
-				题解可视权限
-			</div>
-			<div class="card-body">
-				<?php $solution_view_type_form->printHTML() ?>
-			</div>
-		</div>
 	</aside>
 </div>
 

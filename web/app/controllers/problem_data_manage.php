@@ -11,6 +11,22 @@ requirePHPLib('data');
 UOJProblem::init(UOJRequest::get('id')) || UOJResponse::page404();
 UOJProblem::cur()->userCanManage(Auth::user()) || UOJResponse::page403();
 UOJProblem::info('type') === 'local' || UOJResponse::page404();
+
+$tabs_info = [
+	'statement' => [
+		'name' => '题面',
+		'url' => UOJProblem::cur()->getUri('/manage/statement'),
+	],
+	'permissions' => [
+		'name' => '权限',
+		'url' => UOJProblem::cur()->getUri('/manage/permissions'),
+	],
+	'data' => [
+		'name' => '数据',
+		'url' => UOJProblem::cur()->getUri('/manage/data'),
+	],
+];
+
 $problem = UOJProblem::info();
 $problem_extra_config = UOJProblem::cur()->getExtraConfig();
 
@@ -535,23 +551,9 @@ if ($problem['hackable']) {
 			<?= UOJProblem::cur()->getTitle(['with' => 'id']) ?> 管理
 		</h1>
 
-		<ul class="nav nav-pills my-3" role="tablist">
-			<li class="nav-item">
-				<a class="nav-link" href="<?= UOJProblem::cur()->getUri('/manage/statement') ?>" role="tab">
-					题面
-				</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="<?= UOJProblem::cur()->getUri('/manage/managers') ?>" role="tab">
-					管理者
-				</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link active" href="<?= UOJProblem::cur()->getUri('/manage/data') ?>" role="tab">
-					数据
-				</a>
-			</li>
-		</ul>
+		<div class="my-3">
+			<?= HTML::tablist($tabs_info, 'data', 'nav-pills') ?>
+		</div>
 
 		<div class="card">
 			<div class="card-header" id="div-file_list">

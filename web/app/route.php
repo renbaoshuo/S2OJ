@@ -25,7 +25,7 @@ Route::group(
 		Route::any('/problem/{id}/statistics', '/problem_statistics.php');
 		Route::any('/problem/{id}/resources(?:/{sub_path})?', '/problem_resources.php');
 		Route::any('/problem/{id}/manage/statement', '/problem_statement_manage.php');
-		Route::any('/problem/{id}/manage/managers', '/problem_managers_manage.php');
+		Route::any('/problem/{id}/manage/permissions', '/problem_permissions_manage.php');
 		Route::any('/problem/{id}/manage/data', '/problem_data_manage.php');
 		Route::any('/download/testlib.h', '/download.php?type=testlib.h');
 		Route::any('/download/problem/{id}/data.zip', '/download.php?type=problem');
