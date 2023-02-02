@@ -92,7 +92,7 @@ class AccountService {
       await this.api.waitForSubmission(problem_id, rid, next, end);
     } catch (e) {
       logger.error(e);
-      await end({ error: true, message: e.message });
+      await end({ error: true, status: 'Judgment Failed', message: e.message });
     }
   }
 

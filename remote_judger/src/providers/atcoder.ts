@@ -244,7 +244,7 @@ export default class AtcoderProvider implements IBasicProvider {
     const status_url = `/contests/${contestId}/submissions/me/status/json?reload=true&sids[]=${id}`;
 
     while (true) {
-      if (++i > 60) {
+      if (++i > 180) {
         return await end({
           id,
           error: true,
@@ -253,7 +253,7 @@ export default class AtcoderProvider implements IBasicProvider {
         });
       }
 
-      await sleep(2000);
+      await sleep(1000);
       const { body, error, header } = await this.get(status_url).retry(3);
 
       if (header['set-cookie']) {

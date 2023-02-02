@@ -255,7 +255,7 @@ export default class LibreojProvider implements IBasicProvider {
     let i = 0;
 
     while (true) {
-      if (++i > 60) {
+      if (++i > 180) {
         return await end({
           id,
           error: true,

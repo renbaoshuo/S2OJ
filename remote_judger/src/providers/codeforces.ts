@@ -294,7 +294,7 @@ export default class CodeforcesProvider implements IBasicProvider {
     let i = 0;
 
     while (true) {
-      if (++i > 60) {
+      if (++i > 180) {
         return await end({
           id,
           error: true,
@@ -303,7 +303,7 @@ export default class CodeforcesProvider implements IBasicProvider {
         });
       }
 
-      await sleep(3000);
+      await sleep(1000);
       const { body, error } = await this.post('/data/submitSource')
         .send({
           csrf_token: this.csrf,

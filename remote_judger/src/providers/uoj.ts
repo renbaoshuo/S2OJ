@@ -206,7 +206,7 @@ export default class UOJProvider implements IBasicProvider {
     let i = 0;
 
     while (true) {
-      if (++i > 60) {
+      if (++i > 180) {
         return await end({
           id,
           error: true,
@@ -215,7 +215,7 @@ export default class UOJProvider implements IBasicProvider {
         });
       }
 
-      await sleep(2000);
+      await sleep(1000);
       const { text } = await this.get(`/submission/${id}`);
       const {
         window: { document },
