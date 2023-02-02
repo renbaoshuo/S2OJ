@@ -25,7 +25,7 @@ return [
 	'source code' => 'Source code',
 	'text file' => 'Text file',
 	'zip file upload introduction' => function($str) {
-		return "Upload a .zip file containing $str:";
+		return "Please upload the file(s) named as $str. We will unzip any ZIP file that you upload.";
 	},
 	'or upload files one by one' => 'or upload files one by one:',
 	'accepted submissions' => 'Accepted Submissions',

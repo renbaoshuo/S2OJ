@@ -368,3 +368,13 @@ form.form-horizontal {
 	display: block;
 	font-size: 90%;
 }
+
+/* Dropzone Form */
+
+.dropzone .dz-preview.dz-file-preview .dz-image {
+	background: #e9ecef !important;
+}
+
+.dropzone .dz-preview .dz-progress {
+	height: 6px !important;
+}

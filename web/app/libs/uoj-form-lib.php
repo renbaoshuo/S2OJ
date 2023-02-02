@@ -61,11 +61,7 @@ function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle
 	}
 
 	$form->handle = function (&$vdata) use ($form_name, $requirement, $zip_file_name_gen, $handle) {
-		global $myUser;
-
-		if ($myUser == null) {
-			redirectToLogin();
-		}
+		Auth::check() || UOJResponse::page406('请登录后再提交');
 
 		$tot_size = 0;
 		$zip_file_name = $zip_file_name_gen();
@@ -117,76 +113,150 @@ function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle
 }
 
 function newZipSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle) {
-	$form = new UOJForm($form_name);
-	$name = "zip_ans_{$form_name}";
-	$text = UOJLocale::get('problems::zip file upload introduction', implode(', ', array_map(fn ($req) => $req['file_name'], $requirement)));
-	$html = <<<EOD
-<div id="div-{$name}">
-	<label class="form-label" for="input-{$name}">$text</label>
-	<input class="form-control" type="file" id="input-{$name}" name="{$name}" />
-	<span class="help-block invalid-feedback" id="help-{$name}"></span>
-</div>
-EOD;
-	$form->addNoVal($name, $html);
-	$form->config['is_big'] = true;
-	$form->config['has_file'] = true;
-	$form->handle = function () use ($name, $requirement, $zip_file_name_gen, $handle) {
-		global $myUser;
-
-		if ($myUser == null) {
-			redirectToLogin();
-		}
-
-		if (!isset($_FILES[$name])) {
-			becomeMsgPage('你在干啥……怎么什么都没交过来……？');
-		} elseif (!is_uploaded_file($_FILES[$name]['tmp_name'])) {
-			becomeMsgPage('上传出错，貌似你什么都没交过来……？');
-		}
-
-		$up_zip_file = new ZipArchive();
-		if ($up_zip_file->open($_FILES[$name]['tmp_name']) !== true) {
-			becomeMsgPage('不是合法的zip压缩文件');
-		}
-
-		$tot_size = 0;
-		$zip_content = array();
-		foreach ($requirement as $req) {
-			$stat = $up_zip_file->statName($req['file_name']);
-			if ($stat === false) {
-				$zip_content[$req['name']] = '';
-			} else {
-				$tot_size += $stat['size'];
-				if ($stat['size'] > 20 * 1024 * 1024) {
-					becomeMsgPage("文件 {$req['file_name']} 实际大小过大。");
+	$form = new DropzoneForm(
+		$form_name,
+		[],
+		[
+			'accept' => <<<EOD
+				function(file, done) {
+					if (file.size > 0) {
+						done();
+					} else {
+						done('请不要上传空文件！');
+					}
 				}
-				$ret = $up_zip_file->getFromName($req['file_name']);
-				if ($ret === false) {
-					$zip_content[$req['name']] = '';
-				} else {
-					$zip_content[$req['name']] = $ret;
+			EOD,
+		]
+	);
+	$form->introduction = HTML::tag('p', [], UOJLocale::get(
+		'problems::zip file upload introduction',
+		'<b>' . implode(', ', array_map(fn ($req) => $req['file_name'], $requirement)) . '</b>'
+	));
+
+	$form->handler = function ($form) use ($requirement, $zip_file_name_gen, $handle) {
+		Auth::check() || UOJResponse::page406('请登录后再提交');
+
+		$files = $form->getFiles();
+		if (count($files) == 0) {
+			UOJResponse::page406('上传出错：请提交至少一个文件');
+		}
+
+		$reqset = [];
+		foreach ($requirement as $req) {
+			$file_name = strtolower($req['file_name']);
+			$reqset[$file_name] = true;
+		}
+
+		$fdict = [];
+		$single_file_size_limit = 20 * 1024 * 1024;
+
+		$invalid_zip_msg = '不是合法的 zip 压缩文件（压缩包里的文件名是否包含特殊字符？或者换个压缩软件试试？）';
+
+		foreach ($files as $name => $file) {
+			if (strEndWith(strtolower($name), '.zip')) {
+				$up_zip_file = new ZipArchive();
+				if ($up_zip_file->open($files[$name]['tmp_name']) !== true) {
+					UOJResponse::page406("{$name} {$invalid_zip_msg}");
+				}
+				for ($i = 0; $i < $up_zip_file->numFiles; $i++) {
+					$stat = $up_zip_file->statIndex($i);
+					if ($stat === false) {
+						UOJResponse::page406("{$name} {$invalid_zip_msg}");
+					}
+					$file_name = strtolower(basename($stat['name']));
+					if ($stat['size'] > $single_file_size_limit) {
+						UOJResponse::page406("压缩包内文件 {$file_name} 实际大小过大。");
+					}
+					if ($stat['size'] == 0) { // skip empty files and directories
+						continue;
+					}
+					if (empty($reqset[$file_name])) {
+						UOJResponse::page406("压缩包内包含了题目不需要的文件：{$file_name}");
+					}
+					if (isset($fdict[$file_name])) {
+						UOJResponse::page406("压缩包内的文件出现了重复的文件名：{$file_name}");
+					}
+					$fdict[$file_name] = [
+						'zip' => $up_zip_file,
+						'zip_name' => $name,
+						'size' => $stat['size'],
+						'index' => $i
+					];
 				}
 			}
 		}
-		$up_zip_file->close();
+
+		foreach ($files as $name => $file) {
+			if (!strEndWith(strtolower($name), '.zip')) {
+				$file_name = strtolower($name);
+				if ($file['size'] > $single_file_size_limit) {
+					UOJResponse::page406("文件 {$file_name} 大小过大。");
+				}
+				if ($file['size'] == 0) { // skip empty files
+					continue;
+				}
+				if (empty($reqset[$name])) {
+					UOJResponse::page406("上传了题目不需要的文件：{$file_name}");
+				}
+				if (isset($fdict[$file_name])) {
+					UOJResponse::page406("压缩包内的文件和直接上传的文件中出现了重复的文件名：{$file_name}");
+				}
+				$fdict[$file_name] = [
+					'zip' => false,
+					'size' => $file['size'],
+					'name' => $name
+				];
+			}
+		}
+
+		$tot_size = 0;
+		$up_content = [];
+		$is_empty = true;
+		foreach ($requirement as $req) {
+			$file_name = strtolower($req['file_name']);
+			if (empty($fdict[$file_name])) {
+				$up_content[$req['name']] = '';
+				continue;
+			}
+
+			$is_empty = false;
+			$tot_size += $fdict[$file_name]['size'];
+
+			if ($fdict[$file_name]['zip']) {
+				$ret = $fdict[$file_name]['zip']->getFromIndex($fdict[$file_name]['index']);
+				if ($ret === false) {
+					UOJResponse::page406("{$fdict[$file_name]['zip_name']} {$invalid_zip_msg}");
+				}
+				$up_content[$req['name']] = $ret;
+			} else {
+				$up_content[$req['name']] = file_get_contents($files[$fdict[$file_name]['name']]['tmp_name']);
+			}
+		}
+
+		if ($is_empty) {
+			UOJResponse::page406('未上传任何题目要求的文件');
+		}
 
 		$zip_file_name = $zip_file_name_gen();
 
 		$zip_file = new ZipArchive();
 		if ($zip_file->open(UOJContext::storagePath() . $zip_file_name, ZipArchive::CREATE) !== true) {
-			becomeMsgPage('提交失败');
+			UOJResponse::page406('提交失败：可能是服务器空间不足导致的');
 		}
 
 		foreach ($requirement as $req) {
-			$zip_file->addFromString($req['file_name'], $zip_content[$req['name']]);
+			$zip_file->addFromString($req['file_name'], $up_content[$req['name']]);
 		}
 		$zip_file->close();
 
-		$content = array();
-		$content['file_name'] = $zip_file_name;
-		$content['config'] = array();
+		$content = [
+			'file_name' => $zip_file_name,
+			'config' => []
+		];
 
 		$handle($zip_file_name, $content, $tot_size);
 	};
+
 	return $form;
 }
 

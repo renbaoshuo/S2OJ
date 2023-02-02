@@ -25,7 +25,7 @@ return [
 	'source code' => '源代码',
 	'text file' => '文本文件',
 	'zip file upload introduction' => function($str) {
-		return "上传一个 zip 压缩文件，包含 {$str}：";
+		return "请上传你要提交的文件，并命名为 {$str}。如果你提交了 zip 压缩包，我们会为你自动解压。";
 	},
 	'or upload files one by one' => '或者逐个上传：',
 	'accepted submissions' => '满分提交',
