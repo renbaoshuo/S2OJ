@@ -2,7 +2,6 @@
 requireLib('bootstrap5');
 requireLib('hljs');
 requireLib('mathjax');
-requireLib('pdf.js');
 requirePHPLib('form');
 requirePHPLib('judger');
 

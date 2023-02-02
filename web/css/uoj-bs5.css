@@ -235,7 +235,8 @@ h6,
 /* PDF */
 
 .pdf-page-canvas {
-	width: 100% !important;
+	/* min-width: 100%; */
+	max-width: 100%;
 }
 
 /* Form */

@@ -1052,6 +1052,65 @@ function showCommentReplies(id, replies) {
 	);
 }
 
+// PDF
+$(document).ready(function() {
+	$('div[data-pdf]').each(function() {
+		$(this).append(
+			$('<div class="uoj-pdf-loading-spinner border d-flex flex-column justify-content-center align-items-center" style="width: 100%; height: 350px;" />')
+				.append('<div class="spinner-border text-muted" style="width: 3rem; height: 3rem;" />')
+				.append('<div class="mt-3">Loading PDF...</div>')
+			);
+	});
+
+	$LAB.script('/js/pdf.js').wait(function() {
+		pdfjsLib.GlobalWorkerOptions.workerSrc = '/js/pdf.worker.js';
+
+		// Support HiDPI-screens.
+		var outputScale = window.devicePixelRatio || 1;
+
+		$('div[data-pdf]').each(function() {
+			var _this = $(this);
+			var pdf_src = $(this).data('src');
+
+			$(this).css('width', '100%').css('height', '100%');
+
+			var task = pdfjsLib.getDocument(pdf_src);
+			var id = 'pdf_' + task.docId;
+
+			$(this).attr('id', id + '_container');
+
+			task.promise.then(function(pdf) {
+				for (var i = 1; i <= pdf.numPages; i++) {
+					$(_this).append('<canvas id="' + id + '_page_' + i + '" class="pdf-page-canvas"></canvas>');
+
+					pdf.getPage(i).then(function(page) {
+						var viewport = page.getViewport({
+							scale: 2.5,
+						});
+
+						var canvas = document.getElementById(id + '_page_' + page.pageNumber);
+
+						canvas.height = Math.floor(viewport.height * outputScale);
+						canvas.width = Math.floor(viewport.width * outputScale);
+
+						var transform = outputScale !== 1
+							? [outputScale, 0, 0, outputScale, 0, 0]
+							: null;
+
+						page.render({
+							canvasContext: canvas.getContext('2d'),
+							viewport: viewport,
+							transform: transform,
+						});
+					});
+				}
+
+				$('.uoj-pdf-loading-spinner', _this).remove();
+			});
+		});
+	});
+});
+
 // Tooltip
 $(document).ready(function() {
 	bootstrap.Tooltip.jQueryInterface.call($('[data-bs-toggle="tooltip"]'));

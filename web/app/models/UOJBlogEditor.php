@@ -185,7 +185,6 @@ class UOJBlogEditor {
 			if ($this->type == 'blog') {
 				$req_lib = [
 					'mathjax' => '',
-					'pdf.js' => '',
 				];
 
 				if (isset($REQUIRE_LIB['bootstrap5'])) {
