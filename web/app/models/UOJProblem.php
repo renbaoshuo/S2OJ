@@ -562,6 +562,8 @@ class UOJProblem {
 		foreach ($submission_requirement as $req) {
 			if ($req['type'] == 'source code') {
 				return false;
+			} else if ($req['type'] == 'remote submission') {
+				return false;
 			}
 		}
 

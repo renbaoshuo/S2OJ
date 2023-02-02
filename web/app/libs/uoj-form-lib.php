@@ -46,6 +46,7 @@ function newAddDelCmdForm($form_name, $validate, $handle, $final = null) {
 
 function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle) {
 	$form = new UOJForm($form_name);
+
 	foreach ($requirement as $req) {
 		if ($req['type'] == "source code") {
 			$languages = UOJLang::getAvailableLanguages(isset($req['languages']) ? $req['languages'] : null);
@@ -57,6 +58,101 @@ function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle
 			$form->addTextFileInput("{$form_name}_{$req['name']}", [
 				'filename' => $req['file_name'],
 			]);
+		} else if ($req['type'] == "remote submission") {
+			if ($req['name'] == 'luogu') {
+				$form->appendHTML(HTML::tag_begin('div', ['class' => 'row']));
+				$form->appendHTML(HTML::tag(
+					'div',
+					[
+						'class' => 'col-sm-2',
+					],
+					HTML::tag('label', [
+						'class' => 'form-col-label',
+					], '_uid')
+				));
+				$form->addInput("{$form_name}_{$req['name']}_uid", [
+					'div_class' => 'col-sm-4',
+					'validator_php' => function ($x) {
+						if (!validateUInt($x)) {
+							return 'ID 不合法';
+						}
+
+						return '';
+					},
+				]);
+				$form->appendHTML(HTML::tag(
+					'div',
+					[
+						'class' => 'col-sm-6',
+					],
+					HTML::tag('div', [
+						'class' => 'form-text',
+					], '请在 Cookie 中找到 <code>_uid</code>，然后填入框中。')
+				));
+				$form->appendHTML(HTML::tag_end('div'));
+
+				$form->appendHTML(HTML::tag_begin('div', ['class' => 'row mt-3']));
+				$form->appendHTML(HTML::tag(
+					'div',
+					[
+						'class' => 'col-sm-2',
+					],
+					HTML::tag('label', [
+						'class' => 'form-col-label',
+					], '__clientid')
+				));
+				$form->addInput("{$form_name}_{$req['name']}_clientid", [
+					'div_class' => 'col-sm-4',
+					'validator_php' => function ($x) {
+						if (!validateString($x)) {
+							return 'ID 不合法';
+						}
+
+						return '';
+					},
+				]);
+				$form->appendHTML(HTML::tag(
+					'div',
+					[
+						'class' => 'col-sm-6',
+					],
+					HTML::tag('div', [
+						'class' => 'form-text',
+					], '请在 Cookie 中找到 <code>__clientid</code>，然后填入框中。')
+				));
+				$form->appendHTML(HTML::tag_end('div'));
+
+				$form->appendHTML(HTML::tag_begin('div', ['class' => 'row mt-3']));
+				$form->appendHTML(HTML::tag(
+					'div',
+					[
+						'class' => 'col-sm-2',
+					],
+					HTML::tag('label', [
+						'class' => 'form-col-label',
+					], '提交记录 ID')
+				));
+				$form->addInput("{$form_name}_{$req['name']}_submission_id", [
+					'div_class' => 'col-sm-4',
+					'validator_php' => function ($x) {
+						if (!validateUInt($x)) {
+							return 'ID 不合法';
+						}
+
+						return '';
+					},
+				]);
+				$form->appendHTML(HTML::tag(
+					'div',
+					[
+						'class' => 'col-sm-6',
+					],
+					HTML::tag('div', [
+						'class' => 'form-text',
+					], '请填入提交记录 ID（不带开头的字母 <code>R</code>）。')
+				));
+				$form->appendHTML(HTML::tag_end('div'));
+			}
 		}
 	}
 
@@ -74,35 +170,48 @@ function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle
 		$content = [];
 		$content['file_name'] = $zip_file_name;
 		$content['config'] = [];
+
 		foreach ($requirement as $req) {
 			if ($req['type'] == "source code") {
 				$content['config'][] = ["{$req['name']}_language", $_POST["{$form_name}_{$req['name']}_language"]];
+			} else if ($req['type'] == "remote submission") {
+				$content['no_rejudge'] = true;
+
+				if ($req['name'] == "luogu") {
+					$content['config'][] = ["{$req['name']}_uid", $_POST["{$form_name}_{$req['name']}_uid"]];
+					$content['config'][] = ["{$req['name']}_clientid", $_POST["{$form_name}_{$req['name']}_clientid"]];
+					$content['config'][] = ["{$req['name']}_submission_id", $_POST["{$form_name}_{$req['name']}_submission_id"]];
+				}
 			}
 		}
 
 		foreach ($requirement as $req) {
-			if ($_POST["{$form_name}_{$req['name']}_upload_type"] == 'editor') {
-				$zip_file->addFromString($req['file_name'], $_POST["{$form_name}_{$req['name']}_editor"]);
+			if ($req['type'] == "remote submission") {
+				$zip_file->addFromString($req['name'], '');
 			} else {
-				$tmp_name = UOJForm::uploadedFileTmpName("{$form_name}_{$req['name']}_file");
-				if ($tmp_name == null) {
-					$zip_file->addFromString($req['file_name'], '');
+				if ($_POST["{$form_name}_{$req['name']}_upload_type"] == 'editor') {
+					$zip_file->addFromString($req['file_name'], $_POST["{$form_name}_{$req['name']}_editor"]);
 				} else {
-					$zip_file->addFile($tmp_name, $req['file_name']);
+					$tmp_name = UOJForm::uploadedFileTmpName("{$form_name}_{$req['name']}_file");
+					if ($tmp_name == null) {
+						$zip_file->addFromString($req['file_name'], '');
+					} else {
+						$zip_file->addFile($tmp_name, $req['file_name']);
+					}
 				}
-			}
-			$stat = $zip_file->statName($req['file_name']);
+				$stat = $zip_file->statName($req['file_name']);
 
-			if ($req['type'] == 'source code') {
-				$max_size = isset($req['size']) ? (int)$req['size'] : 100;
-				if ($stat['size'] > $max_size * 1024) {
-					$zip_file->close();
-					unlink(UOJContext::storagePath() . $zip_file_name);
-					UOJResponse::message("源代码长度不能超过 {$max_size} kB。");
+				if ($req['type'] == 'source code') {
+					$max_size = isset($req['size']) ? (int)$req['size'] : 100;
+					if ($stat['size'] > $max_size * 1024) {
+						$zip_file->close();
+						unlink(UOJContext::storagePath() . $zip_file_name);
+						UOJResponse::message("源代码长度不能超过 {$max_size} kB。");
+					}
 				}
-			}
 
-			$tot_size += $stat['size'];
+				$tot_size += $stat['size'];
+			}
 		}
 
 		$zip_file->close();

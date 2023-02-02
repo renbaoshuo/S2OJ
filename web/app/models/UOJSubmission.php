@@ -89,7 +89,8 @@ class UOJSubmission {
 		$content['config'][] = ['problem_id', UOJProblem::info('id')];
 
 		if (UOJProblem::info('type') == 'remote') {
-			$content['config'][] = ['remote_online_judge', UOJProblem::cur()->getExtraConfig('remote_online_judge')];
+			$remote_online_judge = UOJProblem::cur()->getExtraConfig('remote_online_judge');
+			$content['config'][] = ['remote_online_judge', $remote_online_judge];
 			$content['config'][] = ['remote_problem_id', UOJProblem::cur()->getExtraConfig('remote_problem_id')];
 		}
 
@@ -418,6 +419,10 @@ class UOJSubmission {
 	}
 
 	public function userCanRejudge(array $user = null) {
+		if ($this->getContent('no_rejudge')) {
+			return false;
+		}
+
 		if (isSuperUser($user)) {
 			return true;
 		}

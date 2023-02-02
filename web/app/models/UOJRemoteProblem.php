@@ -40,6 +40,12 @@ class UOJRemoteProblem {
 			'url' => 'https://loj.ac',
 			'languages' => ['C', 'C++03', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java17', 'Pascal'],
 		],
+		'luogu' => [
+			'name' => '洛谷',
+			'short_name' => '洛谷',
+			'url' => 'https://www.luogu.com.cn',
+			'languages' => [],
+		],
 	];
 
 	static function curl_get($url) {
@@ -391,6 +397,28 @@ class UOJRemoteProblem {
 			'memory_limit' => $res['judgeInfo']['memoryLimit'],
 			'difficulty' => -1,
 			'statement' => HTML::parsedown()->text($statement),
+		];
+	}
+
+	public static function getSubmissionRequirements($oj) {
+		$remote_provider = UOJRemoteProblem::$providers[$oj];
+
+		if ($oj == 'luogu') {
+			return [
+				[
+					"name" => "luogu",
+					"type" => "remote submission",
+				]
+			];
+		}
+
+		return [
+			[
+				"name" => "answer",
+				"type" => "source code",
+				"file_name" => "answer.code",
+				"languages" => $remote_provider['languages'],
+			]
 		];
 	}
 

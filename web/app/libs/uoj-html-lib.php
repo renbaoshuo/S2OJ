@@ -403,7 +403,7 @@ function echoSubmissionContent($submission, $requirement) {
 			echo '</div>';
 			echo '<div class="card-footer">' . $footer_text . '</div>';
 			echo '</div>';
-		} elseif ($req['type'] == "text") {
+		} else if ($req['type'] == "text") {
 			$file_content = $zip_file->getFromName("{$req['file_name']}", 504);
 			$file_content = strOmit($file_content, 500);
 			$file_content = uojTextEncode($file_content, array('allow_CR' => true, 'html_escape' => true));
@@ -417,6 +417,22 @@ function echoSubmissionContent($submission, $requirement) {
 			echo '</div>';
 			echo '<div class="card-footer">' . $footer_text . '</div>';
 			echo '</div>';
+		} else if ($req['type'] == "remote submission") {
+			$remote_provider = UOJRemoteProblem::$providers[$req['name']];
+			$content = '';
+
+			if ($req['name'] == 'luogu') {
+				$content .= '<p>远端评测 ID：' .
+					HTML::tag(
+						'a',
+						[
+							'href' => $remote_provider['url'] . '/record/' . $config['luogu_submission_id']
+						],
+						'R' . $config['luogu_submission_id']
+					) . '</p>';
+			}
+
+			HTML::echoPanel('', '远端评测记录', $content);
 		}
 	}
 
