@@ -96,6 +96,10 @@ class UOJRemoteProblem {
 		return static::$providers['loj']['url'] . '/p/' . $id;
 	}
 
+	static function getLuoguProblemUrl($id) {
+		return static::$providers['luogu']['url'] . '/problem/' . $id;
+	}
+
 	static function getCodeforcesProblemBasicInfoFromHtml($id, $html) {
 		$remote_provider = static::$providers['codeforces'];
 
@@ -400,6 +404,59 @@ class UOJRemoteProblem {
 		];
 	}
 
+	static function getLuoguProblemBasicInfo($id) {
+		$remote_provider = static::$providers['luogu'];
+		$res = static::curl_get(static::getLuoguProblemUrl($id) . '?_contentOnly=1');
+
+		if (!$res) return null;
+
+		// Convert stdClass to array
+		$res = json_decode(json_encode($res['response']), true);
+
+		if (!isset($res['code']) || $res['code'] != 200) return null;
+
+		$problem = $res['currentData']['problem'];
+		$statement = '';
+
+		if ($problem['background']) {
+			$statement .= "\n### 题目背景\n\n";
+			$statement .= $problem['background'] . "\n";
+		}
+
+		$statement .= "\n### 题目描述\n\n";
+		$statement .= $problem['description'] . "\n";
+
+		$statement .= "\n### 输入格式\n\n";
+		$statement .= $problem['inputFormat'] . "\n";
+
+		$statement .= "\n### 输出格式\n\n";
+		$statement .= $problem['outputFormat'] . "\n";
+
+		$statement .= "\n### 输入输出样例\n\n";
+
+		foreach ($problem['samples'] as $id => $sample) {
+			$display_sample_id = $id + 1;
+
+			$statement .= "\n#### 样例输入 #{$display_sample_id}\n\n";
+			$statement .= "\n```text\n{$sample[0]}\n```\n\n";
+
+			$statement .= "\n#### 样例输出 #{$display_sample_id}\n\n";
+			$statement .= "\n```text\n{$sample[1]}\n```\n\n";
+		}
+
+		$statement .= "\n### 说明/提示\n\n";
+		$statement .= $problem['hint'] . "\n";
+
+		return [
+			'type' => 'html',
+			'title' => "【{$remote_provider['short_name']}{$problem['pid']}】{$problem['title']}",
+			'time_limit' => (float)max($problem['limits']['time']) / 1000.0,
+			'memory_limit' => (float)max($problem['limits']['memory']) / 1024.0,
+			'difficulty' => -1,
+			'statement' => HTML::parsedown()->text($statement),
+		];
+	}
+
 	public static function getSubmissionRequirements($oj) {
 		$remote_provider = UOJRemoteProblem::$providers[$oj];
 
@@ -431,6 +488,8 @@ class UOJRemoteProblem {
 			return static::getUojProblemUrl($id);
 		} else if ($oj === 'loj') {
 			return static::getLojProblemUrl($id);
+		} else if ($oj === 'luogu') {
+			return static::getLuoguProblemUrl($id);
 		}
 
 		return null;
@@ -446,6 +505,8 @@ class UOJRemoteProblem {
 			return static::getUojProblemBasicInfo($id);
 		} else if ($oj === 'loj') {
 			return static::getLojProblemBasicInfo($id);
+		} else if ($oj === 'luogu') {
+			return static::getLuoguProblemBasicInfo($id);
 		}
 
 		return null;

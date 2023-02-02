@@ -79,3 +79,7 @@ function is_short_string($str) {
 function validateCodeforcesProblemId($str) {
 	return preg_match('/(|GYM)[1-9][0-9]{0,5}[A-Z][1-9]?/', $str) !== true;
 }
+
+function validateLuoguProblemId($str) {
+	return preg_match('/P[1-9][0-9]{4,5}/', $str) !== true;
+}

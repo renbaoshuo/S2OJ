@@ -176,6 +176,7 @@ function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle
 				$content['config'][] = ["{$req['name']}_language", $_POST["{$form_name}_{$req['name']}_language"]];
 			} else if ($req['type'] == "remote submission") {
 				$content['no_rejudge'] = true;
+				$content['manual_submit'] = true;
 
 				if ($req['name'] == "luogu") {
 					$content['config'][] = ["{$req['name']}_uid", $_POST["{$form_name}_{$req['name']}_uid"]];

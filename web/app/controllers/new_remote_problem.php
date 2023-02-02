@@ -52,6 +52,16 @@ $new_remote_problem_form->addInput('remote_problem_id', [
 			$vdata['remote_problem_id'] = $id;
 
 			return '';
+		} else if ($remote_oj === 'luogu') {
+			$id = trim(strtoupper($id));
+
+			if (!validateLuoguProblemId($id)) {
+				return '不合法的题目 ID';
+			}
+
+			$vdata['remote_problem_id'] = $id;
+
+			return '';
 		}
 
 		return '不合法的远程 OJ 类型';
