@@ -54,45 +54,44 @@ if (UOJRequest::post('submit-remove_solution') === 'remove_solution') {
 
 if (UOJProblem::cur()->userCanManage(Auth::user()) || UOJProblem::cur()->userPermissionCodeCheck(Auth::user(), UOJProblem::cur()->getExtraConfig('submit_solution_type'))) {
 	$add_new_solution_form = new UOJForm('add_new_solution');
-	$add_new_solution_form->addInput(
-		'blog_id_2',
-		[
-			'placeholder' => '博客 ID',
-			'validator_php' => function ($blog_id, &$vdata) {
-				$blog = UOJBlog::query($blog_id);
+	$add_new_solution_form->addInput('blog_id_2', [
+		'div_class' => 'flex-grow-1',
+		'placeholder' => '博客 ID',
+		'validator_php' => function ($blog_id, &$vdata) {
+			$blog = UOJBlog::query($blog_id);
 
-				if (!$blog) {
-					return '博客不存在';
-				}
+			if (!$blog) {
+				return '博客不存在';
+			}
 
-				if (!$blog->userCanManage(Auth::user())) {
-					if ($blog->info['poster'] != Auth::id()) {
-						if ($blog->info['is_hidden']) {
-							return '博客不存在';
-						}
-
-						return '只能提交本人撰写的博客';
-					}
-				}
-
-				if (!UOJProblem::cur()->userCanManage(Auth::user())) {
+			if (!$blog->userCanManage(Auth::user())) {
+				if ($blog->info['poster'] != Auth::id()) {
 					if ($blog->info['is_hidden']) {
-						return '只能提交公开的博客';
+						return '博客不存在';
 					}
+
+					return '只能提交本人撰写的博客';
 				}
+			}
 
-				if ($problem_id = $blog->getSolutionProblemId()) {
-					return "该博客已经是题目 #$problem_id 的题解";
+			if (!UOJProblem::cur()->userCanManage(Auth::user())) {
+				if ($blog->info['is_hidden']) {
+					return '只能提交公开的博客';
 				}
+			}
 
-				$vdata['blog'] = $blog;
+			if ($problem_id = $blog->getSolutionProblemId()) {
+				return "该博客已经是题目 #$problem_id 的题解";
+			}
 
-				return '';
-			},
-		]
-	);
+			$vdata['blog'] = $blog;
+
+			return '';
+		},
+	]);
+	$add_new_solution_form->config['form']['class'] = 'd-flex';
+	$add_new_solution_form->config['submit_container']['class'] = 'ms-2';
 	$add_new_solution_form->config['submit_button']['text'] = '发布';
-	$add_new_solution_form->config['submit_button']['class'] = 'btn btn-secondary';
 	$add_new_solution_form->handle = function (&$vdata) {
 		DB::insert([
 			"insert into problems_solutions",
