@@ -4,7 +4,6 @@ import proxy from 'superagent-proxy';
 import Logger from './utils/logger';
 import sleep from './utils/sleep';
 import * as TIME from './utils/time';
-import htmlspecialchars from './utils/htmlspecialchars';
 import { apply } from './vjudge';
 import path from 'path';
 import child from 'child_process';
@@ -56,9 +55,9 @@ export default async function daemon(config: UOJConfig) {
       if (error) {
         logger.error('/submit', error.message);
 
-        await sleep(3 * TIME.second);
+        await sleep(2 * TIME.second);
       } else if (text.startsWith('Nothing to judge')) {
-        await sleep(3 * TIME.second);
+        await sleep(TIME.second);
       } else {
         const data: UOJSubmission = JSON.parse(text);
         const { id, content, judge_time } = data;
@@ -85,7 +84,35 @@ export default async function daemon(config: UOJConfig) {
 
         fs.ensureDirSync(tmpdir);
 
-        const reportError = async (error: string, details: string) => {
+        let code = '';
+
+        try {
+          // Download source code
+          logger.debug('Downloading source code.', id);
+          const zipFilePath = path.resolve(tmpdir, 'all.zip');
+          const res = request(`/download${content.file_name}`);
+          const stream = fs.createWriteStream(zipFilePath);
+          res.pipe(stream);
+          await new Promise((resolve, reject) => {
+            stream.on('finish', resolve);
+            stream.on('error', reject);
+          });
+
+          // Extract source code
+          logger.debug('Extracting source code.', id);
+          const extractedPath = path.resolve(tmpdir, 'all');
+          await new Promise((resolve, reject) => {
+            child.exec(`unzip ${zipFilePath} -d ${extractedPath}`, e => {
+              if (e) reject(e);
+              else resolve(true);
+            });
+          });
+
+          // Read source code
+          logger.debug('Reading source code.', id);
+          const sourceCodePath = path.resolve(extractedPath, 'answer.code');
+          code = fs.readFileSync(sourceCodePath, 'utf-8');
+        } catch (e) {
           await request('/submit', {
             submit: true,
             fetch_new: false,
@@ -93,67 +120,17 @@ export default async function daemon(config: UOJConfig) {
             result: JSON.stringify({
               status: 'Judged',
               score: 0,
-              error,
-              details: `<error>${htmlspecialchars(details)}</error>`,
+              error: 'Judgment Failed',
+              details: `<error>Failed to download and extract source code.</error>`,
             }),
             judge_time,
           });
-        };
 
-        // Download source code
-        logger.debug('Downloading source code.', id);
-        const zipFilePath = path.resolve(tmpdir, 'all.zip');
-        const res = request(`/download${content.file_name}`);
-        const stream = fs.createWriteStream(zipFilePath);
-        res.pipe(stream);
-
-        try {
-          await new Promise((resolve, reject) => {
-            stream.on('finish', resolve);
-            stream.on('error', reject);
-          });
-        } catch (e) {
-          await reportError(
-            'Judgment Failed',
-            `Failed to download source code.`
+          logger.error(
+            'Failed to download and extract source code.',
+            id,
+            e.message
           );
-          logger.error('Failed to download source code.', id, e.message);
-
-          fs.removeSync(tmpdir);
-
-          continue;
-        }
-
-        // Unzip source code
-        logger.debug('Unzipping source code.', id);
-        const extractedPath = path.resolve(tmpdir, 'all');
-
-        try {
-          await new Promise((resolve, reject) => {
-            child.exec(`unzip ${zipFilePath} -d ${extractedPath}`, e => {
-              if (e) reject(e);
-              else resolve(true);
-            });
-          });
-        } catch (e) {
-          await reportError('Judgment Failed', `Failed to unzip source code.`);
-          logger.error('Failed to unzip source code.', id, e.message);
-
-          fs.removeSync(tmpdir);
-
-          continue;
-        }
-
-        // Read source code
-        logger.debug('Reading source code.', id);
-        const sourceCodePath = path.resolve(extractedPath, 'answer.code');
-        let code = '';
-
-        try {
-          code = fs.readFileSync(sourceCodePath, 'utf-8');
-        } catch (e) {
-          await reportError('Judgment Failed', `Failed to read source code.`);
-          logger.error('Failed to read source code.', id, e.message);
 
           fs.removeSync(tmpdir);
 
@@ -172,10 +149,19 @@ export default async function daemon(config: UOJConfig) {
             judge_time
           );
         } catch (err) {
-          await reportError(
-            'Judgment Failed',
-            'No details, please contact admin!'
-          );
+          await request('/submit', {
+            submit: true,
+            fetch_new: false,
+            id,
+            result: JSON.stringify({
+              status: 'Judged',
+              score: 0,
+              error: 'Judgment Failed',
+              details: `<error>No details.</error>`,
+            }),
+            judge_time,
+          });
+
           logger.error('Judgment Failed.', id, err.message);
 
           fs.removeSync(tmpdir);
@@ -188,7 +174,7 @@ export default async function daemon(config: UOJConfig) {
     } catch (err) {
       logger.error(err.message);
 
-      await sleep(3 * TIME.second);
+      await sleep(2 * TIME.second);
     }
   }
 }

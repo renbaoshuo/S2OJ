@@ -145,7 +145,7 @@ class VJudge {
   ) {
     if (!this.providers[type]) throw new Error(`no provider ${type}`);
 
-    this.providers[type].judge(id, problem_id, language, code, judge_time);
+    await this.providers[type].judge(id, problem_id, language, code, judge_time);
   }
 }
 
