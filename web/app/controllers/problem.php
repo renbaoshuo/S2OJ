@@ -104,6 +104,17 @@ $custom_test_enabled = $custom_test_requirement && $pre_submit_check_ret === tru
 
 function handleUpload($zip_file_name, $content, $tot_size) {
 	global $is_participating;
+
+	$remote_oj = UOJProblem::cur()->getExtraConfig('remote_online_judge');
+	$remote_provider = UOJRemoteProblem::$providers[$remote_oj];
+
+	if (UOJProblem::info('type') == 'remote') {
+		$submit_type = in_array($_POST['answer_remote_submit_type'], $remote_provider['submit_type']) ? $_POST['answer_remote_submit_type'] : $remote_provider['submit_type'][0];
+		$content['no_rejudge'] = true;
+		$content['config'][] = ['remote_submit_type', $submit_type];
+		$content['config'][] = ['remote_account_data', $_POST['answer_remote_account_data']];
+	}
+
 	UOJSubmission::onUpload($zip_file_name, $content, $tot_size, $is_participating);
 }
 function handleCustomTestUpload($zip_file_name, $content, $tot_size) {
@@ -182,7 +193,7 @@ if ($pre_submit_check_ret === true && !$no_more_submission) {
 
 	if (UOJProblem::cur()->userCanUploadSubmissionViaZip(Auth::user())) {
 		$zip_answer_form = newZipSubmissionForm(
-			'zip-answer',
+			'zip_answer',
 			$submission_requirement,
 			'FS::randomAvailableSubmissionFileName',
 			'handleUpload'
@@ -198,6 +209,24 @@ if ($pre_submit_check_ret === true && !$no_more_submission) {
 		'FS::randomAvailableSubmissionFileName',
 		'handleUpload'
 	);
+
+	if (UOJProblem::info('type') == 'remote') {
+		$remote_oj = UOJProblem::cur()->getExtraConfig('remote_online_judge');
+		$remote_pid = UOJProblem::cur()->getExtraConfig('remote_problem_id');
+		$remote_url = UOJRemoteProblem::getProblemRemoteUrl($remote_oj, $remote_pid);
+		$submit_type = json_encode(UOJRemoteProblem::$providers[$remote_oj]['submit_type']);
+
+		$answer_form->addNoVal('answer_remote_submit_type', '');
+		$answer_form->addNoVal('answer_remote_account_data', '');
+		$answer_form->appendHTML(<<<EOD
+			<h5>Remote Judge 配置</h5>
+			<div class="" id="answer-remote_submit_group"></div>
+			<script>
+				$('#answer-remote_submit_group').remote_submit_type_group("{$remote_oj}", "{$remote_pid}", "{$remote_url}", {$submit_type});
+			</script>
+		EOD);
+	}
+
 	$answer_form->extra_validator = $submission_extra_validator;
 	$answer_form->succ_href = $is_participating ? '/contest/' . UOJContest::info('id') . '/submissions' : '/submissions';
 	$answer_form->runAtServer();

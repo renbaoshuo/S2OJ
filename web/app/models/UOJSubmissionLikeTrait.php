@@ -210,24 +210,6 @@ trait UOJSubmissionLikeTrait {
                     <div class="card-footer">$footer_text</div>
                 </div>
                 EOD;
-			} else if ($req['type'] == "remote submission") {
-				$remote_provider = UOJRemoteProblem::$providers[$req['name']];
-				$content = '';
-
-				if ($req['name'] == 'luogu') {
-					$content .= HTML::tag('div', [], [
-						'远端评测 ID：',
-						HTML::tag(
-							'a',
-							[
-								'href' => "{$remote_provider['url']}/record/{$config['luogu_submission_id']}"
-							],
-							'R' . $config['luogu_submission_id']
-						),
-					]);
-				}
-
-				HTML::echoPanel('mb-3', '远端评测记录', $content);
 			}
 		}
 		$zip_file->close();

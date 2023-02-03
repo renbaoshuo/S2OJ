@@ -14,6 +14,7 @@ class UOJRemoteProblem {
 				'ограничение по времени на тест',
 			],
 			'languages' => ['C', 'C++', 'C++17', 'C++20', 'Java17', 'Pascal', 'Python2', 'Python3'],
+			'submit_type' => ['bot'],
 		],
 		'atcoder' => [
 			'name' => 'AtCoder',
@@ -24,6 +25,7 @@ class UOJRemoteProblem {
 				'指定されたタスクが見つかりません',
 			],
 			'languages' => ['C', 'C++', 'Java11', 'Python3', 'Pascal'],
+			'submit_type' => ['bot'],
 		],
 		'uoj' => [
 			'name' => 'UniversalOJ',
@@ -33,18 +35,21 @@ class UOJRemoteProblem {
 				'未找到该页面',
 			],
 			'languages' => ['C', 'C++03', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java8', 'Java11', 'Java17', 'Pascal'],
+			'submit_type' => ['bot'],
 		],
 		'loj' => [
 			'name' => 'LibreOJ',
 			'short_name' => 'LOJ',
 			'url' => 'https://loj.ac',
 			'languages' => ['C', 'C++03', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java17', 'Pascal'],
+			'submit_type' => ['bot'],
 		],
 		'luogu' => [
 			'name' => '洛谷',
 			'short_name' => '洛谷',
 			'url' => 'https://www.luogu.com.cn',
-			'languages' => [],
+			'languages' => ['C', 'C++98', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Java8', 'Pascal'],
+			'submit_type' => ['my'],
 		],
 	];
 
@@ -459,15 +464,6 @@ class UOJRemoteProblem {
 
 	public static function getSubmissionRequirements($oj) {
 		$remote_provider = UOJRemoteProblem::$providers[$oj];
-
-		if ($oj == 'luogu') {
-			return [
-				[
-					"name" => "luogu",
-					"type" => "remote submission",
-				]
-			];
-		}
 
 		return [
 			[

@@ -947,6 +947,108 @@ $.fn.text_file_form_group = function(name, text) {
 	});
 }
 
+// remote judge submit type group
+$.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
+	return this.each(function() {
+		var input_submit_type_bot_id = 'input-submit_type_bot';
+		var input_submit_type_my_id = 'input-submit_type_my';
+		var div_submit_type_bot_id = 'div-submit_type_bot';
+		var div_submit_type_my_id = 'div-submit_type_my';
+
+		var input_submit_type_bot = $('<input class="form-check-input" type="radio" name="answer_remote_submit_type" id="' + input_submit_type_bot_id + '" value="bot" />');
+		var input_submit_type_my = $('<input class="form-check-input" type="radio" name="answer_remote_submit_type" id="' + input_submit_type_my_id + '" value="my" />');
+		var input_my_account_data = $('<input type="hidden" name="answer_remote_account_data" value="" />');
+
+		var div_submit_type_bot = $('<div id="' + div_submit_type_bot_id + '" />')
+			.append('<div class="mt-3">将使用公用账号提交本题。</div>');
+		var div_submit_type_my = $('<div id="' + div_submit_type_my_id + '" />')
+			.append('<div class="mt-3">将使用您的账号提交本题。</div>');
+
+		input_submit_type_bot.click(function() {
+			div_submit_type_my.hide('fast');
+			div_submit_type_bot.show('fast');
+		});
+		input_submit_type_my.click(function() {
+			div_submit_type_bot.hide('fast');
+			div_submit_type_my.show('fast');
+		});
+
+		if (submit_type[0] == 'bot') {
+			div_submit_type_my.hide();
+			input_submit_type_bot[0].checked = true;
+		} else if (submit_type[0] == 'my') {
+			div_submit_type_bot.hide();
+			input_submit_type_my[0].checked = true;
+		}
+
+		if (submit_type.indexOf('bot') == -1) {
+			input_submit_type_bot.attr('disabled', 'disabled');
+		}
+		if (submit_type.indexOf('my') == -1) {
+			input_submit_type_my.attr('disabled', 'disabled');
+		}
+
+		if (oj == 'luogu') {
+			var luogu_account_data = {"_uid": "", "__clientid": ""};
+			var input_luogu_uid = $('<input class="form-control" type="text" name="luogu_uid" id="input-luogu_uid" />');
+			var input_luogu_clientid = $('<input class="form-control" type="text" name="luogu_clientid" id="input-luogu_clientid" />');
+
+			if ('localStorage' in window) {
+				try {
+					var luogu_account_data_str = localStorage.getItem('uoj_remote_judge_luogu_account_data');
+					if (luogu_account_data_str) {
+						luogu_account_data = JSON.parse(luogu_account_data_str);
+					}
+				} catch (e) {}
+
+				var save_luogu_account_data = function() {
+					localStorage.setItem('uoj_remote_judge_luogu_account_data', JSON.stringify(luogu_account_data));
+				}
+			} else {
+				var save_luogu_account_data = function() {};
+			}
+
+			input_luogu_uid.change(function() {
+				luogu_account_data._uid = $(this).val();
+				input_my_account_data.val(JSON.stringify(luogu_account_data));
+				save_luogu_account_data();
+			});
+
+			input_luogu_clientid.change(function() {
+				luogu_account_data.__clientid = $(this).val();
+				input_my_account_data.val(JSON.stringify(luogu_account_data));
+				save_luogu_account_data();
+			});
+
+			input_my_account_data.val(JSON.stringify(luogu_account_data));
+
+			div_submit_type_my.append(
+				$('<div class="row mt-3" />')
+					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_uid" class="form-col-label">_uid</label>'))
+					.append($('<div class="col-sm-4" />').append(input_luogu_uid))
+					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>_uid</code>。')))
+			).append(
+				$('<div class="row mt-3" />')
+					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_clientid" class="form-col-label">__clientid</label>'))
+					.append($('<div class="col-sm-4" />').append(input_luogu_clientid))
+					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>__clientid</code>。')))
+			).append(input_my_account_data);
+		}
+
+		$(this).append(
+			$('<div class="mt-3" />').append(
+					$('<div class="form-check d-inline-block" />')
+						.append(input_submit_type_bot)
+						.append($('<label class="form-check-label" for="' + input_submit_type_bot_id + '" />').append(' 公用账号'))
+				).append(
+					$('<div class="form-check d-inline-block ms-3" />')
+						.append(input_submit_type_my)
+						.append($('<label class="form-check-label" for="' + input_submit_type_my_id + '" />').append(' 自有账号'))
+				)
+		).append(div_submit_type_bot).append(div_submit_type_my);
+	});
+}
+
 // custom test
 function custom_test_onsubmit(response_text, div_result, url) {
 	if (response_text != '') {
