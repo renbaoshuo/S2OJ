@@ -67,8 +67,8 @@ export default async function daemon(config: UOJConfig) {
 
         if (config.test_sample_only === 'on') {
           await request('/submit', {
-            submit: true,
-            fetch_new: false,
+            submit: 1,
+            fetch_new: 0,
             id,
             result: JSON.stringify({
               status: 'Judged',
@@ -79,6 +79,8 @@ export default async function daemon(config: UOJConfig) {
             }),
             judge_time,
           });
+
+          await sleep(TIME.second);
 
           continue;
         }
@@ -115,8 +117,8 @@ export default async function daemon(config: UOJConfig) {
           code = fs.readFileSync(sourceCodePath, 'utf-8');
         } catch (e) {
           await request('/submit', {
-            submit: true,
-            fetch_new: false,
+            submit: 1,
+            fetch_new: 0,
             id,
             result: JSON.stringify({
               status: 'Judged',
@@ -135,6 +137,8 @@ export default async function daemon(config: UOJConfig) {
 
           fs.removeSync(tmpdir);
 
+          await sleep(TIME.second);
+
           continue;
         }
 
@@ -152,8 +156,8 @@ export default async function daemon(config: UOJConfig) {
           );
         } catch (err) {
           await request('/submit', {
-            submit: true,
-            fetch_new: false,
+            submit: 1,
+            fetch_new: 0,
             id,
             result: JSON.stringify({
               status: 'Judged',
@@ -172,6 +176,8 @@ export default async function daemon(config: UOJConfig) {
         }
 
         fs.removeSync(tmpdir);
+
+        await sleep(TIME.second);
       }
     } catch (err) {
       logger.error(err.message);

@@ -958,19 +958,68 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 		var input_submit_type_bot = $('<input class="form-check-input" type="radio" name="answer_remote_submit_type" id="' + input_submit_type_bot_id + '" value="bot" />');
 		var input_submit_type_my = $('<input class="form-check-input" type="radio" name="answer_remote_submit_type" id="' + input_submit_type_my_id + '" value="my" />');
 		var input_my_account_data = $('<input type="hidden" name="answer_remote_account_data" value="" />');
+		
+		var my_account_validation_status = $('<span />').append('<span class="text-secondary">待验证</span>');
+		var my_account_validation_btn = $('<button type="button" class="btn btn-secondary btn-sm ms-2">验证</button>');
+
+		var validate_my_account = function(data) {
+			my_account_validation_btn.html('<span class="spinner-border spinner-border-sm" role="status"></span>');
+			my_account_validation_btn.addClass('disabled');
+
+			$.ajax({
+				type: 'POST',
+				url: '/api/remote_judge/custom_account_validator?type=' + oj,
+				data: data,
+				success: function(res) {
+					my_account_validation_btn.html('验证');
+					my_account_validation_btn.removeClass('disabled');
+
+					console.log('Validation status', res);
+
+					if (res.ok) {
+						my_account_validation_status.html('<span class="text-success">可用</span>');
+					} else {
+						my_account_validation_status.html('<span class="text-danger">不可用</span>');
+					}
+				},
+				error: function() {
+					my_account_validation_btn.html('验证');
+					my_account_validation_btn.removeClass('disabled');
+					my_account_validation_status.html('<span class="text-secondary">待验证</span>');
+				},
+				dataType: 'json',
+			});
+		};
 
 		var div_submit_type_bot = $('<div id="' + div_submit_type_bot_id + '" />')
 			.append('<div class="mt-3">将使用公用账号提交本题。</div>');
 		var div_submit_type_my = $('<div id="' + div_submit_type_my_id + '" />')
-			.append('<div class="mt-3">将使用您的账号提交本题。</div>');
+			.append($('<div class="mt-3" />')
+				.append('<span>将使用您的账号提交本题。</span>')
+				.append('<span>账号状态：</span>')
+				.append(my_account_validation_status)
+				.append(my_account_validation_btn)
+				);
+
+		if ('localStorage' in window) {
+			var prefer_submit_type = localStorage.getItem('uoj_remote_judge_save_prefer_submit_type__' + oj) || null;
+			var save_prefer_submit_type = function(type) {
+				localStorage.setItem('uoj_remote_judge_save_prefer_submit_type__' + oj, type);
+			}
+		} else {
+			var prefer_submit_type = null;
+			var save_prefer_submit_type = function(type) {};
+		}
 
 		input_submit_type_bot.click(function() {
 			div_submit_type_my.hide('fast');
 			div_submit_type_bot.show('fast');
+			save_prefer_submit_type('bot');
 		});
 		input_submit_type_my.click(function() {
 			div_submit_type_bot.hide('fast');
 			div_submit_type_my.show('fast');
+			save_prefer_submit_type('my');
 		});
 
 		if (submit_type[0] == 'bot') {
@@ -983,15 +1032,26 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 
 		if (submit_type.indexOf('bot') == -1) {
 			input_submit_type_bot.attr('disabled', 'disabled');
+		} else if (prefer_submit_type == 'bot') {
+			div_submit_type_my.hide();
+			div_submit_type_bot.show();
+			input_submit_type_bot[0].checked = true;
+			input_submit_type_my[0].checked = false;
 		}
+
 		if (submit_type.indexOf('my') == -1) {
 			input_submit_type_my.attr('disabled', 'disabled');
+		} else if (prefer_submit_type == 'my') {
+			div_submit_type_bot.hide();
+			div_submit_type_my.show();
+			input_submit_type_bot[0].checked = false;
+			input_submit_type_my[0].checked = true;
 		}
 
 		if (oj == 'luogu') {
 			var luogu_account_data = {"_uid": "", "__client_id": ""};
-			var input_luogu_uid = $('<input class="form-control" type="text" name="luogu_uid" id="input-luogu_uid" />');
-			var input_luogu_client_id = $('<input class="form-control" type="text" name="luogu_client_id" id="input-luogu_client_id" />');
+			var input_luogu_uid = $('<input class="form-control font-monospace" type="text" name="luogu_uid" id="input-luogu_uid" />');
+			var input_luogu_client_id = $('<input class="form-control font-monospace" type="text" name="luogu_client_id" id="input-luogu_client_id" />');
 
 			if ('localStorage' in window) {
 				try {
@@ -1012,32 +1072,50 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 				luogu_account_data._uid = $(this).val();
 				input_my_account_data.val(JSON.stringify(luogu_account_data));
 				save_luogu_account_data();
+				my_account_validation_status.html('<span class="text-secondary">待验证</span>');
 			});
 
 			input_luogu_client_id.change(function() {
 				luogu_account_data.__client_id = $(this).val();
 				input_my_account_data.val(JSON.stringify(luogu_account_data));
 				save_luogu_account_data();
+				my_account_validation_status.html('<span class="text-secondary">待验证</span>');
+			});
+
+			my_account_validation_btn.click(function() {
+				validate_my_account({
+					type: 'luogu',
+					_uid: input_luogu_uid.val(),
+					__client_id: input_luogu_client_id.val(),
+				});
 			});
 
 			input_my_account_data.val(JSON.stringify(luogu_account_data));
 			input_luogu_uid.val(luogu_account_data._uid);
 			input_luogu_client_id.val(luogu_account_data.__client_id);
 
+			if (luogu_account_data._uid && luogu_account_data.__client_id){
+				validate_my_account({
+					type: 'luogu',
+					_uid: luogu_account_data._uid,
+					__client_id: luogu_account_data.__client_id,
+				});
+			}
+
 			div_submit_type_my.append(
-				$('<div class="row mt-3" />')
+				$('<div class="row mt-3 align-items-center" />')
 					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_uid" class="col-form-label">_uid</label>'))
 					.append($('<div class="col-sm-4" />').append(input_luogu_uid))
-					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>_uid</code>。')))
+					.append($('<div class="col-sm-6" />').append($('<div class="form-text mt-0" />').append('请填入 Cookie 中的 <code>_uid</code>。')))
 			).append(
-				$('<div class="row mt-3" />')
+				$('<div class="row mt-3 align-items-center" />')
 					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_client_id" class="col-form-label">__client_id</label>'))
 					.append($('<div class="col-sm-4" />').append(input_luogu_client_id))
-					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>__client_id</code>。')))
+					.append($('<div class="col-sm-6" />').append($('<div class="form-text mt-0" />').append('请填入 Cookie 中的 <code>__client_id</code>。')))
 			).append(input_my_account_data);
 		} else if (oj == 'codeforces') {
 			var codeforces_account_data = {"JSESSIONID": ""};
-			var input_codeforces_jsessionid = $('<input class="form-control" type="text" name="codeforces_jsessionid" id="input-codeforces_jsessionid" />');
+			var input_codeforces_jsessionid = $('<input class="form-control font-monospace" type="text" name="codeforces_jsessionid" id="input-codeforces_jsessionid" />');
 
 			if ('localStorage' in window) {
 				try {
@@ -1056,16 +1134,31 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 				codeforces_account_data.JSESSIONID = $(this).val();
 				input_my_account_data.val(JSON.stringify(codeforces_account_data));
 				save_codeforces_account_data();
+				my_account_validation_status.html('<span class="text-secondary">待验证</span>');
+			});
+
+			my_account_validation_btn.click(function() {
+				validate_my_account({
+					type: 'codeforces',
+					JSESSIONID: input_codeforces_jsessionid.val(),
+				});
 			});
 
 			input_my_account_data.val(JSON.stringify(codeforces_account_data));
 			input_codeforces_jsessionid.val(codeforces_account_data.JSESSIONID);
 
+			if (codeforces_account_data.JSESSIONID) {
+				validate_my_account({
+					type: 'codeforces',
+					JSESSIONID: codeforces_account_data.JSESSIONID,
+				});
+			}
+
 			div_submit_type_my.append(
-				$('<div class="row mt-3" />')
+				$('<div class="row mt-3 align-items-center" />')
 					.append($('<div class="col-sm-2" />').append('<label for="input-codeforces_jsessionid" class="col-form-label">JSESSIONID</label>'))
 					.append($('<div class="col-sm-4" />').append(input_codeforces_jsessionid))
-					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>JSESSIONID</code>。')))
+					.append($('<div class="col-sm-6" />').append($('<div class="form-text mt-0" />').append('请填入 Cookie 中的 <code>JSESSIONID</code>。')))
 			).append(input_my_account_data);
 		} else if (oj == 'uoj') {
 			var uoj_account_data = {"UOJSESSID": ""};

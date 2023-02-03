@@ -98,8 +98,8 @@ class VJudge {
   ) {
     const next = async payload => {
       return await this.request('/submit', {
-        'update-status': true,
-        fetch_new: false,
+        'update-status': 1,
+        fetch_new: 0,
         id,
         status:
           payload.status ||
@@ -110,8 +110,8 @@ class VJudge {
     const end = async payload => {
       if (payload.error) {
         return await this.request('/submit', {
-          submit: true,
-          fetch_new: false,
+          submit: 1,
+          fetch_new: 0,
           id,
           result: JSON.stringify({
             status: 'Judged',
@@ -128,8 +128,8 @@ class VJudge {
       }
 
       return await this.request('/submit', {
-        submit: true,
-        fetch_new: false,
+        submit: 1,
+        fetch_new: 0,
         id,
         result: JSON.stringify({
           status: 'Judged',
