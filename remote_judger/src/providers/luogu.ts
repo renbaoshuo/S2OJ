@@ -4,7 +4,7 @@ import proxy from 'superagent-proxy';
 import Logger from '../utils/logger';
 import { IBasicProvider, RemoteAccount, USER_AGENT } from '../interface';
 import sleep from '../utils/sleep';
-import flattenDeep from '../utils/flattenDeep';
+import flattenDeep from 'lodash.flattendeep';
 
 proxy(superagent);
 const logger = new Logger('remote/luogu');
@@ -106,6 +106,23 @@ export default class LuoguProvider implements IBasicProvider {
     return req;
   }
 
+  async safeGet(url: string) {
+    const res = await this.get(url);
+
+    if (res.text.startsWith('<html><script>document.location.reload()')) {
+      const sec = this.getCookie.call(
+        { cookie: res.header['set-cookie'] },
+        'sec'
+      );
+      this.setCookie('sec', sec);
+      logger.debug('sec', sec);
+
+      return await this.get(url);
+    }
+
+    return res;
+  }
+
   post(url: string) {
     logger.debug('post', url, this.cookie);
 
@@ -125,8 +142,21 @@ export default class LuoguProvider implements IBasicProvider {
     return req;
   }
 
+  getCookie(target: string) {
+    return this.cookie
+      .find(i => i.startsWith(`${target}=`))
+      ?.split('=')[1]
+      ?.split(';')[0];
+  }
+
+  setCookie(target: string, value: string) {
+    this.cookie = this.cookie.filter(i => !i.startsWith(`${target}=`));
+    this.cookie.push(`${target}=${value}`);
+  }
+
   async getCsrfToken(url: string) {
-    const { text: html } = await this.get(url);
+    let { text: html } = await this.safeGet(url);
+
     const $dom = new JSDOM(html);
 
     this.csrf = $dom.window.document
@@ -137,7 +167,7 @@ export default class LuoguProvider implements IBasicProvider {
   }
 
   get loggedIn() {
-    return this.get('/user/setting?_contentOnly=1').then(
+    return this.safeGet('/user/setting?_contentOnly=1').then(
       ({ body }) => body.currentTemplate !== 'AuthLogin'
     );
   }
@@ -208,17 +238,15 @@ export default class LuoguProvider implements IBasicProvider {
   }
 
   async waitForSubmission(problem_id: string, id: string, next, end) {
-    const done = {};
     let fail = 0;
     let count = 0;
-    let finished = 0;
 
     while (count < 120 && fail < 5) {
       await sleep(1500);
       count++;
 
       try {
-        const { body } = await this.get(`/record/${id}?_contentOnly=1`);
+        const { body } = await this.safeGet(`/record/${id}?_contentOnly=1`);
         const data = body.currentData.record;
 
         if (
@@ -227,41 +255,36 @@ export default class LuoguProvider implements IBasicProvider {
         ) {
           return await end({
             error: true,
-            id,
+            id: 'R' + id,
             status: 'Compile Error',
             message: data.detail.compileResult.message,
           });
         }
 
         logger.info('Fetched with length', JSON.stringify(body).length);
-        const total = flattenDeep(body.currentData.testCaseGroup).length;
-
-        // TODO sorted
+        const total = flattenDeep(
+          Object.entries(body.currentData.testCaseGroup || {}).map(o => o[1])
+        ).length;
 
         if (!data.detail.judgeResult?.subtasks) continue;
 
-        for (const key in data.detail.judgeResult.subtasks) {
-          const subtask = data.detail.judgeResult.subtasks[key];
-          for (const cid in subtask.testCases || {}) {
-            if (done[`${subtask.id}.${cid}`]) continue;
-            finished++;
-            done[`${subtask.id}.${cid}`] = true;
-            await next({
-              status: `Judging (${(finished / total) * 100})`,
-            });
-          }
-        }
+        await next({
+          status: `Judging (${
+            data.detail.judgeResult?.finishedCaseCount || '?'
+          }/${total})`,
+        });
 
         if (data.status < 2) continue;
 
         logger.info('RecordID:', id, 'done');
 
-        // TODO calc total status
-
         return await end({
           id: 'R' + id,
           status: STATUS_MAP[data.status],
-          score: data.score,
+          score:
+            STATUS_MAP[data.status] === 'Accepted'
+              ? 100
+              : (data.score / data.problem.fullScore) * 100,
           time: data.time,
           memory: data.memory,
         });
@@ -274,6 +297,7 @@ export default class LuoguProvider implements IBasicProvider {
 
     return await end({
       error: true,
+      id: 'R' + id,
       status: 'Judgment Failed',
       message: 'Failed to fetch submission details.',
     });
