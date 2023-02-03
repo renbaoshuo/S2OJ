@@ -99,6 +99,10 @@ export default class UOJProvider implements IBasicProvider {
     if (account.cookie) this.cookie = account.cookie;
   }
 
+  static constructFromAccountData(data) {
+    throw new Error('Method not implemented.');
+  }
+
   cookie: string[] = [];
   csrf: string;
 

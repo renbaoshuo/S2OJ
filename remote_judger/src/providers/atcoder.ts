@@ -73,6 +73,10 @@ export default class AtcoderProvider implements IBasicProvider {
     this.account.endpoint ||= 'https://atcoder.jp';
   }
 
+  static constructFromAccountData(data) {
+    throw new Error('Method not implemented.');
+  }
+
   cookie: string[] = ['language=en'];
   csrf: string;
 
