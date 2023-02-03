@@ -989,9 +989,9 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 		}
 
 		if (oj == 'luogu') {
-			var luogu_account_data = {"_uid": "", "__clientid": ""};
+			var luogu_account_data = {"_uid": "", "__client_id": ""};
 			var input_luogu_uid = $('<input class="form-control" type="text" name="luogu_uid" id="input-luogu_uid" />');
-			var input_luogu_clientid = $('<input class="form-control" type="text" name="luogu_clientid" id="input-luogu_clientid" />');
+			var input_luogu_client_id = $('<input class="form-control" type="text" name="luogu_client_id" id="input-luogu_client_id" />');
 
 			if ('localStorage' in window) {
 				try {
@@ -1014,13 +1014,15 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 				save_luogu_account_data();
 			});
 
-			input_luogu_clientid.change(function() {
-				luogu_account_data.__clientid = $(this).val();
+			input_luogu_client_id.change(function() {
+				luogu_account_data.__client_id = $(this).val();
 				input_my_account_data.val(JSON.stringify(luogu_account_data));
 				save_luogu_account_data();
 			});
 
 			input_my_account_data.val(JSON.stringify(luogu_account_data));
+			input_luogu_uid.val(luogu_account_data._uid);
+			input_luogu_client_id.val(luogu_account_data.__client_id);
 
 			div_submit_type_my.append(
 				$('<div class="row mt-3" />')
@@ -1029,9 +1031,9 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>_uid</code>。')))
 			).append(
 				$('<div class="row mt-3" />')
-					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_clientid" class="form-col-label">__clientid</label>'))
-					.append($('<div class="col-sm-4" />').append(input_luogu_clientid))
-					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>__clientid</code>。')))
+					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_client_id" class="form-col-label">__client_id</label>'))
+					.append($('<div class="col-sm-4" />').append(input_luogu_client_id))
+					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>__client_id</code>。')))
 			).append(input_my_account_data);
 		}
 

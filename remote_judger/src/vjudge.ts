@@ -139,8 +139,9 @@ class VJudge {
           details:
             payload.details ||
             '<div>' +
-              `<info-block>ID = ${payload.id || 'None'}</info-block>` +
-              `<info-block>VERDICT = ${payload.status}</info-block>` +
+              `<info-block>REMOTE_SUBMISSION_ID = ${
+                payload.id || 'None'
+              }\nVERDICT = ${payload.status}</info-block>` +
               '</div>',
         }),
         judge_time,
@@ -187,11 +188,11 @@ class VJudge {
           message: e.message,
         });
       }
+    } else {
+      throw new Error(
+        'Unsupported remote submit type: ' + config.remote_submit_type
+      );
     }
-
-    throw new Error(
-      'Unsupported remote submit type: ' + config.remote_submit_type
-    );
   }
 }
 
@@ -202,6 +203,7 @@ export async function apply(request: any) {
   await vjudge.addProvider('atcoder');
   await vjudge.addProvider('uoj');
   await vjudge.addProvider('loj');
+  await vjudge.importProvider('luogu');
 
   return vjudge;
 }

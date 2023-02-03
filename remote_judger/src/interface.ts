@@ -1,8 +1,8 @@
 export interface RemoteAccount {
   type: string;
   cookie?: string[];
-  handle: string;
-  password: string;
+  handle?: string;
+  password?: string;
   endpoint?: string;
   proxy?: string;
 }

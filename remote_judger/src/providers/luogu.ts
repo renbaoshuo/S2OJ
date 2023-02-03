@@ -1,0 +1,281 @@
+import { JSDOM } from 'jsdom';
+import superagent from 'superagent';
+import proxy from 'superagent-proxy';
+import Logger from '../utils/logger';
+import { IBasicProvider, RemoteAccount, USER_AGENT } from '../interface';
+import sleep from '../utils/sleep';
+import flattenDeep from '../utils/flattenDeep';
+
+proxy(superagent);
+const logger = new Logger('remote/luogu');
+
+const STATUS_MAP = [
+  'Waiting', // WAITING,
+  'Judging', // JUDGING,
+  'Compile Error', // CE
+  'Output Limit Exceeded', // OLE
+  'Memory Limit Exceeded', // MLE
+  'Time Limit Exceeded', // TLE
+  'Wrong Answer', // WA
+  'Runtime Error', // RE
+  0,
+  0,
+  0,
+  'Judgment Failed', // UKE
+  'Accepted', // AC
+  0,
+  'Wrong Answer', // WA
+];
+
+const LANGS_MAP = {
+  C: {
+    id: 2,
+    name: 'C',
+    comment: '//',
+  },
+  'C++98': {
+    id: 3,
+    name: 'C++98',
+    comment: '//',
+  },
+  'C++11': {
+    id: 4,
+    name: 'C++11',
+    comment: '//',
+  },
+  'C++': {
+    id: 11,
+    name: 'C++14',
+    comment: '//',
+  },
+  'C++17': {
+    id: 12,
+    name: 'C++17',
+    comment: '//',
+  },
+  'C++20': {
+    id: 27,
+    name: 'C++20',
+    comment: '//',
+  },
+  Python3: {
+    id: 7,
+    name: 'Python 3',
+    comment: '#',
+  },
+  Java8: {
+    id: 8,
+    name: 'Java 8',
+    comment: '//',
+  },
+  Pascal: {
+    id: 1,
+    name: 'Pascal',
+    comment: '//',
+  },
+};
+
+export default class LuoguProvider implements IBasicProvider {
+  constructor(public account: RemoteAccount) {
+    if (account.cookie) this.cookie = account.cookie;
+  }
+
+  static constructFromAccountData(data) {
+    return new this({
+      type: 'luogu',
+      cookie: Object.entries(data).map(([key, value]) => `${key}=${value}`),
+    });
+  }
+
+  cookie: string[] = [];
+  csrf: string;
+
+  get(url: string) {
+    logger.debug('get', url, this.cookie);
+
+    if (!url.includes('//'))
+      url = `${this.account.endpoint || 'https://www.luogu.com.cn'}${url}`;
+
+    const req = superagent
+      .get(url)
+      .set('Cookie', this.cookie)
+      .set('User-Agent', USER_AGENT);
+
+    if (this.account.proxy) return req.proxy(this.account.proxy);
+
+    return req;
+  }
+
+  post(url: string) {
+    logger.debug('post', url, this.cookie);
+
+    if (!url.includes('//'))
+      url = `${this.account.endpoint || 'https://www.luogu.com.cn'}${url}`;
+
+    const req = superagent
+      .post(url)
+      .set('Cookie', this.cookie)
+      .set('x-csrf-token', this.csrf)
+      .set('User-Agent', USER_AGENT)
+      .set('x-requested-with', 'XMLHttpRequest')
+      .set('origin', 'https://www.luogu.com.cn');
+
+    if (this.account.proxy) return req.proxy(this.account.proxy);
+
+    return req;
+  }
+
+  async getCsrfToken(url: string) {
+    const { text: html } = await this.get(url);
+    const $dom = new JSDOM(html);
+
+    this.csrf = $dom.window.document
+      .querySelector('meta[name="csrf-token"]')
+      .getAttribute('content');
+
+    logger.info('csrf-token=', this.csrf);
+  }
+
+  get loggedIn() {
+    return this.get('/user/setting?_contentOnly=1').then(
+      ({ body }) => body.currentTemplate !== 'AuthLogin'
+    );
+  }
+
+  async ensureLogin() {
+    if (await this.loggedIn) {
+      await this.getCsrfToken('/user/setting');
+
+      return true;
+    }
+
+    logger.info('retry login');
+
+    // TODO login;
+
+    return false;
+  }
+
+  async submitProblem(
+    id: string,
+    lang: string,
+    code: string,
+    submissionId: number,
+    next,
+    end
+  ) {
+    if (!(await this.ensureLogin())) {
+      end({
+        error: true,
+        status: 'Judgment Failed',
+        message: 'Login failed',
+      });
+
+      return null;
+    }
+
+    if (code.length < 10) {
+      end({
+        error: true,
+        status: 'Compile Error',
+        message: 'Code too short',
+      });
+
+      return null;
+    }
+
+    const programType = LANGS_MAP[lang] || LANGS_MAP['C++'];
+    const comment = programType.comment;
+
+    if (comment) {
+      const msg = `S2OJ Submission #${submissionId} @ ${new Date().getTime()}`;
+      if (typeof comment === 'string') code = `${comment} ${msg}\n${code}`;
+      else if (comment instanceof Array)
+        code = `${comment[0]} ${msg} ${comment[1]}\n${code}`;
+    }
+
+    const result = await this.post(`/fe/api/problem/submit/${id}`)
+      .set('referer', `https://www.luogu.com.cn/problem/${id}`)
+      .send({
+        code,
+        lang: programType.id,
+        enableO2: 1,
+      });
+
+    logger.info('RecordID:', result.body.rid);
+
+    return result.body.rid;
+  }
+
+  async waitForSubmission(problem_id: string, id: string, next, end) {
+    const done = {};
+    let fail = 0;
+    let count = 0;
+    let finished = 0;
+
+    while (count < 120 && fail < 5) {
+      await sleep(1500);
+      count++;
+
+      try {
+        const { body } = await this.get(`/record/${id}?_contentOnly=1`);
+        const data = body.currentData.record;
+
+        if (
+          data.detail.compileResult &&
+          data.detail.compileResult.success === false
+        ) {
+          return await end({
+            error: true,
+            id,
+            status: 'Compile Error',
+            message: data.detail.compileResult.message,
+          });
+        }
+
+        logger.info('Fetched with length', JSON.stringify(body).length);
+        const total = flattenDeep(body.currentData.testCaseGroup).length;
+
+        // TODO sorted
+
+        if (!data.detail.judgeResult?.subtasks) continue;
+
+        for (const key in data.detail.judgeResult.subtasks) {
+          const subtask = data.detail.judgeResult.subtasks[key];
+          for (const cid in subtask.testCases || {}) {
+            if (done[`${subtask.id}.${cid}`]) continue;
+            finished++;
+            done[`${subtask.id}.${cid}`] = true;
+            await next({
+              status: `Judging (${(finished / total) * 100})`,
+            });
+          }
+        }
+
+        if (data.status < 2) continue;
+
+        logger.info('RecordID:', id, 'done');
+
+        // TODO calc total status
+
+        return await end({
+          id: 'R' + id,
+          status: STATUS_MAP[data.status],
+          score: data.score,
+          time: data.time,
+          memory: data.memory,
+        });
+      } catch (e) {
+        logger.error(e);
+
+        fail++;
+      }
+    }
+
+    return await end({
+      error: true,
+      status: 'Judgment Failed',
+      message: 'Failed to fetch submission details.',
+    });
+  }
+}

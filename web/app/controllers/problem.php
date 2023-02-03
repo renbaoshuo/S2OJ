@@ -110,7 +110,9 @@ function handleUpload($zip_file_name, $content, $tot_size) {
 
 	if (UOJProblem::info('type') == 'remote') {
 		$submit_type = in_array($_POST['answer_remote_submit_type'], $remote_provider['submit_type']) ? $_POST['answer_remote_submit_type'] : $remote_provider['submit_type'][0];
-		$content['no_rejudge'] = true;
+		if ($submit_type != 'bot') {
+			$content['no_rejudge'] = true;
+		}
 		$content['config'][] = ['remote_submit_type', $submit_type];
 		$content['config'][] = ['remote_account_data', $_POST['answer_remote_account_data']];
 	}
