@@ -1480,21 +1480,47 @@ if ($cur_tab == 'index') {
 				});
 			</script>
 		<?php elseif ($cur_tab === 'submissions') : ?>
-			<h4>测评失败的提交记录</h4>
-			<?php
-			echoSubmissionsList(
-				"result_error = 'Judgement Failed'",
-				'order by id desc',
-				[
-					'result_hidden' => '',
-					'table_config' => [
-						'div_classes' => ['card', 'mb-3', 'table-responsive'],
-						'table_classes' => ['table', 'uoj-table', 'mb-0', 'text-center']
-					]
-				],
-				$myUser
-			);
-			?>
+			<?php if (!isset($_GET['judging'])) : ?>
+				<div>
+					<h4 class="d-inline-block">测评失败的提交记录</h4>
+					/
+					<a href="/super_manage/submissions?judging=true">处于评测状态的提交记录</a>
+				</div>
+				<?php
+				echoSubmissionsList(
+					"result_error = 'Judgement Failed' or result_error = 'Judgment Failed'",
+					'order by id desc',
+					[
+						'result_hidden' => '',
+						'table_config' => [
+							'div_classes' => ['card', 'mb-3', 'table-responsive'],
+							'table_classes' => ['table', 'uoj-table', 'mb-0', 'text-center']
+						]
+					],
+					$myUser
+				);
+				?>
+			<?php else : ?>
+				<div>
+					<h4 class="d-inline-block">处于评测状态的提交记录</h4>
+					/
+					<a href="/super_manage/submissions">测评失败的提交记录</a>
+				</div>
+				<?php
+				echoSubmissionsList(
+					"status = 'Judging' or status = 'Judged, Judging'",
+					'order by id desc',
+					[
+						'result_hidden' => '',
+						'table_config' => [
+							'div_classes' => ['card', 'mb-3', 'table-responsive'],
+							'table_classes' => ['table', 'uoj-table', 'mb-0', 'text-center']
+						]
+					],
+					$myUser
+				);
+				?>
+			<?php endif ?>
 		<?php elseif ($cur_tab === 'custom_test') : ?>
 			<div class="card mb-3 table-responsive">
 				<table class="table uoj-table mb-0">
@@ -1513,7 +1539,7 @@ if ($cur_tab == 'index') {
 							$problem = queryProblemBrief($submission['problem_id']);
 							$submission_result = json_decode($submission['result'], true);
 							?>
-							<tr style="cursor: pointer" data-bs-toggle="collapse" data-bs-target="#custom_test__<?= $submission['id'] ?>">
+							<tr style="cursor: pointer" data-bs-toggle="collapse" data-bs-target="#custom_test__<?= $submission['id'] ?>" data-bs-delay='{"show":0,"hide":0}'>
 								<td class="text-center text-primary">#<?= $submission['id'] ?></td>
 								<td class="text-center">#<?= $submission['problem_id'] ?></td>
 								<td><?= UOJUser::getLink($submission['submitter']) ?></td>
@@ -1612,7 +1638,7 @@ EOD,
 					echo <<<EOD
 	<tr>
 		<td>$user_link</td>
-		<td><img src="{$row['path']}" width="250" loading="lazy"></td>
+		<td><img src="{$row['path']}" width="250" loading="lazy" decoding="async"></td>
 		<td>$size</td>
 		<td>{$row['upload_time']}</td>
 		<td>
