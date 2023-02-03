@@ -92,7 +92,9 @@ class Auth {
 			$myUser = UOJUser::query($username);
 			if ($myUser['remember_token'] !== $remember_token) {
 				$myUser = null;
+				return;
 			}
+			$_SESSION['username'] = $myUser['username'];
 			return;
 		}
 	}
