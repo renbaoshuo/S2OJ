@@ -1069,7 +1069,7 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 			).append(input_my_account_data);
 		} else if (oj == 'uoj') {
 			var uoj_account_data = {"UOJSESSID": ""};
-			var input_uoj_uojsessid = $('<input class="form-control" type="text" name="uoj_uojsessid" id="input-uoj_uojsessid" />');
+			var input_uoj_uojsessid = $('<input class="form-control font-monospace" type="text" name="uoj_uojsessid" id="input-uoj_uojsessid" />');
 
 			if ('localStorage' in window) {
 				try {
