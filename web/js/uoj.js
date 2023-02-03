@@ -1067,6 +1067,38 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 					.append($('<div class="col-sm-4" />').append(input_codeforces_jsessionid))
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>JSESSIONID</code>。')))
 			).append(input_my_account_data);
+		} else if (oj == 'uoj') {
+			var uoj_account_data = {"UOJSESSID": ""};
+			var input_uoj_uojsessid = $('<input class="form-control" type="text" name="uoj_uojsessid" id="input-uoj_uojsessid" />');
+
+			if ('localStorage' in window) {
+				try {
+					var uoj_account_data_str = localStorage.getItem('uoj_remote_judge_uoj_account_data');
+					if (uoj_account_data_str) {
+						uoj_account_data = JSON.parse(uoj_account_data_str);
+					}
+				} catch (e) {}
+
+				var save_uoj_account_data = function() {
+					localStorage.setItem('uoj_remote_judge_uoj_account_data', JSON.stringify(uoj_account_data));
+				}
+			}
+
+			input_uoj_uojsessid.change(function() {
+				uoj_account_data.UOJSESSID = $(this).val();
+				input_my_account_data.val(JSON.stringify(uoj_account_data));
+				save_uoj_account_data();
+			});
+
+			input_my_account_data.val(JSON.stringify(uoj_account_data));
+			input_uoj_uojsessid.val(uoj_account_data.UOJSESSID);
+
+			div_submit_type_my.append(
+				$('<div class="row mt-3" />')
+					.append($('<div class="col-sm-2" />').append('<label for="input-uoj_uojsessid" class="col-form-label">UOJSESSID</label>'))
+					.append($('<div class="col-sm-4" />').append(input_uoj_uojsessid))
+					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>UOJSESSID</code>。')))
+			).append(input_my_account_data);
 		}
 
 		$(this).append(

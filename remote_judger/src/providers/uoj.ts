@@ -100,45 +100,60 @@ export default class UOJProvider implements IBasicProvider {
   }
 
   static constructFromAccountData(data) {
-    throw new Error('Method not implemented.');
+    return new this({
+      type: 'uoj',
+      cookie: Object.entries(data).map(([key, value]) => `${key}=${value}`),
+    });
   }
 
   cookie: string[] = [];
   csrf: string;
 
   get(url: string) {
-    logger.debug('get', url);
+    logger.debug('get', url, this.cookie);
+
     if (!url.includes('//'))
       url = `${this.account.endpoint || 'https://uoj.ac'}${url}`;
+
     const req = superagent
       .get(url)
       .set('Cookie', this.cookie)
       .set('User-Agent', USER_AGENT);
+
     if (this.account.proxy) return req.proxy(this.account.proxy);
+
     return req;
   }
 
   post(url: string) {
     logger.debug('post', url, this.cookie);
+
     if (!url.includes('//'))
       url = `${this.account.endpoint || 'https://uoj.ac'}${url}`;
+
     const req = superagent
       .post(url)
       .set('Cookie', this.cookie)
       .set('User-Agent', USER_AGENT)
       .type('form');
+
     if (this.account.proxy) return req.proxy(this.account.proxy);
+
     return req;
   }
 
   async getCsrfToken(url: string) {
     const { text: html, header } = await this.get(url);
+
     if (header['set-cookie']) {
       this.cookie = header['set-cookie'];
     }
+
     let value = /_token *: *"(.+?)"/g.exec(html);
     if (value) return value[1];
+
     value = /_token" value="(.+?)"/g.exec(html);
+
     return value?.[1];
   }
 
@@ -150,7 +165,11 @@ export default class UOJProvider implements IBasicProvider {
 
   async ensureLogin() {
     if (await this.loggedIn) return true;
+
+    if (!this.account.handle) return false;
+
     logger.info('retry login');
+
     const _token = await this.getCsrfToken('/login');
     const { header, text } = await this.post('/login').send({
       _token,
@@ -159,11 +178,14 @@ export default class UOJProvider implements IBasicProvider {
       // NOTE: you should pass a pre-hashed key!
       password: this.account.password,
     });
+
     if (header['set-cookie'] && this.cookie.length === 1) {
       header['set-cookie'].push(...this.cookie);
       this.cookie = header['set-cookie'];
     }
+
     if (text === 'ok') return true;
+
     return text;
   }
 
@@ -175,6 +197,16 @@ export default class UOJProvider implements IBasicProvider {
     next,
     end
   ) {
+    if (!(await this.ensureLogin())) {
+      await end({
+        error: true,
+        status: 'Judgment Failed',
+        message: 'Login failed',
+      });
+
+      return null;
+    }
+
     const programType = langs_map[lang] || langs_map['C++'];
     const comment = programType.comment;
 

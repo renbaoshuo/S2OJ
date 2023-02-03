@@ -35,7 +35,7 @@ class UOJRemoteProblem {
 				'未找到该页面',
 			],
 			'languages' => ['C', 'C++03', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java8', 'Java11', 'Java17', 'Pascal'],
-			'submit_type' => ['bot'],
+			'submit_type' => ['bot', 'my'],
 		],
 		'loj' => [
 			'name' => 'LibreOJ',
