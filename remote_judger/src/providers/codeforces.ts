@@ -237,7 +237,7 @@ export default class CodeforcesProvider implements IBasicProvider {
     end
   ) {
     if (!(await this.ensureLogin())) {
-      end({
+      await end({
         error: true,
         status: 'Judgment Failed',
         message: 'Login failed',

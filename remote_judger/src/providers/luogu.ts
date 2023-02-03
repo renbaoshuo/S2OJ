@@ -208,7 +208,7 @@ export default class LuoguProvider implements IBasicProvider {
     end
   ) {
     if (!(await this.ensureLogin())) {
-      end({
+      await end({
         error: true,
         status: 'Judgment Failed',
         message: 'Login failed',
@@ -218,7 +218,7 @@ export default class LuoguProvider implements IBasicProvider {
     }
 
     if (code.length < 10) {
-      end({
+      await end({
         error: true,
         status: 'Compile Error',
         message: 'Code too short',
