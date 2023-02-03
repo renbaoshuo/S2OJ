@@ -157,29 +157,52 @@ if ($cur_tab == 'profile') {
 	$update_profile_form->config['submit_button']['text'] = '更新';
 	$update_profile_form->runAtServer();
 } elseif ($cur_tab == 'problems') {
-	if (isset($_POST['submit-remove_problem']) && $_POST['submit-remove_problem'] == 'remove_problem') {
-		crsf_defend();
+	$problems_form = newAddDelCmdForm(
+		'problems',
+		function ($problem_id) {
+			if (!validateUInt($problem_id)) {
+				return "无效题号";
+			}
 
-		$problem = UOJProblem::query(UOJRequest::post('problem_id', 'validateUInt'));
+			$problem = UOJProblem::query($problem_id);
 
-		if (!$problem) {
-			dieWithAlert('题目不存在');
-		}
+			if (!$problem) {
+				return "不存在题号为 {$problem_id} 的题";
+			}
 
-		if (!UOJList::cur()->hasProblem($problem)) {
-			dieWithAlert('题目不在题单中');
-		}
+			// if (!$problem->userCanManage(Auth::user())) {
+			// 	return "无权添加题号为 {$problem_id} 的题";
+			// }
 
-		DB::delete([
-			"delete from lists_problems",
-			"where", [
-				"problem_id" => $problem->info['id'],
-				"list_id" => UOJList::info('id'),
-			],
-		]);
+			if (!$problem->userCanView(Auth::user())) {
+				return "无权添加题号为 {$problem_id} 的题";
+			}
 
-		dieWithAlert('移除成功！');
-	}
+			return '';
+		},
+		function ($type, $problem_id) {
+			if ($type == '+') {
+				DB::insert([
+					"insert into lists_problems",
+					DB::bracketed_fields(["list_id", "problem_id"]),
+					"values", DB::tuple([UOJList::info('id'), $problem_id]),
+				]);
+			} else if ($type == '-') {
+				DB::delete([
+					"delete from lists_problems",
+					"where", [
+						"list_id" => UOJList::info('id'),
+						"problem_id" => $problem_id,
+					],
+				]);
+			}
+		},
+		null,
+		[
+			'help' => '命令格式：命令一行一个，<code>+233</code> 表示把题号为 <code>233</code> 的试题加入题单，<code>-233</code> 表示把题号为 <code>233</code> 的试题从题单中移除。',
+		]
+	);
+	$problems_form->runAtServer();
 
 	$n_problems = DB::selectCount([
 		"select count(*)",
@@ -188,56 +211,6 @@ if ($cur_tab == 'profile') {
 			"list_id" => UOJList::info('id'),
 		],
 	]);
-
-	$add_new_problem_form = new UOJForm('add_new_problem');
-	$add_new_problem_form->addInput('problem_id', [
-		'label' => '题目 ID',
-		'validator_php' => function ($problem_id, &$vdata) {
-			$problem = UOJProblem::query($problem_id);
-
-			if (!$problem || !$problem->userCanView(Auth::user())) {
-				return '题目不存在';
-			}
-
-			if (UOJList::cur()->hasProblem($problem)) {
-				return '该题目已经在题单中';
-			}
-
-			$vdata['problem'] = $problem;
-
-			return '';
-		},
-	]);
-	$add_new_problem_form->config['submit_button']['text'] = '添加';
-	$add_new_problem_form->handle = function ($vdata) {
-		DB::insert([
-			"insert into lists_problems",
-			DB::bracketed_fields(["list_id", "problem_id"]),
-			"values", DB::tuple([UOJList::info('id'), $vdata['problem']->info['id']]),
-		]);
-
-		dieWithJsonData(['status' => 'success', 'message' => '已将题目 #' . $vdata['problem']->info['id'] . ' 添加到题单 #' . UOJList::info('id') . ' 中']);
-	};
-	$add_new_problem_form->setAjaxSubmit(<<<EOD
-		function(res) {
-			if (res.status === 'success') {
-				$('#result-alert')
-					.html('题目添加成功！' + (res.message || ''))
-					.addClass('alert-success')
-					.removeClass('alert-danger')
-					.show();
-			} else {
-				$('#result-alert')
-					.html('题目添加失败。' + (res.message || ''))
-					.removeClass('alert-success')
-					.addClass('alert-danger')
-					.show();
-			}
-
-			$(window).scrollTop(0);
-		}
-	EOD);
-	$add_new_problem_form->runAtServer();
 }
 ?>
 
@@ -282,85 +255,44 @@ if ($cur_tab == 'profile') {
 			</div>
 		<?php elseif ($cur_tab == 'problems') : ?>
 			<div class="card mt-3 mt-md-0">
-				<div class="card-header">
-					<ul class="nav nav-tabs card-header-tabs" role="tablist">
-						<li class="nav-item">
-							<a class="nav-link active" href="#problems" data-bs-toggle="tab" data-bs-target="#problems">题目列表</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="#add-problem" data-bs-toggle="tab" data-bs-target="#add-problem">添加题目</a>
-						</li>
-					</ul>
-				</div>
-				<div class="card-body tab-content">
-					<div class="tab-pane active" id="problems">
-						<?php
-						echoLongTable(
-							['problem_id'],
-							"lists_problems",
-							["list_id" => UOJList::info('id')],
-							"order by problem_id asc",
-							<<<EOD
-								<tr>
-									<th class="text-center" style="width:5em">ID</th>
-									<th>标题</th>
-									<th style="width:4em">操作</th>
-								</tr>
-							EOD,
-							function ($row) {
-								$problem = UOJProblem::query($row['problem_id']);
+				<div class="card-body">
+					<?php
+					echoLongTable(
+						['problem_id'],
+						"lists_problems",
+						["list_id" => UOJList::info('id')],
+						"order by problem_id asc",
+						<<<EOD
+							<tr>
+								<th class="text-center" style="width:5em">ID</th>
+								<th>标题</th>
+							</tr>
+						EOD,
+						function ($row) {
+							$problem = UOJProblem::query($row['problem_id']);
 
-								echo HTML::tag_begin('tr');
-								echo HTML::tag('td', ['class' => 'text-center'], $problem->info['id']);
-								echo HTML::tag_begin('td');
-								echo $problem->getLink(['with' => 'none']);
-								if ($problem->info['is_hidden']) {
-									echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
-								}
-								echo HTML::tag_end('td');
-								echo HTML::tag('td', [], HTML::tag('form', [
-									'target' => '_self',
-									'method' => 'POST',
-									'class' => 'd-inline-block',
-									'onsubmit' => "return confirm('你确定要将 {$problem->info['id']} 从题单中移除吗？');",
-								], [
-									HTML::hiddenToken(),
-									HTML::empty_tag('input', ['type' => 'hidden', 'name' => 'problem_id', 'value' => $problem->info['id']]),
-									html::tag('button', [
-										'type' => 'submit',
-										'class' => 'btn btn-link text-danger text-decoration-none p-0',
-										'name' => 'submit-remove_problem',
-										'value' => 'remove_problem',
-									], '移除'),
-								]));
-								echo HTML::tag_end('tr');
+							echo HTML::tag_begin('tr');
+							echo HTML::tag('td', ['class' => 'text-center'], $problem->info['id']);
+							echo HTML::tag_begin('td');
+							echo $problem->getLink(['with' => 'none']);
+							if ($problem->info['is_hidden']) {
+								echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
+							}
+							echo HTML::tag_end('td');
+							echo HTML::tag_end('tr');
+						},
+						[
+							'page_len' => 50,
+							'div_classes' => ['table-responsive'],
+							'table_classes' => ['table', 'align-middle'],
+							'print_after_table' => function () use ($n_problems) {
+								echo '<div class="text-muted text-end">共 ', $n_problems, ' 道题目</div>';
 							},
-							[
-								'page_len' => 10,
-								'div_classes' => ['table-responsive'],
-								'table_classes' => ['table', 'align-middle'],
-								'print_after_table' => function () use ($n_problems) {
-									echo '<div class="text-muted text-end">共 ', $n_problems, ' 道题目</div>';
-								},
-							]
-						);
-						?>
-					</div>
-					<div class="tab-pane" id="add-problem">
-						<div id="result-alert" class="alert" role="alert" style="display: none"></div>
-						<div class="row row-cols-1 row-cols-md-2">
-							<div class="col">
-								<?php $add_new_problem_form->printHTML() ?>
-							</div>
-							<div class="col">
-								<h5>注意事项</h5>
-								<ul class="mt-0">
-									<li>隐藏的题目添加进题单后无法被普通用户查看。</li>
-									<li>如当前题单已经被设置为某个小组的作业，则作业也会一并更新。</li>
-								</ul>
-							</div>
-						</div>
-					</div>
+						]
+					);
+					?>
+
+					<?php $problems_form->printHTML() ?>
 				</div>
 			</div>
 		<?php endif ?>
