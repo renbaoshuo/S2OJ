@@ -1048,12 +1048,12 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 			input_luogu_client_id.val(luogu_account_data.__client_id);
 
 			div_submit_type_my.append(
-				$('<div class="row mt-3" />')
+				$('<div class="row mt-3 align-items-center" />')
 					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_uid" class="col-form-label">_uid</label>'))
 					.append($('<div class="col-sm-4" />').append(input_luogu_uid))
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>_uid</code>。')))
 			).append(
-				$('<div class="row mt-3" />')
+				$('<div class="row mt-3 align-items-center" />')
 					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_client_id" class="col-form-label">__client_id</label>'))
 					.append($('<div class="col-sm-4" />').append(input_luogu_client_id))
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>__client_id</code>。')))
@@ -1085,7 +1085,7 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 			input_codeforces_jsessionid.val(codeforces_account_data.JSESSIONID);
 
 			div_submit_type_my.append(
-				$('<div class="row mt-3" />')
+				$('<div class="row mt-3 align-items-center" />')
 					.append($('<div class="col-sm-2" />').append('<label for="input-codeforces_jsessionid" class="col-form-label">JSESSIONID</label>'))
 					.append($('<div class="col-sm-4" />').append(input_codeforces_jsessionid))
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>JSESSIONID</code>。')))
