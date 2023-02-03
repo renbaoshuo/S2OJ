@@ -1,13 +1,13 @@
 <?php
 define('SCRIPT_REFRESH_AS_GET', '<script>;window.location = window.location.origin + window.location.pathname + (window.location.search.length ? window.location.search + "&" : "?") + "_refresh_" + (+new Date()) + "=" + (+new Date()) + window.location.hash;</script>');
 
-function newAddDelCmdForm($form_name, $validate, $handle, $final = null) {
+function newAddDelCmdForm($form_name, $validate, $handle, $final = null, $cfg = []) {
 	$form = new UOJForm($form_name);
 	$form->addTextArea("{$form_name}_cmds", [
 		'label' => '命令',
 		'input_class' => 'form-control font-monospace',
 		'validator_php' => function ($str, &$vdata) use ($validate) {
-			$cmds = array();
+			$cmds = [];
 			foreach (explode("\n", $str) as $line_id => $raw_line) {
 				$line = trim($raw_line);
 				if ($line == '') {
@@ -26,8 +26,8 @@ function newAddDelCmdForm($form_name, $validate, $handle, $final = null) {
 			$vdata['cmds'] = $cmds;
 			return '';
 		},
-	]);
-	if (!isset($final)) {
+	] + $cfg);
+	if (!isset($final) || !$final) {
 		$form->handle = function (&$vdata) use ($handle) {
 			foreach ($vdata['cmds'] as $cmd) {
 				$handle($cmd['type'], $cmd['obj'], $vdata);

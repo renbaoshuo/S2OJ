@@ -46,7 +46,11 @@ $managers_form = newAddDelCmdForm(
 				]
 			]);
 		}
-	}
+	},
+	null,
+	[
+		'help' => '命令格式：命令一行一个，<code>+mike</code> 表示把 <code>mike</code> 加入管理者，<code>-mike</code> 表示把 <code>mike</code> 从管理者中移除。',
+	]
 );
 
 $managers_form->runAtServer();

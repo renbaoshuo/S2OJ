@@ -256,82 +256,36 @@ function(res) {
 EOD);
 	$add_problem_form->runAtServer();
 } elseif ($cur_tab == 'managers') {
-	if (isset($_POST['submit-remove_manager']) && $_POST['submit-remove_manager'] == 'remove_manager') {
-		$username = $_POST['username'];
-		$user = UOJUser::query($username);
+	$managers_form = newAddDelCmdForm(
+		'managers',
+		'validateUserAndStoreByUsername',
+		function ($type, $username, &$vdata) {
+			$user = $vdata['user'][$username];
 
-		if (!$user) {
-			dieWithAlert('用户不存在。');
-		}
-
-		if (!UOJContest::cur()->userCanManage($user)) {
-			dieWithAlert('用户不是这场比赛的管理员。');
-		}
-
-		DB::delete([
-			"delete from contests_permissions",
-			"where", [
-				"contest_id" => $contest['id'],
-				"username" => $user['username'],
-			]
-		]);
-		dieWithAlert('移除成功！');
-	}
-
-	$add_manager_form = new UOJForm('add_manager');
-	$add_manager_form->addInput(
-		'username',
+			if ($type == '+') {
+				DB::insert([
+					"insert into contests_permissions",
+					"(contest_id, username)",
+					"values", DB::tuple([
+						UOJContest::info('id'), $user['username']
+					])
+				]);
+			} else if ($type == '-') {
+				DB::delete([
+					"delete from contests_permissions",
+					"where", [
+						"contest_id" => UOJContest::info('id'),
+						"username" => $user['username']
+					]
+				]);
+			}
+		},
+		null,
 		[
-			'label' => '用户名',
-			'validator_php' => function ($username, &$vdata) {
-				$user = UOJUser::query($username);
-
-				if (!$user) {
-					return '用户不存在';
-				}
-
-				if (UOJContest::cur()->userCanManage($user)) {
-					return '用户已经是这场比赛的管理员';
-				}
-
-				$vdata['username'] = $username;
-
-				return '';
-			},
+			'help' => '命令格式：命令一行一个，<code>+mike</code> 表示把 <code>mike</code> 加入管理者，<code>-mike</code> 表示把 <code>mike</code> 从管理者中移除。',
 		]
 	);
-	$add_manager_form->handle = function (&$vdata) {
-		DB::insert([
-			"insert into contests_permissions",
-			DB::bracketed_fields(["contest_id", "username"]),
-			"values",
-			DB::tuple([UOJContest::info('id'), $vdata['username']])
-		]);
-
-		dieWithJsonData(['status' => 'success', 'message' => '已将用户名为 ' . $vdata['username'] . ' 的用户设置为本场比赛的管理者。']);
-	};
-	$add_manager_form->config['submit_button']['text'] = '添加';
-	$add_manager_form->config['submit_button']['class'] = 'btn btn-secondary mt-3';
-	$add_manager_form->setAjaxSubmit(<<<EOD
-function(res) {
-	if (res.status === 'success') {
-		$('#result-alert')
-			.html('添加成功！' + (res.message || ''))
-			.addClass('alert-success')
-			.removeClass('alert-danger')
-			.show();
-	} else {
-		$('#result-alert')
-			.html('添加失败。' + (res.message || ''))
-			.removeClass('alert-success')
-			.addClass('alert-danger')
-			.show();
-	}
-
-	$(window).scrollTop(0);
-}
-EOD);
-	$add_manager_form->runAtServer();
+	$managers_form->runAtServer();
 } elseif ($cur_tab == 'others') {
 	$rule_form = new UOJForm('basic_rule');
 	$rule_form->addSelect('basic_rule', [
@@ -531,81 +485,34 @@ EOD);
 			</div>
 		<?php elseif ($cur_tab == 'managers') : ?>
 			<div class="card mt-3 mt-md-0">
-				<div class="card-header">
-					<ul class="nav nav-tabs card-header-tabs" role="tablist">
-						<li class="nav-item">
-							<a class="nav-link active" href="#managers" data-bs-toggle="tab" data-bs-target="#managers">管理者列表</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="#add-manager" data-bs-toggle="tab" data-bs-target="#add-manager">添加管理者</a>
-						</li>
-					</ul>
-				</div>
-				<div class="card-body tab-content">
-					<div class="tab-pane active" id="managers">
-						<?php
-						echoLongTable(
-							['*'],
-							'contests_permissions',
-							"contest_id = {$contest['id']}",
-							'ORDER BY username',
-							<<<EOD
-								<tr>
-									<th>用户名</th>
-									<th style="width:6em">操作</th>
-								</tr>
-							EOD,
-							function ($row) {
-								$user = UOJUser::query($row['username']);
+				<div class="card-body">
+					<?php
+					echoLongTable(
+						['*'],
+						'contests_permissions',
+						"contest_id = {$contest['id']}",
+						'ORDER BY username',
+						<<<EOD
+							<tr>
+								<th>用户名</th>
+							</tr>
+						EOD,
+						function ($row) {
+							$user = UOJUser::query($row['username']);
 
-								echo HTML::tag_begin('tr');
-								echo HTML::tag('td', [], UOJUser::getLink($user));
-								echo HTML::tag('td', [], [
-									HTML::tag('form', [
-										'method' => 'POST',
-										'target' => '_self',
-										'class' => 'd-inline-block',
-										'onsubmit' => "return confirm('你确定要将 {$user['username']} 从比赛管理员列表中移除吗？');",
-									], [
-										HTML::hiddenToken(),
-										HTML::empty_tag('input', [
-											'type' => 'hidden',
-											'name' => 'username',
-											'value' => $user['username'],
-										]),
-										HTML::tag('button', [
-											'type' => 'submit',
-											'class' => 'btn btn-link text-danger text-decoration-none p-0',
-											'name' => 'submit-remove_manager',
-											'value' => 'remove_manager',
-										], '移除'),
-									]),
-								]);
-								echo HTML::tag_end('tr');
-							},
-							[
-								'echo_full' => true,
-								'div_classes' => ['table-responsive'],
-								'table_classes' => ['table'],
-							]
-						);
-						?>
-					</div>
-					<div class="tab-pane" id="add-manager">
-						<div id="result-alert" class="alert" role="alert" style="display: none"></div>
-						<div class="row row-cols-1 row-cols-md-2">
-							<div class="col">
-								<?php $add_manager_form->printHTML(); ?>
-							</div>
-							<div class="col mt-3 mt-md-0">
-								<h5>注意事项</h5>
-								<ul class="mb-0">
-									<li>添加管理者前请确认用户名是否正确以免带来不必要的麻烦。</li>
-									<li>比赛管理者如果报名了比赛仍可以正常参赛，但不报名比赛也可以查看并管理本场比赛。</li>
-								</ul>
-							</div>
-						</div>
-					</div>
+							echo HTML::tag_begin('tr');
+							echo HTML::tag('td', [], UOJUser::getLink($user));
+							echo HTML::tag_end('tr');
+						},
+						[
+							'echo_full' => true,
+							'div_classes' => ['table-responsive'],
+							'table_classes' => ['table'],
+						]
+					);
+					?>
+
+					<?php $managers_form->printHTML() ?>
 				</div>
 			</div>
 		<?php elseif ($cur_tab == 'others') : ?>
