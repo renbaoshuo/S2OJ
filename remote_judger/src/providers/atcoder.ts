@@ -129,6 +129,9 @@ export default class AtcoderProvider implements IBasicProvider {
       this.cookie = header['set-cookie'];
     }
 
+    let value = /csrfToken = "(.+?)"/g.exec(html);
+    if (value) return value[1];
+
     if (document.body.children.length < 2 && html.length < 512) {
       throw new Error(document.body.textContent!);
     }
