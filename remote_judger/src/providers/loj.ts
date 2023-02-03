@@ -156,6 +156,10 @@ export default class LibreojProvider implements IBasicProvider {
     this.account.endpoint ||= 'https://api.loj.ac.cn/api';
   }
 
+  static constructFromAccountData(data) {
+    throw new Error('Method not implemented.');
+  }
+
   get(url: string) {
     logger.debug('get', url);
     if (!url.includes('//')) url = `${this.account.endpoint}${url}`;

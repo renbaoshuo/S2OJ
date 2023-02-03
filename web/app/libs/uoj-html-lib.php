@@ -403,7 +403,7 @@ function echoSubmissionContent($submission, $requirement) {
 			echo '</div>';
 			echo '<div class="card-footer">' . $footer_text . '</div>';
 			echo '</div>';
-		} elseif ($req['type'] == "text") {
+		} else if ($req['type'] == "text") {
 			$file_content = $zip_file->getFromName("{$req['file_name']}", 504);
 			$file_content = strOmit($file_content, 500);
 			$file_content = uojTextEncode($file_content, array('allow_CR' => true, 'html_escape' => true));

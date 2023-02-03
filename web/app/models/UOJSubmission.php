@@ -418,6 +418,10 @@ class UOJSubmission {
 	}
 
 	public function userCanRejudge(array $user = null) {
+		if ($this->getContent('no_rejudge')) {
+			return false;
+		}
+
 		if (isSuperUser($user)) {
 			return true;
 		}

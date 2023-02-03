@@ -46,6 +46,7 @@ function newAddDelCmdForm($form_name, $validate, $handle, $final = null) {
 
 function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle) {
 	$form = new UOJForm($form_name);
+
 	foreach ($requirement as $req) {
 		if ($req['type'] == "source code") {
 			$languages = UOJLang::getAvailableLanguages(isset($req['languages']) ? $req['languages'] : null);
@@ -74,6 +75,7 @@ function newSubmissionForm($form_name, $requirement, $zip_file_name_gen, $handle
 		$content = [];
 		$content['file_name'] = $zip_file_name;
 		$content['config'] = [];
+
 		foreach ($requirement as $req) {
 			if ($req['type'] == "source code") {
 				$content['config'][] = ["{$req['name']}_language", $_POST["{$form_name}_{$req['name']}_language"]];

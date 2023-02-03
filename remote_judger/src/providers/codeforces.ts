@@ -87,6 +87,10 @@ export default class CodeforcesProvider implements IBasicProvider {
     this.account.endpoint ||= 'https://codeforces.com';
   }
 
+  static constructFromAccountData(data) {
+    throw new Error('Method not implemented.');
+  }
+
   cookie: string[] = [];
   csrf: string;
 

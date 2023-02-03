@@ -118,7 +118,7 @@ if (UOJProblem::info('type') == 'remote') {
 		</ul>
 	EOD);
 	$re_crawl_form->config['submit_button']['text'] = '重新爬取';
-	$re_crawl_form->handle = function () use ($remote_online_judge, $remote_problem_id, $remote_provider) {
+	$re_crawl_form->handle = function () use ($remote_online_judge, $remote_problem_id) {
 		try {
 			$data = UOJRemoteProblem::getProblemBasicInfo($remote_online_judge, $remote_problem_id);
 		} catch (Exception $e) {
@@ -134,16 +134,9 @@ if (UOJProblem::info('type') == 'remote') {
 			$data['difficulty'] = UOJProblem::info('difficulty');
 		}
 
-		$submission_requirement = [
-			[
-				"name" => "answer",
-				"type" => "source code",
-				"file_name" => "answer.code",
-				"languages" => $remote_provider['languages'],
-			]
-		];
+		$submission_requirement = UOJRemoteProblem::getSubmissionRequirements($remote_online_judge);
 		$enc_submission_requirement = json_encode($submission_requirement);
-
+	
 		$extra_config = [
 			'remote_online_judge' => $remote_online_judge,
 			'remote_problem_id' => $remote_problem_id,

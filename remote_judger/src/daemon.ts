@@ -7,6 +7,7 @@ import * as TIME from './utils/time';
 import { apply } from './vjudge';
 import path from 'path';
 import child from 'child_process';
+import htmlspecialchars from './utils/htmlspecialchars';
 
 proxy(superagent);
 
@@ -146,7 +147,8 @@ export default async function daemon(config: UOJConfig) {
             config.remote_problem_id,
             config.answer_language,
             code,
-            judge_time
+            judge_time,
+            config
           );
         } catch (err) {
           await request('/submit', {
@@ -157,7 +159,7 @@ export default async function daemon(config: UOJConfig) {
               status: 'Judged',
               score: 0,
               error: 'Judgment Failed',
-              details: `<error>No details.</error>`,
+              details: `<error>${htmlspecialchars(err.message)}</error>`,
             }),
             judge_time,
           });

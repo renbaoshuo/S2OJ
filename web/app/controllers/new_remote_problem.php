@@ -52,6 +52,16 @@ $new_remote_problem_form->addInput('remote_problem_id', [
 			$vdata['remote_problem_id'] = $id;
 
 			return '';
+		} else if ($remote_oj === 'luogu') {
+			$id = trim(strtoupper($id));
+
+			if (!validateLuoguProblemId($id)) {
+				return '不合法的题目 ID';
+			}
+
+			$vdata['remote_problem_id'] = $id;
+
+			return '';
 		}
 
 		return '不合法的远程 OJ 类型';
@@ -73,14 +83,7 @@ $new_remote_problem_form->handle = function (&$vdata) {
 		UOJResponse::page500('题目抓取失败，可能是题目不存在或者没有题面！如果题目没有问题，请稍后再试。<a href="">返回</a>');
 	}
 
-	$submission_requirement = [
-		[
-			"name" => "answer",
-			"type" => "source code",
-			"file_name" => "answer.code",
-			"languages" => $remote_provider['languages'],
-		]
-	];
+	$submission_requirement = UOJRemoteProblem::getSubmissionRequirements($remote_online_judge);
 	$enc_submission_requirement = json_encode($submission_requirement);
 
 	$extra_config = [
