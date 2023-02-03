@@ -240,7 +240,7 @@ class UOJRemoteProblem {
 		if (!$res) return null;
 
 		$dom = new \IvoPetkov\HTML5DOMDocument();
-		$dom->loadHTML($res);
+		$dom->loadHTML($res['response']);
 		$container_dom = $dom->querySelectorAll('#main-container > div.row > div.col-sm-12')->item(1);
 
 		if (!$container_dom) return null;
@@ -315,7 +315,7 @@ class UOJRemoteProblem {
 		if (!$res) return null;
 
 		$dom = new \IvoPetkov\HTML5DOMDocument();
-		$dom->loadHTML($res);
+		$dom->loadHTML($res['response']);
 
 		$title_dom = $dom->querySelector('.page-header');
 		$title_matches = [];
