@@ -665,7 +665,12 @@ class UOJForm {
 			EOD;
 		} else {
 			echo <<<EOD
-				if (ok) $("#button-submit-{$this->form_name}").addClass('disabled');
+				if (ok) {
+					$("#button-submit-{$this->form_name}").addClass('disabled');
+					$(this).submit(function () {
+						return false;
+					});
+				}
 				return ok;
 			EOD;
 		}
