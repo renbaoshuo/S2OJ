@@ -1026,14 +1026,46 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 
 			div_submit_type_my.append(
 				$('<div class="row mt-3" />')
-					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_uid" class="form-col-label">_uid</label>'))
+					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_uid" class="col-form-label">_uid</label>'))
 					.append($('<div class="col-sm-4" />').append(input_luogu_uid))
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>_uid</code>。')))
 			).append(
 				$('<div class="row mt-3" />')
-					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_client_id" class="form-col-label">__client_id</label>'))
+					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_client_id" class="col-form-label">__client_id</label>'))
 					.append($('<div class="col-sm-4" />').append(input_luogu_client_id))
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>__client_id</code>。')))
+			).append(input_my_account_data);
+		} else if (oj == 'codeforces') {
+			var codeforces_account_data = {"JSESSIONID": ""};
+			var input_codeforces_jsessionid = $('<input class="form-control" type="text" name="codeforces_jsessionid" id="input-codeforces_jsessionid" />');
+
+			if ('localStorage' in window) {
+				try {
+					var codeforces_account_data_str = localStorage.getItem('uoj_remote_judge_codeforces_account_data');
+					if (codeforces_account_data_str) {
+						codeforces_account_data = JSON.parse(codeforces_account_data_str);
+					}
+				} catch (e) {}
+
+				var save_codeforces_account_data = function() {
+					localStorage.setItem('uoj_remote_judge_codeforces_account_data', JSON.stringify(codeforces_account_data));
+				}
+			}
+
+			input_codeforces_jsessionid.change(function() {
+				codeforces_account_data.JSESSIONID = $(this).val();
+				input_my_account_data.val(JSON.stringify(codeforces_account_data));
+				save_codeforces_account_data();
+			});
+
+			input_my_account_data.val(JSON.stringify(codeforces_account_data));
+			input_codeforces_jsessionid.val(codeforces_account_data.JSESSIONID);
+
+			div_submit_type_my.append(
+				$('<div class="row mt-3" />')
+					.append($('<div class="col-sm-2" />').append('<label for="input-codeforces_jsessionid" class="col-form-label">JSESSIONID</label>'))
+					.append($('<div class="col-sm-4" />').append(input_codeforces_jsessionid))
+					.append($('<div class="col-sm-6" />').append($('<div class="form-text" />').append('请填入 Cookie 中的 <code>JSESSIONID</code>。')))
 			).append(input_my_account_data);
 		}
 

@@ -11,7 +11,7 @@ import Logger from '../utils/logger';
 proxy(superagent);
 const logger = new Logger('remote/codeforces');
 
-const langs_map = {
+const LANGS_MAP = {
   C: {
     name: 'GNU GCC C11 5.1.0',
     id: 43,
@@ -88,7 +88,10 @@ export default class CodeforcesProvider implements IBasicProvider {
   }
 
   static constructFromAccountData(data) {
-    throw new Error('Method not implemented.');
+    return new this({
+      type: 'codeforces',
+      cookie: Object.entries(data).map(([key, value]) => `${key}=${value}`),
+    });
   }
 
   cookie: string[] = [];
@@ -166,23 +169,41 @@ export default class CodeforcesProvider implements IBasicProvider {
   get loggedIn() {
     return this.get('/enter').then(res => {
       const html = res.text;
+
       if (html.includes('Login into Codeforces')) return false;
+
       if (html.length < 1000 && html.includes('Redirecting...')) {
         logger.debug('Got a redirect', html);
         return false;
       }
+
+      if (res.header['set-cookie']) {
+        const _39ce7 = this.getCookie.call(
+          { cookie: res.header['set-cookie'] },
+          '39ce7'
+        );
+
+        if (_39ce7) this.setCookie('39ce7', _39ce7);
+      }
+
       return true;
     });
   }
 
   async ensureLogin() {
     if (await this.loggedIn) return true;
+
     logger.info('retry normal login');
+
+    if (!this.account.handle) return false;
+
     const [csrf, ftaa, bfaa] = await this.getCsrfToken('/enter');
     const { header } = await this.get('/enter');
+
     if (header['set-cookie']) {
       this.cookie = header['set-cookie'];
     }
+
     const res = await this.post('/enter').send({
       csrf_token: csrf,
       action: 'enter',
@@ -193,10 +214,13 @@ export default class CodeforcesProvider implements IBasicProvider {
       remember: 'on',
       _tta: this.tta(this.getCookie('39ce7')),
     });
+
     const cookie = res.header['set-cookie'];
+
     if (cookie) {
       this.cookie = cookie;
     }
+
     if (await this.loggedIn) {
       logger.success('Logged in');
       return true;
@@ -212,18 +236,32 @@ export default class CodeforcesProvider implements IBasicProvider {
     next,
     end
   ) {
-    const programType = langs_map[lang] || langs_map['C++'];
+    if (!(await this.ensureLogin())) {
+      end({
+        error: true,
+        status: 'Judgment Failed',
+        message: 'Login failed',
+      });
+
+      return null;
+    }
+
+    const programType = LANGS_MAP[lang] || LANGS_MAP['C++'];
     const comment = programType.comment;
+
     if (comment) {
       const msg = `S2OJ Submission #${submissionId} @ ${new Date().getTime()}`;
       if (typeof comment === 'string') code = `${comment} ${msg}\n${code}`;
       else if (comment instanceof Array)
         code = `${comment[0]} ${msg} ${comment[1]}\n${code}`;
     }
+
     const [type, contestId, problemId] = parseProblemId(id);
+
     const [csrf, ftaa, bfaa] = await this.getCsrfToken(
       type !== 'GYM' ? '/problemset/submit' : `/gym/${contestId}/submit`
     );
+
     logger.debug(
       'Submitting',
       id,
@@ -231,6 +269,7 @@ export default class CodeforcesProvider implements IBasicProvider {
       lang,
       `(S2OJ Submission #${submissionId})`
     );
+
     // TODO: check submit time to ensure submission
     const { text: submit, error } = await this.post(
       `/${

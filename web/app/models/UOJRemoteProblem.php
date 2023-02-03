@@ -14,7 +14,7 @@ class UOJRemoteProblem {
 				'ограничение по времени на тест',
 			],
 			'languages' => ['C', 'C++', 'C++17', 'C++20', 'Java17', 'Pascal', 'Python2', 'Python3'],
-			'submit_type' => ['bot'],
+			'submit_type' => ['bot', 'my'],
 		],
 		'atcoder' => [
 			'name' => 'AtCoder',
