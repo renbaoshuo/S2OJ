@@ -964,13 +964,25 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 		var div_submit_type_my = $('<div id="' + div_submit_type_my_id + '" />')
 			.append('<div class="mt-3">将使用您的账号提交本题。</div>');
 
+		if ('localStorage' in window) {
+			var prefer_submit_type = localStorage.getItem('uoj_remote_judge_save_prefer_submit_type__' + oj) || null;
+			var save_prefer_submit_type = function(type) {
+				localStorage.setItem('uoj_remote_judge_save_prefer_submit_type__' + oj, type);
+			}
+		} else {
+			var prefer_submit_type = null;
+			var save_prefer_submit_type = function(type) {};
+		}
+
 		input_submit_type_bot.click(function() {
 			div_submit_type_my.hide('fast');
 			div_submit_type_bot.show('fast');
+			save_prefer_submit_type('bot');
 		});
 		input_submit_type_my.click(function() {
 			div_submit_type_bot.hide('fast');
 			div_submit_type_my.show('fast');
+			save_prefer_submit_type('my');
 		});
 
 		if (submit_type[0] == 'bot') {
@@ -983,9 +995,20 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 
 		if (submit_type.indexOf('bot') == -1) {
 			input_submit_type_bot.attr('disabled', 'disabled');
+		} else if (prefer_submit_type == 'bot') {
+			div_submit_type_my.hide();
+			div_submit_type_bot.show();
+			input_submit_type_bot[0].checked = true;
+			input_submit_type_my[0].checked = false;
 		}
+
 		if (submit_type.indexOf('my') == -1) {
 			input_submit_type_my.attr('disabled', 'disabled');
+		} else if (prefer_submit_type == 'my') {
+			div_submit_type_bot.hide();
+			div_submit_type_my.show();
+			input_submit_type_bot[0].checked = false;
+			input_submit_type_my[0].checked = true;
 		}
 
 		if (oj == 'luogu') {
