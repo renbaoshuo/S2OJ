@@ -5,6 +5,7 @@ import Logger from '../utils/logger';
 import { IBasicProvider, RemoteAccount, USER_AGENT } from '../interface';
 import sleep from '../utils/sleep';
 import flattenDeep from 'lodash.flattendeep';
+import htmlspecialchars from '../utils/htmlspecialchars';
 
 proxy(superagent);
 const logger = new Logger('remote/luogu');
@@ -74,6 +75,18 @@ const LANGS_MAP = {
     comment: '//',
   },
 };
+
+function buildLuoguTestCaseInfoBlock(test) {
+  let res = '';
+
+  res += `<test num="${test.id + 1}" info="${STATUS_MAP[test.status]}" time="${
+    test.time || -1
+  }" memory="${test.memory || -1}" score="${test.score || ''}">`;
+  res += `<res>${htmlspecialchars(test.description || '')}</res>`;
+  res += '</test>';
+
+  return res;
+}
 
 export default class LuoguProvider implements IBasicProvider {
   constructor(public account: RemoteAccount) {
@@ -255,7 +268,7 @@ export default class LuoguProvider implements IBasicProvider {
         ) {
           return await end({
             error: true,
-            id: 'R' + id,
+            id: `R${id}`,
             status: 'Compile Error',
             message: data.detail.compileResult.message,
           });
@@ -278,15 +291,47 @@ export default class LuoguProvider implements IBasicProvider {
 
         logger.info('RecordID:', id, 'done');
 
+        const status = STATUS_MAP[data.status];
+        let details = '';
+
+        details += `<info-block>REMOTE_SUBMISSION_ID = ${id}\nVERDICT = ${status}</info-block>`;
+
+        if (data.detail.judgeResult.subtasks.length === 1) {
+          details += Object.entries(
+            data.detail.judgeResult.subtasks[0].testCases
+          )
+            .map(o => o[1])
+            .map(buildLuoguTestCaseInfoBlock)
+            .join('\n');
+        } else {
+          details += Object.entries(data.detail.judgeResult.subtasks)
+            .map(o => o[1])
+            .map(
+              (subtask: any, index) =>
+                `<subtask num="${index}" info="${
+                  STATUS_MAP[subtask.status]
+                }" time="${subtask.time || -1}" memory="${
+                  subtask.memory || -1
+                }" score="${subtask.score || ''}">${Object.entries(
+                  subtask.testCases
+                )
+                  .map(o => o[1])
+                  .map(buildLuoguTestCaseInfoBlock)
+                  .join('\n')}</subtask>`
+            )
+            .join('\n');
+        }
+
         return await end({
-          id: 'R' + id,
-          status: STATUS_MAP[data.status],
+          id: `R${id}`,
+          status,
           score:
-            STATUS_MAP[data.status] === 'Accepted'
+            status === 'Accepted'
               ? 100
               : (data.score / data.problem.fullScore) * 100,
           time: data.time,
           memory: data.memory,
+          details: `<div>${details}</div>`,
         });
       } catch (e) {
         logger.error(e);
@@ -297,7 +342,7 @@ export default class LuoguProvider implements IBasicProvider {
 
     return await end({
       error: true,
-      id: 'R' + id,
+      id: `R${id}`,
       status: 'Judgment Failed',
       message: 'Failed to fetch submission details.',
     });
