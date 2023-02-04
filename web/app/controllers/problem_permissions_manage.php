@@ -193,30 +193,29 @@ $solution_view_type_form->runAtServer();
 		<div class="card">
 			<div class="card-header fw-bold">管理者</div>
 			<div class="card-body">
-				<table class="table">
-					<thead>
+				<?php
+				echoLongTable(
+					['username'],
+					"problems_permissions",
+					["problem_id" => UOJProblem::info('id')],
+					"",
+					<<<EOD
 						<tr>
-							<th>#</th>
 							<th>用户名</th>
 						</tr>
-					</thead>
-					<tbody>
-						<?php
-						$row_id = 0;
-						$res = DB::selectAll([
-							"select username from problems_permissions",
-							"where", ["problem_id" => UOJProblem::info('id')]
-						]);
-						foreach ($res as $row) {
-							$row_id++;
-							echo '<tr>', '<td>', $row_id, '</td>', '<td>', UOJUser::getLink($row['username']), '</td>', '</tr>';
-						}
-						?>
-					</tbody>
-				</table>
-				<p class="text-center">
-					命令格式：命令一行一个，<code>+mike</code> 表示把 <code>mike</code> 加入管理者，<code>-mike</code> 表示把 <code>mike</code> 从管理者中移除。
-				</p>
+					EOD,
+					function ($row) {
+						echo HTML::tag_begin('tr');
+						echo HTML::tag('td', [], UOJUser::getLink($row['username']));
+						echo HTML::tag_end('tr');
+					},
+					[
+						'echo_full' => true,
+						'div_classes' => ['table-responsive'],
+						'table_classes' => ['table', 'align-middle'],
+					]
+				);
+				?>
 
 				<?php $managers_form->printHTML() ?>
 			</div>
