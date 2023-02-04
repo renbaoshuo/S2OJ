@@ -229,47 +229,6 @@ function echoSubmission($submission, $config, $viewer) {
 	$usubm->echoStatusTableRow($config, $viewer);
 }
 
-function echoSubmissionsListOnlyOne($submission, $config, $user) {
-	echo '<div class="card mb-3 table-responsive">';
-	echo '<table class="table text-center uoj-table mb-0">';
-	echo '<thead>';
-	echo '<tr>';
-	if (!isset($config['id_hidden'])) {
-		echo '<th>ID</th>';
-	}
-	if (!isset($config['problem_hidden'])) {
-		echo '<th>' . UOJLocale::get('problems::problem') . '</th>';
-	}
-	if (!isset($config['submitter_hidden'])) {
-		echo '<th>' . UOJLocale::get('problems::submitter') . '</th>';
-	}
-	if (!isset($config['result_hidden'])) {
-		echo '<th style="min-width:3em">' . UOJLocale::get('problems::result') . '</th>';
-	}
-	if (!isset($config['used_time_hidden'])) {
-		echo '<th>' . UOJLocale::get('problems::used time') . '</th>';
-	}
-	if (!isset($config['used_memory_hidden'])) {
-		echo '<th>' . UOJLocale::get('problems::used memory') . '</th>';
-	}
-	echo '<th style="min-width:5em">' . UOJLocale::get('problems::language') . '</th>';
-	echo '<th style="min-width:5em">' . UOJLocale::get('problems::file size') . '</th>';
-	if (!isset($config['submit_time_hidden'])) {
-		echo '<th>' . UOJLocale::get('problems::submit time') . '</th>';
-	}
-	if (!isset($config['judge_time_hidden'])) {
-		echo '<th>' . UOJLocale::get('problems::judge time') . '</th>';
-	}
-	echo '</tr>';
-	echo '</thead>';
-	echo '<tbody>';
-	echoSubmission($submission, $config, $user);
-	echo '</tbody>';
-	echo '</table>';
-	echo '</div>';
-}
-
-
 function echoSubmissionsList($cond, $tail, $config, $user) {
 	$header_row = '<tr>';
 	$col_names = [
