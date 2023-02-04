@@ -96,6 +96,7 @@ Route::group(
 		// Apps
 		Route::any('/apps/image_hosting', '/apps/image_hosting.php');
 		Route::any('/apps/html2markdown', '/apps/html2markdown.php');
+		Route::any('/apps/diff_online', '/apps/diff_online.php');
 	}
 );
 

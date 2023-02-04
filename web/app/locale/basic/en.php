@@ -102,4 +102,5 @@ return [
 	'apps' => 'Apps',
 	'image hosting' => 'Image Hosting',
 	'html to markdown' => 'HTML to Markdown',
+	'diff online' => 'Diff Online',
 ];

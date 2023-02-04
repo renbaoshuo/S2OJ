@@ -102,4 +102,5 @@ return [
 	'apps' => '应用',
 	'image hosting' => '图床',
 	'html to markdown' => 'HTML 转 Markdown',
+	'diff online' => '在线比较',
 ];
