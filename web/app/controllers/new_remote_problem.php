@@ -153,6 +153,7 @@ $new_remote_problem_form->runAtServer();
 									<li><a href="https://atcoder.jp/contests/archive">AtCoder</a></li>
 									<li><a href="https://uoj.ac/problems">UniversalOJ</a></li>
 									<li><a href="https://loj.ac/p">LibreOJ</a></li>
+									<li><a href="https://www.luogu.com.cn/problem/list">洛谷</a></li>
 								</ul>
 							</li>
 							<li>在导入题目前请先搜索题库中是否已经存在相应题目，避免重复添加。</li>
