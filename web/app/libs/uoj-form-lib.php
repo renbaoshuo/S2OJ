@@ -3,6 +3,7 @@ define('SCRIPT_REFRESH_AS_GET', '<script>;window.location = window.location.orig
 
 function newAddDelCmdForm($form_name, $validate, $handle, $final = null, $cfg = []) {
 	$form = new UOJForm($form_name);
+	$form->config['ctrl_enter_submit'] = true;
 	$form->addTextArea("{$form_name}_cmds", [
 		'label' => '命令',
 		'input_class' => 'form-control font-monospace',

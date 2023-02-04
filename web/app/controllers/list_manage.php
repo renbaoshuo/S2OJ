@@ -282,7 +282,7 @@ if ($cur_tab == 'profile') {
 							echo HTML::tag_end('tr');
 						},
 						[
-							'page_len' => 50,
+							'echo_full' => true,
 							'div_classes' => ['table-responsive'],
 							'table_classes' => ['table', 'align-middle'],
 							'print_after_table' => function () use ($n_problems) {
