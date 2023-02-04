@@ -241,6 +241,10 @@ h6,
 
 /* Form */
 
+form {
+	margin-bottom: 0;
+}
+
 form.form-horizontal {
 	margin-bottom: 8px;
 }
