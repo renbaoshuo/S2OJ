@@ -453,7 +453,7 @@ if (UOJContest::cur()) {
 							<?php $his_score = DB::selectSingle(["select max(score)", "from submissions", "where", ["problem_id" => UOJProblem::info('id'), "submitter" => Auth::id()]]) ?>
 
 							<a class="<?= is_null($his_score) ? '' : 'uoj-score' ?>" href="<?= HTML::url('/submissions', ['params' => ['problem_id' => UOJProblem::info('id'), 'submitter' => Auth::id()]]) ?>">
-								<?= is_null($his_score) ? '无' : $his_score ?>
+								<?= is_null($his_score) ? '无' : UOJSubmission::roundedScore($his_score) ?>
 							</a>
 						</li>
 					<?php endif ?>

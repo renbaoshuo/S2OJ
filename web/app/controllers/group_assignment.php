@@ -63,9 +63,9 @@ UOJGroupAssignment::cur()->userCanView(['ensure' => true]);
 				if ($submission) {
 					$row[2][] = [
 						(int)$submission['id'],
-						(int)$submission['score'],
+						UOJSubmission::roundedScore($submission['score']),
 					];
-					$row[0] += $submission['score'];
+					$row[0] = UOJSubmission::roundedScore($row[0] + $submission['score']);
 				} else {
 					$row[2][] = null;
 				}

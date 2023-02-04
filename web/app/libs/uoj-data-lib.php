@@ -310,7 +310,7 @@ class SyncProblemDataHandler {
 			if ($this->problem_conf === -1) {
 				throw new UOJFileNotFoundException("problem.conf");
 			} elseif ($this->problem_conf === -2) {
-				throw new UOJProblemConfException("syntax error");
+				throw new UOJProblemConfException("syntax error: duplicate keys");
 			}
 
 			$this->allow_files = array_flip(FS::scandir($this->upload_dir));

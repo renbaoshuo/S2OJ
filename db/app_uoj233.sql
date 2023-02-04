@@ -332,7 +332,7 @@ CREATE TABLE `contests_submissions` (
   `submitter` varchar(20) NOT NULL,
   `problem_id` int NOT NULL,
   `submission_id` int NOT NULL,
-  `score` int NOT NULL,
+  `score` DECIMAL(15, 10) NOT NULL,
   `penalty` int NOT NULL,
   `cnt` int DEFAULT NULL,
   `n_failures` int DEFAULT NULL,
@@ -875,9 +875,9 @@ CREATE TABLE `submissions` (
   `result` mediumblob NOT NULL,
   `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `result_error` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `score` int DEFAULT NULL,
+  `score` DECIMAL(15, 10) DEFAULT NULL,
   `hide_score_to_others` tinyint(1) NOT NULL DEFAULT '0',
-  `hidden_score` int DEFAULT NULL,
+  `hidden_score` DECIMAL(15, 10) DEFAULT NULL,
   `used_time` int NOT NULL DEFAULT '0',
   `used_memory` int NOT NULL DEFAULT '0',
   `is_hidden` tinyint(1) NOT NULL,
@@ -922,7 +922,7 @@ CREATE TABLE `submissions_history` (
   `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `status_details` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `result_error` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `score` int DEFAULT NULL,
+  `score` DECIMAL(15, 10) DEFAULT NULL,
   `used_time` int NOT NULL DEFAULT '0',
   `used_memory` int NOT NULL DEFAULT '0',
   `major` tinyint(1) NOT NULL,
@@ -994,7 +994,8 @@ INSERT INTO `upgrades` (`name`, `status`, `updated_at`) VALUES
   ('20_problem_difficulty', 'up', now()),
   ('21_problem_difficulty', 'up', now()),
   ('28_remote_judge', 'up', now()),
-  ('31_problem_resources', 'up', now());
+  ('31_problem_resources', 'up', now()),
+  ('36_decimal_score_range', 'up', now());
 /*!40000 ALTER TABLE `upgrades` ENABLE KEYS */;
 UNLOCK TABLES;
 

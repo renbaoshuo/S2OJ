@@ -110,7 +110,7 @@ class DB {
     		return 'true';
     	} elseif ($str === false) {
     		return 'false';
-    	} elseif (is_int($str)) {
+    	} elseif (is_int($str)|| is_float($str)) {
     		return $str;
     	} elseif (is_string($str)) {
     		return '\''.DB::escape($str).'\'';

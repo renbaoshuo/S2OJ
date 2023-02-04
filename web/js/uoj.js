@@ -419,8 +419,8 @@ $.fn.uoj_highlight = function() {
 		$(this).find("span.uoj-username, span[data-uoj-username]").each(replaceWithHighlightUsername);
 		$(this).find(".uoj-honor").uoj_honor();
 		$(this).find(".uoj-score").each(function() {
-			var score = parseInt($(this).text());
-			var maxscore = parseInt($(this).data('max'));
+			var score = parseFloat($(this).text());
+			var maxscore = parseFloat($(this).data('max'));
 			if (isNaN(score)) {
 				return;
 			}
