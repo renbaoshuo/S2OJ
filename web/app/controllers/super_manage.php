@@ -1491,13 +1491,12 @@ if ($cur_tab == 'index') {
 					"result_error = 'Judgement Failed' or result_error = 'Judgment Failed'",
 					'order by id desc',
 					[
-						'result_hidden' => '',
 						'table_config' => [
 							'div_classes' => ['card', 'mb-3', 'table-responsive'],
 							'table_classes' => ['table', 'uoj-table', 'mb-0', 'text-center']
 						]
 					],
-					$myUser
+					Auth::user()
 				);
 				?>
 			<?php else : ?>
@@ -1511,13 +1510,12 @@ if ($cur_tab == 'index') {
 					"status = 'Judging' or status = 'Judged, Judging'",
 					'order by id desc',
 					[
-						'result_hidden' => '',
 						'table_config' => [
 							'div_classes' => ['card', 'mb-3', 'table-responsive'],
 							'table_classes' => ['table', 'uoj-table', 'mb-0', 'text-center']
 						]
 					],
-					$myUser
+					Auth::user()
 				);
 				?>
 			<?php endif ?>
