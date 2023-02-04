@@ -996,6 +996,7 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 		var div_submit_type_my = $('<div id="' + div_submit_type_my_id + '" />')
 			.append($('<div class="mt-3" />')
 				.append('<span>将使用您的账号提交本题。</span>')
+				.append('<span>配置方法请查阅 <a href="https://sjzezoj.com/blog/baoshuo/post/717" target="_blank">使用教程</a>。</span>')
 				.append('<span>账号状态：</span>')
 				.append(my_account_validation_status)
 				.append(my_account_validation_btn)
