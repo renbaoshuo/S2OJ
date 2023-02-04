@@ -1051,8 +1051,8 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 
 		if (oj == 'luogu') {
 			var luogu_account_data = {"_uid": "", "__client_id": ""};
-			var input_luogu_uid = $('<input class="form-control font-monospace" type="text" name="luogu_uid" id="input-luogu_uid" />');
-			var input_luogu_client_id = $('<input class="form-control font-monospace" type="text" name="luogu_client_id" id="input-luogu_client_id" />');
+			var input_luogu_uid = $('<input class="form-control font-monospace" type="text" name="luogu_uid" id="input-luogu_uid" autocomplete="off" />');
+			var input_luogu_client_id = $('<input class="form-control font-monospace" type="text" name="luogu_client_id" id="input-luogu_client_id" autocomplete="off" />');
 
 			if ('localStorage' in window) {
 				try {
@@ -1116,7 +1116,7 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 			).append(input_my_account_data);
 		} else if (oj == 'codeforces') {
 			var codeforces_account_data = {"JSESSIONID": ""};
-			var input_codeforces_jsessionid = $('<input class="form-control font-monospace" type="text" name="codeforces_jsessionid" id="input-codeforces_jsessionid" />');
+			var input_codeforces_jsessionid = $('<input class="form-control font-monospace" type="text" name="codeforces_jsessionid" id="input-codeforces_jsessionid" autocomplete="off" />');
 
 			if ('localStorage' in window) {
 				try {
