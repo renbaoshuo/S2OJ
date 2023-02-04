@@ -663,6 +663,10 @@ class UOJProblem {
 		return "/var/uoj_data/{$this->info['id']}";
 	}
 
+	public function getUploadFolderPath() {
+		return "/var/uoj_data/upload/{$this->info['id']}";
+	}
+
 	public function getDataZipPath() {
 		return "/var/uoj_data/{$this->info['id']}.zip";
 	}
@@ -670,6 +674,10 @@ class UOJProblem {
 	public function getDataFilePath($name = '') {
 		// return "zip://{$this->getDataZipPath()}#{$this->info['id']}/$name";
 		return "{$this->getDataFolderPath()}/$name";
+	}
+
+	public function getUploadFilePath($name = '') {
+		return "{$this->getUploadFolderPath()}/$name";
 	}
 
 	public function getResourcesFolderPath() {

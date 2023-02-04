@@ -201,7 +201,9 @@ class SyncProblemDataHandler {
 
 	public function _updateProblemConf($new_problem_conf) {
 		try {
-			putUOJConf("{$this->data_dir}/problem.conf", $new_problem_conf);
+			putUOJConf("{$this->upload_dir}/problem.conf", $new_problem_conf);
+
+			$this->_sync();
 			return '';
 		} catch (Exception $e) {
 			return $e->getMessage();
@@ -505,4 +507,8 @@ function dataAddHackPoint($problem, $uploaded_input_file, $uploaded_output_file,
 	}
 
 	return (new SyncProblemDataHandler($problem, $user))->addHackPoint($uploaded_input_file, $uploaded_output_file, $reason);
+}
+
+function dataUpdateProblemConf($problem, $new_problem_conf) {
+	return (new SyncProblemDataHandler($problem))->updateProblemConf($new_problem_conf);
 }

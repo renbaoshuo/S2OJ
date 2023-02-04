@@ -90,58 +90,6 @@ if ($_POST['problem_data_file_submit'] == 'submit') {
 	}
 }
 
-// 添加配置文件
-if ($_POST['problem_settings_file_submit'] == 'submit') {
-	if ($_POST['use_builtin_checker'] and $_POST['n_tests']) {
-		$set_filename = "/var/uoj_data/upload/{$problem['id']}/problem.conf";
-		$has_legacy = false;
-		if (file_exists($set_filename)) {
-			$has_legacy = true;
-			unlink($set_filename);
-		}
-		$setfile = fopen($set_filename, "w");
-		fwrite($setfile, "use_builtin_judger on\n");
-		if ($_POST['use_builtin_checker'] != 'ownchk') {
-			fwrite($setfile, "use_builtin_checker " . $_POST['use_builtin_checker'] . "\n");
-		}
-		fwrite($setfile, "n_tests " . $_POST['n_tests'] . "\n");
-		if ($_POST['n_ex_tests']) {
-			fwrite($setfile, "n_ex_tests " . $_POST['n_ex_tests'] . "\n");
-		} else {
-			fwrite($setfile, "n_ex_tests 0\n");
-		}
-		if ($_POST['n_sample_tests']) {
-			fwrite($setfile, "n_sample_tests " . $_POST['n_sample_tests'] . "\n");
-		} else {
-			fwrite($setfile, "n_sample_tests 0\n");
-		}
-		if (isset($_POST['input_pre'])) {
-			fwrite($setfile, "input_pre " . $_POST['input_pre'] . "\n");
-		}
-		if (isset($_POST['input_suf'])) {
-			fwrite($setfile, "input_suf " . $_POST['input_suf'] . "\n");
-		}
-		if (isset($_POST['output_pre'])) {
-			fwrite($setfile, "output_pre " . $_POST['output_pre'] . "\n");
-		}
-		if (isset($_POST['output_suf'])) {
-			fwrite($setfile, "output_suf " . $_POST['output_suf'] . "\n");
-		}
-		fwrite($setfile, "time_limit " . ($_POST['time_limit'] ?: 1) . "\n");
-		fwrite($setfile, "memory_limit " . ($_POST['memory_limit'] ?: 256) . "\n");
-		fclose($setfile);
-		if (!$has_legacy) {
-			echo "<script>alert('添加成功！请点击「检验配置并同步数据」按钮以应用新配置文件。')</script>";
-		} else {
-			echo "<script>alert('替换成功！请点击「检验配置并同步数据」按钮以应用新配置文件。')</script>";
-		}
-	} else {
-		$errmsg = "添加配置文件失败，请检查是否所有必填输入框都已填写！";
-		becomeMsgPage('<div>' . $errmsg . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
-	}
-}
-
-
 $info_form = new UOJForm('info');
 $attachment_url = UOJProblem::cur()->getAttachmentUri();
 $info_form->appendHTML(<<<EOD
@@ -670,7 +618,7 @@ if ($problem['hackable']) {
 				<button type="button" class="btn d-block w-100 btn-primary" data-bs-toggle="modal" data-bs-target="#UploadDataModal">上传数据</button>
 			</div>
 			<div class="mt-2">
-				<button type="button" class="btn d-block w-100 btn-primary" data-bs-toggle="modal" data-bs-target="#ProblemSettingsFileModal">试题配置</button>
+				<a role="button" class="btn d-block w-100 btn-primary" href="<?= UOJProblem::cur()->getUri('/manage/data/configure') ?>">试题配置</a>
 			</div>
 		</div>
 	</aside>
@@ -698,110 +646,6 @@ if ($problem['hackable']) {
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-success">上传</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
-				</div>
-			</form>
-		</div>
-	</div>
-</div>
-
-<?php $problem_conf = UOJProblem::cur()->getProblemConf() ?>
-
-<div class="modal fade" id="ProblemSettingsFileModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-lg">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h4 class="modal-title" id="myModalLabel">试题配置</h4>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<form class="form-horizontal" action="" method="post" role="form">
-				<div class="modal-body">
-					<div class="form-group row">
-						<label for="use_builtin_checker" class="col-sm-5 control-label">比对函数</label>
-						<div class="col-sm-7">
-							<?php $checker_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('use_builtin_checker', 'ownchk') : ""; ?>
-							<select class="form-select" id="use_builtin_checker" name="use_builtin_checker">
-								<option value="ncmp" <?= $checker_value == "ncmp" ? 'selected' : '' ?>>ncmp: 整数序列</option>
-								<option value="wcmp" <?= $checker_value == "wcmp" ? 'selected' : '' ?>>wcmp: 字符串序列</option>
-								<option value="lcmp" <?= $checker_value == "lcmp" ? 'selected' : '' ?>>lcmp: 多行数据（忽略行内与行末的多余空格，同时忽略文末回车）</option>
-								<option value="fcmp" <?= $checker_value == "fcmp" ? 'selected' : '' ?>>fcmp: 多行数据（不忽略行末空格，但忽略文末回车）</option>
-								<option value="rcmp4" <?= $checker_value == "rcmp4" ? 'selected' : '' ?>>rcmp4: 浮点数序列（误差不超过 1e-4）</option>
-								<option value="rcmp6" <?= $checker_value == "rcmp6" ? 'selected' : '' ?>>rcmp6: 浮点数序列（误差不超过 1e-6）</option>
-								<option value="rcmp9" <?= $checker_value == "rcmp9" ? 'selected' : '' ?>>rcmp9: 浮点数序列（误差不超过 1e-9）</option>
-								<option value="yesno" <?= $checker_value == "yesno" ? 'selected' : '' ?>>yesno: Yes、No（不区分大小写）</option>
-								<option value="uncmp" <?= $checker_value == "uncmp" ? 'selected' : '' ?>>uncmp: 整数集合</option>
-								<option value="bcmp" <?= $checker_value == "bcmp" ? 'selected' : '' ?>>bcmp: 二进制文件</option>
-								<option value="ownchk" <?= $checker_value == "ownchk" ? 'selected' : '' ?>>自定义校验器（需上传 chk.cpp）</option>
-							</select>
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="n_tests" class="col-sm-5 control-label">n_tests</label>
-						<div class="col-sm-7">
-							<?php $n_tests_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('n_tests', '') : ""; ?>
-							<input type="number" class="form-control" id="n_tests" name="n_tests" placeholder="数据点个数（必填）" value="<?= $n_tests_value ?>">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="n_ex_tests" class="col-sm-5 control-label">n_ex_tests</label>
-						<div class="col-sm-7">
-							<?php $n_ex_tests_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('n_ex_tests', 0) : ""; ?>
-							<input type="number" class="form-control" id="n_ex_tests" name="n_ex_tests" placeholder="额外数据点个数（默认为 0）" value="<?= $n_ex_tests_value ?>">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="n_sample_tests" class="col-sm-5 control-label">n_sample_tests</label>
-						<div class="col-sm-7">
-							<?php $n_sample_tests_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('n_sample_tests', 0) : ""; ?>
-							<input type="number" class="form-control" id="n_sample_tests" name="n_sample_tests" placeholder="样例测试点个数（默认为 0）" value="<?= $n_sample_tests_value ?>">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="input_pre" class="col-sm-5 control-label">input_pre</label>
-						<div class="col-sm-7">
-							<?php $input_pre_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('input_pre', 'input') : ""; ?>
-							<input type="text" class="form-control" id="input_pre" name="input_pre" placeholder="输入文件名称（默认为 input）" value="<?= $input_pre_value ?>">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="input_suf" class="col-sm-5 control-label">input_suf</label>
-						<div class="col-sm-7">
-							<?php $input_suf_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('input_suf', 'txt') : ""; ?>
-							<input type="text" class="form-control" id="input_suf" name="input_suf" placeholder="输入文件后缀（默认为 txt）" value="<?= $input_suf_value ?>">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="output_pre" class="col-sm-5 control-label">output_pre</label>
-						<div class="col-sm-7">
-							<?php $output_pre_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('output_pre', 'output') : ''; ?>
-							<input type="text" class="form-control" id="output_pre" name="output_pre" placeholder="输出文件名称（默认为 output）" value="<?= $output_pre_value ?>">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="output_suf" class="col-sm-5 control-label">output_suf</label>
-						<div class="col-sm-7">
-							<?php $output_suf_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('output_suf', 'txt') : ""; ?>
-							<input type="text" class="form-control" id="output_suf" name="output_suf" placeholder="输出文件后缀（默认为 txt）" value="<?= $output_suf_value ?>">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="time_limit" class="col-sm-5 control-label">time_limit</label>
-						<div class="col-sm-7">
-							<?php $time_limit_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('time_limit', 1) : ""; ?>
-							<input type="text" class="form-control" id="time_limit" name="time_limit" placeholder="时间限制（默认为 1s）" value="<?= $time_limit_value ?>">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="memory_limit" class="col-sm-5 control-label">memory_limit</label>
-						<div class="col-sm-7">
-							<?php $memory_limit_value = $problem_conf instanceof UOJProblemConf ? $problem_conf->getVal('memory_limit', 256) : ""; ?>
-							<input type="number" class="form-control" id="memory_limit" name="memory_limit" placeholder="内存限制（默认为 256 MB）" value="<?= $memory_limit_value ?>">
-						</div>
-					</div>
-					<input type="hidden" name="problem_settings_file_submit" value="submit">
-				</div>
-				<div class="modal-footer">
-					<button type="submit" class="btn btn-success">确定</button>
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
 				</div>
 			</form>
