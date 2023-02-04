@@ -598,7 +598,7 @@ struct RunCheckerResult {
 				if (fscanf(fres, "%lf", &d) != 1) {
 					return RunCheckerResult::failed_result();
 				} else {
-					res.scr = 100 * d;
+					res.scr = 100.0 * d;
 				}
 			} else {
 				res.scr = 0;
@@ -804,7 +804,7 @@ SubtaskMetaInfo conf_subtask_meta_info(string pre, const int &num) {
 
 	meta.subtask_type = conf_str(pre + "subtask_type", num, "packed");
 	meta.subtask_used_time_type = conf_str(pre + "subtask_used_time_type", num, "sum");
-	meta.full_score = conf_score(pre + "subtask_score", num, 100 / nT);
+	meta.full_score = conf_score(pre + "subtask_score", num, 100.0 / nT);
 	if (conf_str("subtask_dependence", num, "none") == "many") {
 		string cur = "subtask_dependence_" + vtos(num);
 		int p = 1;
@@ -1643,7 +1643,7 @@ bool main_data_test(TP test_point_func) {
 			if (po.scr != 100) {
 				passed = false;
 			}
-			po.scr = scale_score(po.scr, conf_score("point_score", i, 100 / n));
+			po.scr = scale_score(po.scr, conf_score("point_score", i, 100.0 / n));
 			add_point_info(po);
 		}
 	} else if (nT == 1 && conf_subtask_meta_info(1).is_ordinary()) { // ACM
