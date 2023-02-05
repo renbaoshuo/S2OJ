@@ -1,7 +1,6 @@
 <?php
 requireLib('bootstrap5');
 requireLib('md5');
-requireLib('jquery.query');
 requirePHPLib('form');
 requirePHPLib('judger');
 

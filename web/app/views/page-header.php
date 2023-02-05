@@ -80,14 +80,6 @@ if (!isset($ShowPageHeader)) {
 	<!-- jQuery cookie -->
 	<?= HTML::js_src('/js/jquery.cookie.min.js') ?>
 
-	<!-- jQuery modal -->
-	<?= HTML::js_src('/js/jquery.modal.js') ?>
-
-	<?php if (isset($REQUIRE_LIB['tagcanvas'])) : ?>
-		<!-- jQuery tag canvas -->
-		<?= HTML::js_src('/js/jquery.tagcanvas.min.js') ?>
-	<?php endif ?>
-
 	<?php if (isset($REQUIRE_LIB['bootstrap5'])) : ?>
 		<?= HTML::js_src('/js/bootstrap5.bundle.min.js?v=2022.9.23') ?>
 	<?php else : ?>
@@ -239,19 +231,9 @@ if (!isset($ShowPageHeader)) {
 		<?= HTML::js_src('/js/jquery.hotkeys.js') ?>
 	<?php endif ?>
 
-	<?php if (isset($REQUIRE_LIB['jquery.query'])) : ?>
-		<!-- jquery.query -->
-		<?= HTML::js_src('/js/jquery.query-object.js') ?>
-	<?php endif ?>
-
 	<?php if (isset($REQUIRE_LIB['jquery.datatables'])) : ?>
 		<!-- jquery.datatable -->
 		<?= HTML::js_src('/js/jquery.datatables.min.js') ?>
-	<?php endif ?>
-
-	<?php if (isset($REQUIRE_LIB['colorhelpers'])) : ?>
-		<!-- colorhelpers -->
-		<?= HTML::js_src('/js/jquery.colorhelpers.min.js') ?>
 	<?php endif ?>
 
 	<?php if (isset($REQUIRE_LIB['morris'])) : ?>
@@ -266,17 +248,6 @@ if (!isset($ShowPageHeader)) {
 		<?= HTML::js_src('/js/raphael.min.js') ?>
 	<?php endif ?>
 
-	<?php if (isset($REQUIRE_LIB['shjs'])) : ?>
-		<!-- shjs -->
-		<?= HTML::css_link('/css/sh_typical.min.css') ?>
-		<?= HTML::js_src('/js/sh_main.min.js') ?>
-		<script type="text/javascript">
-			$(document).ready(function() {
-				sh_highlightDocument()
-			})
-		</script>
-	<?php endif ?>
-
 	<?php if (isset($REQUIRE_LIB['hljs'])) : ?>
 		<?= HTML::css_link('/css/highlightjs.github.min.css?v=11.6.0-20221005') ?>
 		<?= HTML::js_src('/js/highlightjs.min.js?v=11.6.0-20221005') ?>
@@ -285,11 +256,6 @@ if (!isset($ShowPageHeader)) {
 				hljs.highlightAll();
 			});
 		</script>
-	<?php endif ?>
-
-	<?php if (isset($REQUIRE_LIB['ckeditor'])) : ?>
-		<!-- ckeditor -->
-		<?= HTML::js_src('/js/ckeditor/ckeditor.js') ?>
 	<?php endif ?>
 
 	<?php if (isset($REQUIRE_LIB['dropzone'])) : ?>
