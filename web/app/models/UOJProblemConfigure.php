@@ -34,14 +34,14 @@ class UOJProblemConfigure {
 		'real-8' => '实数，四舍五入到小数点后 8 位',
 	];
 
-	private static function getCardHeader($title) {
+	private static function getCardHeader($title, $body_class = 'vstack gap-3') {
 		return <<<EOD
 		<div class="col-12 col-md-6">
 			<div class="card">
 				<div class="card-header fw-bold">
 					{$title}
 				</div>
-				<div class="card-body vstack gap-3">
+				<div class="card-body {$body_class}">
 		EOD;
 	}
 
@@ -65,6 +65,13 @@ class UOJProblemConfigure {
 
 		$this->simple_form = new UOJForm('simple');
 
+		$encoded_problem_conf = json_encode($problem_conf->conf, JSON_FORCE_OBJECT);
+		$this->simple_form->appendHTML(<<<EOD
+		<script>
+			var problem_conf = {$encoded_problem_conf};
+		</script>
+		EOD);
+
 		$this->simple_form->appendHTML(static::getCardHeader('基本信息'));
 		$this->addSelect($this->simple_form, 'use_builtin_judger', ['on' => '默认', 'off' => '自定义 Judger'], '测评逻辑', 'on');
 		$this->addSelect($this->simple_form, 'use_builtin_checker', self::$supported_checkers, '比对函数', 'ncmp');
@@ -74,7 +81,7 @@ class UOJProblemConfigure {
 		$this->simple_form->appendHTML(static::getCardHeader('数据配置'));
 		$this->addNumberInput($this->simple_form, 'n_tests', '数据点个数', 10);
 		$this->addNumberInput($this->simple_form, 'n_ex_tests', '额外数据点个数', 0);
-		$this->addNumberInput($this->simple_form, 'n_sample_tests', '样例数据点个数', 0);
+		$this->addNumberInput($this->simple_form, 'n_sample_tests', '样例数据点个数', 0, ['help' => '样例数据点为额外数据点的前 x 个数据点。']);
 		$this->simple_form->appendHTML(static::getCardFooter());
 
 		$this->simple_form->appendHTML(static::getCardHeader('文件配置'));
@@ -89,6 +96,29 @@ class UOJProblemConfigure {
 		$this->addNumberInput($this->simple_form, 'memory_limit', '内存限制', 256, ['help' => '单位为 MiB。']);
 		$this->addNumberInput($this->simple_form, 'output_limit', '输出长度限制', 64, ['help' => '单位为 MiB。']);
 		$this->simple_form->appendHTML(static::getCardFooter());
+
+		$this->simple_form->appendHTML(static::getCardHeader('测试点分值', ''));
+		$this->simple_form->appendHTML(<<<EOD
+			<div id="div-point-score-container" class="row gy-3"></div>
+		EOD);
+		$this->simple_form->appendHTML(static::getCardFooter());
+		$this->simple_form->appendHTML(<<<EOD
+		<script>
+			$(document).ready(function() {
+				$('#input-n_tests').change(function() {
+					problem_conf['n_tests'] = $(this).val();
+					$('#div-point-score-container').problem_configure_point_scores(problem_conf);
+				});
+
+				$('#input-score_type').change(function() {
+					problem_conf['score_type'] = $(this).val();
+					$('.uoj-problem-configure-point-score-input', $('#div-point-score-container')).first().trigger('change');
+				});
+
+				$('#div-point-score-container').problem_configure_point_scores(problem_conf);
+			});
+		</script>
+		EOD);
 
 		$this->simple_form->succ_href = $this->href;
 		$this->simple_form->config['form']['class'] = 'row gy-3 mt-2';
@@ -109,6 +139,13 @@ class UOJProblemConfigure {
 			'select_div_class' => 'col-8',
 			'default_value' => $this->problem_conf->getVal($key, $default_val),
 		] + $cfg);
+		$form->appendHTML(<<<EOD
+		<script>
+			$('#input-{$key}').change(function() {
+				problem_conf['{$key}'] = $(this).val();
+			});
+		</script>
+		EOD);
 	}
 
 	public function addNumberInput(UOJForm $form, $key, $label, $default_val = '', $cfg = []) {
@@ -124,6 +161,13 @@ class UOJProblemConfigure {
 				return validateInt($x) ? '' : '必须为一个整数';
 			},
 		] + $cfg);
+		$form->appendHTML(<<<EOD
+		<script>
+			$('#input-{$key}').change(function() {
+				problem_conf['{$key}'] = $(this).val();
+			});
+		</script>
+		EOD);
 	}
 
 	public function addTimeLimitInput(UOJForm $form, $key, $label, $default_val = '', $cfg = []) {
@@ -146,6 +190,13 @@ class UOJProblemConfigure {
 				}
 			},
 		] + $cfg);
+		$form->appendHTML(<<<EOD
+		<script>
+			$('#input-{$key}').change(function() {
+				problem_conf['{$key}'] = $(this).val();
+			});
+		</script>
+		EOD);
 	}
 
 	public function addTextInput(UOJForm $form, $key, $label, $default_val = '', $cfg = []) {
@@ -160,6 +211,13 @@ class UOJProblemConfigure {
 				return ctype_graph($x) ? '' : '必须仅包含除空格以外的可见字符';
 			},
 		] + $cfg);
+		$form->appendHTML(<<<EOD
+		<script>
+			$('#input-{$key}').change(function() {
+				problem_conf['{$key}'] = $(this).val();
+			});
+		</script>
+		EOD);
 	}
 
 	public function runAtServer() {
@@ -168,9 +226,15 @@ class UOJProblemConfigure {
 
 	public function onUpload(array &$vdata) {
 		$conf = $this->problem_conf->conf;
+		$conf_keys = $this->conf_keys;
+		$n_tests = intval(UOJRequest::post('n_tests', 'validateUInt', $this->problem_conf->getVal('n_tests', 10)));
 
-		foreach (array_keys($this->conf_keys) as $key) {
-			$val = UOJRequest::post($key);
+		for ($i = 1; $i <= $n_tests; $i++) {
+			$conf_keys["point_score_$i"] = true;
+		}
+
+		foreach (array_keys($conf_keys) as $key) {
+			$val = UOJRequest::post($key, 'is_string', '');
 			if ($key === 'use_builtin_judger') {
 				if ($val === 'off') {
 					unset($conf[$key]);

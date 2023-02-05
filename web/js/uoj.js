@@ -1177,6 +1177,68 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 	});
 }
 
+// problem_configure: point scores
+$.fn.problem_configure_point_scores = function(problem_conf) {
+	return $(this).each(function() {
+		var _this = this;
+		var n_tests = parseInt(problem_conf['n_tests']);
+
+		$(this).html('');
+
+		if (isNaN(n_tests) || n_tests <= 0) {
+			$(this).html('不可用。');
+		}
+
+		for (var i = 1; i <= n_tests; i++) {
+			var input_point_score = $('<input class="form-control uoj-problem-configure-point-score-input" type="number" name="point_score_' + i + '" id="input-point_score_' + i + '" />');
+
+			if (problem_conf['point_score_' + i]) {
+				input_point_score.val(problem_conf['point_score_' + i]);
+			}
+
+			$(this).append(
+				$('<div class="col-sm-6" />').append(
+					$('<div class="row" />')
+						.append($('<div class="col-5" />').append('<label for="input-point_score_' + i + '" class="col-form-label">测试点 #' + i + '</label>'))
+						.append($('<div class="col-7 col-sm-6" />').append(input_point_score))
+				)
+			);
+		}
+
+		$('.uoj-problem-configure-point-score-input', this).change(function() {
+			var full_score = 100;
+			var rest_tests = parseInt(problem_conf['n_tests'] || '10');
+			var score_type = problem_conf['score_type'] || 'int';
+
+			$('.uoj-problem-configure-point-score-input', _this).each(function() {
+				var point_score = parseInt($(this).val());
+				if (!isNaN(point_score)) {
+					full_score -= point_score;
+					rest_tests--;
+				}
+			});
+
+			$('.uoj-problem-configure-point-score-input', _this).each(function() {
+				if ($(this).val() == '') {
+					var val = full_score / rest_tests;
+
+					if (score_type == 'int') {
+						val = Math.floor(val);
+					} else {
+						var decimal_places = parseInt(score_type.substring(5));
+
+						val = val.toFixed(decimal_places);
+					}
+
+					$(this).attr('placeholder', val);
+				}
+			});
+		});
+
+		$('.uoj-problem-configure-point-score-input', this).first().trigger('change');
+	});
+};
+
 // custom test
 function custom_test_onsubmit(response_text, div_result, url) {
 	if (response_text != '') {

@@ -7,7 +7,6 @@ requirePHPLib('data');
 UOJProblem::init(UOJRequest::get('id')) || UOJResponse::page404();
 UOJProblem::cur()->userCanManage(Auth::user()) || UOJResponse::page403();
 
-$problem = UOJProblem::info();
 $problem_configure = new UOJProblemConfigure(UOJProblem::cur());
 $problem_configure->runAtServer();
 ?>
