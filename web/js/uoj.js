@@ -1350,6 +1350,22 @@ $.fn.problem_configure_subtasks = function(problem_conf) {
 					});
 				})(i);
 
+				if (problem_conf['subtask_type_' + i]) {
+					input_subtask_type.val(problem_conf['subtask_type_' + i]);
+				}
+
+				if (problem_conf['subtask_end_' + i]) {
+					input_subtask_end.val(problem_conf['subtask_end_' + i]);
+				}
+
+				if (problem_conf['subtask_score_' + i]) {
+					input_subtask_score.val(problem_conf['subtask_score_' + i]);
+				}
+
+				if (problem_conf['subtask_used_time_type_' + i]) {
+					input_subtask_used_time_type.val(problem_conf['subtask_used_time_type_' + i]);
+				}
+
 				div_subtasks.append(
 					$('<div class="list-group-item" />').append(
 						$('<div class="fw-bold" />').text('Subtask #' + i)
