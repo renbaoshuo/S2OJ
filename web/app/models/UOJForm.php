@@ -125,6 +125,8 @@ class UOJForm {
 			'type' => 'text',
 			'div_class' => '',
 			'input_class' => 'form-control',
+			'input_attrs' => [],
+			'input_div_class' => null,
 			'default_value' => '',
 			'label' => '',
 			'label_class' => 'form-label',
@@ -148,6 +150,10 @@ class UOJForm {
 			], $config['label']);
 		}
 
+		if ($config['input_div_class'] !== null) {
+			$html .= HTML::tag_begin('div', ['class' => $config['input_div_class']]);
+		}
+
 		$html .= HTML::empty_tag('input', [
 			'class' => $config['input_class'],
 			'type' => $config['type'],
@@ -155,11 +161,15 @@ class UOJForm {
 			'id' => "input-$name",
 			'value' => $config['default_value'],
 			'placeholder' => $config['placeholder'],
-		]);
+		] + $config['input_attrs']);
 		$html .= HTML::tag('div', ['class' => 'invalid-feedback', 'id' => "help-$name"], '');
 
 		if ($config['help']) {
 			$html .= HTML::tag('div', ['class' => $config['help_class']], $config['help']);
+		}
+
+		if ($config['input_div_class'] !== null) {
+			$html .= HTML::tag_end('div');
 		}
 
 		$html .= HTML::tag_end('div');
@@ -255,6 +265,7 @@ class UOJForm {
 		$config += [
 			'div_class' => '',
 			'select_class' => 'form-select',
+			'select_div_class' => null,
 			'options' => [],
 			'default_value' => '',
 			'label' => '',
@@ -275,6 +286,10 @@ class UOJForm {
 			], $config['label']);
 		}
 
+		if ($config['select_div_class'] !== null) {
+			$html .= HTML::tag_begin('div', ['class' => $config['select_div_class']]);
+		}
+
 		// Select
 		$html .= HTML::tag_begin('select', ['id' => "input-$name", 'name' => $name, 'class' => $config['select_class']]);
 
@@ -291,6 +306,10 @@ class UOJForm {
 		// Help text
 		if ($config['help']) {
 			$html .= HTML::tag('div', ['class' => $config['help_class']], $config['help']);
+		}
+
+		if ($config['select_div_class'] !== null) {
+			$html .= HTML::tag_end('div');
 		}
 
 		$html .= HTML::tag_end('div');
@@ -503,6 +522,13 @@ class UOJForm {
 		if (!$this->config['no_submit']) {
 			echo HTML::tag_begin('div', ['class' => $this->config['submit_container']['class']]);
 
+			if ($this->config['back_button']['href'] !== null) {
+				echo HTML::tag('a', [
+					'class' => $this->config['back_button']['class'],
+					'href' => $this->config['back_button']['href']
+				], '返回');
+			}
+
 			echo HTML::tag('button', [
 				'type' => 'submit',
 				'id' => "button-submit-{$this->form_name}",
@@ -510,13 +536,6 @@ class UOJForm {
 				'value' => $this->form_name,
 				'class' => $this->config['submit_button']['class']
 			], $this->config['submit_button']['text']);
-
-			if ($this->config['back_button']['href'] !== null) {
-				echo HTML::tag('a', [
-					'class' => $this->config['back_button']['class'],
-					'href' => $this->config['back_button']['href']
-				], '返回');
-			}
 
 			echo HTML::tag_end('div');
 		}
