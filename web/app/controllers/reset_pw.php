@@ -1,4 +1,8 @@
 <?php
+requireLib('bootstrap5');
+requireLib('dialog');
+requireLib('md5');
+
 if (!isset($_GET['p'])) {
 	become404Page();
 }
@@ -46,24 +50,30 @@ if (isset($_POST['reset'])) {
 	die(resetPassword());
 }
 ?>
-<?php
-$REQUIRE_LIB['dialog'] = '';
-$REQUIRE_LIB['md5'] = '';
-?>
-<?php echoUOJPageHeader('更改密码') ?>
-<h2 class="page-header">更改密码</h2>
-<form id="form-reset" class="form-horizontal">
-	<div id="div-password" class="form-group">
-		<label for="input-password" class="col-sm-2 control-label">新密码</label>
-		<div class="col-sm-3">
-			<input type="password" class="form-control" id="input-password" name="password" placeholder="输入新密码" maxlength="20" />
-			<input type="password" class="form-control top-buffer-sm" id="input-confirm_password" placeholder="再次输入新密码" maxlength="20" />
-			<span class="help-block" id="help-password"></span>
+
+<?php echoUOJPageHeader(UOJLocale::get('reset password')) ?>
+
+<form id="form-reset" class="card mw-100 mx-auto" style="width:600px">
+	<div class="card-body">
+		<h1 class="card-title text-center mb-3">
+			<?= UOJLocale::get('reset password') ?>
+		</h1>
+		<div class="mb-1">
+			<label for="input-username" class="form-label"><?= UOJLocale::get('username') ?></label>
+			<input type="text" class="form-control" value="<?= $user['username'] ?>" disabled />
 		</div>
-	</div>
-	<div class="form-group">
-		<div class="col-sm-offset-2 col-sm-3">
-			<button type="submit" id="button-submit" class="btn btn-secondary">提交</button>
+		<div id="div-password" class="mb-1">
+			<label for="input-password" class="form-label">
+				<?= UOJLocale::get('new password') ?>
+			</label>
+			<input type="password" class="form-control" id="input-password" name="password" placeholder="<?= UOJLocale::get('enter your password') ?>" maxlength="20" />
+			<input type="password" class="form-control mt-2" id="input-confirm_password" placeholder="<?= UOJLocale::get('re-enter your password') ?>" maxlength="20" />
+			<span class="help-block invalid-feedback" id="help-password"></span>
+		</div>
+		<div class="text-center">
+			<button type="submit" id="button-submit" class="btn btn-primary">
+				<?= UOJLocale::get('submit') ?>
+			</button>
 		</div>
 	</div>
 </form>
@@ -74,12 +84,13 @@ $REQUIRE_LIB['md5'] = '';
 		ok &= getFormErrorAndShowHelp('password', validateSettingPassword);
 		return ok;
 	}
+
 	$(document).ready(function() {
 		$('#form-reset').submit(function(e) {
 			if (!validateResetPwPost()) {
 				return false;
 			}
-			$.post(<?= json_encode($_SERVER['REQUEST_URI']) ?>, {
+			$.post(<?= json_encode(UOJContext::requestURI()) ?>, {
 				reset: '',
 				newPW: md5($('#input-password').val(), "<?= getPasswordClientSalt() ?>")
 			}, function(res) {
@@ -116,4 +127,5 @@ $REQUIRE_LIB['md5'] = '';
 		});
 	});
 </script>
+
 <?php echoUOJPageFooter() ?>

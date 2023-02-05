@@ -39,6 +39,7 @@ return [
 	'new password' => '新密码',
 	'current password' => '当前密码',
 	'confirm new password' => '确认新密码',
+	'reset password' => '重置密码',
 	'verification code' => '验证码',
 	'email' => 'Email',
 	'QQ' => 'QQ',

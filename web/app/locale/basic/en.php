@@ -39,6 +39,7 @@ return [
 	'new password' => 'New password',
 	'current password' => 'Current password',
 	'confirm new password' => 'Confirm new password',
+	'reset password' => 'Reset Password',
 	'verification code' => 'Verification code',
 	'email' => 'Email',
 	'QQ' => 'QQ',
