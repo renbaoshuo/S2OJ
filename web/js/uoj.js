@@ -1212,10 +1212,12 @@ $.fn.problem_configure_point_scores = function(problem_conf) {
 		var _this = this;
 		var n_tests = parseInt(problem_conf['n_tests']);
 
-		$(this).html('');
+		$(this).empty();
 
 		if (isNaN(n_tests) || n_tests <= 0) {
 			$(this).html('不可用。');
+
+			return;
 		}
 
 		for (var i = 1; i <= n_tests; i++) {
@@ -1272,6 +1274,150 @@ $.fn.problem_configure_point_scores = function(problem_conf) {
 		});
 
 		$('.uoj-problem-configure-point-score-input', this).first().trigger('change');
+	});
+};
+
+// problem_configure: subtasks
+$.fn.problem_configure_subtasks = function(problem_conf) {
+	return $(this).each(function() {
+		var _this = this;
+		var n_subtasks = parseInt(problem_conf['n_subtasks'] || '0');
+
+		$(this).empty();
+
+		if (isNaN(n_subtasks)) {
+			$(this).html('不可用。');
+
+			return;
+		}
+
+		var input_n_subtasks = $('<input class="form-control" type="number" name="n_subtasks" id="input-n_subtasks" />');
+		var div_subtasks = $('<div class="list-group list-group-flush border-top" />');
+
+		if (n_subtasks) {
+			input_n_subtasks.val(n_subtasks);
+		}
+
+		$(this).append(
+			$('<div class="m-3" />').append(
+				$('<div class="row" />').append(
+					$('<div class="col-4" />').append('<label for="input-n_subtasks" class="col-form-label">子任务数</label>')
+				).append(
+					$('<div class="col-8" />').append(input_n_subtasks)
+				)
+			)
+		).append(div_subtasks);
+
+		input_n_subtasks.change(function() {
+			div_subtasks.empty();
+
+			var n_subtasks = parseInt(input_n_subtasks.val() || '0');
+			problem_conf['n_subtasks'] = input_n_subtasks.val();
+
+			for (var i = 1; i <= n_subtasks; i++) {
+				var input_subtask_type = $('<select class="form-select form-select-sm" name="subtask_type_' + i + '" id="input-subtask_type_' + i + '" />');
+				var input_subtask_end = $('<input class="form-control form-control-sm uoj-problem-configure-subtask-end-input" type="number" name="subtask_end_' + i + '" id="input-subtask_end_' + i + '" />');
+				var input_subtask_score = $('<input class="form-control form-control-sm uoj-problem-configure-subtask-score-input" type="number" name="subtask_score_' + i + '" id="input-subtask_score_' + i + '" />');
+				var input_subtask_used_time_type = $('<select class="form-select form-select-sm" name="subtask_used_time_type_' + i + '" id="input-subtask_used_time_type_' + i + '" />');
+
+				input_subtask_type
+					.append($('<option value="packed" />').text('错一个就零分'))
+					.append($('<option value="min" />').text('得分取所有测试点中的最小值'));
+				input_subtask_used_time_type
+					.append($('<option value="sum" />').text('全部相加'))
+					.append($('<option value="max" />').text('取所有测试点中的最大值'));
+
+				(function(i) {
+					input_subtask_type.change(function() {
+						problem_conf['subtask_type_' + i] = $(this).val();
+						$('#problem-conf-preview').problem_conf_preview(problem_conf);
+					});
+
+					input_subtask_end.change(function() {
+						problem_conf['subtask_end_' + i] = $(this).val();
+						$('#problem-conf-preview').problem_conf_preview(problem_conf);
+					})
+
+					input_subtask_score.change(function() {
+						problem_conf['subtask_score_' + i] = $(this).val();
+						$('#problem-conf-preview').problem_conf_preview(problem_conf);
+					});
+
+					input_subtask_used_time_type.change(function() {
+						problem_conf['subtask_used_time_type_' + i] = $(this).val();
+						$('#problem-conf-preview').problem_conf_preview(problem_conf);
+					});
+				})(i);
+
+				div_subtasks.append(
+					$('<div class="list-group-item" />').append(
+						$('<div class="fw-bold" />').text('Subtask #' + i)
+					).append(
+						$('<div />').append(
+							$('<div class="row mt-2" />').append(
+								$('<div class="col-sm-6" />').append('<label for="input-subtask_type_' + i + '" class="col-form-label col-form-label-sm">评分类型</label>')
+							).append(
+								$('<div class="col-sm-6" />').append(input_subtask_type)
+							)
+						).append(
+							$('<div class="row mt-2" />').append(
+								$('<div class="col-sm-6" />').append('<label for="input-subtask_end_' + i + '" class="col-form-label col-form-label-sm">最后一个测试点的编号</label>')
+							).append(
+								$('<div class="col-sm-6" />').append(input_subtask_end)
+							)
+						).append(
+							$('<div class="row mt-2" />').append(
+								$('<div class="col-sm-6" />').append('<label for="input-subtask_score_' + i + '" class="col-form-label col-form-label-sm">分数</label>')
+							).append(
+								$('<div class="col-sm-6" />').append(input_subtask_score)
+							)
+						).append(
+							$('<div class="row mt-2" />').append(
+								$('<div class="col-sm-6" />').append('<label for="input-subtask_used_time_type_' + i + '" class="col-form-label col-form-label-sm">程序用时统计方式</label>')
+							).append(
+								$('<div class="col-sm-6" />').append(input_subtask_used_time_type)
+							)
+						)
+					)
+				);
+			}
+
+			$('.uoj-problem-configure-subtask-score-input', _this).change(function() {
+				var full_score = 100;
+				var rest_subtasks = parseInt(problem_conf['n_subtasks'] || '10');
+				var score_type = problem_conf['score_type'] || 'int';
+	
+				$('.uoj-problem-configure-subtask-score-input', _this).each(function() {
+					var subtask_score = parseInt($(this).val());
+	
+					if (!isNaN(subtask_score)) {
+						full_score -= subtask_score;
+						rest_subtasks--;
+					}
+				});
+	
+				$('.uoj-problem-configure-subtask-score-input', _this).each(function() {
+					if ($(this).val() == '') {
+						var val = full_score / rest_subtasks;
+	
+						if (score_type == 'int') {
+							val = Math.floor(val);
+						} else {
+							var decimal_places = parseInt(score_type.substring(5));
+	
+							val = val.toFixed(decimal_places);
+						}
+	
+						$(this).attr('placeholder', val);
+					}
+				});
+			});
+
+			$('.uoj-problem-configure-subtask-score-input', _this).first().trigger('change');
+			$('#problem-conf-preview').problem_conf_preview(problem_conf);
+		});
+
+		input_n_subtasks.trigger('change');
 	});
 };
 

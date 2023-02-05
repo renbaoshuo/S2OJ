@@ -37,7 +37,7 @@ class UOJProblemConfigure {
 	private static function getCardHeader($title, $body_class = 'vstack gap-3') {
 		return <<<EOD
 		<div class="col-12 col-md-6">
-			<div class="card">
+			<div class="card h-100 overflow-hidden">
 				<div class="card-header fw-bold">
 					{$title}
 				</div>
@@ -99,10 +99,11 @@ class UOJProblemConfigure {
 
 		$this->simple_form->appendHTML(static::getCardHeader('测试点分值', ''));
 		$this->simple_form->appendHTML(<<<EOD
-			<details>
-				<summary>展开/收起全部</summary>
-				<div id="div-point-score-container" class="row g-3 mt-0"></div>
-			</details>
+		<details id="div-point-score-container-outer">
+			<summary>展开/收起全部</summary>
+			<div id="div-point-score-container" class="row g-3 mt-0"></div>
+		</details>
+		<div id="div-point-score-unavailable" style="display: none;">在启用 Subtask 时「测试点分值」不可用。</div>
 		EOD);
 		$this->simple_form->appendHTML(static::getCardFooter());
 		$this->simple_form->appendHTML(<<<EOD
@@ -123,6 +124,58 @@ class UOJProblemConfigure {
 		</script>
 		EOD);
 
+		$this->simple_form->appendHTML(static::getCardHeader('Subtask 配置', 'p-0'));
+		$this->simple_form->appendHTML(<<<EOD
+		<div class="form-check form-switch m-3">
+			<input class="form-check-input" type="checkbox" role="switch" id="input-enable_subtasks">
+			<label class="form-check-label" for="input-enable_subtasks">启用 Subtask</label>
+		</div>
+		<div id="div-subtasks-container"></div>
+		EOD);
+		$this->simple_form->appendHTML(static::getCardFooter());
+		$this->simple_form->appendHTML(<<<EOD
+		<script>
+			$(document).ready(function() {
+				$('#input-enable_subtasks').change(function() {
+					if (this.checked) {
+						$('#div-point-score-container-outer').hide();
+						$('#div-point-score-unavailable').show();
+						$('#div-subtasks-container').problem_configure_subtasks(problem_conf);
+					} else {
+						$('#div-point-score-container-outer').show();
+						$('#div-point-score-unavailable').hide();
+						$('#div-subtasks-container').empty();
+						$('.uoj-problem-configure-point-score-input').val('');
+
+						var subtask_keys = Object.keys(problem_conf).filter(function(key) {
+							return /^subtask_/.test(key);
+						});
+
+						for (var i = 0; i < subtask_keys.length; ++i) {
+							problem_conf[subtask_keys[i]] = '';
+						}
+
+						problem_conf['n_subtasks'] = '';
+					}
+
+					$('#problem-conf-preview').problem_conf_preview(problem_conf);
+				});
+
+				if (problem_conf['n_subtasks']) {
+					$('#input-enable_subtasks').prop('checked', true).trigger('change');
+				}
+			});
+		</script>
+		EOD);
+
+		$this->simple_form->appendHTML(<<<EOD
+		<script>
+			$(document).on("keydown", "form", function(event) { 
+				return event.key != "Enter";
+			});
+		</script>
+		EOD);
+
 		$this->simple_form->succ_href = $this->href;
 		$this->simple_form->config['form']['class'] = 'row gy-3';
 		$this->simple_form->config['submit_container']['class'] = 'col-12 text-center mt-3';
@@ -137,7 +190,7 @@ class UOJProblemConfigure {
 		$form->addSelect($key, [
 			'options' => $options,
 			'label' => $label,
-			'div_class' => 'row',
+			'div_class' => 'row gx-2',
 			'label_class' => 'col-form-label col-4',
 			'select_div_class' => 'col-8',
 			'default_value' => $this->problem_conf->getVal($key, $default_val),
@@ -157,7 +210,7 @@ class UOJProblemConfigure {
 		$form->addInput($key, [
 			'type' => 'number',
 			'label' => $label,
-			'div_class' => 'row',
+			'div_class' => 'row gx-2',
 			'label_class' => 'col-form-label col-4',
 			'input_div_class' => 'col-8',
 			'default_value' => $this->problem_conf->getVal($key, $default_val),
@@ -181,7 +234,7 @@ class UOJProblemConfigure {
 			'type' => 'number',
 			'label' => $label,
 			'input_attrs' => ['step' => 0.001],
-			'div_class' => 'row',
+			'div_class' => 'row gx-2',
 			'label_class' => 'col-form-label col-4',
 			'input_div_class' => 'col-8',
 			'default_value' => $this->problem_conf->getVal($key, $default_val),
@@ -209,7 +262,7 @@ class UOJProblemConfigure {
 		$this->conf_keys[$key] = true;
 		$form->addInput($key, [
 			'label' => $label,
-			'div_class' => 'row',
+			'div_class' => 'row gx-2',
 			'label_class' => 'col-form-label col-4',
 			'input_div_class' => 'col-8',
 			'default_value' => $this->problem_conf->getVal($key, $default_val),
@@ -235,9 +288,31 @@ class UOJProblemConfigure {
 		$conf = $this->problem_conf->conf;
 		$conf_keys = $this->conf_keys;
 		$n_tests = intval(UOJRequest::post('n_tests', 'validateUInt', $this->problem_conf->getVal('n_tests', 10)));
+		$n_subtasks = intval(UOJRequest::post('n_subtasks', 'validateUInt', $this->problem_conf->getVal('n_subtasks', 0)));
 
 		for ($i = 1; $i <= $n_tests; $i++) {
 			$conf_keys["point_score_$i"] = true;
+		}
+
+		$conf_keys['n_subtasks'] = true;
+		for ($i = 1; $i <= $n_subtasks; $i++) {
+			$conf_keys["subtask_type_$i"] = true;
+			$conf_keys["subtask_score_$i"] = true;
+			$conf_keys["subtask_end_$i"] = true;
+			$conf_keys["subtask_used_time_type_$i"] = true;
+
+			// $conf_keys["subtask_dependence_$i"] = true;
+
+			// $subtask_dependence_str = UOJRequest::post("subtask_dependence_$i", 'is_string', '');
+
+			// if ($subtask_dependence_str == 'many') {
+			// 	$subtask_dependence_cnt = 0;
+
+			// 	while (UOJRequest::post("subtask_dependence_{$i}_{$subtask_dependence_cnt}", 'is_string', '') != '') {
+			// 		$subtask_dependence_cnt++;
+			// 		$conf_keys["subtask_dependence_{$i}_{$subtask_dependence_cnt}"] = true;
+			// 	}
+			// }
 		}
 
 		foreach (array_keys($conf_keys) as $key) {
