@@ -1,6 +1,7 @@
 <?php
 requireLib('bootstrap5');
 requireLib('md5');
+requireLib('dialog');
 
 use Gregwar\Captcha\PhraseBuilder;
 
@@ -86,23 +87,6 @@ if (isset($_POST['register'])) {
 	</div>
 </form>
 
-<div id="dialog" class="modal fade" tabindex="-1">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="modal-title"></h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				<p id="modal-text"></p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" data-bs-dismiss="modal" aria-label="Close">好的</button>
-			</div>
-		</div>
-	</div>
-</div>
-
 <script type="text/javascript">
 	function refreshCaptcha() {
 		var timestamp = new Date().getTime();
@@ -161,23 +145,36 @@ if (isset($_POST['register'])) {
 			captcha: $('#input-captcha').val(),
 		}, function(msg) {
 			if (/^欢迎你！/.test(msg)) {
-				var prevUrl = document.referrer;
-				if (!prevUrl) {
-					prevUrl = '/';
-				};
-				$('#modal-title').html('注册成功');
-				$('#modal-text').html(msg);
-				$('#dialog')
-					.modal('show')
-					.on('hidden.bs.modal', function() {
+				BootstrapDialog.show({
+					title: '注册成功',
+					message: msg,
+					type: BootstrapDialog.TYPE_SUCCESS,
+					buttons: [{
+						label: '好的',
+						action: function(dialog) {
+							dialog.close();
+						}
+					}],
+					onhidden: function(dialog) {
+						var prevUrl = document.referrer;
+						if (!prevUrl) {
+							prevUrl = '/';
+						};
 						window.location.href = prevUrl;
-					});
-				refreshCaptcha();
+					}
+				});
 			} else {
-				$('#modal-title').html('注册失败');
-				$('#modal-text').html(msg);
-				$('#dialog').modal('show');
-				refreshCaptcha();
+				BootstrapDialog.show({
+					title: '注册失败',
+					message: msg,
+					type: BootstrapDialog.TYPE_DANGER,
+					buttons: [{
+						label: '好的',
+						action: function(dialog) {
+							dialog.close();
+						}
+					}],
+				});
 			}
 		});
 	}
