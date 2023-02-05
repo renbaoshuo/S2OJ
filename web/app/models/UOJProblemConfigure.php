@@ -101,7 +101,7 @@ class UOJProblemConfigure {
 		$this->simple_form->appendHTML(<<<EOD
 		<details id="div-point-score-container-outer">
 			<summary>展开/收起全部</summary>
-			<div id="div-point-score-container" class="row g-3 mt-0"></div>
+			<div id="div-point-score-container" class="row gx-3 gy-2 mt-0"></div>
 		</details>
 		<div id="div-point-score-unavailable" style="display: none;">在启用 Subtask 时「测试点分值」不可用。</div>
 		EOD);
@@ -115,8 +115,27 @@ class UOJProblemConfigure {
 				});
 
 				$('#input-score_type').change(function() {
-					problem_conf['score_type'] = $(this).val();
+					var score_type = $(this).val();
+					var step = '1';
+					problem_conf['score_type'] = score_type;
+
+					if (score_type == 'int') {
+						step = '1';
+					} else {
+						var decimal_places = parseInt(score_type.substring(5));
+
+						if (decimal_places == 0) {
+							step = '1';
+						} else {
+							step = (0).toFixed(decimal_places - 1) + '1';
+						}
+					}
+
+					$('.uoj-problem-configure-point-score-input', $('#div-point-score-container')).attr('step', step);
 					$('.uoj-problem-configure-point-score-input', $('#div-point-score-container')).first().trigger('change');
+
+					$('.uoj-problem-configure-subtask-score-input', $('#div-point-score-container')).attr('step', step);
+					$('.uoj-problem-configure-subtask-score-input', $('#div-point-score-container')).first().trigger('change');
 				});
 
 				$('#div-point-score-container').problem_configure_point_scores(problem_conf);

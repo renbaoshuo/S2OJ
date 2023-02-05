@@ -1236,9 +1236,9 @@ $.fn.problem_configure_point_scores = function(problem_conf) {
 
 			$(this).append(
 				$('<div class="col-sm-6" />').append(
-					$('<div class="row gx-1" />')
-						.append($('<div class="col-7" />').append('<label for="input-point_score_' + i + '" class="col-form-label col-form-label-sm">测试点 #' + i + '</label>'))
-						.append($('<div class="col-5" />').append(input_point_score))
+					$('<div class="" />')
+						.append($('<div class="" />').append('<label for="input-point_score_' + i + '" class="col-form-label col-form-label-sm">测试点 #' + i + '</label>'))
+						.append($('<div class="" />').append(input_point_score))
 				)
 			);
 		}
