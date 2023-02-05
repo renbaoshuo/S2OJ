@@ -1177,6 +1177,35 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 	});
 }
 
+// problem_configure: print problem.conf
+$.fn.problem_conf_preview = function(problem_conf) {
+	return $(this).each(function() {
+		var keys = Object.keys(problem_conf);
+		var res = '';
+
+		for (var i = 0; i < keys.length; i++) {
+			var key = keys[i];
+			var value = problem_conf[key];
+
+			if (!value) {
+				continue;
+			}
+
+			if (key == 'use_builtin_judger' && value == 'off') {
+				continue;
+			}
+
+			if (key == 'use_builtin_checker' && value == 'ownchk') {
+				continue;
+			}
+
+			res += key + ' ' + value + '\n';
+		}
+
+		$(this).html('<pre class="bg-light mb-0 p-3"><code>' + res + '</code></pre>');
+	});
+}
+
 // problem_configure: point scores
 $.fn.problem_configure_point_scores = function(problem_conf) {
 	return $(this).each(function() {
@@ -1190,17 +1219,24 @@ $.fn.problem_configure_point_scores = function(problem_conf) {
 		}
 
 		for (var i = 1; i <= n_tests; i++) {
-			var input_point_score = $('<input class="form-control uoj-problem-configure-point-score-input" type="number" name="point_score_' + i + '" id="input-point_score_' + i + '" />');
+			var input_point_score = $('<input class="form-control form-control-sm uoj-problem-configure-point-score-input" type="number" name="point_score_' + i + '" id="input-point_score_' + i + '" />');
 
 			if (problem_conf['point_score_' + i]) {
 				input_point_score.val(problem_conf['point_score_' + i]);
 			}
 
+			(function(i){
+				input_point_score.change(function() {
+					problem_conf['point_score_' + i] = $(this).val();
+					$('#problem-conf-preview').problem_conf_preview(problem_conf);
+				});
+			})(i);
+
 			$(this).append(
 				$('<div class="col-sm-6" />').append(
-					$('<div class="row" />')
-						.append($('<div class="col-5" />').append('<label for="input-point_score_' + i + '" class="col-form-label">测试点 #' + i + '</label>'))
-						.append($('<div class="col-7 col-sm-6" />').append(input_point_score))
+					$('<div class="row gx-1" />')
+						.append($('<div class="col-7" />').append('<label for="input-point_score_' + i + '" class="col-form-label col-form-label-sm">测试点 #' + i + '</label>'))
+						.append($('<div class="col-5" />').append(input_point_score))
 				)
 			);
 		}

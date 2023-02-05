@@ -81,7 +81,7 @@ class UOJProblemConfigure {
 		$this->simple_form->appendHTML(static::getCardHeader('数据配置'));
 		$this->addNumberInput($this->simple_form, 'n_tests', '数据点个数', 10);
 		$this->addNumberInput($this->simple_form, 'n_ex_tests', '额外数据点个数', 0);
-		$this->addNumberInput($this->simple_form, 'n_sample_tests', '样例数据点个数', 0, ['help' => '样例数据点为额外数据点的前 x 个数据点。']);
+		$this->addNumberInput($this->simple_form, 'n_sample_tests', '样例数据点个数', 0, ['help' => '样例数据点为额外数据点中的前 x 个数据点。']);
 		$this->simple_form->appendHTML(static::getCardFooter());
 
 		$this->simple_form->appendHTML(static::getCardHeader('文件配置'));
@@ -99,7 +99,10 @@ class UOJProblemConfigure {
 
 		$this->simple_form->appendHTML(static::getCardHeader('测试点分值', ''));
 		$this->simple_form->appendHTML(<<<EOD
-			<div id="div-point-score-container" class="row gy-3"></div>
+			<details>
+				<summary>展开/收起全部</summary>
+				<div id="div-point-score-container" class="row g-3 mt-0"></div>
+			</details>
 		EOD);
 		$this->simple_form->appendHTML(static::getCardFooter());
 		$this->simple_form->appendHTML(<<<EOD
@@ -121,7 +124,7 @@ class UOJProblemConfigure {
 		EOD);
 
 		$this->simple_form->succ_href = $this->href;
-		$this->simple_form->config['form']['class'] = 'row gy-3 mt-2';
+		$this->simple_form->config['form']['class'] = 'row gy-3';
 		$this->simple_form->config['submit_container']['class'] = 'col-12 text-center mt-3';
 		$this->simple_form->config['back_button']['href'] = $this->href;
 		$this->simple_form->config['back_button']['class'] = 'btn btn-secondary me-2';
@@ -143,6 +146,7 @@ class UOJProblemConfigure {
 		<script>
 			$('#input-{$key}').change(function() {
 				problem_conf['{$key}'] = $(this).val();
+				$('#problem-conf-preview').problem_conf_preview(problem_conf);
 			});
 		</script>
 		EOD);
@@ -165,6 +169,7 @@ class UOJProblemConfigure {
 		<script>
 			$('#input-{$key}').change(function() {
 				problem_conf['{$key}'] = $(this).val();
+				$('#problem-conf-preview').problem_conf_preview(problem_conf);
 			});
 		</script>
 		EOD);
@@ -194,6 +199,7 @@ class UOJProblemConfigure {
 		<script>
 			$('#input-{$key}').change(function() {
 				problem_conf['{$key}'] = $(this).val();
+				$('#problem-conf-preview').problem_conf_preview(problem_conf);
 			});
 		</script>
 		EOD);
@@ -215,6 +221,7 @@ class UOJProblemConfigure {
 		<script>
 			$('#input-{$key}').change(function() {
 				problem_conf['{$key}'] = $(this).val();
+				$('#problem-conf-preview').problem_conf_preview(problem_conf);
 			});
 		</script>
 		EOD);
@@ -250,6 +257,8 @@ class UOJProblemConfigure {
 			} else {
 				if ($val !== '') {
 					$conf[$key] = $val;
+				} else if (isset($conf[$key])) {
+					unset($conf[$key]);
 				}
 			}
 		}
