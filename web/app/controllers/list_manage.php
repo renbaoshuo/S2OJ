@@ -1,6 +1,4 @@
 <?php
-
-requireLib('bootstrap5');
 requirePHPLib('form');
 
 Auth::check() || redirectToLogin();

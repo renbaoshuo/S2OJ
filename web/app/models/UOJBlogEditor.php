@@ -187,7 +187,6 @@ class UOJBlogEditor {
 					'mathjax' => '',
 				];
 
-				$req_lib['bootstrap5'] = '';
 				$req_lib['hljs'] = '';
 
 				echoUOJPageHeader('博客预览', array('ShowPageHeader' => false, 'REQUIRE_LIB' => $req_lib));

@@ -1,5 +1,4 @@
 <?php
-requireLib('bootstrap5');
 requireLib('calendar_heatmap');
 
 Auth::check() || redirectToLogin();

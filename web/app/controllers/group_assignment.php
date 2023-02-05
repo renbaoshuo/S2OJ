@@ -4,7 +4,6 @@ if (!Auth::check()) {
 }
 
 requirePHPLib('form');
-requireLib('bootstrap5');
 
 $group_id = $_GET['id'];
 if (!validateUInt($group_id)) {

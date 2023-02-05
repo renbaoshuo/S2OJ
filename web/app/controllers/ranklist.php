@@ -1,5 +1,4 @@
 <?php
-requireLib('bootstrap5');
 
 Auth::check() || redirectToLogin();
 UOJUser::checkPermission(Auth::user(), 'users.view') || UOJResponse::page403();

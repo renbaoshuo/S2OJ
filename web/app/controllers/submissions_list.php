@@ -1,5 +1,4 @@
 <?php
-requireLib('bootstrap5');
 requirePHPLib('judger');
 
 Auth::check() || redirectToLogin();

@@ -3,7 +3,6 @@ if (!Auth::check()) {
 	redirectToLogin();
 }
 
-requireLib('bootstrap5');
 requirePHPLib('form');
 requirePHPLib('judger');
 requirePHPLib('data');

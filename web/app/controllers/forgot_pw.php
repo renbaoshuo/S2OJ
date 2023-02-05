@@ -1,5 +1,4 @@
 <?php
-requireLib('bootstrap5');
 requirePHPLib('form');
 
 use Gregwar\Captcha\PhraseBuilder;

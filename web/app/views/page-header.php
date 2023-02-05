@@ -1,27 +1,5 @@
 <!-- Made with 💖 by Baoshuo ( https://baoshuo.ren ) -->
 <?php
-if (!isset($REQUIRE_LIB['bootstrap5'])) {
-	$new_user_msg_num = DB::selectCount("select count(*) from user_msg where receiver = '" . Auth::id() . "' and read_time is null");
-	$new_system_msg_num = DB::selectCount("select count(*) from user_system_msg where receiver = '" . Auth::id() . "' and read_time is null");
-	$new_msg_tot = $new_user_msg_num + $new_system_msg_num;
-
-	if ($new_user_msg_num == 0) {
-		$new_user_msg_num_html = '';
-	} else {
-		$new_user_msg_num_html = '<span class="badge badge-pill badge-secondary">' . $new_user_msg_num . '</span>';
-	}
-	if ($new_system_msg_num == 0) {
-		$new_system_msg_num_html = '';
-	} else {
-		$new_system_msg_num_html = '<span class="badge badge-pill badge-secondary">' . $new_system_msg_num . '</span>';
-	}
-	if ($new_msg_tot == 0) {
-		$new_msg_tot_html = '';
-	} else {
-		$new_msg_tot_html = '<sup><span class="badge badge-pill badge-secondary">' . $new_msg_tot . '</span></sup>';
-	}
-}
-
 if (!isset($PageMainTitle)) {
 	$PageMainTitle = UOJConfig::$data['profile']['oj-name'];
 }
@@ -47,24 +25,13 @@ if (!isset($ShowPageHeader)) {
 		uojHome = ''; // '<?= HTML::url('/') ?>';
 	</script>
 
-	<?php if (isset($REQUIRE_LIB['bootstrap5'])) : ?>
-		<!-- Bootstrap 5 (CSS) -->
-		<?= HTML::css_link('/css/bootstrap5.min.css?v=5.2.1') ?>
-		<!-- Bootstrap Icons -->
-		<?= HTML::css_link('/css/bootstrap-icons.min.css?v=2022.9.23') ?>
-	<?php else : ?>
-		<!-- Bootstrap core CSS -->
-		<?= HTML::css_link('/css/bootstrap.min.css?v=2019.5.31') ?>
-		<!-- Bootstrap Glyphicons CSS-->
-		<?= HTML::css_link('/css/bootstrap-glyphicons.min.css?v=2019.5.31') ?>
-	<?php endif ?>
+	<!-- Bootstrap 5 (CSS) -->
+	<?= HTML::css_link('/css/bootstrap5.min.css?v=5.2.1') ?>
+	<!-- Bootstrap Icons -->
+	<?= HTML::css_link('/css/bootstrap-icons.min.css?v=2022.9.23') ?>
 
-	<?php if (isset($REQUIRE_LIB['bootstrap5'])) : ?>
-		<?= HTML::css_link('/css/uoj-bs5.css?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
-	<?php else : ?>
-		<!-- Custom styles for this template -->
-		<?= HTML::css_link('/css/uoj-theme.css?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
-	<?php endif ?>
+	<!-- Custom styles for this template -->
+	<?= HTML::css_link('/css/uoj-bs5.css?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
 
 	<!-- jQuery (necessary for Bootstrap\'s JavaScript plugins) -->
 	<?= HTML::js_src('/js/jquery.min.js') ?>
@@ -80,16 +47,8 @@ if (!isset($ShowPageHeader)) {
 	<!-- jQuery cookie -->
 	<?= HTML::js_src('/js/jquery.cookie.min.js') ?>
 
-	<?php if (isset($REQUIRE_LIB['bootstrap5'])) : ?>
-		<?= HTML::js_src('/js/bootstrap5.bundle.min.js?v=2022.9.23') ?>
-	<?php else : ?>
-		<!-- Include all compiled plugins (below), or include individual files as needed -->
-		<?= HTML::js_src('/js/popper.min.js?v=2019.5.31') ?>
-		<?= HTML::js_src('/js/bootstrap.min.js?v=2019.5.31') ?>
-	<?php endif ?>
-	<script>
-		var isBootstrap5Page = Boolean(<?= isset($REQUIRE_LIB['bootstrap5']) ? 'true' : 'false' ?>);
-	</script>
+	<!-- Bootstrap 5: JavaScript -->
+	<?= HTML::js_src('/js/bootstrap5.bundle.min.js?v=2022.9.23') ?>
 
 	<!-- Color converter -->
 	<?= HTML::js_src('/js/color-converter.min.js') ?>
@@ -301,62 +260,12 @@ if (!isset($ShowPageHeader)) {
 	<script async data-domain="sjzezoj.com" src="https://stat.u.sb/js/script.js"></script>
 </head>
 
-<?php if (isset($REQUIRE_LIB['bootstrap5'])) : ?>
-
-	<body class="d-flex flex-column min-vh-100
+<body class="d-flex flex-column min-vh-100
 	<?php if ($ShowPageHeader) : ?>
 		bg-light
 	<?php endif ?>">
-	<?php else : ?>
+	<?php if ($ShowPageHeader) : ?>
+		<?php uojIncludeView($PageNav, array('REQUIRE_LIB' => $REQUIRE_LIB)) ?>
+	<?php endif ?>
 
-		<body>
-		<?php endif ?>
-		<?php if (!isset($REQUIRE_LIB['bootstrap5'])) : ?>
-			<div class="container theme-showcase" role="main">
-			<?php endif ?>
-			<?php if ($ShowPageHeader) : ?>
-				<?php if (!isset($REQUIRE_LIB['bootstrap5'])) : ?>
-					<div>
-						<ul class="nav nav-pills float-right" role="tablist">
-							<?php if (Auth::check()) : ?>
-								<li class="nav-item dropdown">
-									<a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-										<span class="uoj-username" data-link="0"><?= Auth::id() ?></span> <?= $new_msg_tot_html ?>
-									</a>
-									<ul class="dropdown-menu" role="menu">
-										<li role="presentation"><a class="dropdown-item" href="<?= HTML::url('/user/' . Auth::id()) ?>"><?= UOJLocale::get('my profile') ?></a></li>
-										<li role="presentation"><a class="dropdown-item" href="<?= HTML::url('/user_msg') ?>"><?= UOJLocale::get('private message') ?>&nbsp;&nbsp;<?= $new_user_msg_num_html ?></a></li>
-										<li role="presentation"><a class="dropdown-item" href="<?= HTML::url('/user/' . Auth::id() . '/system_msg') ?>"><?= UOJLocale::get('system message') ?>&nbsp;&nbsp;<?= $new_system_msg_num_html ?></a></li>
-										<?php if (isSuperUser(Auth::user())) : ?>
-											<li role="presentation"><a class="dropdown-item" href="<?= HTML::url('/super_manage') ?>"><?= UOJLocale::get('system manage') ?></a></li>
-										<?php endif ?>
-									</ul>
-								</li>
-								<li class="nav-item" role="presentation"><a class="nav-link" href="<?= HTML::url('/logout?_token=' . crsf_token()) ?>"><?= UOJLocale::get('logout') ?></a></li>
-							<?php else : ?>
-								<li class="nav-item" role="presentation"><a class="nav-link" href="<?= HTML::url('/login') ?>"><?= UOJLocale::get('login') ?></a></li>
-								<?php if (UOJConfig::$data['switch']['open-register'] || !DB::selectCount("SELECT COUNT(*) FROM user_info")) : ?>
-									<li class="nav-item" role="presentation"><a class="nav-link" href="<?= HTML::url('/register') ?>"><?= UOJLocale::get('register') ?></a></li>
-								<?php endif ?>
-							<?php endif ?>
-						</ul>
-						<h1 class="d-none d-sm-block" style="position: relative; top: 4px; width: 15em">
-							<a href="<?= HTML::url('/') ?>">
-								<img src="<?= HTML::url('/images/logo_small.png') ?>" alt="Logo" class="img-rounded" style="width: 39px; height: 39px; position: relative; top: -4px; margin-right: 8px;" />
-							</a>
-							<span style="position: absolute; font-size: 13px; letter-spacing: 10px; left: 48px;">石家庄二中</span>
-							<span class="d" style="position: absolute; font-size: 26px; top: 11px;">在线评测系统</span>
-						</h1>
-						<h1 class="d-block d-sm-none"><?= $PageMainTitleOnSmall ?></h1>
-					</div>
-				<?php endif ?>
-
-				<?php uojIncludeView($PageNav, array('REQUIRE_LIB' => $REQUIRE_LIB)) ?>
-			<?php endif ?>
-
-
-			<?php if (isset($REQUIRE_LIB['bootstrap5'])) : ?>
-				<div class="uoj-content container flex-fill">
-				<?php else : ?>
-					<div class="uoj-content">
-					<?php endif ?>
+	<div class="uoj-content container flex-fill">

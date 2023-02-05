@@ -81,8 +81,6 @@ function becomeMsgPage($msg, $title = '消息') {
 	if (UOJContext::isAjax()) {
 		die($msg);
 	} else {
-		$REQUIRE_LIB['bootstrap5'] = '';
-
 		echoUOJPageHeader($title);
 		echo $msg;
 		echoUOJPageFooter();

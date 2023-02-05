@@ -3,7 +3,6 @@
 use Gregwar\Captcha\PhraseBuilder;
 
 requireLib('md5');
-requireLib('bootstrap5');
 
 Auth::check() && redirectTo('/');
 

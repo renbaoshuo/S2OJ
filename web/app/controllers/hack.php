@@ -2,7 +2,6 @@
 requirePHPLib('form');
 requirePHPLib('judger');
 requirePHPLib('data');
-requireLib('bootstrap5');
 requireLib('hljs');
 
 Auth::check() || redirectToLogin();

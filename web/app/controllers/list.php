@@ -1,6 +1,4 @@
 <?php
-
-requireLib('bootstrap5');
 requireLib('mathjax');
 requirePHPLib('form');
 requirePHPLib('judger');

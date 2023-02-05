@@ -3,7 +3,6 @@
 use Gregwar\Captcha\PhraseBuilder;
 
 requirePHPLib('form');
-requireLib('bootstrap5');
 
 Auth::check() || redirectToLogin();
 UOJUser::checkPermission(Auth::user(), 'users.upload_image') || UOJResponse::page403();

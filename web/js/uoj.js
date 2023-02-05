@@ -295,12 +295,8 @@ $.fn.click_zan_block = function() {
 			return;
 		}
 
-		var up_icon_html = isBootstrap5Page
-			? '<i class="bi bi-hand-thumbs-up"></i>'
-			: '<span class="glyphicon glyphicon-thumbs-up"></span>';
-		var down_icon_html = isBootstrap5Page
-			? '<i class="bi bi-hand-thumbs-down"></i>'
-			: '<span class="glyphicon glyphicon-thumbs-down"></span>';
+		var up_icon_html = '<i class="bi bi-hand-thumbs-up"></i>';
+		var down_icon_html = '<i class="bi bi-hand-thumbs-down"></i>';
 
 		if (val == 1) {
 			$(this).addClass('uoj-click-zan-block-cur-up');
@@ -325,11 +321,11 @@ $.fn.click_zan_block = function() {
 		var up_node = $('<a href="#" class="uoj-click-zan-up">'+up_icon_html+uojLocale('click-zan::good')+'</a>').click(function(e) {
 			e.preventDefault();
 			click_zan(id, type, 1, node);
-		}).addClass(isBootstrap5Page ? 'text-decoration-none' : '');
+		});
 		var down_node = $('<a href="#" class="uoj-click-zan-down">'+down_icon_html+uojLocale('click-zan::bad')+'</a>').click(function(e) {
 			e.preventDefault();
 			click_zan(id, type, -1, node);
-		}).addClass(isBootstrap5Page ? 'text-decoration-none' : '');
+		});
 		
 		$(this)
 			.append(up_node)
@@ -562,38 +558,22 @@ $.fn.long_table = function(data, cur_page, header_row, get_row_str, config) {
 		if (n_pages > 1) {
 			var pagination = $('<ul class="pagination top-buffer-no bot-buffer-sm justify-content-center"></ul>');
 			if (cur_page > 1) {
-				if (isBootstrap5Page) {
-					pagination.append(get_page_li(1, '<i class="bi bi-chevron-double-left"></i>'));
-					pagination.append(get_page_li(cur_page - 1, '<i class="bi bi-chevron-left"></i>'));
-				} else {
-					pagination.append(get_page_li(cur_page - 1, '<span class="glyphicon glyphicon glyphicon-backward"></span>'));
-				}
+				pagination.append(get_page_li(1, '<i class="bi bi-chevron-double-left"></i>'));
+				pagination.append(get_page_li(cur_page - 1, '<i class="bi bi-chevron-left"></i>'));
 			} else {
-				if (isBootstrap5Page) {
-					pagination.append(get_page_li(-1, '<i class="bi bi-chevron-double-left"></i>'));
-					pagination.append(get_page_li(-1, '<i class="bi bi-chevron-left"></i>'));
-				} else {
-					pagination.append(get_page_li(-1, '<span class="glyphicon glyphicon glyphicon-backward"></span>'));
-				}
+				pagination.append(get_page_li(-1, '<i class="bi bi-chevron-double-left"></i>'));
+				pagination.append(get_page_li(-1, '<i class="bi bi-chevron-left"></i>'));
 			}
 			var max_extend = config.max_extend != undefined ? config.max_extend : 5;
 			for (var i = Math.max(cur_page - max_extend, 1); i <= Math.min(cur_page + max_extend, n_pages); i++) {
 				pagination.append(get_page_li(i, i.toString()));
 			}
 			if (cur_page < n_pages) {
-				if (isBootstrap5Page) {
-					pagination.append(get_page_li(cur_page + 1, '<i class="bi bi-chevron-right"></i>'));
-					pagination.append(get_page_li(n_pages, '<i class="bi bi-chevron-double-right"></i>'));
-				} else {
-					pagination.append(get_page_li(cur_page + 1, '<span class="glyphicon glyphicon glyphicon-forward"></span>'));
-				}
+				pagination.append(get_page_li(cur_page + 1, '<i class="bi bi-chevron-right"></i>'));
+				pagination.append(get_page_li(n_pages, '<i class="bi bi-chevron-double-right"></i>'));
 			} else {
-				if (isBootstrap5Page) {
-					pagination.append(get_page_li(-1, '<i class="bi bi-chevron-right"></i>'));
-					pagination.append(get_page_li(-1, '<i class="bi bi-chevron-double-right"></i>'));
-				} else {
-					pagination.append(get_page_li(-1, '<span class="glyphicon glyphicon glyphicon-forward"></span>'));
-				}
+				pagination.append(get_page_li(-1, '<i class="bi bi-chevron-right"></i>'));
+				pagination.append(get_page_li(-1, '<i class="bi bi-chevron-double-right"></i>'));
 			}
 			$(table_div).append($('<div class="text-center"></div>').append(pagination));
 		}

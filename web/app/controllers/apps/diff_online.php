@@ -1,7 +1,3 @@
-<?php
-requireLib('bootstrap5');
-?>
-
 <?php echoUOJPageHeader(UOJLocale::get('diff online')) ?>
 
 <h1>

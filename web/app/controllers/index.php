@@ -1,4 +1,3 @@
-<?php requireLib('bootstrap5'); ?>
 <?php
 $blogs = DB::selectAll([
 	"select blogs.id, title, poster, post_time from important_blogs inner join blogs on important_blogs.blog_id = blogs.id",

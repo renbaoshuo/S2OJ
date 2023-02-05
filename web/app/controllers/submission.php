@@ -1,5 +1,4 @@
 <?php
-requireLib('bootstrap5');
 requireLib('hljs');
 requirePHPLib('form');
 requirePHPLib('judger');

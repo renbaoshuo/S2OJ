@@ -1,9 +1,6 @@
 <?php
-requireLib('bootstrap5');
 
-if (!Auth::check()) {
-	redirectToLogin();
-}
+Auth::check() || redirectToLogin();
 
 function handleMsgPost() {
 	if (!isset($_POST['message'])) {

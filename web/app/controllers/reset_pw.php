@@ -1,5 +1,4 @@
 <?php
-requireLib('bootstrap5');
 requireLib('dialog');
 requireLib('md5');
 

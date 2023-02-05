@@ -1,5 +1,3 @@
-<?php requireLib('bootstrap5') ?>
-
 <?php echoUOJPageHeader(UOJLocale::get('html to markdown')) ?>
 
 <h1>

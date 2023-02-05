@@ -1,5 +1,4 @@
 <?php
-requireLib('bootstrap5');
 requirePHPLib('form');
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('announcements')) ?>
