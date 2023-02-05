@@ -1221,7 +1221,7 @@ $.fn.problem_configure_point_scores = function(problem_conf) {
 		}
 
 		for (var i = 1; i <= n_tests; i++) {
-			var input_point_score = $('<input class="form-control form-control-sm uoj-problem-configure-point-score-input" type="number" name="point_score_' + i + '" id="input-point_score_' + i + '" />');
+			var input_point_score = $('<input class="form-control form-control-sm uoj-problem-configure-point-score-input" type="number" name="point_score_' + i + '" id="input-point_score_' + i + '" min="0" max="100" />');
 
 			if (problem_conf['point_score_' + i]) {
 				input_point_score.val(problem_conf['point_score_' + i]);
@@ -1312,12 +1312,13 @@ $.fn.problem_configure_subtasks = function(problem_conf) {
 			div_subtasks.empty();
 
 			var n_subtasks = parseInt(input_n_subtasks.val() || '0');
+			var n_tests = parseInt(problem_conf['n_tests'] || '10');
 			problem_conf['n_subtasks'] = input_n_subtasks.val();
 
 			for (var i = 1; i <= n_subtasks; i++) {
 				var input_subtask_type = $('<select class="form-select form-select-sm" name="subtask_type_' + i + '" id="input-subtask_type_' + i + '" />');
-				var input_subtask_end = $('<input class="form-control form-control-sm uoj-problem-configure-subtask-end-input" type="number" name="subtask_end_' + i + '" id="input-subtask_end_' + i + '" />');
-				var input_subtask_score = $('<input class="form-control form-control-sm uoj-problem-configure-subtask-score-input" type="number" name="subtask_score_' + i + '" id="input-subtask_score_' + i + '" />');
+				var input_subtask_end = $('<input class="form-control form-control-sm uoj-problem-configure-subtask-end-input" type="number" name="subtask_end_' + i + '" id="input-subtask_end_' + i + '" min="0" max="' + n_tests + '" />');
+				var input_subtask_score = $('<input class="form-control form-control-sm uoj-problem-configure-subtask-score-input" type="number" name="subtask_score_' + i + '" id="input-subtask_score_' + i + '" min="0" max="100" />');
 				var input_subtask_used_time_type = $('<select class="form-select form-select-sm" name="subtask_used_time_type_' + i + '" id="input-subtask_used_time_type_' + i + '" />');
 
 				input_subtask_type
