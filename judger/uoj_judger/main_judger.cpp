@@ -13,8 +13,17 @@ int main(int argc, char **argv)  {
 	rpc.limits = conf_run_limit("judger", 0, RL_JUDGER_DEFAULT);
 	rpc.unsafe = true;
 	runp::result res = runp::run(rpc);
+
 	if (res.type != runp::RS_AC) {
-		end_judge_judgment_failed("Judgment Failed : Judger " + runp::rstype_str(res.type));
+		stringstream msg;
+
+		msg << "Judgment Failed" << endl;
+		msg << "\n------\n" << endl;
+		msg << "Judger result: " << runp::rstype_str(res.type) << endl;
+		msg << "Extra message: " << res.extra << endl;
+
+		end_judge_judgment_failed(msg.str());
 	}
+
 	return 0;
 }
