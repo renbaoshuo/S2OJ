@@ -43,6 +43,16 @@ foreach ($problem_configure->problem_conf->conf as $key => $val) {
 				此处显示的 <code>problem.conf</code> 为根据右侧填写的配置信息生成的内容预览，并非题目当前实际配置文件。
 			</div>
 		</div>
+		<div class="card mt-3">
+			<div class="card-header fw-bold">功能说明</div>
+
+			<div class="card-body">
+				<p>此处可以对 <b>传统题</b> 进行快速配置，在填写完成之后点击页面底部的「提交」按钮即可替换现有配置文件并进行数据同步。</p>
+				<p>目前暂不支持对交互题、提交答案题、通信题进行配置，对于此类题目请手动编写配置文件。</p>
+				<p>如需要配置子任务依赖，也可以基于此处生成的配置文件进行修改后再手动上传。</p>
+				<p>关于数据配置的更多帮助，请查阅 <a href="https://s2oj.github.io/#/manage/tutorial/problem_data" target="_blank">帮助文档</a>。</p>
+			</div>
+		</div>
 	</div>
 	<div class="col-12 col-md-8 mt-3 mt-md-0">
 		<?php $problem_configure->printHTML() ?>

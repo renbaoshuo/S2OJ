@@ -618,7 +618,7 @@ if ($problem['hackable']) {
 				<button type="button" class="btn d-block w-100 btn-primary" data-bs-toggle="modal" data-bs-target="#UploadDataModal">上传数据</button>
 			</div>
 			<div class="mt-2">
-				<a role="button" class="btn d-block w-100 btn-primary" href="<?= UOJProblem::cur()->getUri('/manage/data/configure') ?>">试题配置</a>
+				<a role="button" class="btn d-block w-100 btn-primary" href="<?= UOJProblem::cur()->getUri('/manage/data/configure') ?>">数据配置</a>
 			</div>
 		</div>
 	</aside>

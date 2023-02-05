@@ -1323,7 +1323,7 @@ $.fn.problem_configure_subtasks = function(problem_conf) {
 
 				input_subtask_type
 					.append($('<option value="packed" />').text('错一个就零分'))
-					.append($('<option value="min" />').text('得分取所有测试点中的最小值'));
+					.append($('<option value="min" />').text('取所有测试点中的最小值'));
 				input_subtask_used_time_type
 					.append($('<option value="sum" />').text('全部相加'))
 					.append($('<option value="max" />').text('取所有测试点中的最大值'));
