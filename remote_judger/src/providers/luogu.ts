@@ -295,28 +295,23 @@ export default class LuoguProvider implements IBasicProvider {
         let details = '';
 
         details +=
-          '<div class="border-bottom p-3">' +
-          '<table class="table w-auto mb-0 caption-top">' +
-          '<caption class="fw-bold text-body mb-1 pt-0">远端信息</caption>' +
-          '<tbody class="border-top">' +
+          '<remote-result-container>' +
+          '<remote-result-table>' +
           Object.entries({
             题目: `<a href="https://www.luogu.com.cn/problem/${
               data.problem.pid
-            }" target="_blank">${data.problem.pid} ${htmlspecialchars(
-              data.problem.title
-            )}</a>`,
-            提交记录: `<a href="https://www.luogu.com.cn/record/${id}" target="_blank">R${id}</a>`,
+            }">${data.problem.pid} ${htmlspecialchars(data.problem.title)}</a>`,
+            提交记录: `<a href="https://www.luogu.com.cn/record/${id}">R${id}</a>`,
             提交时间: new Date(data.submitTime * 1000).toLocaleString('zh-CN'),
-            账号: `<a href="https://www.luogu.com.cn/user/${data.user.uid}" target="_blank">${data.user.name}</a>`,
+            账号: `<a href="https://www.luogu.com.cn/user/${data.user.uid}">${data.user.name}</a>`,
             状态: status,
           })
             .map(
-              o => `<tr><td class="fw-bold">${o[0]}</td><td>${o[1]}</td></tr>`
+              o => `<remote-result-tr name="${o[0]}">${o[1]}</remote-result-tr>`
             )
             .join('') +
-          '</tbody>' +
-          '</table>' +
-          '</div>';
+          '</remote-result-table>' +
+          '</remote-result-container>';
 
         if (data.detail.judgeResult.subtasks.length === 1) {
           details += Object.entries(

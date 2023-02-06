@@ -419,24 +419,21 @@ export default class CodeforcesProvider implements IBasicProvider {
         const remote_handle = stripHtml(body.partyName).result;
         const details =
           '<div>' +
-          '<div class="border-bottom p-3">' +
-          '<table class="table w-auto mb-0 caption-top">' +
-          '<caption class="fw-bold text-body mb-1 pt-0">远端信息</caption>' +
-          '<tbody class="border-top">' +
+          '<remote-result-container>' +
+          '<remote-result-table>' +
           Object.entries({
             比赛: stripHtml(body.contestName).result,
             题目: stripHtml(body.problemName).result,
-            提交记录: `<a href="https://codeforces.com${body.href}" target="_blank">${id}</a>`,
-            账号: `<a href="https://codeforces.com/profile/${remote_handle}" target="_blank">${remote_handle}</a>`,
+            提交记录: `<a href="https://codeforces.com${body.href}">${id}</a>`,
+            账号: `<a href="https://codeforces.com/profile/${remote_handle}">${remote_handle}</a>`,
             状态: stripHtml(body.verdict).result,
           })
             .map(
-              o => `<tr><td class="fw-bold">${o[0]}</td><td>${o[1]}</td></tr>`
+              o => `<remote-result-tr name="${o[0]}">${o[1]}</remote-result-tr>`
             )
             .join('') +
-          '</tbody>' +
-          '</table>' +
-          '</div>' +
+          '</remote-result-table>' +
+          '</remote-result-container>' +
           `<tests>${tests.join('\n')}</tests>` +
           '</div>';
 

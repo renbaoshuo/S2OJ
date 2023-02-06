@@ -410,6 +410,33 @@ class JudgmentDetailsPrinter {
 			echo '<pre class="bg-light rounded p-3">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
+		} elseif ($node->nodeName == 'remote-result-container') {
+			echo '<div class="border-bottom p-3">';
+			$this->_print_c($node);
+			echo '</div>';
+		} elseif ($node->nodeName == 'remote-result-table') {
+			echo '<table class="table w-auto mb-0 caption-top">';
+			echo '<caption class="fw-bold text-body mb-1 pt-0">远端信息</caption>';
+			echo '<tbody class="border-top">';
+			$this->_print_c($node);
+			echo '</tbody>';
+			echo '</table>';
+		} elseif ($node->nodeName == 'remote-result-tr') {
+			$name = $node->getAttribute("name");
+			echo '<tr>';
+			echo '<td class="fw-bold">', $name, '</td>';
+			echo '<td>';
+			$this->_print_c($node);
+			echo '</td>';
+			echo '</tr>';
+		} elseif ($node->nodeName == 'remote-source-code') {
+			$language = $node->getAttribute("language");
+			echo '<div class="border-bottom p-3">';
+			echo '<div class="fw-bold mb-2">源代码</div>';
+			echo '<pre><code class="language-', $language, ' bg-light mb-0 rounded">';
+			$this->_print_c($node);
+			echo "</code></pre>";
+			echo '</div>';
 		} elseif ($node->nodeName == 'tests') {
 			if ($node->hasAttribute("errcode")) {
 				echo "<pre>", "Judgment Failed. Error Code: ", $node->getAttribute("errcode"), ".</pre>";

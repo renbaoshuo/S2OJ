@@ -461,37 +461,29 @@ export default class LibreojProvider implements IBasicProvider {
         let details = '';
 
         details +=
-          '<div class="border-bottom p-3">' +
-          '<table class="table w-auto mb-0 caption-top">' +
-          '<caption class="fw-bold text-body mb-1 pt-0">远端信息</caption>' +
-          '<tbody class="border-top">' +
+          '<remote-result-container>' +
+          '<remote-result-table>' +
           Object.entries({
-            题目: `<a href="https://loj.ac/p/${
-              body.meta.problem.displayId
-            }" target="_blank">#${
+            题目: `<a href="https://loj.ac/p/${body.meta.problem.displayId}">#${
               body.meta.problem.displayId
             }. ${htmlspecialchars(body.meta.problemTitle)}</a>`,
-            提交记录: `<a href="https://loj.ac/s/${id}" target="_blank">${id}</a>`,
+            提交记录: `<a href="https://loj.ac/s/${id}">${id}</a>`,
             提交时间: new Date(body.meta.submitTime).toLocaleString('zh-CN'),
-            账号: `<a href="https://loj.ac/user/${body.meta.submitter.id}" target="_blank">${body.meta.submitter.username}</a>`,
+            账号: `<a href="https://loj.ac/user/${body.meta.submitter.id}">${body.meta.submitter.username}</a>`,
             状态: status,
           })
             .map(
-              o => `<tr><td class="fw-bold">${o[0]}</td><td>${o[1]}</td></tr>`
+              o => `<remote-result-tr name="${o[0]}">${o[1]}</remote-result-tr>`
             )
             .join('') +
-          '</tbody>' +
-          '</table>' +
-          '</div>';
+          '</remote-result-table>' +
+          '</remote-result-container>';
 
         if (result_show_source) {
           details +=
-            '<div class="border-bottom p-3">' +
-            '<div class="fw-bold mb-2">源代码</div>' +
-            `<pre><code class="language-${body.content.language} bg-light rounded p-3">` +
+            `<remote-source-code language="${body.content.language}">` +
             htmlspecialchars(parse(body.content.code)) +
-            '</code></pre>' +
-            '</div>';
+            '</remote-source-code>';
         }
 
         // Samples
