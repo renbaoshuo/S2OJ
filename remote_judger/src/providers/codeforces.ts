@@ -344,6 +344,10 @@ export default class CodeforcesProvider implements IBasicProvider {
       .getAttribute('data-submission-id');
   }
 
+  async ensureIsOwnSubmission(id: string) {
+    throw new Error('Method not implemented.');
+  }
+
   async waitForSubmission(id: string, next, end) {
     let count = 0;
     let fail = 0;

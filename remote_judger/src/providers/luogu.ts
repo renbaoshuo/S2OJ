@@ -250,7 +250,26 @@ export default class LuoguProvider implements IBasicProvider {
     return result.body.rid;
   }
 
-  async waitForSubmission(id: string, next, end) {
+  async ensureIsOwnSubmission(id: string) {
+    const { body } = await this.safeGet(`/record/${id}?_contentOnly=1`);
+
+    const current_uid = body.currentUser?.uid;
+    const submission_uid = body.currentData.record?.user.uid;
+
+    return current_uid && submission_uid && current_uid === submission_uid;
+  }
+
+  async waitForSubmission(id: string, next, end, problem_id: string) {
+    if (!(await this.ensureLogin())) {
+      await end({
+        error: true,
+        status: 'Judgment Failed',
+        message: 'Login failed',
+      });
+
+      return null;
+    }
+
     let fail = 0;
     let count = 0;
 
@@ -261,6 +280,24 @@ export default class LuoguProvider implements IBasicProvider {
       try {
         const { body } = await this.safeGet(`/record/${id}?_contentOnly=1`);
         const data = body.currentData.record;
+
+        if (!data) {
+          return await end({
+            error: true,
+            id: `R${id}`,
+            status: 'Judgment Failed',
+            message: 'Failed to fetch submission details.',
+          });
+        }
+
+        if (data.problem.pid != problem_id) {
+          return await end({
+            id,
+            error: true,
+            status: 'Judgment Failed',
+            message: 'Submission does not match current problem.',
+          });
+        }
 
         if (
           data.detail.compileResult &&

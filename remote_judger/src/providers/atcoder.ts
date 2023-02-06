@@ -244,6 +244,10 @@ export default class AtcoderProvider implements IBasicProvider {
       .getAttribute('data-id');
   }
 
+  async ensureIsOwnSubmission(id: string) {
+    throw new Error('Method not implemented.');
+  }
+
   async waitForSubmission(id: string, next, end, problem_id: string) {
     let count = 0;
     let fail = 0;

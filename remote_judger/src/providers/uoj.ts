@@ -206,6 +206,10 @@ export default class UOJProvider implements IBasicProvider {
       .innerHTML.split('#')[1];
   }
 
+  async ensureIsOwnSubmission(id: string) {
+    throw new Error('Method not implemented.');
+  }
+
   async waitForSubmission(id: string, next, end) {
     let count = 0;
     let fail = 0;

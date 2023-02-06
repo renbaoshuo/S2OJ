@@ -19,6 +19,7 @@ export interface IBasicProvider {
     next: NextFunction,
     end: NextFunction
   ): Promise<string | void>;
+  ensureIsOwnSubmission(id: string): Promise<boolean | void>;
   waitForSubmission(
     id: string,
     next: NextFunction,
