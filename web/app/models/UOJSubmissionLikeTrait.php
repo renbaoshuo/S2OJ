@@ -142,18 +142,33 @@ trait UOJSubmissionLikeTrait {
 			return false;
 		}
 
+		if ($content['remote_submission_id']) {
+			echo <<<EOD
+				<div class="card mb-3">
+					<div class="card-header fw-bold">
+						远程提交
+					</div>
+					<div class="card-body">
+						远程提交 ID：{$content['remote_submission_id']}
+					</div>
+				</div>
+			EOD;
+
+			return true;
+		}
+
 		$zip_file = new ZipArchive();
 		if ($zip_file->open(UOJContext::storagePath() . $content['file_name'], ZipArchive::RDONLY) !== true) {
 			echo <<<EOD
-            <div class="card mb-3">
-                <div class="card-header text-bg-danger fw-bold">
-                    提交内容
-                </div>
-                <div class="card-body">
-                    木有
-                </div>
-            </div>
-            EOD;
+				<div class="card mb-3">
+					<div class="card-header text-bg-danger fw-bold">
+						提交内容
+					</div>
+					<div class="card-body">
+						木有
+					</div>
+				</div>
+			EOD;
 			return false;
 		}
 

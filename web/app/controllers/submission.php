@@ -168,7 +168,7 @@ if ($perm['manager_view']) {
 ?>
 
 <?php if ($perm['content'] || $perm['manager_view']) : ?>
-	<div class="copy-button-container">
+	<div>
 		<?php UOJSubmission::cur()->echoContent() ?>
 	</div>
 

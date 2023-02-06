@@ -188,6 +188,43 @@ class VJudge {
           message: e.message,
         });
       }
+    } else if (config.remote_submit_type == 'archive') {
+      try {
+        const provider = this.p_imports[type].constructFromAccountData(
+          JSON.parse(config.remote_account_data)
+        );
+
+        if (!config.remote_submission_id) {
+          return await end({
+            error: true,
+            status: 'Judgment Failed',
+            message: 'REMOTE_SUBMISSION_ID is not set.',
+          });
+        }
+
+        if (await provider.ensureIsOwnSubmission(config.remote_submission_id)) {
+          await provider.waitForSubmission(
+            problem_id,
+            config.remote_submission_id,
+            next,
+            end
+          );
+        } else {
+          return await end({
+            error: true,
+            status: 'Judgment Failed',
+            message: 'Remote submission does not belongs to current user.',
+          });
+        }
+      } catch (e) {
+        logger.error(e);
+
+        await end({
+          error: true,
+          status: 'Judgment Failed',
+          message: e.message,
+        });
+      }
     } else {
       throw new Error(
         'Unsupported remote submit type: ' + config.remote_submit_type

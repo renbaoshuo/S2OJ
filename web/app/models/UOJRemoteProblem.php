@@ -42,7 +42,7 @@ class UOJRemoteProblem {
 			'short_name' => 'LOJ',
 			'url' => 'https://loj.ac',
 			'languages' => ['C', 'C++03', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java17', 'Pascal'],
-			'submit_type' => ['bot'],
+			'submit_type' => ['bot', 'archive'],
 		],
 		'luogu' => [
 			'name' => '洛谷',

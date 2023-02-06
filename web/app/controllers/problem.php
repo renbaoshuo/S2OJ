@@ -109,13 +109,30 @@ function handleUpload($zip_file_name, $content, $tot_size) {
 
 	if (UOJProblem::info('type') == 'remote') {
 		$submit_type = in_array($_POST['answer_remote_submit_type'], $remote_provider['submit_type']) ? $_POST['answer_remote_submit_type'] : $remote_provider['submit_type'][0];
+		$content['config'][] = ['remote_submit_type', $submit_type];
 
 		if ($submit_type != 'bot') {
 			$content['no_rejudge'] = true;
 			$content['config'][] = ['remote_account_data', $_POST['answer_remote_account_data']];
 		}
 
-		$content['config'][] = ['remote_submit_type', $submit_type];
+		if ($submit_type == 'archive') {
+			$content['remote_submission_id'] = $_POST['answer_remote_submission_id'];
+			$content['config'][] = ['remote_submission_id', $_POST['answer_remote_submission_id']];
+
+			$content['config'] = array_filter(
+				$content['config'],
+				function ($key) {
+					return !strEndWith($key, '_language');
+				},
+				ARRAY_FILTER_USE_KEY
+			);
+
+			$zip_file = new ZipArchive();
+			$zip_file->open(UOJContext::storagePath() . $zip_file_name, ZipArchive::CREATE);
+			$zip_file->addFromString('answer.code', '');
+			$zip_file->close();
+		}
 	}
 
 	UOJSubmission::onUpload($zip_file_name, $content, $tot_size, $is_participating);
@@ -217,10 +234,18 @@ if ($pre_submit_check_ret === true && !$no_more_submission) {
 		$remote_oj = UOJProblem::cur()->getExtraConfig('remote_online_judge');
 		$remote_pid = UOJProblem::cur()->getExtraConfig('remote_problem_id');
 		$remote_url = UOJRemoteProblem::getProblemRemoteUrl($remote_oj, $remote_pid);
-		$submit_type = json_encode(UOJRemoteProblem::$providers[$remote_oj]['submit_type']);
+		$remote_provider = UOJRemoteProblem::$providers[$remote_oj];
+		$submit_type = json_encode($remote_provider['submit_type']);
 
-		$answer_form->addNoVal('answer_remote_submit_type', '');
-		$answer_form->addNoVal('answer_remote_account_data', '');
+		$answer_form->add('answer_remote_submit_type', '', function ($opt) use ($remote_provider) {
+			return in_array($opt, $remote_provider['submit_type']) ? '' : '无效选项';
+		}, null);
+		$answer_form->add('answer_remote_account_data', '', function ($data) {
+			return json_decode($data) !== null ? '' : '无效数据';
+		}, null);
+		$answer_form->add('answer_remote_submission_id', '', function ($id) {
+			return validateUInt($id) ? '' : '无效 ID';
+		}, null);
 		$answer_form->appendHTML(<<<EOD
 			<h5>Remote Judge 配置</h5>
 			<div class="" id="answer-remote_submit_group"></div>

@@ -932,11 +932,14 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 	return this.each(function() {
 		var input_submit_type_bot_id = 'input-submit_type_bot';
 		var input_submit_type_my_id = 'input-submit_type_my';
+		var input_submit_type_archive_id = 'input-submit_type_archive';
 		var div_submit_type_bot_id = 'div-submit_type_bot';
 		var div_submit_type_my_id = 'div-submit_type_my';
+		var div_submit_type_archive_id = 'div-submit_type_archive';
 
 		var input_submit_type_bot = $('<input class="form-check-input" type="radio" name="answer_remote_submit_type" id="' + input_submit_type_bot_id + '" value="bot" />');
 		var input_submit_type_my = $('<input class="form-check-input" type="radio" name="answer_remote_submit_type" id="' + input_submit_type_my_id + '" value="my" />');
+		var input_submit_type_archive = $('<input class="form-check-input" type="radio" name="answer_remote_submit_type" id="' + input_submit_type_archive_id + '" value="archive" />');
 		var input_my_account_data = $('<input type="hidden" name="answer_remote_account_data" value="" />');
 		
 		var my_account_validation_status = $('<span />').append('<span class="text-secondary">待验证</span>');
@@ -977,10 +980,24 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 			.append($('<div class="mt-3" />')
 				.append('<span>将使用您的账号提交本题。</span>')
 				.append('<span>配置方法请查阅 <a href="https://sjzezoj.com/blog/baoshuo/post/717" target="_blank">使用教程</a>。</span>')
+			);
+		var div_submit_type_archive = $('<div id="' + div_submit_type_archive_id + '" />')
+			.append($('<div class="mt-3" />')
+				.append('<span>将从您给定的提交记录中抓取评测结果。</span>')
+				.append('<span>配置方法请查阅 <a href="https://sjzezoj.com/blog/baoshuo/post/717" target="_blank">使用教程</a>。</span>')
+			).append(
+				$('<div class="row mt-3 align-items-center" />')
+					.append($('<div class="col-sm-2" />').append('<label for="input-answer_remote_submission_id" class="col-form-label">提交记录 ID</label>'))
+					.append($('<div class="col-sm-4" />').append('<input id="input-answer_remote_submission_id" name="answer_remote_submission_id" class="form-control font-monospace" autocomplete="off" />'))
+					.append($('<div class="col-sm-6" />').append($('<div class="form-text mt-0" />').append('请填入远程 OJ 上的提交记录 ID。')))
+			);
+		var div_account_data = $('<div class="border px-3 py-2 mt-3" />')
+			.append($('<div class="mt-2" />').append('<span class="fs-6 fw-bold">远程账号信息</span>'))
+			.append($('<div class="mt-3" />')
 				.append('<span>账号状态：</span>')
 				.append(my_account_validation_status)
 				.append(my_account_validation_btn)
-				);
+			);
 
 		if ('localStorage' in window) {
 			var prefer_submit_type = localStorage.getItem('uoj_remote_judge_save_prefer_submit_type__' + oj) || null;
@@ -993,31 +1010,64 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 		}
 
 		input_submit_type_bot.click(function() {
+			div_account_data.hide('fast');
 			div_submit_type_my.hide('fast');
+			div_submit_type_archive.hide('fast');
 			div_submit_type_bot.show('fast');
+			$('#form-group-answer_answer').show('fast');
 			save_prefer_submit_type('bot');
 		});
 		input_submit_type_my.click(function() {
 			div_submit_type_bot.hide('fast');
+			div_submit_type_archive.hide('fast');
 			div_submit_type_my.show('fast');
+			div_account_data.show('fast');
+			$('#form-group-answer_answer').show('fast');
 			save_prefer_submit_type('my');
+		});
+		input_submit_type_archive.click(function() {
+			div_submit_type_bot.hide('fast');
+			div_submit_type_my.hide('fast');
+			div_submit_type_archive.show('fast');
+			div_account_data.show('fast');
+			$('#form-group-answer_answer').hide('fast');
+			save_prefer_submit_type('archive');
 		});
 
 		if (submit_type[0] == 'bot') {
+			div_account_data.hide();
 			div_submit_type_my.hide();
+			div_submit_type_archive.hide();
+			div_submit_type_bot.show();
+			$('#form-group-answer_answer').show();
 			input_submit_type_bot[0].checked = true;
 		} else if (submit_type[0] == 'my') {
 			div_submit_type_bot.hide();
+			div_submit_type_my.show();
+			div_submit_type_archive.hide();
+			div_account_data.show();
+			$('#form-group-answer_answer').show();
 			input_submit_type_my[0].checked = true;
+		} else if (submit_type[0] == 'archive') {
+			div_submit_type_bot.hide();
+			div_submit_type_my.hide();
+			div_submit_type_archive.show();
+			div_account_data.show();
+			$('#form-group-answer_answer').hide();
+			input_submit_type_archive[0].checked = true;
 		}
 
 		if (submit_type.indexOf('bot') == -1) {
 			input_submit_type_bot.attr('disabled', 'disabled');
 		} else if (prefer_submit_type == 'bot') {
+			div_account_data.hide();
 			div_submit_type_my.hide();
+			div_submit_type_archive.hide();
 			div_submit_type_bot.show();
+			$('#form-group-answer_answer').show();
 			input_submit_type_bot[0].checked = true;
 			input_submit_type_my[0].checked = false;
+			input_submit_type_archive[0].checked = false;
 		}
 
 		if (submit_type.indexOf('my') == -1) {
@@ -1025,8 +1075,25 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 		} else if (prefer_submit_type == 'my') {
 			div_submit_type_bot.hide();
 			div_submit_type_my.show();
+			div_submit_type_archive.hide();
+			div_account_data.show();
+			$('#form-group-answer_answer').show();
 			input_submit_type_bot[0].checked = false;
 			input_submit_type_my[0].checked = true;
+			input_submit_type_archive[0].checked = false;
+		}
+
+		if (submit_type.indexOf('archive') == -1) {
+			input_submit_type_archive.attr('disabled', 'disabled');
+		} else if (prefer_submit_type == 'archive') {
+			div_submit_type_bot.hide();
+			div_submit_type_my.hide();
+			div_submit_type_archive.show();
+			div_account_data.show();
+			$('#form-group-answer_answer').hide();
+			input_submit_type_bot[0].checked = false;
+			input_submit_type_my[0].checked = false;
+			input_submit_type_archive[0].checked = true;
 		}
 
 		if (oj == 'luogu') {
@@ -1083,7 +1150,7 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 				});
 			}
 
-			div_submit_type_my.append(
+			div_account_data.append(
 				$('<div class="row mt-3 align-items-center" />')
 					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_uid" class="col-form-label">_uid</label>'))
 					.append($('<div class="col-sm-4" />').append(input_luogu_uid))
@@ -1135,11 +1202,60 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 				});
 			}
 
-			div_submit_type_my.append(
+			div_account_data.append(
 				$('<div class="row mt-3 align-items-center" />')
 					.append($('<div class="col-sm-2" />').append('<label for="input-codeforces_jsessionid" class="col-form-label">JSESSIONID</label>'))
 					.append($('<div class="col-sm-4" />').append(input_codeforces_jsessionid))
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text mt-0" />').append('请填入 Cookie 中的 <code>JSESSIONID</code>。')))
+			).append(input_my_account_data);
+		} else if (oj == 'loj') {
+			var loj_account_data = {username: "", token: ""};
+			var input_loj_token = $('<input class="form-control font-monospace" type="text" name="loj_token" id="input-loj_token" autocomplete="off" />');
+
+			if ('localStorage' in window) {
+				try {
+					var loj_account_data_str = localStorage.getItem('uoj_remote_judge_loj_account_data');
+					if (loj_account_data_str) {
+						loj_account_data = JSON.parse(loj_account_data_str);
+					}
+				} catch (e) {}
+
+				var save_loj_account_data = function() {
+					localStorage.setItem('uoj_remote_judge_loj_account_data', JSON.stringify(loj_account_data));
+				}
+			} else {
+				var save_loj_account_data = function() {};
+			}
+
+			input_loj_token.change(function() {
+				loj_account_data.token = $(this).val();
+				input_my_account_data.val(JSON.stringify(loj_account_data));
+				save_loj_account_data();
+				my_account_validation_status.html('<span class="text-secondary">待验证</span>');
+			});
+
+			my_account_validation_btn.click(function() {
+				validate_my_account({
+					type: 'loj',
+					token: input_loj_token.val(),
+				});
+			});
+
+			input_my_account_data.val(JSON.stringify(loj_account_data));
+			input_loj_token.val(loj_account_data.token);
+
+			if (loj_account_data.token) {
+				validate_my_account({
+					type: 'loj',
+					token: loj_account_data.token,
+				});
+			}
+
+			div_account_data.append(
+				$('<div class="row mt-3 align-items-center" />')
+					.append($('<div class="col-sm-2" />').append('<label for="input-loj_token" class="col-form-label">Token</label>'))
+					.append($('<div class="col-sm-4" />').append(input_loj_token))
+					.append($('<div class="col-sm-6" />').append($('<div class="form-text mt-0" />').append('请前往 <a href="https://loj.ac" target="_blank">LibreOJ</a> 登录账号，然后输入在控制台中运行 <code>console.log(JSON.parse(localStorage.appState).token)</code> 的输出结果。')))
 			).append(input_my_account_data);
 		}
 
@@ -1152,8 +1268,16 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 					$('<div class="form-check d-inline-block ms-3" />')
 						.append(input_submit_type_my)
 						.append($('<label class="form-check-label" for="' + input_submit_type_my_id + '" />').append(' 自有账号'))
+				).append(
+					$('<div class="form-check d-inline-block ms-3" />')
+						.append(input_submit_type_archive)
+						.append($('<label class="form-check-label" for="' + input_submit_type_archive_id + '" />').append(' 归档'))
 				)
-		).append(div_submit_type_bot).append(div_submit_type_my);
+		)
+			.append(div_submit_type_bot)
+			.append(div_submit_type_my)
+			.append(div_submit_type_archive)
+			.append(div_account_data);
 	});
 }
 

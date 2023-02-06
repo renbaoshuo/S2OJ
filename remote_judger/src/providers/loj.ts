@@ -10,7 +10,7 @@ import { crlf, LF } from 'crlf-normalize';
 proxy(superagent);
 const logger = new Logger('remote/loj');
 
-const langs_map = {
+const LANGS_MAP = {
   C: {
     name: 'C (gcc, c11, O2, m64)',
     info: {
@@ -157,7 +157,11 @@ export default class LibreojProvider implements IBasicProvider {
   }
 
   static constructFromAccountData(data) {
-    throw new Error('Method not implemented.');
+    return new this({
+      type: 'loj',
+      handle: data.username,
+      password: data.token,
+    });
   }
 
   get(url: string) {
@@ -186,8 +190,7 @@ export default class LibreojProvider implements IBasicProvider {
 
   get loggedIn() {
     return this.get('/auth/getSessionInfo?token=' + this.account.password).then(
-      res =>
-        res.body.userMeta && res.body.userMeta.username === this.account.handle
+      res => res.body.userMeta && res.body.userMeta.id
     );
   }
 
@@ -212,7 +215,17 @@ export default class LibreojProvider implements IBasicProvider {
     next,
     end
   ) {
-    const programType = langs_map[lang] || langs_map['C++'];
+    if (!(await this.ensureLogin())) {
+      await end({
+        error: true,
+        status: 'Judgment Failed',
+        message: 'Login failed',
+      });
+
+      return null;
+    }
+
+    const programType = LANGS_MAP[lang] || LANGS_MAP['C++'];
     const comment = programType.comment;
 
     if (comment) {
@@ -255,7 +268,34 @@ export default class LibreojProvider implements IBasicProvider {
     return body.submissionId;
   }
 
+  async ensureIsOwnSubmission(id: string) {
+    const user_id = await this.get(
+      '/auth/getSessionInfo?token=' + this.account.password
+    ).then(res => res.body.userMeta?.id);
+
+    if (!user_id) return false;
+
+    const submission_user_id = await this.post(
+      '/submission/getSubmissionDetail'
+    )
+      .send({ submissionId: String(id), locale: 'zh_CN' })
+      .retry(3)
+      .then(res => res.body.meta?.submitter.id);
+
+    return user_id === submission_user_id;
+  }
+
   async waitForSubmission(problem_id: string, id: string, next, end) {
+    if (!(await this.ensureLogin())) {
+      await end({
+        error: true,
+        status: 'Judgment Failed',
+        message: 'Login failed',
+      });
+
+      return null;
+    }
+
     let i = 0;
 
     while (true) {
@@ -274,6 +314,15 @@ export default class LibreojProvider implements IBasicProvider {
         .retry(3);
 
       if (error) continue;
+
+      if (body.meta.problem.displayId != problem_id) {
+        return await end({
+          id,
+          error: true,
+          status: 'Judgment Failed',
+          message: 'Submission does not match current problem.',
+        });
+      }
 
       if (!body.progress) {
         await next({ status: 'Waiting for Remote Judge' });
