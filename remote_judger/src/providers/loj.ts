@@ -462,7 +462,9 @@ export default class LibreojProvider implements IBasicProvider {
         '<div class="border-bottom p-3">' +
         `<p><b>Problem:</b> #${body.meta.problem.displayId}. ${body.meta.problemTitle}</p>` +
         `<p><b>Remote submission:</b> <a href="https://loj.ac/s/${id}" target="_blank">${id}</a></p>` +
-        `<p><b>Remote submit time:</b> ${body.meta.submitTime}</p>` +
+        `<p><b>Remote submit time:</b> ${new Date(
+          body.meta.submitTime
+        ).toLocaleString('zh-CN')}</p>` +
         `<p><b>Remote account:</b> <a href="https://loj.ac/user/${body.meta.submitter.id}" target="_blank">${body.meta.submitter.username}</a></p>` +
         `<p class="mb-0"><b>Verdict:</b> ${status}</p>` +
         '</div>';

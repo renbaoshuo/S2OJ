@@ -294,7 +294,16 @@ export default class LuoguProvider implements IBasicProvider {
         const status = STATUS_MAP[data.status];
         let details = '';
 
-        details += `<info-block>REMOTE_SUBMISSION_ID = ${id}\nVERDICT = ${status}</info-block>`;
+        details +=
+          '<div class="border-bottom p-3">' +
+          `<p><b>Problem:</b> ${data.problem.pid} ${data.problem.title}</p>` +
+          `<p><b>Remote submission:</b> <a href="https://www.luogu.com.cn/record/${id}" target="_blank">R${id}</a></p>` +
+          `<p><b>Remote submit time:</b> ${new Date(
+            data.submitTime * 1000
+          ).toLocaleString('zh-CN')}</p>` +
+          `<p><b>Remote account:</b> <a href="https://www.luogu.com.cn/user/${data.user.uid}" target="_blank">${data.user.name}</a></p>` +
+          `<p class="mb-0"><b>Verdict:</b> ${status}</p>` +
+          '</div>';
 
         if (data.detail.judgeResult.subtasks.length === 1) {
           details += Object.entries(

@@ -9,4 +9,5 @@ COPY . .
 
 RUN npm run build
 
+ENV LANG=C.UTF-8 TZ="Asia/Shanghai"
 CMD [ "node", "--experimental-specifier-resolution=node", "dist/entrypoint.js" ]
