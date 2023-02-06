@@ -241,10 +241,10 @@ if ($pre_submit_check_ret === true && !$no_more_submission) {
 			return in_array($opt, $remote_provider['submit_type']) ? '' : '无效选项';
 		}, null);
 		$answer_form->add('answer_remote_account_data', '', function ($data) {
-			return json_decode($data) !== null ? '' : '无效数据';
+			return $_POST['answer_remote_submit_type'] == 'bot' || json_decode($data) !== null ? '' : '无效数据';
 		}, null);
 		$answer_form->add('answer_remote_submission_id', '', function ($id) {
-			return validateUInt($id) ? '' : '无效 ID';
+			return $_POST['answer_remote_submit_type'] != 'archive' || validateUInt($id) ? '' : '无效 ID';
 		}, null);
 		$answer_form->appendHTML(<<<EOD
 			<h5>Remote Judge 配置</h5>
