@@ -6,7 +6,7 @@ ENV USE_MIRROR $USE_MIRROR
 SHELL ["/bin/bash", "-c"]
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV PKGS="php7.4 php7.4-yaml php7.4-xml php7.4-dev php7.4-zip php7.4-mysql php7.4-mbstring php7.4-gd php7.4-curl php7.4-imagick libseccomp-dev git vim ntp zip unzip curl wget apache2 libapache2-mod-xsendfile php-pear mysql-client build-essential fp-compiler re2c libseccomp-dev libyaml-dev python2.7 python3.10 python3-requests openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk"
+ENV PKGS="php7.4 php7.4-yaml php7.4-xml php7.4-dev php7.4-zip php7.4-mysql php7.4-mbstring php7.4-gd php7.4-curl php7.4-imagick libseccomp-dev git vim ntp zip unzip curl wget apache2 libapache2-mod-xsendfile php-pear mysql-client build-essential fp-compiler re2c libseccomp-dev libyaml-dev python2.7 python3.10 python3-requests openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk language-pack-zh*"
 RUN if [[ "$USE_MIRROR" == "1" ]]; then\
         sed -i "s@http://.*archive.ubuntu.com@https://mirrors.aliyun.com@g" /etc/apt/sources.list &&\
         sed -i "s@http://.*security.ubuntu.com@https://mirrors.aliyun.com@g" /etc/apt/sources.list ;\

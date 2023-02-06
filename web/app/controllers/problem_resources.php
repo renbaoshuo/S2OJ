@@ -37,10 +37,10 @@ define('FM_ROOT_URL', UOJProblem::cur()->getResourcesBaseUri());
 $sub_path = UOJRequest::get('sub_path', 'is_string', '');
 
 if ($sub_path) {
-	$filepath = realpath(UOJProblem::cur()->getResourcesPath($sub_path));
+	$filepath = realpath(UOJProblem::cur()->getResourcesPath(rawurldecode($sub_path)));
 	$realbasepath = realpath(UOJProblem::cur()->getResourcesPath());
 
-	if (!str_starts_with($filepath, $realbasepath)) {
+	if (!strStartWith($filepath, $realbasepath)) {
 		UOJResponse::page406();
 	}
 

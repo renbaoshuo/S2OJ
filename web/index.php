@@ -1,5 +1,7 @@
 <?php
 
+setlocale(LC_ALL, 'zh_CN.UTF-8', 'C.UTF-8');
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/app/vendor/autoload.php';
 require $_SERVER['DOCUMENT_ROOT'] . '/app/libs/uoj-lib.php';
 
