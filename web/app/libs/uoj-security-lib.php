@@ -28,7 +28,10 @@ function crsf_check() {
 }
 function crsf_defend() {
 	if (!crsf_check()) {
-		UOJResponse::page403('页面已过期（可能页面真的过期了，也可能是刚才你访问的网页没有完全加载，也可能是你的浏览器版本太老）');
+		UOJResponse::page403(<<<EOD
+		<div>页面已过期（可能页面真的过期了，也可能是刚才你访问的网页没有完全加载，也可能是你的浏览器版本太老）</div>
+		<div><a href="">返回</a></div>
+		EOD);
 	}
 }
 
