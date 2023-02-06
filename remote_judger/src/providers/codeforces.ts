@@ -146,8 +146,8 @@ export default class CodeforcesProvider implements IBasicProvider {
     return _tta;
   }
 
-  async getCsrfToken(url: string) {
-    const { text: html } = await this.get(url);
+  async getCsrfToken(url: string, referer = '') {
+    const { text: html } = await this.get(url).set('Referer', referer);
     const {
       window: { document },
     } = new JSDOM(html);
@@ -257,9 +257,17 @@ export default class CodeforcesProvider implements IBasicProvider {
     }
 
     const [type, contestId, problemId] = parseProblemId(id);
+    const referer =
+      this.account.endpoint +
+      (type !== 'GYM'
+        ? `/problemset/problem/${contestId}/${problemId}`
+        : `/gym/${contestId}/problem/${problemId}`);
+
+    logger.debug('referer', referer);
 
     const [csrf, ftaa, bfaa] = await this.getCsrfToken(
-      type !== 'GYM' ? '/problemset/submit' : `/gym/${contestId}/submit`
+      type !== 'GYM' ? '/problemset/submit' : `/gym/${contestId}/submit`,
+      referer
     );
 
     logger.debug(
@@ -275,25 +283,27 @@ export default class CodeforcesProvider implements IBasicProvider {
       `/${
         type !== 'GYM' ? 'problemset' : `gym/${contestId}`
       }/submit?csrf_token=${csrf}`
-    ).send({
-      csrf_token: csrf,
-      action: 'submitSolutionFormSubmitted',
-      programTypeId: programType.id,
-      source: code,
-      tabsize: 4,
-      sourceFile: '',
-      ftaa,
-      bfaa,
-      _tta: this.tta(this.getCookie('39ce7')),
-      ...(type !== 'GYM'
-        ? {
-            submittedProblemCode: contestId + problemId,
-            sourceCodeConfirmed: true,
-          }
-        : {
-            submittedProblemIndex: problemId,
-          }),
-    });
+    )
+      .send({
+        csrf_token: csrf,
+        action: 'submitSolutionFormSubmitted',
+        programTypeId: programType.id,
+        source: code,
+        tabsize: 4,
+        sourceFile: '',
+        ftaa,
+        bfaa,
+        _tta: this.tta(this.getCookie('39ce7')),
+        ...(type !== 'GYM'
+          ? {
+              submittedProblemCode: contestId + problemId,
+              sourceCodeConfirmed: true,
+            }
+          : {
+              submittedProblemIndex: problemId,
+            }),
+      })
+      .set('Referer', referer);
 
     if (error) {
       end({
