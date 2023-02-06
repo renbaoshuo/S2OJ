@@ -488,7 +488,7 @@ class SyncProblemDataHandler {
 				"extra_config" => DB::json_set(
 					'extra_config',
 					'$.time_limit',
-					$this->final_problem_conf['time_limit'] ? (int)$this->final_problem_conf['time_limit'] : null,
+					$this->final_problem_conf['time_limit'] ? (float)$this->final_problem_conf['time_limit'] : null,
 					'$.memory_limit',
 					$this->final_problem_conf['memory_limit'] ? (int)$this->final_problem_conf['memory_limit'] : null,
 				),
