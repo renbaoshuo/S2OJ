@@ -431,9 +431,9 @@ class JudgmentDetailsPrinter {
 			echo '</tr>';
 		} elseif ($node->nodeName == 'remote-source-code') {
 			$language = $node->getAttribute("language");
-			echo '<div class="border-bottom p-3">';
+			echo '<div class="border-bottom p-3 copy-button-container">';
 			echo '<div class="fw-bold mb-2">源代码</div>';
-			echo '<pre><code class="language-', $language, ' bg-light mb-0 rounded">';
+			echo '<pre><code class="language-', $language, ' bg-light mb-0 rounded p-3">';
 			$this->_print_c($node);
 			echo "</code></pre>";
 			echo '</div>';
