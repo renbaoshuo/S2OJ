@@ -259,8 +259,6 @@ if ($pre_submit_check_ret === true && !$no_more_submission) {
 	$answer_form->runAtServer();
 }
 
-$conf = UOJProblem::cur()->getProblemConf();
-
 if (UOJContest::cur()) {
 	$pageTitle = UOJProblem::cur()->getTitle(['with' => 'letter', 'simplify' => true]);
 } else {
@@ -291,13 +289,8 @@ if (UOJContest::cur()) {
 				</h1>
 
 				<?php
-				if (UOJProblem::info('type') == 'local') {
-					$time_limit = $conf instanceof UOJProblemConf ? $conf->getVal('time_limit', 1) : null;
-					$memory_limit = $conf instanceof UOJProblemConf ? $conf->getVal('memory_limit', 256) : null;
-				} else if (UOJProblem::info('type') == 'remote') {
-					$time_limit = UOJProblem::cur()->getExtraConfig('time_limit');
-					$memory_limit = UOJProblem::cur()->getExtraConfig('memory_limit');
-				}
+				$time_limit = UOJProblem::cur()->getExtraConfig('time_limit');
+				$memory_limit = UOJProblem::cur()->getExtraConfig('memory_limit');
 				?>
 				<div class="text-center small">
 					时间限制: <?= $time_limit ? "$time_limit s" : "N/A" ?>

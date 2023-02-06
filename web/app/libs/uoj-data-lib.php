@@ -482,6 +482,22 @@ class SyncProblemDataHandler {
 			['mv', "{$this->id}.next.zip", "{$this->id}.zip", '-f'],
 		]);
 
+		DB::update([
+			"update problems",
+			"set", [
+				"extra_config" => DB::json_set(
+					'extra_config',
+					'$.time_limit',
+					$this->final_problem_conf['time_limit'] ? (int)$this->final_problem_conf['time_limit'] : null,
+					'$.memory_limit',
+					$this->final_problem_conf['memory_limit'] ? (int)$this->final_problem_conf['memory_limit'] : null,
+				),
+			],
+			"where", [
+				"id" => $this->id,
+			],
+		]);
+
 		return '';
 	}
 
