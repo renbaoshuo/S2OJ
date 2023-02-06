@@ -2,6 +2,7 @@ import { JSDOM } from 'jsdom';
 import superagent from 'superagent';
 import proxy from 'superagent-proxy';
 import { crlf, LF } from 'crlf-normalize';
+import { stripHtml } from 'string-strip-html';
 import sleep from '../utils/sleep';
 import mathSum from 'math-sum';
 import { IBasicProvider, RemoteAccount, USER_AGENT } from '../interface';
@@ -418,9 +419,18 @@ export default class CodeforcesProvider implements IBasicProvider {
         tests.push(test_info);
       }
 
+      const remote_handle = stripHtml(body.partyName).result;
       const details =
         '<div>' +
-        `<info-block>REMOTE_SUBMISSION_ID = ${id}\nVERDICT = ${status}</info-block>` +
+        '<div class="border-bottom p-3">' +
+        `<p><b>Contest:</b> ${stripHtml(body.contestName).result}</p>` +
+        `<p><b>Problem:</b> ${stripHtml(body.problemName).result}</p>` +
+        `<p><b>Remote submission:</b> <a href="https://codeforces.com${body.href}" target="_blank">${id}</a></p>` +
+        `<p><b>Remote account:</b> <a href="https://codeforces.com/profile/${remote_handle}" target="_blank">${remote_handle}</a></p>` +
+        `<p class="mb-0"><b>Verdict:</b> ${
+          stripHtml(body.verdict).result
+        }</p>` +
+        '</div>' +
         `<tests>${tests.join('\n')}</tests>` +
         '</div>';
 
