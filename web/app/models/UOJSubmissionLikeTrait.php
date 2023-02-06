@@ -200,7 +200,7 @@ trait UOJSubmissionLikeTrait {
                         {$req['name']}
                     </div>
                     <div class="card-body">
-                        <pre><code class="$sh_class bg-light rounded p-3">{$file_content}\n</code></pre>
+                        <pre class="mb-0"><code class="$sh_class bg-light rounded p-3">{$file_content}\n</code></pre>
                     </div>
                     <div class="card-footer">$footer_text</div>
                 </div>
@@ -220,7 +220,7 @@ trait UOJSubmissionLikeTrait {
                         {$req['file_name']}
                     </div>
                     <div class="card-body">
-                        <pre>\n{$file_content}\n</pre>
+                        <pre class="mb-0 bg-light rounded p-3">\n{$file_content}\n</pre>
                     </div>
                     <div class="card-footer">$footer_text</div>
                 </div>
