@@ -1670,7 +1670,11 @@ $(document).ready(function() {
 
 				$(this).css('width', '100%').css('height', '100%');
 
-				var task = pdfjsLib.getDocument(pdf_src);
+				var task = pdfjsLib.getDocument({
+					url: pdf_src,
+					cMapUrl: '/fonts/pdfjs-cmaps/',
+					cMapPacked: true,
+				});
 				var id = 'pdf_' + task.docId;
 
 				$(this).attr('id', id + '_container');
