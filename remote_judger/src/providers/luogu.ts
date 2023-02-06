@@ -296,13 +296,26 @@ export default class LuoguProvider implements IBasicProvider {
 
         details +=
           '<div class="border-bottom p-3">' +
-          `<p><b>Problem:</b> ${data.problem.pid} ${data.problem.title}</p>` +
-          `<p><b>Remote submission:</b> <a href="https://www.luogu.com.cn/record/${id}" target="_blank">R${id}</a></p>` +
-          `<p><b>Remote submit time:</b> ${new Date(
-            data.submitTime * 1000
-          ).toLocaleString('zh-CN')}</p>` +
-          `<p><b>Remote account:</b> <a href="https://www.luogu.com.cn/user/${data.user.uid}" target="_blank">${data.user.name}</a></p>` +
-          `<p class="mb-0"><b>Verdict:</b> ${status}</p>` +
+          '<table class="table w-auto mb-0 caption-top">' +
+          '<caption class="fw-bold text-body mb-1 pt-0">远端信息</caption>' +
+          '<tbody class="border-top">' +
+          Object.entries({
+            题目: `<a href="https://www.luogu.com.cn/problem/${
+              data.problem.pid
+            }" target="_blank">${data.problem.pid} ${htmlspecialchars(
+              data.problem.title
+            )}</a>`,
+            提交记录: `<a href="https://www.luogu.com.cn/record/${id}" target="_blank">R${id}</a>`,
+            提交时间: new Date(data.submitTime * 1000).toLocaleString('zh-CN'),
+            账号: `<a href="https://www.luogu.com.cn/user/${data.user.uid}" target="_blank">${data.user.name}</a>`,
+            状态: status,
+          })
+            .map(
+              o => `<tr><td class="fw-bold">${o[0]}</td><td>${o[1]}</td></tr>`
+            )
+            .join('') +
+          '</tbody>' +
+          '</table>' +
           '</div>';
 
         if (data.detail.judgeResult.subtasks.length === 1) {

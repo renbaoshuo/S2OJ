@@ -543,7 +543,7 @@ class JudgmentDetailsPrinter {
 
 			if ($test_memory >= 0) {
 				echo '<div class="col-sm-2">';
-				echo '<i class="bi bi-memory"></i> ', $test_memory, 'kB';
+				echo '<i class="bi bi-memory"></i> ', $test_memory, ' kB';
 				echo '</div>';
 			}
 

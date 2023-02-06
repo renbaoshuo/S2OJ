@@ -420,13 +420,22 @@ export default class CodeforcesProvider implements IBasicProvider {
         const details =
           '<div>' +
           '<div class="border-bottom p-3">' +
-          `<p><b>Contest:</b> ${stripHtml(body.contestName).result}</p>` +
-          `<p><b>Problem:</b> ${stripHtml(body.problemName).result}</p>` +
-          `<p><b>Remote submission:</b> <a href="https://codeforces.com${body.href}" target="_blank">${id}</a></p>` +
-          `<p><b>Remote account:</b> <a href="https://codeforces.com/profile/${remote_handle}" target="_blank">${remote_handle}</a></p>` +
-          `<p class="mb-0"><b>Verdict:</b> ${
-            stripHtml(body.verdict).result
-          }</p>` +
+          '<table class="table w-auto mb-0 caption-top">' +
+          '<caption class="fw-bold text-body mb-1 pt-0">远端信息</caption>' +
+          '<tbody class="border-top">' +
+          Object.entries({
+            比赛: stripHtml(body.contestName).result,
+            题目: stripHtml(body.problemName).result,
+            提交记录: `<a href="https://codeforces.com${body.href}" target="_blank">${id}</a>`,
+            账号: `<a href="https://codeforces.com/profile/${remote_handle}" target="_blank">${remote_handle}</a>`,
+            状态: stripHtml(body.verdict).result,
+          })
+            .map(
+              o => `<tr><td class="fw-bold">${o[0]}</td><td>${o[1]}</td></tr>`
+            )
+            .join('') +
+          '</tbody>' +
+          '</table>' +
           '</div>' +
           `<tests>${tests.join('\n')}</tests>` +
           '</div>';

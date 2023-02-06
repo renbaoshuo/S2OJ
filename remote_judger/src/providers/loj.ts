@@ -7,6 +7,7 @@ import { IBasicProvider, RemoteAccount, USER_AGENT } from '../interface';
 import Logger from '../utils/logger';
 import { normalize, VERDICT } from '../verdict';
 import htmlspecialchars from '../utils/htmlspecialchars';
+import { stripHtml } from 'string-strip-html';
 
 proxy(superagent);
 const logger = new Logger('remote/loj');
@@ -461,13 +462,26 @@ export default class LibreojProvider implements IBasicProvider {
 
         details +=
           '<div class="border-bottom p-3">' +
-          `<p><b>Problem:</b> #${body.meta.problem.displayId}. ${body.meta.problemTitle}</p>` +
-          `<p><b>Remote submission:</b> <a href="https://loj.ac/s/${id}" target="_blank">${id}</a></p>` +
-          `<p><b>Remote submit time:</b> ${new Date(
-            body.meta.submitTime
-          ).toLocaleString('zh-CN')}</p>` +
-          `<p><b>Remote account:</b> <a href="https://loj.ac/user/${body.meta.submitter.id}" target="_blank">${body.meta.submitter.username}</a></p>` +
-          `<p class="mb-0"><b>Verdict:</b> ${status}</p>` +
+          '<table class="table w-auto mb-0 caption-top">' +
+          '<caption class="fw-bold text-body mb-1 pt-0">远端信息</caption>' +
+          '<tbody class="border-top">' +
+          Object.entries({
+            题目: `<a href="https://loj.ac/p/${
+              body.meta.problem.displayId
+            }" target="_blank">#${
+              body.meta.problem.displayId
+            }. ${htmlspecialchars(body.meta.problemTitle)}</a>`,
+            提交记录: `<a href="https://loj.ac/s/${id}" target="_blank">${id}</a>`,
+            提交时间: new Date(body.meta.submitTime).toLocaleString('zh-CN'),
+            账号: `<a href="https://loj.ac/user/${body.meta.submitter.id}" target="_blank">${body.meta.submitter.username}</a>`,
+            状态: status,
+          })
+            .map(
+              o => `<tr><td class="fw-bold">${o[0]}</td><td>${o[1]}</td></tr>`
+            )
+            .join('') +
+          '</tbody>' +
+          '</table>' +
           '</div>';
 
         if (result_show_source) {
