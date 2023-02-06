@@ -254,8 +254,8 @@ export default class LuoguProvider implements IBasicProvider {
     let fail = 0;
     let count = 0;
 
-    while (count < 120 && fail < 5) {
-      await sleep(1500);
+    while (count < 180 && fail < 5) {
+      await sleep(1000);
       count++;
 
       try {
