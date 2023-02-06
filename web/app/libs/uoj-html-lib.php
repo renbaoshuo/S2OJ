@@ -433,7 +433,7 @@ class JudgmentDetailsPrinter {
 			$language = $node->getAttribute("language");
 			echo '<div class="border-bottom p-3 copy-button-container">';
 			echo '<div class="fw-bold mb-2">源代码</div>';
-			echo '<pre><code class="language-', $language, ' bg-light mb-0 rounded p-3">';
+			echo '<pre class="mb-0"><code class="language-', $language, ' bg-light rounded p-3">';
 			$this->_print_c($node);
 			echo "</code></pre>";
 			echo '</div>';
