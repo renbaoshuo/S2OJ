@@ -23,7 +23,8 @@ export interface IBasicProvider {
     id: string,
     next: NextFunction,
     end: NextFunction,
-    problem_id?: string
+    problem_id: string,
+    result_show_source?: boolean
   ): Promise<void>;
 }
 

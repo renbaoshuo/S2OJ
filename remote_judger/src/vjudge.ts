@@ -207,7 +207,8 @@ class VJudge {
             config.remote_submission_id,
             next,
             end,
-            problem_id
+            problem_id,
+            true
           );
         } else {
           return await end({

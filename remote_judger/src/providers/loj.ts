@@ -1,11 +1,12 @@
 import superagent from 'superagent';
 import proxy from 'superagent-proxy';
 import { stripVTControlCharacters } from 'util';
+import { crlf, LF } from 'crlf-normalize';
 import sleep from '../utils/sleep';
 import { IBasicProvider, RemoteAccount, USER_AGENT } from '../interface';
 import Logger from '../utils/logger';
 import { normalize, VERDICT } from '../verdict';
-import { crlf, LF } from 'crlf-normalize';
+import htmlspecialchars from '../utils/htmlspecialchars';
 
 proxy(superagent);
 const logger = new Logger('remote/loj');
@@ -285,7 +286,13 @@ export default class LibreojProvider implements IBasicProvider {
     return user_id === submission_user_id;
   }
 
-  async waitForSubmission(id: string, next, end, problem_id: string) {
+  async waitForSubmission(
+    id: string,
+    next,
+    end,
+    problem_id: string,
+    result_show_source = false
+  ) {
     if (!(await this.ensureLogin())) {
       await end({
         error: true,
@@ -462,6 +469,16 @@ export default class LibreojProvider implements IBasicProvider {
           `<p><b>Remote account:</b> <a href="https://loj.ac/user/${body.meta.submitter.id}" target="_blank">${body.meta.submitter.username}</a></p>` +
           `<p class="mb-0"><b>Verdict:</b> ${status}</p>` +
           '</div>';
+
+        if (result_show_source) {
+          details +=
+            '<div class="border-bottom p-3">' +
+            '<div class="fw-bold mb-2">源代码</div>' +
+            `<pre><code class="language-${body.content.language} bg-light rounded p-3">` +
+            htmlspecialchars(parse(body.content.code)) +
+            '</code></pre>' +
+            '</div>';
+        }
 
         // Samples
         if (body.progress.samples) {
