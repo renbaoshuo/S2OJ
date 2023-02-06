@@ -324,9 +324,9 @@ function getDataDisplayer() {
 		return $disp;
 	} elseif ($judger_name === 'on') {
 		if ($problem_conf->isOn('interaction_mode')) {
-			if (isset($problem_conf['use_builtin_checker'])) {
+			if ($problem_conf->getVal('use_builtin_checker', null)) {
 				$disp->addTab('checker', function ($self) {
-					echo '<h4>use builtin checker : ', $self->problem_conf['use_builtin_checker']['val'], '</h4>';
+					echo '<h4>use builtin checker: ', $self->problem_conf['use_builtin_checker']['val'], '</h4>';
 				});
 			} else {
 				addSrcTab($disp, 'checker', 'chk');
@@ -336,7 +336,7 @@ function getDataDisplayer() {
 			addSrcTab($disp, 'standard', 'std');
 			addSrcTab($disp, 'validator', 'val');
 		}
-		if (isset($problem_conf->conf['interaction_mode'])) {
+		if ($problem_conf->isOn('interaction_mode')) {
 			addSrcTab($disp, 'interactor', 'interactor');
 		}
 		return $disp;
