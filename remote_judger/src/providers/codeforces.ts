@@ -344,104 +344,113 @@ export default class CodeforcesProvider implements IBasicProvider {
       .getAttribute('data-submission-id');
   }
 
-  async waitForSubmission(problem_id: string, id: string, next, end) {
-    let i = 0;
+  async waitForSubmission(id: string, next, end) {
+    let count = 0;
+    let fail = 0;
 
-    while (true) {
-      if (++i > 180) {
-        return await end({
-          id,
-          error: true,
-          status: 'Judgment Failed',
-          message: 'Failed to fetch submission details.',
-        });
-      }
-
+    while (count < 180 && fail < 10) {
+      count++;
       await sleep(1000);
-      const { body, error } = await this.post('/data/submitSource')
-        .send({
-          csrf_token: this.csrf,
-          submissionId: id,
-        })
-        .retry(3);
-      if (error) continue;
-      if (body.compilationError === 'true') {
+
+      try {
+        const { body } = await this.post('/data/submitSource')
+          .send({
+            csrf_token: this.csrf,
+            submissionId: id,
+          })
+          .retry(3);
+
+        if (body.compilationError === 'true') {
+          return await end({
+            id,
+            error: true,
+            status: 'Compile Error',
+            message: crlf(body['checkerStdoutAndStderr#1'], LF),
+          });
+        }
+
+        const time = mathSum(
+          Object.keys(body)
+            .filter(k => k.startsWith('timeConsumed#'))
+            .map(k => +body[k])
+        );
+        const memory =
+          Math.max(
+            ...Object.keys(body)
+              .filter(k => k.startsWith('memoryConsumed#'))
+              .map(k => +body[k])
+          ) / 1024;
+        await next({ test_id: body.testCount });
+
+        if (body.waiting === 'true') continue;
+
+        const testCount = +body.testCount;
+        const status =
+          VERDICT[
+            Object.keys(VERDICT).find(k => normalize(body.verdict).includes(k))
+          ];
+        let tests: string[] = [];
+
+        for (let i = 1; i <= testCount; i++) {
+          let test_info = '';
+          let info_text =
+            VERDICT[
+              Object.keys(VERDICT).find(k =>
+                normalize(body[`verdict#${i}`]).includes(k)
+              )
+            ];
+
+          test_info += `<test num="${i}" info="${info_text}" time="${
+            body[`timeConsumed#${i}`]
+          }" memory="${+body[`memoryConsumed#${i}`] / 1024}">`;
+
+          const parse = (id: string) => crlf(body[id], LF);
+
+          test_info += `<in>${parse(`input#${i}`)}</in>\n`;
+          test_info += `<out>${parse(`output#${i}`)}</out>\n`;
+          test_info += `<ans>${parse(`answer#${i}`)}</ans>\n`;
+          test_info += `<res>${parse(`checkerStdoutAndStderr#${i}`)}</res>\n`;
+
+          test_info += '</test>';
+
+          tests.push(test_info);
+        }
+
+        const remote_handle = stripHtml(body.partyName).result;
+        const details =
+          '<div>' +
+          '<div class="border-bottom p-3">' +
+          `<p><b>Contest:</b> ${stripHtml(body.contestName).result}</p>` +
+          `<p><b>Problem:</b> ${stripHtml(body.problemName).result}</p>` +
+          `<p><b>Remote submission:</b> <a href="https://codeforces.com${body.href}" target="_blank">${id}</a></p>` +
+          `<p><b>Remote account:</b> <a href="https://codeforces.com/profile/${remote_handle}" target="_blank">${remote_handle}</a></p>` +
+          `<p class="mb-0"><b>Verdict:</b> ${
+            stripHtml(body.verdict).result
+          }</p>` +
+          '</div>' +
+          `<tests>${tests.join('\n')}</tests>` +
+          '</div>';
+
         return await end({
           id,
-          error: true,
-          status: 'Compile Error',
-          message: crlf(body['checkerStdoutAndStderr#1'], LF),
+          status,
+          score: status === 'Accepted' ? 100 : 0,
+          time,
+          memory,
+          details,
         });
+      } catch (e) {
+        logger.error(e);
+
+        fail++;
       }
-      const time = mathSum(
-        Object.keys(body)
-          .filter(k => k.startsWith('timeConsumed#'))
-          .map(k => +body[k])
-      );
-      const memory =
-        Math.max(
-          ...Object.keys(body)
-            .filter(k => k.startsWith('memoryConsumed#'))
-            .map(k => +body[k])
-        ) / 1024;
-      await next({ test_id: body.testCount });
-      if (body.waiting === 'true') continue;
-
-      const testCount = +body.testCount;
-      const status =
-        VERDICT[
-          Object.keys(VERDICT).find(k => normalize(body.verdict).includes(k))
-        ];
-      let tests: string[] = [];
-
-      for (let i = 1; i <= testCount; i++) {
-        let test_info = '';
-        let info_text =
-          VERDICT[
-            Object.keys(VERDICT).find(k =>
-              normalize(body[`verdict#${i}`]).includes(k)
-            )
-          ];
-
-        test_info += `<test num="${i}" info="${info_text}" time="${
-          body[`timeConsumed#${i}`]
-        }" memory="${+body[`memoryConsumed#${i}`] / 1024}">`;
-
-        const parse = (id: string) => crlf(body[id], LF);
-
-        test_info += `<in>${parse(`input#${i}`)}</in>\n`;
-        test_info += `<out>${parse(`output#${i}`)}</out>\n`;
-        test_info += `<ans>${parse(`answer#${i}`)}</ans>\n`;
-        test_info += `<res>${parse(`checkerStdoutAndStderr#${i}`)}</res>\n`;
-
-        test_info += '</test>';
-
-        tests.push(test_info);
-      }
-
-      const remote_handle = stripHtml(body.partyName).result;
-      const details =
-        '<div>' +
-        '<div class="border-bottom p-3">' +
-        `<p><b>Contest:</b> ${stripHtml(body.contestName).result}</p>` +
-        `<p><b>Problem:</b> ${stripHtml(body.problemName).result}</p>` +
-        `<p><b>Remote submission:</b> <a href="https://codeforces.com${body.href}" target="_blank">${id}</a></p>` +
-        `<p><b>Remote account:</b> <a href="https://codeforces.com/profile/${remote_handle}" target="_blank">${remote_handle}</a></p>` +
-        `<p class="mb-0"><b>Verdict:</b> ${
-          stripHtml(body.verdict).result
-        }</p>` +
-        '</div>' +
-        `<tests>${tests.join('\n')}</tests>` +
-        '</div>';
-
-      return await end({
-        id,
-        status,
-        score: status === 'Accepted' ? 100 : 0,
-        time,
-        memory,
-        details,
-      });
     }
+
+    return await end({
+      id,
+      error: true,
+      status: 'Judgment Failed',
+      message: 'Failed to fetch submission details.',
+    });
   }
 }

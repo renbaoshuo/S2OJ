@@ -285,7 +285,7 @@ export default class LibreojProvider implements IBasicProvider {
     return user_id === submission_user_id;
   }
 
-  async waitForSubmission(problem_id: string, id: string, next, end) {
+  async waitForSubmission(id: string, next, end, problem_id: string) {
     if (!(await this.ensureLogin())) {
       await end({
         error: true,
@@ -296,226 +296,234 @@ export default class LibreojProvider implements IBasicProvider {
       return null;
     }
 
-    let i = 0;
+    let count = 0;
+    let fail = 0;
 
-    while (true) {
-      if (++i > 180) {
-        return await end({
-          id,
-          error: true,
-          status: 'Judgment Failed',
-          message: 'Failed to fetch submission details.',
-        });
-      }
-
+    while (count < 180 && fail < 10) {
+      count++;
       await sleep(1000);
-      const { body, error } = await this.post('/submission/getSubmissionDetail')
-        .send({ submissionId: String(id), locale: 'zh_CN' })
-        .retry(3);
 
-      if (error) continue;
+      try {
+        const { body } = await this.post('/submission/getSubmissionDetail')
+          .send({ submissionId: String(id), locale: 'zh_CN' })
+          .retry(3);
 
-      if (body.meta.problem.displayId != problem_id) {
-        return await end({
-          id,
-          error: true,
-          status: 'Judgment Failed',
-          message: 'Submission does not match current problem.',
-        });
-      }
-
-      if (!body.progress) {
-        await next({ status: 'Waiting for Remote Judge' });
-
-        continue;
-      }
-
-      await next({
-        status: `${body.progress.progressType}`,
-      });
-
-      if (body.progress.progressType !== 'Finished') {
-        continue;
-      }
-
-      const status =
-        VERDICT[
-          Object.keys(VERDICT).find(k =>
-            normalize(body.meta.status).includes(k)
-          )
-        ];
-
-      if (status === 'Compile Error') {
-        await end({
-          error: true,
-          id,
-          status: 'Compile Error',
-          message: stripVTControlCharacters(body.progress.compile.message),
-        });
-      }
-
-      if (status === 'Judgment Failed') {
-        await end({
-          error: true,
-          id,
-          status: 'Judgment Failed',
-          message: 'Error occurred on remote online judge.',
-        });
-      }
-
-      const parse = (str: string) => crlf(str, LF);
-
-      const getSubtaskStatusDisplayText = (testcases: any): string => {
-        let result: string = null;
-
-        for (const testcase of testcases) {
-          if (!testcase.testcaseHash) {
-            result = 'Skipped';
-
-            break;
-          } else if (
-            body.progress.testcaseResult[testcase.testcaseHash].status !==
-            'Accepted'
-          ) {
-            result = body.progress.testcaseResult[testcase.testcaseHash].status;
-
-            break;
-          }
+        if (body.meta.problem.displayId != problem_id) {
+          return await end({
+            id,
+            error: true,
+            status: 'Judgment Failed',
+            message: 'Submission does not match current problem.',
+          });
         }
 
-        result ||= 'Accepted';
-        result =
-          VERDICT[
-            Object.keys(VERDICT).find(k => normalize(result).includes(k))
-          ];
+        if (!body.progress) {
+          await next({ status: 'Waiting for Remote Judge' });
 
-        return result;
-      };
+          continue;
+        }
 
-      const getTestcaseBlock = (id: string, index: number): string => {
-        const testcase = body.progress.testcaseResult[id];
+        await next({
+          status: `${body.progress.progressType}`,
+        });
 
-        if (!testcase) return '';
+        if (body.progress.progressType !== 'Finished') {
+          continue;
+        }
 
         const status =
           VERDICT[
             Object.keys(VERDICT).find(k =>
-              normalize(testcase.status).includes(k)
+              normalize(body.meta.status).includes(k)
             )
           ];
-        let test_info = '';
 
-        test_info += `<test num="${
-          index + 1
-        }" info="${status}" time="${Math.round(testcase.time || 0)}" memory="${
-          testcase.memory
-        }">`;
-
-        if (testcase.input) {
-          if (typeof testcase.input === 'string') {
-            test_info += `<in>${parse(testcase.input)}</in>\n`;
-          } else {
-            test_info += `<in>${parse(testcase.input.data)}\n\n(${
-              testcase.input.omittedLength
-            } bytes omitted)</in>\n`;
-          }
+        if (status === 'Compile Error') {
+          await end({
+            error: true,
+            id,
+            status: 'Compile Error',
+            message: stripVTControlCharacters(body.progress.compile.message),
+          });
         }
 
-        if (testcase.userOutput) {
-          if (typeof testcase.userOutput === 'string') {
-            test_info += `<out>${parse(testcase.userOutput)}</out>\n`;
-          } else {
-            test_info += `<out>${parse(testcase.userOutput.data)}\n\n(${
-              testcase.userOutput.omittedLength
-            } bytes omitted)</out>\n`;
-          }
+        if (status === 'Judgment Failed') {
+          await end({
+            error: true,
+            id,
+            status: 'Judgment Failed',
+            message: 'Error occurred on remote online judge.',
+          });
         }
 
-        if (testcase.output) {
-          if (typeof testcase.output === 'string') {
-            test_info += `<ans>${parse(testcase.output)}</ans>\n`;
-          } else {
-            test_info += `<ans>${parse(testcase.output.data)}\n\n(${
-              testcase.output.omittedLength
-            } bytes omitted)</ans>\n`;
+        const parse = (str: string) => crlf(str, LF);
+
+        const getSubtaskStatusDisplayText = (testcases: any): string => {
+          let result: string = null;
+
+          for (const testcase of testcases) {
+            if (!testcase.testcaseHash) {
+              result = 'Skipped';
+
+              break;
+            } else if (
+              body.progress.testcaseResult[testcase.testcaseHash].status !==
+              'Accepted'
+            ) {
+              result =
+                body.progress.testcaseResult[testcase.testcaseHash].status;
+
+              break;
+            }
           }
+
+          result ||= 'Accepted';
+          result =
+            VERDICT[
+              Object.keys(VERDICT).find(k => normalize(result).includes(k))
+            ];
+
+          return result;
+        };
+
+        const getTestcaseBlock = (id: string, index: number): string => {
+          const testcase = body.progress.testcaseResult[id];
+
+          if (!testcase) return '';
+
+          const status =
+            VERDICT[
+              Object.keys(VERDICT).find(k =>
+                normalize(testcase.status).includes(k)
+              )
+            ];
+          let test_info = '';
+
+          test_info += `<test num="${
+            index + 1
+          }" info="${status}" time="${Math.round(
+            testcase.time || 0
+          )}" memory="${testcase.memory}">`;
+
+          if (testcase.input) {
+            if (typeof testcase.input === 'string') {
+              test_info += `<in>${parse(testcase.input)}</in>\n`;
+            } else {
+              test_info += `<in>${parse(testcase.input.data)}\n\n(${
+                testcase.input.omittedLength
+              } bytes omitted)</in>\n`;
+            }
+          }
+
+          if (testcase.userOutput) {
+            if (typeof testcase.userOutput === 'string') {
+              test_info += `<out>${parse(testcase.userOutput)}</out>\n`;
+            } else {
+              test_info += `<out>${parse(testcase.userOutput.data)}\n\n(${
+                testcase.userOutput.omittedLength
+              } bytes omitted)</out>\n`;
+            }
+          }
+
+          if (testcase.output) {
+            if (typeof testcase.output === 'string') {
+              test_info += `<ans>${parse(testcase.output)}</ans>\n`;
+            } else {
+              test_info += `<ans>${parse(testcase.output.data)}\n\n(${
+                testcase.output.omittedLength
+              } bytes omitted)</ans>\n`;
+            }
+          }
+
+          if (testcase.checkerMessage) {
+            if (typeof testcase.checkerMessage === 'string') {
+              test_info += `<res>${parse(testcase.checkerMessage)}</res>\n`;
+            } else {
+              test_info += `<res>${parse(testcase.checkerMessage.data)}\n\n(${
+                testcase.checkerMessage.omittedLength
+              } bytes omitted)</res>\n`;
+            }
+          }
+
+          test_info += '</test>';
+
+          return test_info;
+        };
+
+        let details = '';
+
+        details +=
+          '<div class="border-bottom p-3">' +
+          `<p><b>Problem:</b> #${body.meta.problem.displayId}. ${body.meta.problemTitle}</p>` +
+          `<p><b>Remote submission:</b> <a href="https://loj.ac/s/${id}" target="_blank">${id}</a></p>` +
+          `<p><b>Remote submit time:</b> ${new Date(
+            body.meta.submitTime
+          ).toLocaleString('zh-CN')}</p>` +
+          `<p><b>Remote account:</b> <a href="https://loj.ac/user/${body.meta.submitter.id}" target="_blank">${body.meta.submitter.username}</a></p>` +
+          `<p class="mb-0"><b>Verdict:</b> ${status}</p>` +
+          '</div>';
+
+        // Samples
+        if (body.progress.samples) {
+          details += `<subtask title="Samples" info="${getSubtaskStatusDisplayText(
+            body.progress.samples
+          )}" num="0">${body.progress.samples
+            .map((item, index) =>
+              item.testcaseHash
+                ? getTestcaseBlock(item.testcaseHash, index)
+                : `<test num="${index + 1}" info="Skipped"></test>`
+            )
+            .join('\n')}</subtask>`;
         }
 
-        if (testcase.checkerMessage) {
-          if (typeof testcase.checkerMessage === 'string') {
-            test_info += `<res>${parse(testcase.checkerMessage)}</res>\n`;
-          } else {
-            test_info += `<res>${parse(testcase.checkerMessage.data)}\n\n(${
-              testcase.checkerMessage.omittedLength
-            } bytes omitted)</res>\n`;
-          }
+        // Tests
+        if (body.progress.subtasks.length === 1) {
+          details += `<tests>${body.progress.subtasks[0].testcases
+            .map((item, index) =>
+              item.testcaseHash
+                ? getTestcaseBlock(item.testcaseHash, index)
+                : `<test num="${index + 1}" info="Skipped"></test>`
+            )
+            .join('\n')}</tests>`;
+        } else {
+          details += `<tests>${body.progress.subtasks
+            .map(
+              (subtask, index) =>
+                `<subtask num="${
+                  index + 1
+                }" info="${getSubtaskStatusDisplayText(
+                  subtask.testcases
+                )}">${subtask.testcases
+                  .map((item, index) =>
+                    item.testcaseHash
+                      ? getTestcaseBlock(item.testcaseHash, index)
+                      : `<test num="${index + 1}" info="Skipped"></test>`
+                  )
+                  .join('\n')}</subtask>`
+            )
+            .join('\n')}</tests>`;
         }
 
-        test_info += '</test>';
+        return await end({
+          id,
+          status: body.meta.status,
+          score: body.meta.score,
+          time: body.meta.timeUsed,
+          memory: body.meta.memoryUsed,
+          details: `<div>${details}</div>`,
+        });
+      } catch (e) {
+        logger.error(e);
 
-        return test_info;
-      };
-
-      let details = '';
-
-      details +=
-        '<div class="border-bottom p-3">' +
-        `<p><b>Problem:</b> #${body.meta.problem.displayId}. ${body.meta.problemTitle}</p>` +
-        `<p><b>Remote submission:</b> <a href="https://loj.ac/s/${id}" target="_blank">${id}</a></p>` +
-        `<p><b>Remote submit time:</b> ${new Date(
-          body.meta.submitTime
-        ).toLocaleString('zh-CN')}</p>` +
-        `<p><b>Remote account:</b> <a href="https://loj.ac/user/${body.meta.submitter.id}" target="_blank">${body.meta.submitter.username}</a></p>` +
-        `<p class="mb-0"><b>Verdict:</b> ${status}</p>` +
-        '</div>';
-
-      // Samples
-      if (body.progress.samples) {
-        details += `<subtask title="Samples" info="${getSubtaskStatusDisplayText(
-          body.progress.samples
-        )}" num="0">${body.progress.samples
-          .map((item, index) =>
-            item.testcaseHash
-              ? getTestcaseBlock(item.testcaseHash, index)
-              : `<test num="${index + 1}" info="Skipped"></test>`
-          )
-          .join('\n')}</subtask>`;
+        fail++;
       }
-
-      // Tests
-      if (body.progress.subtasks.length === 1) {
-        details += `<tests>${body.progress.subtasks[0].testcases
-          .map((item, index) =>
-            item.testcaseHash
-              ? getTestcaseBlock(item.testcaseHash, index)
-              : `<test num="${index + 1}" info="Skipped"></test>`
-          )
-          .join('\n')}</tests>`;
-      } else {
-        details += `<tests>${body.progress.subtasks
-          .map(
-            (subtask, index) =>
-              `<subtask num="${index + 1}" info="${getSubtaskStatusDisplayText(
-                subtask.testcases
-              )}">${subtask.testcases
-                .map((item, index) =>
-                  item.testcaseHash
-                    ? getTestcaseBlock(item.testcaseHash, index)
-                    : `<test num="${index + 1}" info="Skipped"></test>`
-                )
-                .join('\n')}</subtask>`
-          )
-          .join('\n')}</tests>`;
-      }
-
-      return await end({
-        id,
-        status: body.meta.status,
-        score: body.meta.score,
-        time: body.meta.timeUsed,
-        memory: body.meta.memoryUsed,
-        details: `<div>${details}</div>`,
-      });
     }
+
+    return await end({
+      id,
+      error: true,
+      status: 'Judgment Failed',
+      message: 'Failed to fetch submission details.',
+    });
   }
 }

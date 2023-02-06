@@ -250,11 +250,11 @@ export default class LuoguProvider implements IBasicProvider {
     return result.body.rid;
   }
 
-  async waitForSubmission(problem_id: string, id: string, next, end) {
+  async waitForSubmission(id: string, next, end) {
     let fail = 0;
     let count = 0;
 
-    while (count < 180 && fail < 5) {
+    while (count < 180 && fail < 10) {
       await sleep(1000);
       count++;
 

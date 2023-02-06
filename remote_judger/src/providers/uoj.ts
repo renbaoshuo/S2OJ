@@ -9,7 +9,7 @@ import sleep from '../utils/sleep';
 proxy(superagent);
 const logger = new Logger('remote/uoj');
 
-const langs_map = {
+const LANGS_MAP = {
   C: {
     name: 'C',
     id: 'C',
@@ -175,7 +175,7 @@ export default class UOJProvider implements IBasicProvider {
     next,
     end
   ) {
-    const programType = langs_map[lang] || langs_map['C++'];
+    const programType = LANGS_MAP[lang] || LANGS_MAP['C++'];
     const comment = programType.comment;
 
     if (comment) {
@@ -206,65 +206,72 @@ export default class UOJProvider implements IBasicProvider {
       .innerHTML.split('#')[1];
   }
 
-  async waitForSubmission(problem_id: string, id: string, next, end) {
-    let i = 0;
+  async waitForSubmission(id: string, next, end) {
+    let count = 0;
+    let fail = 0;
 
-    while (true) {
-      if (++i > 180) {
-        return await end({
-          id,
-          error: true,
-          status: 'Judgment Failed',
-          message: 'Failed to fetch submission details.',
-        });
-      }
-
+    while (count < 180 && fail < 10) {
+      count++;
       await sleep(1000);
-      const { text } = await this.get(`/submission/${id}`);
-      const {
-        window: { document },
-      } = new JSDOM(text);
-      const find = (content: string) =>
-        Array.from(
-          document.querySelectorAll('.panel-heading>.panel-title')
-        ).find(n => n.innerHTML === content).parentElement.parentElement
-          .children[1];
-      if (text.includes('Compile Error')) {
+
+      try {
+        const { text } = await this.get(`/submission/${id}`);
+        const {
+          window: { document },
+        } = new JSDOM(text);
+        const find = (content: string) =>
+          Array.from(
+            document.querySelectorAll('.panel-heading>.panel-title')
+          ).find(n => n.innerHTML === content).parentElement.parentElement
+            .children[1];
+        if (text.includes('Compile Error')) {
+          return await end({
+            error: true,
+            id,
+            status: 'Compile Error',
+            message: find('详细').children[0].innerHTML,
+          });
+        }
+
+        await next({});
+
+        const summary = document.querySelector('tbody>tr');
+        if (!summary) continue;
+        const time = parseTimeMS(summary.children[4].innerHTML);
+        const memory = parseMemoryMB(summary.children[5].innerHTML) * 1024;
+        let panel = document.getElementById(
+          'details_details_accordion_collapse_subtask_1'
+        );
+        if (!panel) {
+          panel = document.getElementById('details_details_accordion');
+          if (!panel) continue;
+        }
+
+        if (document.querySelector('tbody').innerHTML.includes('Judging'))
+          continue;
+
+        const score = +summary.children[3]?.children[0]?.innerHTML || 0;
+        const status = score === 100 ? 'Accepted' : 'Unaccepted';
+
         return await end({
-          error: true,
           id,
-          status: 'Compile Error',
-          message: find('详细').children[0].innerHTML,
+          status,
+          score,
+          time,
+          memory,
         });
+      } catch (e) {
+        logger.error(e);
+
+        fail++;
       }
-
-      await next({});
-
-      const summary = document.querySelector('tbody>tr');
-      if (!summary) continue;
-      const time = parseTimeMS(summary.children[4].innerHTML);
-      const memory = parseMemoryMB(summary.children[5].innerHTML) * 1024;
-      let panel = document.getElementById(
-        'details_details_accordion_collapse_subtask_1'
-      );
-      if (!panel) {
-        panel = document.getElementById('details_details_accordion');
-        if (!panel) continue;
-      }
-
-      if (document.querySelector('tbody').innerHTML.includes('Judging'))
-        continue;
-
-      const score = +summary.children[3]?.children[0]?.innerHTML || 0;
-      const status = score === 100 ? 'Accepted' : 'Unaccepted';
-
-      return await end({
-        id,
-        status,
-        score,
-        time,
-        memory,
-      });
     }
+
+    return await end({
+      id,
+      error: true,
+      status: 'Judgment Failed',
+      message: 'Failed to fetch submission details.',
+    });
   }
 }

@@ -35,7 +35,7 @@ class AccountService {
 
       if (!rid) return;
 
-      await this.api.waitForSubmission(problem_id, rid, next, end);
+      await this.api.waitForSubmission(rid, next, end, problem_id);
     } catch (e) {
       logger.error(e);
 
@@ -178,7 +178,7 @@ class VJudge {
 
         if (!rid) return;
 
-        await provider.waitForSubmission(problem_id, rid, next, end);
+        await provider.waitForSubmission(rid, next, end, problem_id);
       } catch (e) {
         logger.error(e);
 
@@ -204,10 +204,10 @@ class VJudge {
 
         if (await provider.ensureIsOwnSubmission(config.remote_submission_id)) {
           await provider.waitForSubmission(
-            problem_id,
             config.remote_submission_id,
             next,
-            end
+            end,
+            problem_id
           );
         } else {
           return await end({

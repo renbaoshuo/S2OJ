@@ -8,7 +8,7 @@ import Logger from '../utils/logger';
 proxy(superagent);
 const logger = new Logger('remote/atcoder');
 
-const langs_map = {
+const LANGS_MAP = {
   C: {
     name: 'C (GCC 9.2.1)',
     id: 4001,
@@ -182,7 +182,7 @@ export default class AtcoderProvider implements IBasicProvider {
     next,
     end
   ) {
-    const programType = langs_map[lang] || langs_map['C++'];
+    const programType = LANGS_MAP[lang] || LANGS_MAP['C++'];
     const comment = programType.comment;
 
     if (comment) {
@@ -244,90 +244,96 @@ export default class AtcoderProvider implements IBasicProvider {
       .getAttribute('data-id');
   }
 
-  async waitForSubmission(problem_id: string, id: string, next, end) {
-    let i = 0;
+  async waitForSubmission(id: string, next, end, problem_id: string) {
+    let count = 0;
+    let fail = 0;
 
     const [contestId] = parseProblemId(problem_id);
     const status_url = `/contests/${contestId}/submissions/me/status/json?reload=true&sids[]=${id}`;
 
-    while (true) {
-      if (++i > 180) {
-        return await end({
-          id,
-          error: true,
-          status: 'Judgment Failed',
-          message: 'Failed to fetch submission details.',
-        });
-      }
-
+    while (count < 180 && fail < 10) {
+      count++;
       await sleep(1000);
-      const { body, error, header } = await this.get(status_url).retry(3);
 
-      if (header['set-cookie']) {
-        this.cookie = header['set-cookie'];
-      }
+      try {
+        const { body, header } = await this.get(status_url).retry(3);
 
-      if (error) continue;
+        if (header['set-cookie']) {
+          this.cookie = header['set-cookie'];
+        }
 
-      const result = body.Result[id];
-      const {
-        window: { document },
-      } = new JSDOM(`<table>${result.Html}</table>`);
+        const result = body.Result[id];
+        const {
+          window: { document },
+        } = new JSDOM(`<table>${result.Html}</table>`);
 
-      const elements = document.querySelectorAll('td');
-      const statusTd = elements[0];
-      const statusElem = statusTd.querySelector('span');
+        const elements = document.querySelectorAll('td');
+        const statusTd = elements[0];
+        const statusElem = statusTd.querySelector('span');
 
-      if (
-        statusElem.title === 'Waiting for Judging' ||
-        statusElem.title === 'Waiting for Re-judging' ||
-        ['WJ', 'WR'].includes(statusElem.innerHTML.trim())
-      ) {
-        await next({ test_id: 0 });
+        if (
+          statusElem.title === 'Waiting for Judging' ||
+          statusElem.title === 'Waiting for Re-judging' ||
+          ['WJ', 'WR'].includes(statusElem.innerHTML.trim())
+        ) {
+          await next({ test_id: 0 });
 
-        continue;
-      }
+          continue;
+        }
 
-      if (
-        statusElem.title === 'Judging' ||
-        (statusTd.colSpan == 3 && statusTd.className.includes('waiting-judge'))
-      ) {
-        await next({ test_id: /(\d+)/.exec(statusElem.innerHTML)[1] || 0 });
+        if (
+          statusElem.title === 'Judging' ||
+          (statusTd.colSpan == 3 &&
+            statusTd.className.includes('waiting-judge'))
+        ) {
+          await next({ test_id: /(\d+)/.exec(statusElem.innerHTML)[1] || 0 });
 
-        continue;
-      }
+          continue;
+        }
 
-      if (statusElem.title === 'Compilation Error') {
+        if (statusElem.title === 'Compilation Error') {
+          return await end({
+            id,
+            error: true,
+            status: 'Compile Error',
+            message: '',
+          });
+        }
+
+        if (statusElem.title === 'Internal Error') {
+          return await end({
+            error: true,
+            status: 'Judgment Failed',
+            message: 'AtCoder Internal Error.',
+          });
+        }
+
+        const time = parseInt(elements[1].innerHTML.trim());
+        const memory = parseInt(elements[2].innerHTML.trim());
+
         return await end({
           id,
-          error: true,
-          status: 'Compile Error',
-          message: '',
+          status: statusElem.title || 'None',
+          score:
+            statusElem.title === 'Accepted' ||
+            statusElem.innerHTML.trim() === 'AC'
+              ? 100
+              : 0,
+          time,
+          memory,
         });
+      } catch (e) {
+        logger.error(e);
+
+        fail++;
       }
-
-      if (statusElem.title === 'Internal Error') {
-        return await end({
-          error: true,
-          status: 'Judgment Failed',
-          message: 'AtCoder Internal Error.',
-        });
-      }
-
-      const time = parseInt(elements[1].innerHTML.trim());
-      const memory = parseInt(elements[2].innerHTML.trim());
-
-      return await end({
-        id,
-        status: statusElem.title || 'None',
-        score:
-          statusElem.title === 'Accepted' ||
-          statusElem.innerHTML.trim() === 'AC'
-            ? 100
-            : 0,
-        time,
-        memory,
-      });
     }
+
+    return await end({
+      id,
+      error: true,
+      status: 'Judgment Failed',
+      message: 'Failed to fetch submission details.',
+    });
   }
 }
