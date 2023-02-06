@@ -167,7 +167,7 @@ if (isSuperUser(Auth::user())) {
 			if ($extra_config === null) {
 				return '不是合法的JSON';
 			}
-			$vdata['extra_config'] = json_encode($extra_config);
+			$vdata['extra_config'] = json_encode($extra_config, JSON_FORCE_OBJECT);
 		},
 	]);
 	$info_form->handle = function (&$vdata) use ($problem) {
