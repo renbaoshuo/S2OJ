@@ -120,16 +120,15 @@ function handleUpload($zip_file_name, $content, $tot_size) {
 			$content['remote_submission_id'] = $_POST['answer_remote_submission_id'];
 			$content['config'][] = ['remote_submission_id', $_POST['answer_remote_submission_id']];
 
-			$content['config'] = array_filter(
+			$content['config'] = array_values(array_filter(
 				$content['config'],
-				function ($key) {
-					return !strEndWith($key, '_language');
+				function ($row) {
+					return !strEndWith($row[0], '_language');
 				},
-				ARRAY_FILTER_USE_KEY
-			);
+			));
 
 			$zip_file = new ZipArchive();
-			$zip_file->open(UOJContext::storagePath() . $zip_file_name, ZipArchive::CREATE);
+			$zip_file->open(UOJContext::storagePath() . $zip_file_name, ZipArchive::OVERWRITE);
 			$zip_file->addFromString('answer.code', '');
 			$zip_file->close();
 		}
