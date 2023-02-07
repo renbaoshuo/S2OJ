@@ -39,6 +39,12 @@ foreach ($contest_data['people'] as $person) {
 }
 ?>
 
+<?php if ($contest['extra_config']['basic_rule'] === 'ACM') : ?>
+	<div class="text-warning">
+		ACM 比赛的赛后总结暂时不支持显示附加信息。
+	</div>
+<?php endif ?>
+
 <div id="standings"></div>
 
 <div class="modal fade" id="UpdateSelfReviewsModal" tabindex="-1" aria-labelledby="UpdateSelfReviewsModalLabel" aria-hidden="true">

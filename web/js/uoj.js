@@ -524,14 +524,16 @@ $.fn.long_table = function(data, cur_page, header_row, get_row_str, config) {
 		}
 		
 		$(table_div).append(
-			$('<div class="' + div_classes.join(' ') + '" />').append(
-				(typeof config.print_before_table === 'function' ? config.print_before_table() : ''),
-				$('<table class="' + table_classes.join(' ') + '" />').append(
-					$('<thead>' + header_row + '</thead>')
-				).append(
-					tbody
-				),
-				(typeof config.print_after_table === 'function' ? config.print_after_table() : '')
+				typeof config.print_before_table === 'function' ? config.print_before_table() : ''
+			).append(
+				$('<div class="' + div_classes.join(' ') + '" />').append(
+					$('<table class="' + table_classes.join(' ') + '" />').append(
+						$('<thead />').append(header_row)
+					).append(
+						tbody
+					)
+			).append(
+				typeof config.print_after_table === 'function' ? config.print_after_table() : ''
 			)
 		);
 		
@@ -554,8 +556,7 @@ $.fn.long_table = function(data, cur_page, header_row, get_row_str, config) {
 			);
 			return li;
 		};
-		
-		if (n_pages > 1) {
+		var get_pagination = function() {
 			var pagination = $('<ul class="pagination top-buffer-no bot-buffer-sm justify-content-center"></ul>');
 			if (cur_page > 1) {
 				pagination.append(get_page_li(1, '<i class="bi bi-chevron-double-left"></i>'));
@@ -575,7 +576,14 @@ $.fn.long_table = function(data, cur_page, header_row, get_row_str, config) {
 				pagination.append(get_page_li(-1, '<i class="bi bi-chevron-right"></i>'));
 				pagination.append(get_page_li(-1, '<i class="bi bi-chevron-double-right"></i>'));
 			}
-			$(table_div).append($('<div class="text-center"></div>').append(pagination));
+			return pagination;
+		}
+		
+		if (n_pages > 1) {
+			$(table_div).append($('<div class="text-center"></div>').append(get_pagination()));
+			if (config.top_pagination) {
+				$(table_div).prepend($('<div class="text-center"></div>').append(get_pagination()));
+			}
 		}
 	});
 };
@@ -1661,6 +1669,293 @@ function showCommentReplies(id, replies) {
 			prevent_focus_on_click: true
 		}
 	);
+}
+
+function getACMStandingsMeta() {
+	var stat = {};
+	var full_score = 0;
+
+	for (var k = 0; k < problems.length; k++) {
+		var pid = problems[k];
+		stat[pid] = {};
+		stat[pid].cnt = 0;
+		stat[pid].ac_cnt = 0;
+		stat[pid].earliest = null;
+		if (("problem_" + pid) in bonus) {
+			for (var j in score) {
+				if (score[j][k] != undefined) {
+					stat[pid].cnt += score[j][k][3];
+					if (score[j][k][1] === -1200) {
+						stat[pid].ac_cnt++;
+					}
+				}
+			}
+		} else {
+			full_score += 100;
+			for (var j in score) {
+				if (score[j][k] != undefined) {
+					stat[pid].cnt += score[j][k][3];
+					if (score[j][k][0] === 100) {
+						stat[pid].ac_cnt++;
+						if (stat[pid].earliest === null || score[j][k][2] < stat[pid].earliest) {
+							stat[pid].earliest = score[j][k][2];
+						}
+					}
+				}
+			}
+		}
+	}
+	return { stat, full_score };
+}
+
+function setACMStandingsTH(th, i, meta) {
+	if (i == -3) {
+		return $(th).css('width', '34px').text('#');
+	} else if (i == -2) {
+		if (problems.length <= 10) {
+			$(th).css('width', '114px');
+		}
+		return $(th).text(uojLocale('username'));
+	} else if (i == -1) {
+		return $(th).css('width', '57px').text(uojLocale('contests::total score'));
+	}
+
+	var pid = problems[i];
+	
+	$(th).css('width', '57px');
+	if (("problem_" + pid) in bonus) {
+		$(th).attr('title', '附加题，通过后减免 20 分钟罚时');
+	}
+	var th_str = '<div><a href="/contest/' + contest_id + '/problem/' + pid + '">' + String.fromCharCode('A'.charCodeAt(0) + i);
+	if (("problem_" + pid) in bonus) {
+		th_str += '*';
+	}
+	th_str += '</a></div>';
+	if (meta && pid in meta.stat) {
+		th_str += '<div>' + meta.stat[pid].ac_cnt + '/' + meta.stat[pid].cnt + '</div>';
+	}
+	return $(th).html(th_str);
+}
+
+function setACMStandingsTD(td, row, i, meta) {
+	if (i == -3) {
+		return $(td).attr('class', '').html(row[3]);
+	} else if (i == -2) {
+		if (2 in row[2] && row[2][2]) {
+			let td_title = row[2][2]['team_name'] + "\n";
+			for (var i = 0; i < row[2][2]['members'].length; i++) {
+				td_title += row[2][2]['members'][i]['name'];
+				td_title += "  （";
+				td_title += row[2][2]['members'][i]['organization'];
+				td_title += "）";
+				if (i < row[2][2]['members'].length - 1) {
+					td_title += "\n";
+				}
+			}
+			return $(td).attr('class', '').attr('title', td_title).html(
+				'<div class="text-center" style="overflow-wrap:anywhere;">' +
+					'<small><strong>' + htmlspecialchars(row[2][2]['team_name']) + '</strong></small>' +
+				'</div>' +
+				'<div>' +
+					'<small>' + getUserLink(row[2][0], row[2][1], row[2][3]) + '</small>' +
+				'</div>'
+			);
+		} else {
+			return $(td).attr('class', '').html(getUserLink(row[2][0], row[2][1], row[2][3]));
+		}
+	} else if (i == -1) {
+		let td_title = "总分：" + row[0] + "\n";
+		td_title += "罚时：" + row[1] + "，即 " + getPenaltyTimeStr(row[1]);
+		return $(td).attr('class', 'standings-score-td').attr('title', td_title).html(
+			'<div>' +
+				'<span class="uoj-score" data-max="' + meta.full_score + '" style="color:' + getColOfScore(row[0] * 100 / meta.full_score) + '">' +
+					row[0] +
+				'</span>' +
+			'</div>' +
+			'<div>' +
+				'<small>' + getPenaltyTimeStr(row[1]) + '</small>' +
+			'</div>'
+		);
+	}
+
+	var col = score[row[2][0]][i];
+
+	$(td).attr('class', 'standings-score-td');
+	
+	if (col === undefined) {
+		return $(td).html('');
+	}
+
+	var td_title = String.fromCharCode('A'.charCodeAt(0) + i) + "题\n";
+	var td_content = '';
+
+	if (("problem_" + problems[i]) in bonus) {
+		td_content += '<div>';
+		if (col[0] !== null) {
+			if (col[1] == -1200) {
+				td_content += '<a href="/submission/' + col[2] + '" class="uoj-score" data-score="100" style="color:' + getColOfScore(100) + '">';
+				td_content += '+';
+				td_content += '</a>';
+
+				td_title += col[3] + " 次有效提交后通过，减免罚时 20 分钟";
+			} else {
+				td_content += '<a href="/submission/' + col[2] + '" class="uoj-score" data-score="0" style="color:' + getColOfScore(0) + '">';
+				td_content += 0;
+				td_content += '</a>';
+
+				td_title += "尚未通过，未减免罚时";
+				td_title += "\n" + col[3] + " 次有效提交";
+			}
+			if (col[5] > 0) {
+				td_content += ' + ';
+				td_title += "\n" + "因封榜有 " + col[5] + " 次提交结果未知";
+			}
+		} else {
+			td_title += "封榜后提交了 " + col[5] + " 次，结果未知";
+		}
+
+		if (col[5] > 0) {
+			td_content += '<strong class="text-muted">?</strong>';
+		}
+		td_content += '</div>';
+
+		if (col[4] > 0) {
+			td_content += '<div><small>';
+			td_content += '(+' + col[4] + ')';
+			td_content += '</small></div>';
+		}
+	} else {
+		td_content += '<div>';
+		if (col[0] !== null) {
+			td_content += '<a href="/submission/' + col[2] + '" class="uoj-score" style="color:' + getColOfScore(col[0]) + '">';
+			td_content += col[0];
+			td_content += '</a>';
+
+			td_title += "得分：" + col[0] + " 分";
+			td_title += "\n" + col[3] + " 次有效提交";
+
+			if (col[5] > 0) {
+				td_content += ' + ';
+				td_title += "\n" + "因封榜有 " + col[5] + " 次提交结果未知";
+			}
+		} else {
+			td_title += "封榜后提交了 " + col[5] + " 次，结果未知";
+		}
+		if (col[5] > 0) {
+			td_content += '<strong class="text-muted">?</strong>';
+		}
+		td_content += '</div>';
+		
+		if (col[0] > 0) {
+			let orig_penalty = col[1] - col[4] * 60 * 20;
+			td_content += '<div><small>' + getPenaltyTimeStr(orig_penalty) + '</small></div>';
+
+			if (col[4] > 0) {
+				td_title += "\n" + col[4] + " 次提交计入罚时";
+			}
+			td_title += "\n" + "罚时：" + orig_penalty;
+			if (col[4] > 0) {
+				td_title += " + " + col[4] + " × 1200 = " + col[1];
+			}
+			td_title += "，即 " + getPenaltyTimeStr(orig_penalty);
+		}
+
+		if (col[4] > 0) {
+			td_content += '<div><small>';
+			td_content += '(+' + col[4] + ')';
+			td_content += '</small></div>';
+		}
+	}
+
+	if (meta.stat[problems[i]].earliest === col[2]) {
+		$(td).addClass('first-blood table-success');
+	}
+
+	return $(td).attr('title', td_title).html(td_content);
+}
+
+// standings
+function showStandings() {
+	if (contest_rule == 'OI' || contest_rule == 'IOI') {
+		$("#standings").long_table(
+			standings,
+			1,
+			'<tr>' +
+				'<th style="width:5em">#</th>' +
+				'<th style="width:14em">'+uojLocale('username')+'</th>' +
+				'<th style="width:5em">'+uojLocale('contests::total score')+'</th>' +
+				$.map(problems, function(col, idx) {
+					return '<th style="width:8em;">' + '<a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode('A'.charCodeAt(0) + idx) + '</a>' + '</th>';
+				}).join('') +
+			'</tr>',
+			function(row) {
+				var col_tr = '';
+				if (myname != row[2][0]) {
+					col_tr += '<tr>';
+				} else {
+					col_tr += '<tr class="table-warning">';
+				}
+				col_tr += '<td>' + row[3] + '</td>';
+				col_tr += '<td>' + getUserLink(row[2][0], row[2][1], row[2][3]) + '</td>';
+				col_tr += '<td>' + '<div><span class="uoj-score" data-max="' + problems.length * 100 + '" style="color:' + getColOfScore(row[0] / problems.length) + '">' + row[0] + '</span></div>' + '<div>' + getPenaltyTimeStr(row[1]) + '</div></td>';
+				for (var i = 0; i < problems.length; i++) {
+					col_tr += '<td>';
+					col = score[row[2][0]][i];
+					if (col != undefined) {
+						col_tr += '<div><a href="/submission/' + col[2] + '" class="uoj-score" style="color:' + getColOfScore(col[0]) + '">' + col[0] + '</a></div>';
+						if (standings_version < 2) {
+							col_tr += '<div class="small">' + getPenaltyTimeStr(col[1]) + '</div>';
+						} else {
+							if (col[0] > 0) {
+								col_tr += '<div class="small">' + getPenaltyTimeStr(col[1]) + '</div>';
+							}
+						}
+					}
+					col_tr += '</td>';
+				}
+				col_tr += '</tr>';
+				return col_tr;
+			}, {
+				div_classes: standings_config.div_classes ? standings_config.div_classes : ['table-responsive', 'card', 'my-3'],
+				table_classes: standings_config.table_classes ? standings_config.table_classes : ['table', 'table-bordered', 'text-center', 'align-middle', 'uoj-table', 'uoj-standings-table', 'mb-0'],
+				page_len: standings_config.page_len ? standings_config.page_len : 50,
+				top_pagination: true,
+				print_after_table: function() {
+					return '<div class="card-footer bg-transparent text-end text-muted">' + uojLocale("contests::n participants", standings.length) + '</div>';
+				}
+			}
+		);
+	} else if (contest_rule == 'ACM') {
+		var meta = getACMStandingsMeta();
+		var header = $('<tr />');
+		for (let i = -3; i < problems.length; i++) {
+			header.append(setACMStandingsTH(document.createElement('th'), i, meta));
+		}
+
+		$("#standings").long_table(
+			standings,
+			1,
+			header,
+			function(row) {
+				var tr = $('<tr />'); // .css('height', '57px');
+				if (myname == row[2][0]) {
+					tr.addClass('table-warning');
+				}
+				for (let i = -3; i < problems.length; i++) {
+					tr.append(setACMStandingsTD(document.createElement('td'), row, i, meta));
+				}
+				return tr;
+			}, {
+				div_classes: standings_config.div_classes ? standings_config.div_classes : ['table-responsive', 'card', 'my-3'],
+				table_classes: standings_config.table_classes ? standings_config.table_classes : ['table', 'table-bordered', 'text-center', 'align-middle', 'uoj-table', 'uoj-standings-table', 'mb-0'],
+				page_len: standings_config.page_len ? standings_config.page_len : 50,
+				top_pagination: true,
+				print_after_table: function() {
+					return '<div class="card-footer bg-transparent text-end text-muted">' + uojLocale("contests::n participants", standings.length) + '</div>';
+				}
+			}
+		);
+	}
 }
 
 // PDF

@@ -48,9 +48,9 @@ function updateContestPlayerNum($contest) {
 // problems: pos => id
 //
 // for individual competition:
-//	 people  : username, realname
+//	 people  : username, realname, null, username_color
 // for team competition:
-//	 people  : username, null, ['team_name' => team_name, 'members' => members]
+//	 people  : username, null, ['team_name' => team_name, 'members' => members], null
 //
 // for OI/IOI contest:
 //	 data	: id, submit_time, submitter, problem_pos, score
@@ -437,7 +437,7 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $cfg = [])
 
 function calcACMScoreAndPenaltyForOneProblem($contest, $problem_id, $sub, $n_failures) {
 	if (isset($contest['extra_config']['bonus']["problem_{$problem_id}"])) {
-		if ($sub[4] === 100) {
+		if ($sub[4] == 100) {
 			return [0, -60 * 20];
 		} else {
 			return [0, 0];
