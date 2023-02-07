@@ -256,7 +256,7 @@ if (isset($_POST['user_msg'])) {
 			'<div class="list-group-item list-group-item-action p-2 d-flex ' + (type ? 'list-group-item-warning' : '') + '" style="cursor: pointer; user-select: none;" ' +
 			'onclick="enterConversation(\'' + conversationName + '\')">' +
 			'<div class="flex-shrink-0 me-3">' +
-			'<img class="rounded" width="56" height="56" src="' + avatar_addr + '" />' +
+			'<img class="rounded uoj-user-avatar" width="56" height="56" src="' + avatar_addr + '" />' +
 			'</div>' +
 			'<div class="flex-grow-1 overflow-hidden">' +
 			'<div class="d-flex justify-content-between">' +
@@ -290,7 +290,7 @@ if (isset($_POST['user_msg'])) {
 				'<span class="float-end" data-bs-toggle="tooltip" data-bs-title="' + read_time + '"><i class="bi bi-check2-all"></i></span>') +
 			'</div>' +
 			'</div>' +
-			(type ? '<img class="flex-shrink-0 ms-2 rounded" width="32" height="32" src="' + user_avatar + '" style="user-select: none;" />' : '') +
+			(type ? '<img class="flex-shrink-0 ms-2 rounded uoj-user-avatar" width="32" height="32" src="' + user_avatar + '" style="user-select: none;" />' : '') +
 			'</div>'
 		);
 	}

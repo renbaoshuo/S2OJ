@@ -170,7 +170,7 @@ $pag = new Paginator($pag_config);
 						<div class="mb-3">
 							<span class="me-2 d-inline-block">
 								<a class="text-decoration-none" href="<?= HTML::url('/user/' . $poster['username']) ?>">
-									<img src="<?= HTML::avatar_addr($poster, 64) ?>" width="32" height="32" class="rounded" />
+									<img src="<?= HTML::avatar_addr($poster, 64) ?>" width="32" height="32" class="rounded uoj-user-avatar" />
 								</a>
 								<?= UOJUser::getLink($poster) ?>
 							</span>

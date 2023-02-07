@@ -3,7 +3,7 @@
 	<div class="container">
 
 		<a class="navbar-brand" href="<?= HTML::blog_url(UOJUserBlog::id(), '/') ?>">
-			<img src="<?= HTML::avatar_addr(UOJUserBlog::user(), 48) ?>" alt="Logo" width="24" height="24" class="d-inline-block align-text-top" />
+			<img src="<?= HTML::avatar_addr(UOJUserBlog::user(), 48) ?>" alt="Logo" width="24" height="24" class="d-inline-block align-text-top uoj-user-avatar" />
 			<?= UOJUserBlog::id() ?>
 		</a>
 

@@ -263,7 +263,7 @@ $comments_pag = new Paginator([
 				<div class="d-flex">
 					<div class="mr-3 flex-shrink-0">
 						<a href="<?= HTML::url('/user/' . $poster['username']) ?>" class="d-none d-sm-block text-decoration-none">
-							<img class="rounded" src="<?= $asrc ?>" alt="Avatar of <?= $poster['username'] ?>" width="64" height="64" />
+							<img class="rounded uoj-user-avatar" src="<?= $asrc ?>" alt="Avatar of <?= $poster['username'] ?>" width="64" height="64" />
 						</a>
 					</div>
 					<div id="comment-body-<?= $comment['id'] ?>" class="flex-grow-1 ms-3">

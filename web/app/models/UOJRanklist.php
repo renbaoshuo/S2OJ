@@ -54,7 +54,7 @@ class UOJRanklist {
             <div class="list-group-item">
                 <div class="d-flex">
                     <div class="flex-shrink-0">
-                        <a href="{$userpro}"><img class="rounded" src="{$asrc}" width="50" height="50" /></a>
+                        <a href="{$userpro}"><img class="rounded uoj-user-avatar" src="{$asrc}" width="50" height="50" /></a>
                     </div>
                     <div class="flex-grow-1 ms-3">
                         <div class="row">

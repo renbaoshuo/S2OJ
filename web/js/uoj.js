@@ -1772,3 +1772,9 @@ $(document).ready(function() {
 		);
 	});	
 });
+
+$(document).ready(function() {
+	$('img.uoj-user-avatar').on('error', function() {
+		$(this).attr('src', 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4NzIgODcyIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMCAwaDg3MnY4NzJIMHoiLz48cGF0aCBmaWxsPSIjYzVjNWM1IiBkPSJNMCAwdjg3MmgxMTBhMzI3IDM4MyAwIDAxMjM2LTM0NSAxOTUgMTk1IDAgMDEtMTA0LTE3MiAxOTUgMTk1IDAgMDExOTUtMTk1IDE5NSAxOTUgMCAwMTE5NSAxOTUgMTk1IDE5NSAwIDAxLTEwNiAxNzMgMzI3IDM4MyAwIDAxMjM2IDM0NGgxMTBWMHoiLz48L3N2Zz4=');
+	});
+});

@@ -3,7 +3,7 @@
 <div class="row">
 	<div class="col-md-3">
 		<div class="card">
-			<img class="card-img-top" alt="Avatar of <?= $user['username'] ?>" src="<?= HTML::avatar_addr($user, 512) ?>" />
+			<img class="card-img-top uoj-user-avatar" alt="Avatar of <?= $user['username'] ?>" src="<?= HTML::avatar_addr($user, 512) ?>" />
 			<div class="card-body">
 				<?php if ($user['usergroup'] == 'S') : ?>
 					<span class="badge bg-secondary">
