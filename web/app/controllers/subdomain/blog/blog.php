@@ -179,6 +179,8 @@ if (UOJUserBlog::userHasManagePermission(Auth::user())) {
 		'validator_php' => 'validateString',
 	]);
 	$hide_form->handle = function (&$vdata) {
+		$comment = $vdata['comment_hide_id'];
+
 		if ($_POST['comment_hide_type'] == 'unhide') {
 			$reason = '';
 		} else if ($_POST['comment_hide_type'] == 'other') {
@@ -187,7 +189,16 @@ if (UOJUserBlog::userHasManagePermission(Auth::user())) {
 			$reason = '该评论由于' . UOJBlogComment::HIDE_REASONS[$_POST['comment_hide_type']] . '，已被管理员隐藏';
 		}
 
-		$vdata['comment_hide_id']->hide($reason);
+		$comment->hide($reason);
+
+		if ($_POST['comment_hide_type'] != 'unhide') {
+			sendSystemMsg(
+				$comment->info['poster'],
+				'评论隐藏通知',
+				"<p>" . UOJUser::getLink($comment->info['poster']) . " 您好：</p>" .
+					"<p>您为博客 " . UOJBlog::cur()->getLink() . " 回复的评论 “" . substr($comment->info['content'], 0, 30) . "……” 已被管理员隐藏，隐藏原因为 “{$reason}”。</p>"
+			);
+		}
 	};
 	$hide_form->runAtServer();
 }
