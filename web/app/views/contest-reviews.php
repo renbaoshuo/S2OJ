@@ -97,7 +97,7 @@ foreach ($contest_data['people'] as $person) {
 
 				var res = $('<tr />')
 					.append($('<td />').append(row[3]))
-					.append($('<td />').append(getUserLink(row[2][0], row[2][1])).append(button_update_review))
+					.append($('<td />').append(getUserLink(row[2][0], row[2][1], row[2][3])).append(button_update_review))
 					.append($('<td />').append($('<span class="uoj-score" />').attr('data-max', problems.length * 100).css('color', getColOfScore(row[0] / problems.length)).append(row[0])));
 
 				for (var i = 0; i < problems.length; i++) {
@@ -106,8 +106,6 @@ foreach ($contest_data['people'] as $person) {
 					col = score[row[2][0]][i];
 
 					if (col != undefined) {
-						td.append($('<div />').append($('<a class="uoj-score" />').attr('href', '/submission/' + col[2]).attr('data-max', 100).css('color', getColOfScore(col[0])).append(col[0])));
-
 						if (col[2]) {
 							td.append(
 								$('<div />').append(
