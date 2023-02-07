@@ -497,9 +497,9 @@ class UOJSubmission {
 					} else {
 						$actual_score = $this->getActualScore();
 						if ($actual_score === null) {
-							echo $tag_st, '" class="small text-decoration-none">', $this->info['result_error'], $tag_ed;
+							echo $tag_st, ' class="small text-decoration-none">', $this->info['result_error'], $tag_ed;
 						} else {
-							echo $tag_st, '" class="uoj-score text-decoration-none">', $actual_score, $tag_ed;
+							echo $tag_st, ' class="uoj-score text-decoration-none">', $actual_score, $tag_ed;
 						}
 					}
 				} else {
