@@ -89,7 +89,7 @@ if (UOJProblem::cur()->userCanManage(Auth::user()) || UOJProblem::cur()->userPer
 		},
 	]);
 	$add_new_solution_form->config['form']['class'] = 'd-flex';
-	$add_new_solution_form->config['submit_container']['class'] = 'ms-2';
+	$add_new_solution_form->config['submit_container']['class'] = 'ms-2 flex-shrink-0';
 	$add_new_solution_form->config['submit_button']['text'] = '发布';
 	$add_new_solution_form->handle = function (&$vdata) {
 		DB::insert([
