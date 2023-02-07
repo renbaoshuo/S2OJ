@@ -1160,7 +1160,7 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 					.append($('<div class="col-sm-2" />').append('<label for="input-luogu_client_id" class="col-form-label">__client_id</label>'))
 					.append($('<div class="col-sm-4" />').append(input_luogu_client_id))
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text mt-0" />').append('请填入 Cookie 中的 <code>__client_id</code>。')))
-			).append(input_my_account_data);
+			);
 		} else if (oj == 'codeforces') {
 			var codeforces_account_data = {"JSESSIONID": ""};
 			var input_codeforces_jsessionid = $('<input class="form-control font-monospace" type="text" name="codeforces_jsessionid" id="input-codeforces_jsessionid" autocomplete="off" />');
@@ -1207,7 +1207,7 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 					.append($('<div class="col-sm-2" />').append('<label for="input-codeforces_jsessionid" class="col-form-label">JSESSIONID</label>'))
 					.append($('<div class="col-sm-4" />').append(input_codeforces_jsessionid))
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text mt-0" />').append('请填入 Cookie 中的 <code>JSESSIONID</code>。')))
-			).append(input_my_account_data);
+			);
 		} else if (oj == 'loj') {
 			var loj_account_data = {username: "", token: ""};
 			var input_loj_token = $('<input class="form-control font-monospace" type="text" name="loj_token" id="input-loj_token" autocomplete="off" />');
@@ -1256,7 +1256,7 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 					.append($('<div class="col-sm-2" />').append('<label for="input-loj_token" class="col-form-label">Token</label>'))
 					.append($('<div class="col-sm-4" />').append(input_loj_token))
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text mt-0" />').append('请前往 <a href="https://loj.ac" target="_blank">LibreOJ</a> 登录账号，然后输入在控制台中运行 <code>console.log(JSON.parse(localStorage.appState).token)</code> 的输出结果。')))
-			).append(input_my_account_data);
+			);
 		}
 
 		$(this).append(
@@ -1277,7 +1277,8 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 			.append(div_submit_type_bot)
 			.append(div_submit_type_my)
 			.append(div_submit_type_archive)
-			.append(div_account_data);
+			.append(div_account_data)
+			.append(input_my_account_data);
 	});
 }
 
