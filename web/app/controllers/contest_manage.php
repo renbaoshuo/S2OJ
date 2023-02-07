@@ -223,6 +223,12 @@ EOD);
 			$contest['extra_config']["problem_{$vdata['problem_id']}"] = $judge_type;
 		}
 
+		if ($_POST['bonus']) {
+			$contest['extra_config']['bonus']["problem_{$vdata['problem_id']}"] = true;
+		} else {
+			unset($contest['extra_config']['bonus']["problem_{$vdata['problem_id']}"]);
+		}
+
 		$esc_extra_config = json_encode($contest['extra_config']);
 		DB::update([
 			"update contests",
