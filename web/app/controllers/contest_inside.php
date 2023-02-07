@@ -236,97 +236,85 @@ if ($cur_tab == 'dashboard') {
 		$reply_question = null;
 	}
 } elseif ($cur_tab == 'self_reviews') {
-	if (UOJContest::cur()->userHasMarkedParticipated(Auth::user())) {
-		$self_reviews_update_form = new UOJForm('self_review_update');
-		$self_reviews_update_form->config['ctrl_enter_submit'] = true;
-
-		$contest_problems = DB::selectAll([
-			"select problem_id",
-			"from", "contests_problems",
-			"where", ["contest_id" => $contest['id']],
-			"order by level, problem_id"
-		]);
-		for ($i = 0; $i < count($contest_problems); $i++) {
-			$contest_problems[$i]['problem'] = UOJContestProblem::query($contest_problems[$i]['problem_id']);
+	$self_reviews_update_form = new UOJForm('self_reviews_update');
+	$self_reviews_update_form->config['ctrl_enter_submit'] = true;
+	$self_reviews_update_form->addHidden('self_reviews_update__username', '', function ($username, &$vdata) {
+		if (!validateUsername($username)) {
+			return '无效用户名';
 		}
 
-		for ($i = 0; $i < count($contest_problems); $i++) {
-			$content = DB::selectSingle([
-				"select content",
-				"from", "contests_reviews",
-				"where", [
-					"contest_id" => $contest['id'],
-					"problem_id" => $contest_problems[$i]['problem_id'],
-					"poster" => Auth::id(),
-				],
-			]);
-			$self_reviews_update_form->addTextArea('self_review_update__problem_' . $contest_problems[$i]['problem']->getLetter(), [
-				'div_class' => 'mb-3',
-				'label' => '<b>' . $contest_problems[$i]['problem']->getLetter() . '</b>: ' . $contest_problems[$i]['problem']->info['title'],
-				'default_value' => $content,
-				'validator_php' => function ($content) {
-					if (strlen($content) > 200) {
-						return '总结不能超过200字';
-					}
-
-					return '';
-				},
-			]);
+		if ($username != Auth::id() && !UOJContest::cur()->userCanManage(Auth::user())) {
+			return '权限不足';
 		}
 
-		$content = DB::selectSingle([
-			"select content",
-			"from", "contests_reviews",
-			"where", [
-				"contest_id" => $contest['id'],
-				"problem_id" => -1,
-				"poster" => Auth::id(),
-			],
-		]);
-		$self_reviews_update_form->addTextArea('self_review_update__overall', [
-			'label' => '比赛总结',
-			'default_value' => $content,
+		return '';
+	}, null);
+
+	$contest_problems = array_map(fn ($row) => UOJContestProblem::query($row['problem_id']), DB::selectAll([
+		"select problem_id",
+		"from", "contests_problems",
+		"where", ["contest_id" => $contest['id']],
+		"order by level, problem_id"
+	]));
+
+	foreach ($contest_problems as $cp) {
+		$self_reviews_update_form->addTextArea('self_reviews_update__problem_' . $cp->getLetter(), [
+			'div_class' => 'mb-3',
+			'label' => $cp->getTitle(['with' => 'letter']),
+			'default_value' => '',
 			'validator_php' => function ($content) {
 				if (strlen($content) > 200) {
-					return '总结不能超过200字';
+					return '长度超过限制';
 				}
 
 				return '';
 			},
 		]);
-
-		$self_reviews_update_form->handle = function () use ($contest, $contest_problems) {
-			for ($i = 0; $i < count($contest_problems); $i++) {
-				if (isset($_POST['self_review_update__problem_' . $contest_problems[$i]['problem']->getLetter()])) {
-					DB::query([
-						"replace into contests_reviews",
-						"(contest_id, problem_id, poster, content)",
-						"values", DB::tuple([
-							$contest['id'],
-							$contest_problems[$i]['problem_id'],
-							Auth::id(),
-							$_POST['self_review_update__problem_' . $contest_problems[$i]['problem']->getLetter()],
-						]),
-					]);
-				}
-			}
-
-			if (isset($_POST['self_review_update__overall'])) {
-				DB::query([
-					"replace into contests_reviews",
-					"(contest_id, problem_id, poster, content)",
-					"values", DB::tuple([
-						$contest['id'],
-						-1,
-						Auth::id(),
-						$_POST['self_review_update__overall'],
-					]),
-				]);
-			}
-		};
-
-		$self_reviews_update_form->runAtServer();
 	}
+
+	$self_reviews_update_form->addTextArea('self_reviews_update__overall', [
+		'label' => '比赛总结',
+		'validator_php' => function ($content) {
+			if (strlen($content) > 300) {
+				return '长度超过限制';
+			}
+
+			return '';
+		},
+	]);
+
+	$self_reviews_update_form->handle = function (&$vdata) use ($contest_problems) {
+		foreach ($contest_problems as $cp) {
+			DB::update([
+				"replace into contests_reviews",
+				DB::bracketed_fields([
+					"contest_id",
+					"problem_id",
+					"poster",
+					"content"
+				]),
+				"values", DB::tuple([
+					UOJContest::info('id'),
+					$cp->info['id'],
+					$_POST['self_reviews_update__username'],
+					$_POST['self_reviews_update__problem_' . $cp->getLetter()],
+				]),
+			]);
+		}
+
+		DB::update([
+			"replace into contests_reviews",
+			"(contest_id, problem_id, poster, content)",
+			"values", DB::tuple([
+				UOJContest::info('id'),
+				-1,
+				$_POST['self_reviews_update__username'],
+				$_POST['self_reviews_update__overall'],
+			]),
+		]);
+	};
+
+	$self_reviews_update_form->runAtServer();
 }
 
 function echoDashboard() {
@@ -469,9 +457,12 @@ function echoStandings($is_after_contest_query = false) {
 }
 
 function echoSelfReviews() {
-	global $contest;
+	global $contest, $self_reviews_update_form;
 
-	uojIncludeView('contest-reviews', ['contest' => $contest] + UOJContest::cur()->queryResult());
+	uojIncludeView('contest-reviews', [
+		'contest' => $contest,
+		'self_reviews_update_form' => $self_reviews_update_form,
+	] + UOJContest::cur()->queryResult());
 }
 ?>
 <?php echoUOJPageHeader($tabs_info[$cur_tab]['name'] . ' - ' . UOJContest::info('name') . ' - ' . UOJLocale::get('contests::contest')) ?>
@@ -538,17 +529,7 @@ function echoSelfReviews() {
 			</div>
 			</div>
 
-			<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings') : ?>
-			<?php elseif ($cur_tab == 'self_reviews') : ?>
-				<?php if (isset($self_reviews_update_form)) : ?>
-					<hr />
-
-					<div class="col-md-6">
-						<h4>修改我的赛后总结</h4>
-						<div class="small">赛后总结支持 Markdown 语法。</div>
-						<?php $self_reviews_update_form->printHTML(); ?>
-					</div>
-				<?php endif ?>
+			<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings' || $cur_tab == 'self_reviews') : ?>
 			<?php else : ?>
 				<div class="d-md-none">
 					<hr />
