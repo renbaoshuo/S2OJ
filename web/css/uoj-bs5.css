@@ -253,10 +253,22 @@ form.form-horizontal {
 	margin-bottom: 1rem;
 }
 
-.form-inline .form-control {
-	display: inline-block;
-	width: auto;
-	vertical-align: middle;
+.form-control:focus,
+.form-check-input:focus,
+.form-select:focus {
+	box-shadow: 0 0 0 0.125rem rgb(13 110 253 / 25%);
+}
+
+.accordion {
+	--bs-accordion-btn-focus-box-shadow: 0 0 0 0.125rem rgb(13 110 253 / 25%);
+}
+
+.btn {
+	--bs-btn-focus-box-shadow: 0 0 0 0.125rem rgb(13 110 253 / 25%);
+}
+
+.pagination {
+	--bs-pagination-btn-focus-box-shadow: 0 0 0 0.125rem rgb(13 110 253 / 25%);
 }
 
 /* User accepted problems list */
