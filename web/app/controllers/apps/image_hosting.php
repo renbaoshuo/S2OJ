@@ -411,7 +411,7 @@ $pag = new Paginator($pag_config);
 	<?php foreach ($pag->get() as $idx => $row) : ?>
 		<div class="col">
 			<div class="card">
-				<img src="<?= $row['path'] ?>" class="card-img-top" height="200" loading="lazy" decoding="async" style="object-fit: contain">
+				<img src="<?= $row['path'] ?>" class="card-img-top object-fit-contain" height="200" loading="lazy" decoding="async">
 				<div class="card-footer bg-transparent small px-2">
 					<div class="d-flex flex-wrap justify-content-between">
 						<time><?= $row['upload_time'] ?></time>
