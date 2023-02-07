@@ -645,7 +645,7 @@ class UOJProblem {
 		foreach ($this->findInContests() as $cp) {
 			if ($cp->contest->userHasRegistered($user) && $cp->contest->progress() == CONTEST_IN_PROGRESS) {
 				if ($submission->userIsSubmitter($user)) {
-					if ($cp->contest->getJudgeTypeInContest() == 'no-details') {
+					if ($cp->getJudgeTypeInContest() == 'no-details') {
 						return ['low_level_details'];
 					} else {
 						return [];
