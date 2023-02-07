@@ -26,7 +26,7 @@ if (!isset($ShowPageHeader)) {
 	</script>
 
 	<!-- Bootstrap 5 (CSS) -->
-	<?= HTML::css_link('/css/bootstrap5.min.css?v=5.2.1') ?>
+	<?= HTML::css_link('/css/bootstrap.min.css?v=5.3.0-alpha1') ?>
 	<!-- Bootstrap Icons -->
 	<?= HTML::css_link('/css/bootstrap-icons.min.css?v=2022.9.23') ?>
 
@@ -48,7 +48,7 @@ if (!isset($ShowPageHeader)) {
 	<?= HTML::js_src('/js/jquery.cookie.min.js') ?>
 
 	<!-- Bootstrap 5: JavaScript -->
-	<?= HTML::js_src('/js/bootstrap5.bundle.min.js?v=2022.9.23') ?>
+	<?= HTML::js_src('/js/bootstrap.bundle.min.js?v=5.3.0-alpha1') ?>
 
 	<!-- Color converter -->
 	<?= HTML::js_src('/js/color-converter.min.js') ?>
