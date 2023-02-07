@@ -441,7 +441,11 @@ class JudgmentDetailsPrinter {
 			if ($node->hasAttribute("errcode")) {
 				echo "<pre>", "Judgment Failed. Error Code: ", $node->getAttribute("errcode"), ".</pre>";
 			}
-			echo '<div id="', $this->name, '_details_accordion">';
+			if ($this->styler->accordion_flush) {
+				echo '<div id="', $this->name, '_details_accordion" class="accordion accordion-flush">';
+			} else {
+				echo '<div id="', $this->name, '_details_accordion" class="accordion">';
+			}
 			$this->_print_c($node);
 			if ($this->styler->show_small_tip) {
 				echo '<div class="my-2 px-2 text-end text-muted">', '小提示：点击横条可展开更详细的信息', '</div>';
@@ -458,19 +462,22 @@ class JudgmentDetailsPrinter {
 			$subtask_type = $this->_get_attr($node, 'type', 'packed');
 			$subtask_used_time_type = $this->_get_attr($node, 'used-time-type', 'sum');
 
-			echo '<div class="card border-0 rounded-0 border-bottom ', $this->styler->getTestInfoClass($subtask_info), '">';
+			echo '<div class="accordion accordion-flush border-bottom">';
+			echo '<div class="accordion-item ', $this->styler->getTestInfoClass($subtask_info), '">';
 
 			$accordion_parent = "{$this->name}_details_accordion";
 			$accordion_collapse =  "{$accordion_parent}_collapse_subtask_{$subtask_num}";
 			$accordion_collapse_accordion =  "{$accordion_collapse}_accordion";
-			echo 	'<div class="card-header uoj-submission-result-item bg-transparent rounded-0 border-0" data-bs-toggle="collapse" data-bs-parent="#', $accordion_parent, '" data-bs-target="#', $accordion_collapse, '">';
 
-			echo 		'<div class="row">';
+			echo  	'<div class="accordion-header">';
+			echo  	'<button type="button" class="accordion-button py-2 px-3 collapsed uoj-submission-result-item" data-bs-toggle="collapse" data-bs-parent="#', $accordion_parent, '" data-bs-target="#', $accordion_collapse, '">';
+
+			echo 		'<div class="row w-100">';
 			echo 			'<div class="col-sm-4">';
 			if ($subtask_title !== '') {
-				echo 		    '<h3 class="fs-5">', $subtask_title, ': ', '</h3>';
+				echo 		    '<h3 class="fs-5 mb-0">', $subtask_title, ': ', '</h3>';
 			} else {
-				echo 			'<h3 class="fs-5">', 'Subtask #', $subtask_num, ': ', '</h3>';
+				echo 			'<h3 class="fs-5 mb-0">', 'Subtask #', $subtask_num, ': ', '</h3>';
 			}
 			echo 			'</div>';
 
@@ -502,12 +509,13 @@ class JudgmentDetailsPrinter {
 			}
 
 			echo 		'</div>';
+			echo 	'</button>';
 			echo 	'</div>';
 
-			echo 	'<div id="', $accordion_collapse, '" class="card-collapse collapse">';
-			echo 		'<div class="card-body pt-0">';
+			echo 	'<div id="', $accordion_collapse, '" class="accordion-collapse collapse" data-bs-parent="#', $accordion_parent, '">';
+			echo 		'<div class="accordion-body">';
 
-			echo 			'<div id="', $accordion_collapse_accordion, '" class="border rounded overflow-hidden">';
+			echo 			'<div id="', $accordion_collapse_accordion, '" class="accordion uoj-subtask-test-item">';
 			$this->subtask_num = $subtask_num;
 			$this->_print_c($node);
 			$this->subtask_num = null;
@@ -516,6 +524,7 @@ class JudgmentDetailsPrinter {
 			echo 		'</div>';
 			echo 	'</div>';
 			echo '</div>';
+			echo '</div>';
 		} elseif ($node->nodeName == 'test') {
 			$test_info = $node->getAttribute('info');
 			$test_num = $node->getAttribute('num');
@@ -523,7 +532,7 @@ class JudgmentDetailsPrinter {
 			$test_time = $this->_get_attr($node, 'time', -1);
 			$test_memory = $this->_get_attr($node, 'memory', -1);
 
-			echo '<div class="card border-0 rounded-0 border-bottom ', $this->styler->getTestInfoClass($test_info), '">';
+			echo '<div class="accordion-item ', $this->styler->getTestInfoClass($test_info), '">';
 
 			$accordion_parent = "{$this->name}_details_accordion";
 			if ($this->subtask_num != null) {
@@ -534,16 +543,18 @@ class JudgmentDetailsPrinter {
 				$accordion_collapse .= "_in_subtask_{$this->subtask_num}";
 			}
 			if (!$this->styler->shouldFadeDetails($test_info)) {
-				echo '<div class="card-header uoj-submission-result-item bg-transparent rounded-0 border-0" data-bs-toggle="collapse" data-bs-parent="#', $accordion_parent, '" data-bs-target="#', $accordion_collapse, '">';
+				echo '<div class="accordion-header">';
+				echo '<button class="accordion-button py-2 px-3 collapsed uoj-submission-result-item" data-bs-toggle="collapse" data-bs-parent="#', $accordion_parent, '" data-bs-target="#', $accordion_collapse, '">';
 			} else {
-				echo '<div class="card-header uoj-submission-result-item bg-transparent rounded-0 border-0">';
+				echo '<div class="accordion-header">';
+				echo '<button type="button" class="accordion-button py-2 px-3 collapsed uoj-submission-result-item">';
 			}
-			echo '<div class="row">';
+			echo '<div class="row w-100">';
 			echo '<div class="col-sm-4">';
 			if ($test_num > 0) {
-				echo '<h4 class="fs-5">', 'Test #', $test_num, ': ', '</h4>';
+				echo '<h4 class="fs-5 mb-0">', 'Test #', $test_num, '</h4>';
 			} else {
-				echo '<h4 class="fs-5">', 'Extra Test:', '</h4>';
+				echo '<h4 class="fs-5 mb-0">', 'Extra Test', '</h4>';
 			}
 			echo '</div>';
 
@@ -575,15 +586,16 @@ class JudgmentDetailsPrinter {
 			}
 
 			echo '</div>';
+			echo '</button>';
 			echo '</div>';
 
 			if (!$this->styler->shouldFadeDetails($test_info)) {
-				$accordion_collapse_class = 'card-collapse collapse';
+				$accordion_collapse_class = 'accordion-collapse collapse';
 				if ($this->styler->collapse_in) {
 					$accordion_collapse_class .= ' in';
 				}
-				echo '<div id="', $accordion_collapse, '" class="uoj-testcase ', $accordion_collapse_class, '" data-test=' . $test_num . '>';
-				echo '<div class="card-body">';
+				echo '<div id="', $accordion_collapse, '" class="uoj-testcase ', $accordion_collapse_class, '" data-test="', $test_num, '" data-bs-parent="#', $accordion_parent, '">';
+				echo '<div class="accordion-body">';
 
 				$this->_print_c($node);
 
@@ -597,18 +609,20 @@ class JudgmentDetailsPrinter {
 			$test_time = $this->_get_attr($node, 'time', -1);
 			$test_memory = $this->_get_attr($node, 'memory', -1);
 
-			echo '<div class="card ', $this->styler->getTestInfoClass($test_info), ' mb-3">';
+			echo '<div class="accordion-item ', $this->styler->getTestInfoClass($test_info), ' mb-3">';
 
 			$accordion_parent = "{$this->name}_details_accordion";
 			$accordion_collapse = "{$accordion_parent}_collapse_custom_test";
 			if (!$this->styler->shouldFadeDetails($test_info)) {
-				echo '<div class="card-header uoj-submission-result-item bg-transparent rounded-0 border-0" data-bs-toggle="collapse" data-bs-parent="#', $accordion_parent, '" data-bs-target="#', $accordion_collapse, '">';
+				echo '<div class="accordion-header">';
+				echo '<button type="button" class="accordion-button py-2 px-3 collapsed uoj-submission-result-item" data-bs-toggle="collapse" data-bs-parent="#', $accordion_parent, '" data-bs-target="#', $accordion_collapse, '">';
 			} else {
-				echo '<div class="card-header uoj-submission-result-item bg-transparent rounded-0 border-0">';
+				echo '<div class="accordion-header">';
+				echo '<button class="accordion-button py-2 px-3 collapsed uoj-submission-result-item">';
 			}
-			echo '<div class="row">';
+			echo '<div class="row w-100">';
 			echo '<div class="col-sm-4">';
-			echo '<h4 class="card-title">', 'Custom Test: ', '</h4>';
+			echo '<h4 class="card-title">', 'Custom Test', '</h4>';
 			echo '</div>';
 
 			echo '<div class="col-sm-4 uoj-status-text">';
@@ -629,15 +643,16 @@ class JudgmentDetailsPrinter {
 			}
 
 			echo '</div>';
+			echo '</button>';
 			echo '</div>';
 
 			if (!$this->styler->shouldFadeDetails($test_info)) {
-				$accordion_collapse_class = 'card-collapse collapse';
+				$accordion_collapse_class = 'accordion-collapse collapse';
 				if ($this->styler->collapse_in) {
 					$accordion_collapse_class .= ' in';
 				}
-				echo '<div id="', $accordion_collapse, '" class="', $accordion_collapse_class, '">';
-				echo '<div class="card-body">';
+				echo '<div id="', $accordion_collapse, '" class="', $accordion_collapse_class, '" data-bs-parent="#', $accordion_parent, '">';
+				echo '<div class="accordion-body">';
 
 				$this->_print_c($node);
 
@@ -647,22 +662,22 @@ class JudgmentDetailsPrinter {
 				echo '</div>';
 			}
 		} elseif ($node->nodeName == 'in') {
-			echo '<h4 class="fs-6"><span>input: </span></h4>';
+			echo '<h4 class="fs-6 fw-bold">输入文件</h4>';
 			echo '<pre class="bg-light p-3 rounded">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 		} elseif ($node->nodeName == 'out') {
-			echo '<h4 class="fs-6"><span>output: </span></h4>';
+			echo '<h4 class="fs-6 fw-bold">程序输出</h4>';
 			echo '<pre class="bg-light p-3 rounded">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 		} elseif ($node->nodeName == 'ans') {
-			echo '<h4 class="fs-6"><span>answer: </span></h4>';
+			echo '<h4 class="fs-6 fw-bold">答案文件</h4>';
 			echo '<pre class="bg-light p-3 rounded">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 		} elseif ($node->nodeName == 'res') {
-			echo '<h4 class="fs-6"><span>result: </span></h4>';
+			echo '<h4 class="fs-6 fw-bold"><span>检查器信息</span></h4>';
 			echo '<pre class="bg-light p-3 rounded">', "\n";
 			if ($node->hasChildNodes()) {
 				$this->_print_c($node);
@@ -725,17 +740,18 @@ function echoJudgementDetails($raw_details, $styler, $name) {
 class SubmissionDetailsStyler {
 	public $show_score = true;
 	public $show_small_tip = true;
+	public $accordion_flush = true;
 	public $collapse_in = false;
 	public $fade_all_details = false;
 	public function getTestInfoClass($info) {
 		if ($info == 'Accepted' || $info == 'Extra Test Passed') {
-			return 'card-uoj-accepted';
+			return 'uoj-status-accepted';
 		} elseif ($info == 'Time Limit Exceeded') {
-			return 'card-uoj-tle';
+			return 'uoj-status-tle';
 		} elseif ($info == 'Acceptable Answer') {
-			return 'card-uoj-acceptable-answer';
+			return 'uoj-status-acceptable-answer';
 		} else {
-			return 'card-uoj-wrong';
+			return 'uoj-status-wrong';
 		}
 	}
 	public function getTestInfoIcon($test_info) {
@@ -758,18 +774,18 @@ class SubmissionDetailsStyler {
 class CustomTestSubmissionDetailsStyler {
 	public $show_score = true;
 	public $show_small_tip = false;
+	public $accordion_flush = false;
 	public $collapse_in = true;
 	public $fade_all_details = false;
-	public $ioi_contest_is_running = false;
 	public function getTestInfoClass($info) {
 		if ($info == 'Success') {
-			return 'card-uoj-accepted';
+			return 'uoj-status-accepted';
 		} elseif ($info == 'Time Limit Exceeded') {
-			return 'card-uoj-tle';
+			return 'uoj-status-tle';
 		} elseif ($info == 'Acceptable Answer') {
-			return 'card-uoj-acceptable-answer';
+			return 'uoj-status-acceptable-answer';
 		} else {
-			return 'card-uoj-wrong';
+			return 'uoj-status-wrong';
 		}
 	}
 	public function getTestInfoIcon($test_info) {
@@ -793,16 +809,17 @@ class HackDetailsStyler {
 	public $show_score = false;
 	public $show_small_tip = false;
 	public $collapse_in = true;
+	public $accordion_flush = false;
 	public $fade_all_details = false;
 	public function getTestInfoClass($info) {
 		if ($info == 'Accepted' || $info == 'Extra Test Passed') {
-			return 'card-uoj-accepted';
+			return 'uoj-status-accepted';
 		} elseif ($info == 'Time Limit Exceeded') {
-			return 'card-uoj-tle';
+			return 'uoj-status-tle';
 		} elseif ($info == 'Acceptable Answer') {
-			return 'card-uoj-acceptable-answer';
+			return 'uoj-status-acceptable-answer';
 		} else {
-			return 'card-uoj-wrong';
+			return 'uoj-status-wrong';
 		}
 	}
 	public function getTestInfoIcon($test_info) {
