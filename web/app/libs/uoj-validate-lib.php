@@ -75,8 +75,8 @@ function validateURL($url) {
 	return filter_var($url, FILTER_VALIDATE_URL) !== false;
 }
 
-function validateString($str) {
-	return preg_match('/[^0-9a-zA-Z]/', $str) !== true;
+function validateString($x) {
+	return is_string($x) ? '' : '不合法的字符串';
 }
 
 function validateGitHubUsername($username) {
@@ -93,6 +93,20 @@ function validateUserAndStoreByUsername($username, &$vdata) {
 	}
 	$vdata['user'][$username] = $user;
 	return '';
+}
+
+function validateCommentId($id) {
+	if (!validateUInt($id)) {
+		return 'ID 不合法';
+	}
+
+	$comment = UOJBlogComment::query($id);
+
+	if (!$comment) {
+		return '评论不存在';
+	}
+
+	return ['error' => '', 'store' => $comment];
 }
 
 function is_short_string($str) {

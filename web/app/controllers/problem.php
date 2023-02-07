@@ -323,12 +323,12 @@ if (UOJContest::cur()) {
 					</div>
 					<div class="tab-pane" id="submit">
 						<?php if ($pre_submit_check_ret !== true) : ?>
-							<p class="text-warning h4"><?= $pre_submit_check_ret ?></p>
+							<p class="text-warning-emphasis h4"><?= $pre_submit_check_ret ?></p>
 						<?php elseif ($no_more_submission) : ?>
-							<p class="text-warning h4"><?= $no_more_submission ?></p>
+							<p class="text-warning-emphasis h4"><?= $no_more_submission ?></p>
 						<?php else : ?>
 							<?php if ($submission_warning) : ?>
-								<p class="text-warning h4"><?= $submission_warning ?></p>
+								<p class="text-warning-emphasis h4"><?= $submission_warning ?></p>
 							<?php endif ?>
 							<?php if (isset($zip_answer_form)) : ?>
 								<?php $zip_answer_form->printHTML(); ?>

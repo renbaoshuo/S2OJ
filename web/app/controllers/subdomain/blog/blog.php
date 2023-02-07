@@ -13,6 +13,8 @@ $blog = UOJBlog::info();
 function getCommentContentToDisplay($comment) {
 	if (!$comment['is_hidden']) {
 		return $comment['content'];
+	} else if (UOJUserBlog::userHasManagePermission(Auth::user())) {
+		return '<span class="text-muted mb-3">【' . HTML::escape($comment['reason_to_hide']) . '】</span>' . $comment['content'];
 	} else {
 		return '<span class="text-muted">【' . HTML::escape($comment['reason_to_hide']) . '】</span>';
 	}
@@ -162,6 +164,34 @@ $reply_form->handle = function (&$vdata) {
 $reply_form->config['ctrl_enter_submit'] = true;
 $reply_form->runAtServer();
 
+if (UOJUserBlog::userHasManagePermission(Auth::user())) {
+	$hide_form = new UOJForm('hide');
+	$hide_form->addHidden('comment_hide_id', '', 'validateCommentId', null);
+	$hide_form->addSelect('comment_hide_type', [
+		'label' => '隐藏理由',
+		'options' => UOJBlogComment::HIDE_REASONS,
+		'default_value' => 'spam',
+	]);
+	$hide_form->addInput('comment_hide_reason', [
+		'div_class' => 'mt-3',
+		'label' => '自定义隐藏理由',
+		'default_value' => '该评论由于违反社区规定，已被管理员隐藏',
+		'validator_php' => 'validateString',
+	]);
+	$hide_form->handle = function (&$vdata) {
+		if ($_POST['comment_hide_type'] == 'unhide') {
+			$reason = '';
+		} else if ($_POST['comment_hide_type'] == 'other') {
+			$reason = $_POST['comment_hide_reason'];
+		} else {
+			$reason = '该评论由于' . UOJBlogComment::HIDE_REASONS[$_POST['comment_hide_type']] . '，已被管理员隐藏';
+		}
+
+		$vdata['comment_hide_id']->hide($reason);
+	};
+	$hide_form->runAtServer();
+}
+
 $comments_pag = new Paginator([
 	'col_names' => ['*'],
 	'table_name' => 'blogs_comments',
@@ -170,8 +200,37 @@ $comments_pag = new Paginator([
 	'page_len' => 20
 ]);
 ?>
+
 <?php echoUOJPageHeader(HTML::stripTags($blog['title']) . ' - 博客') ?>
+
+<script>
+	var user_can_hide_comment = <?= json_encode(isset($hide_form)) ?>;
+</script>
+
 <?php UOJBlog::cur()->echoView(['show_title_only' => isset($_GET['page']) && $_GET['page'] != 1]) ?>
+
+<?php if (isset($hide_form)) : ?>
+	<div class="modal fade" id="HideCommentModal" tabindex="-1" aria-labelledby="HideCommentModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="HideCommentModalLabel">隐藏评论</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3">
+						<div class="mb-2">原评论（ID: <span id="span-comment_hide_id"></span>）：</div>
+						<blockquote id="HideCommentModalOriginalComment" class="border-start border-3 ps-3 text-muted"></blockquote>
+					</div>
+
+					<hr>
+
+					<?php $hide_form->printHTML(); ?>
+				</div>
+			</div>
+		</div>
+	</div>
+<?php endif ?>
 
 <h2>
 	评论
@@ -216,13 +275,20 @@ $comments_pag = new Paginator([
 								<?= ClickZans::getBlock('BC', $comment['id'], $comment['zan']) ?>
 							</div>
 						</div>
-						<div class="comment-content my-2"><?= $comment['content'] ?></div>
+						<div class="comment-content my-2" id="comment-content-<?= $comment['id'] ?>"><?= getCommentContentToDisplay($comment) ?></div>
 						<ul class="list-inline mb-0 text-end">
 							<li class="list-inline-item small text-muted">
 								<?= $comment['post_time'] ?>
 							</li>
+							<?php if (isset($hide_form)) : ?>
+								<li class="list-inline-item">
+									<a href="#" class="text-warning-emphasis text-decoration-none p-0 uoj-blog-hide-comment-btn" data-comment-id="<?= $comment['id'] ?>">
+										隐藏
+									</a>
+								</li>
+							<?php endif ?>
 							<li class="list-inline-item">
-								<a class="text-decoration-none" id="reply-to-<?= $comment['id'] ?>" href="#">
+								<a id="reply-to-<?= $comment['id'] ?>" href="#">
 									回复
 								</a>
 							</li>
@@ -248,5 +314,15 @@ $comments_pag = new Paginator([
 <div id="div-form-reply" style="display:none">
 	<?php $reply_form->printHTML() ?>
 </div>
+
+<script>
+	$('.uoj-blog-hide-comment-btn').each(function() {
+		$(this).click(function() {
+			var comment_id = $(this).data('comment-id');
+
+			toggleModalHideComment(comment_id, $('#comment-content-' + comment_id).html());
+		});
+	})
+</script>
 
 <?php echoUOJPageFooter() ?>

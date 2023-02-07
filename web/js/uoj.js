@@ -1577,6 +1577,14 @@ function custom_test_onsubmit(response_text, div_result, url) {
 	setTimeout(update, 500);
 }
 
+// hide comment
+function toggleModalHideComment(id, content) {
+	$('#input-comment_hide_id').val(id);
+	$('#span-comment_hide_id').text(id);
+	$('#HideCommentModalOriginalComment').html(content);
+	$('#HideCommentModal').modal('show');
+}
+
 // comment
 function showCommentReplies(id, replies) {
 	var toggleFormReply = function(from, text) {
@@ -1596,7 +1604,6 @@ function showCommentReplies(id, replies) {
 					$(r).val(text).focus();
 				});
 			});
-
 		} else if ($(q).css('display') != 'none') {
 			$(q).appendTo(p).hide('fast');
 		} else {
@@ -1629,6 +1636,14 @@ function showCommentReplies(id, replies) {
 				).append(
 					$('<ul class="text-end mb-0 list-inline" />').append(
 						'<li class="list-inline-item small text-muted">' + reply.post_time + '</li>'
+					).append(
+						user_can_hide_comment
+							? $('<li class="list-inline-item" />').append(
+								$('<a href="#" class="text-warning-emphasis text-decoration-none p-0" />').data('comment-id', reply.id).text('隐藏').click(function() {
+									toggleModalHideComment(reply.id, reply.content);
+								})
+							)
+							: ''
 					).append(
 						$('<li class="list-inline-item" />').append(
 							$('<a href="#">回复</a>').click(function (e) {

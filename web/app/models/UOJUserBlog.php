@@ -33,6 +33,14 @@ class UOJUserBlog {
 		return self::$user['username'] === $user['username'];
 	}
 
+	public static function userHasManagePermission(?array $user) {
+		if ($user === null) {
+			return false;
+		}
+
+		return isSuperUser($user) || UOJUser::checkPermission($user, 'blogs.manage');
+	}
+
 	public static function userCanManage(?array $user, ?string $whose_blog = null) {
 		if ($whose_blog === null) {
 			$whose_blog = self::id();
