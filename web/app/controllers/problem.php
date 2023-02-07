@@ -131,6 +131,8 @@ function handleUpload($zip_file_name, $content, $tot_size) {
 			$zip_file->open(UOJContext::storagePath() . $zip_file_name, ZipArchive::OVERWRITE);
 			$zip_file->addFromString('answer.code', '');
 			$zip_file->close();
+
+			$tot_size = 0;
 		}
 	}
 
