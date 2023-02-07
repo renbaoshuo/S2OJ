@@ -1897,7 +1897,7 @@ function showStandings() {
 				}
 				col_tr += '<td>' + row[3] + '</td>';
 				col_tr += '<td>' + getUserLink(row[2][0], row[2][1], row[2][3]) + '</td>';
-				col_tr += '<td>' + '<div><span class="uoj-score" data-max="' + problems.length * 100 + '" style="color:' + getColOfScore(row[0] / problems.length) + '">' + row[0] + '</span></div>' + '<div>' + getPenaltyTimeStr(row[1]) + '</div></td>';
+				col_tr += '<td>' + '<div><span class="uoj-score" data-max="' + problems.length * 100 + '" style="color:' + getColOfScore(row[0] / problems.length) + '">' + row[0] + '</span></div>' + '<div class="small">' + getPenaltyTimeStr(row[1]) + '</div></td>';
 				for (var i = 0; i < problems.length; i++) {
 					col_tr += '<td>';
 					col = score[row[2][0]][i];
