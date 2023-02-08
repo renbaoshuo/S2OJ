@@ -287,7 +287,11 @@ class UOJUser {
 		}
 
 		for ($i = 0; $i < count($new_h); $i++) {
-			if ($new_h[$i]['addr'] == $cur['addr'] && $new_h[$i]['ua'] == $cur['ua']) {
+			if (
+				$new_h[$i]['addr'] == $cur['addr'] &&
+				$new_h[$i]['forwarded_addr'] == $cur['forwarded_addr'] &&
+				$new_h[$i]['ua'] == $cur['ua']
+			) {
 				$new_h[$i]['last'] = $cur['last'];
 				return $new_h;
 			}
