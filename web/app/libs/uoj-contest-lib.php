@@ -226,6 +226,20 @@ function queryACMContestSubmissionData($contest, $problems, $prob_pos, $config =
 					])
 				], "order by id"
 			], DB::NUM);
+		} elseif ($config['after_contest']) {
+			$res = DB::selectAll([
+				"select id, submit_time, submitter, problem_id, score, null, null from submissions",
+				"where", [
+					["problem_id", "in", DB::rawtuple($problems)],
+					["submitter", "in", DB::rawbracket([
+						"select username from contests_registrants",
+						"where", [
+							"contest_id" => $contest['id'],
+							"has_participated" => 1,
+						],
+					])],
+				], "order by score",
+			], DB::NUM);
 		} else {
 			$esc_start_time_str = DB::escape($contest['start_time_str']);
 			$res = DB::selectAll([
