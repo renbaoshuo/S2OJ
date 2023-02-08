@@ -12,7 +12,8 @@ function blog_editor_init(name, editor_config) {
 	var input_content_md = $("#input-" + name + "_content_md");
 	var input_is_hidden = $("#input-" + name + "_is_hidden");
 	var this_form = input_is_hidden[0].form;
-	
+	var div_container_editor = $("#div_container-" + name + "_content_md");
+
 	var is_saved;
 	var last_save_done = true;
 	
@@ -77,35 +78,109 @@ function blog_editor_init(name, editor_config) {
 	
 	set_saved(true);
 	
-	// init codemirror
+	// init editor
 	if (input_content_md[0]) {
-		input_content_md.wrap('<div class="blog-content-md-editor"></div>');
-		var blog_contend_md_editor = input_content_md.parent();
-		input_content_md.before($('<div class="blog-content-md-editor-toolbar"></div>')
-			.append(toolbar)
-		);
-		input_content_md.wrap('<div class="blog-content-md-editor-in"></div>');
+		div_container_editor.empty();
+		div_container_editor.wrap('<div class="blog-content-md-editor"></div>');
+		var blog_contend_md_editor = div_container_editor.parent();
+		blog_contend_md_editor.prepend($('<div class="blog-content-md-editor-toolbar"></div>').append(toolbar));
+		div_container_editor.wrap('<div class="blog-content-md-editor-in border"></div>');
+		div_container_editor.append($('<div class="border d-flex justify-content-center align-items-center" style="width: 100%; height: 500px;" />').append('<div class="spinner-border text-muted" style="width: 3rem; height: 3rem;" />'));
 
-		var codeeditor;
-		if (editor_config.type == 'blog') {
-			codeeditor = CodeMirror.fromTextArea(input_content_md[0], {
-				mode: 'gfm',
-				lineNumbers: true,
-				matchBrackets: true,
-				lineWrapping: true,
-				styleActiveLine: true,
-				theme: 'default'
+		require_monaco({}, function() {
+			$(div_container_editor).empty();
+
+			var monaco_editor_instance = monaco.editor.create(div_container_editor[0], {
+				language: editor_config.type == 'slide' ? 'yaml' : 'markdown',
+				automaticLayout: true,
+				fontSize: "16px",
+				minimap: {
+					enabled: false,
+				},
+				wordWrap: 'on',
+				theme: 'vs',
 			});
-		} else if (editor_config.type == 'slide') {
-			codeeditor = CodeMirror.fromTextArea(input_content_md[0], {
-				mode: 'plain',
-				lineNumbers: true,
-				matchBrackets: true,
-				lineWrapping: true,
-				styleActiveLine: true,
-				theme: 'default'
+
+			monaco_editor_instance.getModel().setValue(input_content_md.val());
+
+			monaco_editor_instance.onDidChangeModelContent(function () {
+				set_saved(false);
+				input_content_md.val(monaco_editor_instance.getModel().getValue());
 			});
-		}
+
+			function add_around(sl, sr) {
+				var selection = monaco_editor_instance.getSelection();
+				var selection_value = monaco_editor_instance.getModel().getValueInRange(selection);
+
+				monaco_editor_instance.executeEdits(sl + selection_value + sr, [{
+					range: selection,
+					text: sl + selection_value + sr,
+					forceMoveMarkers: true,
+				}]);
+			}
+
+			bold_btn.click(function() {
+				add_around("**", "**");
+				monaco_editor_instance.focus();
+			});
+
+			italic_btn.click(function() {
+				add_around("_", "_");
+				monaco_editor_instance.focus();
+			});
+
+			monaco_editor_instance.addAction({
+				id: 'save',
+				label: 'Save',
+				keybindings: [
+					monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
+				],
+				precondition: null,
+				keybindingContext: null,
+				run: function(ed) {
+					save_btn.click();
+				},
+			});
+
+			monaco_editor_instance.addAction({
+				id: 'bold',
+				label: 'Bold',
+				keybindings: [
+					monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyB,
+				],
+				precondition: null,
+				keybindingContext: null,
+				run: function(ed) {
+					bold_btn.click();
+				},
+			});
+
+			monaco_editor_instance.addAction({
+				id: 'preview',
+				label: 'Preview',
+				keybindings: [
+					monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyD,
+				],
+				precondition: null,
+				keybindingContext: null,
+				run: function(ed) {
+					preview_btn.click();
+				},
+			});
+
+			monaco_editor_instance.addAction({
+				id: 'italic',
+				label: 'Italic',
+				keybindings: [
+					monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyI,
+				],
+				precondition: null,
+				keybindingContext: null,
+				run: function(ed) {
+					italic_btn.click();
+				},
+			});
+		});
 	}
 
 	function preview(html) {
@@ -219,17 +294,8 @@ function blog_editor_init(name, editor_config) {
 			config.done();
 		});
 	}
-	function add_around(sl, sr) {
-		codeeditor.replaceSelection(sl + codeeditor.getSelection() + sr);
-	}
 	
 	// event
-	if (input_content_md[0]) {
-		codeeditor.on('change', function() {
-			codeeditor.save();
-			set_saved(false);
-		});
-	}
 	$.merge(input_title, input_tags).on('input', function() {
 		set_saved(false);
 	});
@@ -251,18 +317,9 @@ function blog_editor_init(name, editor_config) {
 			blog_contend_md_editor.find('.blog-content-md-editor-preview').slideUp('fast', function() {
 				$(this).remove();
 			});
-			codeeditor.focus();
 		} else {
 			save({need_preview: true});
 		}
-	});
-	bold_btn.click(function() {
-		add_around("**", "**");
-		codeeditor.focus();
-	});
-	italic_btn.click(function() {
-		add_around("*", "*");
-		codeeditor.focus();
 	});
 	input_is_hidden.on('switchChange.bootstrapSwitch', function(e, state) {
 		var ok = true;
@@ -289,22 +346,6 @@ function blog_editor_init(name, editor_config) {
 	});
 	
 	// init hot keys
-	if (input_content_md[0]) {
-		codeeditor.setOption("extraKeys", {
-			"Ctrl-S": function(cm) {
-				save_btn.click();
-			},
-			"Ctrl-B": function(cm) {
-				bold_btn.click();
-			},
-			"Ctrl-D": function(cm) {
-				preview_btn.click();
-			},
-			"Ctrl-I": function(cm) {
-				italic_btn.click();
-			}
-		});
-	}
 	$(document).bind('keydown', 'ctrl+d', function() {
 		preview_btn.click();
 		return false;

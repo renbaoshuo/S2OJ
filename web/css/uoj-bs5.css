@@ -455,12 +455,6 @@ form.form-horizontal {
 	}
 }
 
-/* Fix CodeMirror */
-
-.CodeMirror-linenumber {
-	font-size: 14px !important;
-}
-
 /* Back button */
 
 .uoj-back-btn {

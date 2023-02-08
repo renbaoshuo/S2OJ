@@ -171,8 +171,6 @@ class UOJBlogEditor {
 	}
 
 	public function handleSave() {
-		global $REQUIRE_LIB;
-
 		$save = $this->save;
 		$this->receivePostData();
 		$ret = $save($this->post_data);
@@ -185,15 +183,19 @@ class UOJBlogEditor {
 			if ($this->type == 'blog') {
 				$req_lib = [
 					'mathjax' => '',
+					'hljs' => '',
 				];
 
-				$req_lib['hljs'] = '';
+				echoUOJPageHeader('博客预览', [
+					'ShowPageHeader' => false,
+					'REQUIRE_LIB' => $req_lib,
+				]);
 
-				echoUOJPageHeader('博客预览', array('ShowPageHeader' => false, 'REQUIRE_LIB' => $req_lib));
 				echo '<article class="markdown-body">';
 				echo $this->post_data['content'];
 				echo '</article>';
-				echoUOJPageFooter(array('ShowPageFooter' => false));
+
+				echoUOJPageFooter(['ShowPageFooter' => false]);
 			} elseif ($this->type == 'slide') {
 				uojIncludeView('slide', array_merge(
 					UOJContext::pageConfig(),

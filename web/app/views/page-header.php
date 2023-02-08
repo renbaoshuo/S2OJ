@@ -72,31 +72,8 @@ if (!isset($ShowPageHeader)) {
 		<!-- UOJ blog editor -->
 		<?php $REQUIRE_LIB['jquery.hotkeys'] = '' ?>
 		<?php $REQUIRE_LIB['switch'] = '' ?>
-		<?= HTML::css_link('/js/codemirror/lib/codemirror.css') ?>
 		<?= HTML::css_link('/css/blog-editor.css') ?>
-		<?= HTML::js_src('/js/marked.js?v=2016.10.19') ?>
 		<?= HTML::js_src('/js/blog-editor/blog-editor.js?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
-		<?= HTML::js_src('/js/codemirror/lib/codemirror.js') ?>
-		<?= HTML::js_src('/js/codemirror/addon/mode/overlay.js') ?>
-		<?= HTML::js_src('/js/codemirror/addon/selection/active-line.js') ?>
-		<?= HTML::js_src('/js/codemirror/mode/xml/xml.js') ?>
-		<?= HTML::js_src('/js/codemirror/mode/gfm/gfm.js') ?>
-		<?= HTML::js_src('/js/codemirror/mode/markdown/markdown.js') ?>
-		<?= HTML::js_src('/js/codemirror/mode/javascript/javascript.js') ?>
-		<?= HTML::js_src('/js/codemirror/mode/css/css.js') ?>
-		<?= HTML::js_src('/js/codemirror/mode/htmlmixed/htmlmixed.js') ?>
-		<?= HTML::js_src('/js/codemirror/mode/clike/clike.js') ?>
-		<?= HTML::js_src('/js/codemirror/mode/pascal/pascal.js') ?>
-	<?php endif ?>
-
-	<?php if (isset($REQUIRE_LIB['slide-editor'])) : ?>
-		<!-- UOJ slide editor -->
-		<?= HTML::css_link('/js/codemirror/lib/codemirror.css') ?>
-		<?= HTML::css_link('/css/slide-editor.css') ?>
-		<?= HTML::js_src('/js/slide-editor/slide-editor.js') ?>
-		<?= HTML::js_src('/js/codemirror/lib/codemirror.js') ?>
-		<?= HTML::js_src('/js/codemirror/addon/mode/overlay.js') ?>
-		<?= HTML::js_src('/js/codemirror/addon/selection/active-line.js') ?>
 	<?php endif ?>
 
 	<?php if (isset($REQUIRE_LIB['md5'])) : ?>
