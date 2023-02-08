@@ -1710,19 +1710,19 @@ function getACMStandingsMeta() {
 
 function setACMStandingsTH(th, i, meta) {
 	if (i == -3) {
-		return $(th).css('width', '34px').text('#');
+		return $(th).css('width', '3em').text('#');
 	} else if (i == -2) {
 		if (problems.length <= 10) {
-			$(th).css('width', '114px');
+			$(th).css('width', '14em');
 		}
 		return $(th).text(uojLocale('username'));
 	} else if (i == -1) {
-		return $(th).css('width', '57px').text(uojLocale('contests::total score'));
+		return $(th).css('width', '5em').text(uojLocale('contests::total score'));
 	}
 
 	var pid = problems[i];
 	
-	$(th).css('width', '57px');
+	$(th).css('width', '5em');
 	if (("problem_" + pid) in bonus) {
 		$(th).attr('title', '附加题，通过后减免 20 分钟罚时');
 	}
