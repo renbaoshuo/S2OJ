@@ -453,7 +453,13 @@ function echoMySubmissions() {
 
 function echoStandings($is_after_contest_query = false) {
 	global $contest;
-	uojIncludeView('contest-standings', ['contest' => $contest] + UOJContest::cur()->queryResult(['after_contest' => $is_after_contest_query]));
+
+	uojIncludeView('contest-standings', [
+		'contest' => $contest,
+		'after_contest' => $is_after_contest_query,
+	] + UOJContest::cur()->queryResult([
+		'after_contest' => $is_after_contest_query,
+	]));
 }
 
 function echoSelfReviews() {

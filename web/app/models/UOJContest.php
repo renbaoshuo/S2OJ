@@ -339,10 +339,11 @@ class UOJContest {
 	public function queryResult($cfg = []) {
 		$contest_data = queryContestData($this->info, $cfg);
 		calcStandings($this->info, $contest_data, $score, $standings, $cfg);
+
 		return [
 			'standings' => $standings,
 			'score' => $score,
-			'contest_data' => $contest_data
+			'contest_data' => $contest_data,
 		];
 	}
 

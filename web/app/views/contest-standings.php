@@ -16,6 +16,7 @@
 	var problems = <?= json_encode($contest_data['problems']) ?>;
 	var standings_config = <?= json_encode(isset($standings_config) ? $standings_config : ['_config' => true]) ?>;
 	var myname = <?= json_encode(Auth::id()) ?>;
+	var after_contest = <?= json_encode(isset($after_contest) && $after_contest) ?>;
 	var first_accepted = {};
 
 	$(document).ready(showStandings());

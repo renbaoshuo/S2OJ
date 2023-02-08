@@ -78,7 +78,7 @@ function queryContestData($contest, $config = []) {
 		$prob_pos[$problems[] = (int)$row[0]] = $n_problems++;
 	}
 
-	if ($contest['extra_config']['basic_rule'] == 'OI' || $contest['extra_config']['basic_rule'] == 'IOI') {
+	if ($contest['extra_config']['basic_rule'] == 'OI' || $contest['extra_config']['basic_rule'] == 'IOI' || $config['after_contest']) {
 		$data = queryOIorIOIContestSubmissionData($contest, $problems, $prob_pos, $config);
 	} elseif ($contest['extra_config']['basic_rule'] == 'ACM') {
 		$data = queryACMContestSubmissionData($contest, $problems, $prob_pos, $config);
@@ -290,6 +290,16 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $cfg = [])
 			}
 			$score[$sub[2]][$sub[3]] = array($sub[4], $penalty, $sub[0]);
 		}
+	} else if ($contest['extra_config']['basic_rule'] === 'IOI' || $cfg['after_contest']) {
+		foreach ($contest_data['data'] as $sub) {
+			$penalty = (new DateTime($sub[1]))->getTimestamp() - $contest['start_time']->getTimestamp();
+			if ($sub[4] == 0) {
+				$penalty = 0;
+			}
+			if (!isset($score[$sub[2]][$sub[3]]) || $score[$sub[2]][$sub[3]][0] < $sub[4]) {
+				$score[$sub[2]][$sub[3]] = array($sub[4], $penalty, $sub[0]);
+			}
+		}
 	} else if ($contest['extra_config']['basic_rule'] === 'ACM') {
 		// sub: id, submit_time, submitter, problem_pos, score
 		//	  id, submit_time (plus penalty), submitter, problem_pos, score, cnt, n_failures
@@ -386,16 +396,6 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $cfg = [])
 						$n_frozen
 					];
 				}
-			}
-		}
-	} else if ($contest['extra_config']['basic_rule'] === 'IOI') {
-		foreach ($contest_data['data'] as $sub) {
-			$penalty = (new DateTime($sub[1]))->getTimestamp() - $contest['start_time']->getTimestamp();
-			if ($sub[4] == 0) {
-				$penalty = 0;
-			}
-			if (!isset($score[$sub[2]][$sub[3]]) || $score[$sub[2]][$sub[3]][0] < $sub[4]) {
-				$score[$sub[2]][$sub[3]] = array($sub[4], $penalty, $sub[0]);
 			}
 		}
 	}
