@@ -387,6 +387,10 @@ function calcStandings($contest, $contest_data, &$score, &$standings, $cfg = [])
 						}
 					}
 
+					if ($final_scr == 0) {
+						$penalty = 0;
+					}
+
 					$score[$uname][$pr] = [
 						$final_scr,
 						$penalty,
