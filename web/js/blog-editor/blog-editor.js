@@ -99,6 +99,9 @@ function blog_editor_init(name, editor_config) {
 				},
 				wordWrap: 'on',
 				theme: 'vs',
+				unicodeHighlight: {
+					ambiguousCharacters: false,
+				},
 			});
 
 			monaco_editor_instance.getModel().setValue(input_content_md.val());
