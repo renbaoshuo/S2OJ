@@ -53,7 +53,7 @@ class UOJRemoteProblem {
 		],
 	];
 
-	static function curl_get($url) {
+	private static function curl_get($url) {
 		$curl = new Curl\Curl();
 		$curl->setUserAgent(static::USER_AGENT);
 
@@ -73,7 +73,7 @@ class UOJRemoteProblem {
 		return $res;
 	}
 
-	static function getCodeforcesProblemUrl($id) {
+	private static function getCodeforcesProblemUrl($id) {
 		if (str_starts_with($id, 'GYM')) {
 			return static::$providers['codeforces']['url'] . '/gym/' . preg_replace_callback('/GYM([1-9][0-9]{0,5})([A-Z][1-9]?)/', fn ($matches) => $matches[1] . '/problem/' . $matches[2], $id);
 		}
@@ -81,7 +81,7 @@ class UOJRemoteProblem {
 		return static::$providers['codeforces']['url'] . '/problemset/problem/' . preg_replace_callback('/([1-9][0-9]{0,5})([A-Z][1-9]?)/', fn ($matches) => $matches[1] . '/' . $matches[2], $id);
 	}
 
-	static function getAtcoderProblemUrl($id) {
+	private static function getAtcoderProblemUrl($id) {
 		return static::$providers['atcoder']['url'] . '/contests/' . preg_replace_callback('/(\w+)([a-z][1-9]?)/', function ($matches) {
 			$contest = str_replace('_', '', $matches[1]);
 
@@ -93,19 +93,19 @@ class UOJRemoteProblem {
 		}, $id);
 	}
 
-	static function getUojProblemUrl($id) {
+	private static function getUojProblemUrl($id) {
 		return static::$providers['uoj']['url'] . '/problem/' . $id;
 	}
 
-	static function getLojProblemUrl($id) {
+	private static function getLojProblemUrl($id) {
 		return static::$providers['loj']['url'] . '/p/' . $id;
 	}
 
-	static function getLuoguProblemUrl($id) {
+	private static function getLuoguProblemUrl($id) {
 		return static::$providers['luogu']['url'] . '/problem/' . $id;
 	}
 
-	static function getCodeforcesProblemBasicInfoFromHtml($id, $html) {
+	private static function getCodeforcesProblemBasicInfoFromHtml($id, $html) {
 		$remote_provider = static::$providers['codeforces'];
 
 		$html = preg_replace('/\$\$\$/', '$', $html);
@@ -170,10 +170,12 @@ class UOJRemoteProblem {
 					$input_text .= HTML::stripTags($line->innerHTML) . "\n";
 				}
 			} else {
-				$input_text = HTML::stripTags($input_dom->querySelector('pre')->innerHTML);
+				$input_text = $input_dom->querySelector('pre')->innerHTML;
+				$input_text = preg_replace('/<br>/', "\n", $input_text);
+				$input_text = HTML::stripTags($input_text);
 			}
 
-			$input_dom->outerHTML = HTML::tag('h4', [], "Input #{$sample_input_cnt}") . HTML::tag('pre', [], HTML::tag('code', [], $input_text));
+			$input_dom->outerHTML = HTML::tag('h4', [], "Input #{$sample_input_cnt}") . HTML::tag('pre', [], HTML::tag('code', [], trim($input_text)));
 		}
 
 		foreach ($statement_dom->querySelectorAll('.output') as &$output_dom) {
@@ -185,10 +187,12 @@ class UOJRemoteProblem {
 					$output_text .= HTML::stripTags($line->innerHTML) . "\n";
 				}
 			} else {
-				$output_text = HTML::stripTags($output_dom->querySelector('pre')->innerHTML);
+				$output_text = $output_dom->querySelector('pre')->innerHTML;
+				$output_text = preg_replace('/<br>/', "\n", $output_text);
+				$output_text = HTML::stripTags($output_text);
 			}
 
-			$output_dom->outerHTML = HTML::tag('h4', [], "Output #{$sample_output_cnt}") . HTML::tag('pre', [], HTML::tag('code', [], $output_text));
+			$output_dom->outerHTML = HTML::tag('h4', [], "Output #{$sample_output_cnt}") . HTML::tag('pre', [], HTML::tag('code', [], trim($output_text)));
 		}
 
 		return [
@@ -201,7 +205,7 @@ class UOJRemoteProblem {
 		];
 	}
 
-	static function getCodeforcesProblemBasicInfo($id) {
+	private static function getCodeforcesProblemBasicInfo($id) {
 		$res = static::curl_get(static::getCodeforcesProblemUrl($id));
 
 		if (!$res) return null;
@@ -234,7 +238,7 @@ class UOJRemoteProblem {
 		}
 	}
 
-	static function getAtcoderProblemBasicInfo($id) {
+	private static function getAtcoderProblemBasicInfo($id) {
 		$res = static::curl_get(static::getAtcoderProblemUrl($id));
 
 		if (!$res) return null;
@@ -308,7 +312,7 @@ class UOJRemoteProblem {
 		];
 	}
 
-	static function getUojProblemBasicInfo($id) {
+	private static function getUojProblemBasicInfo($id) {
 		$remote_provider = static::$providers['uoj'];
 		$res = static::curl_get(static::getUojProblemUrl($id));
 
@@ -343,7 +347,7 @@ class UOJRemoteProblem {
 		];
 	}
 
-	static function getLojProblemBasicInfo($id) {
+	private static function getLojProblemBasicInfo($id) {
 		$remote_provider = static::$providers['loj'];
 		$curl = new Curl\Curl();
 		$curl->setUserAgent(static::USER_AGENT);
@@ -409,7 +413,7 @@ class UOJRemoteProblem {
 		];
 	}
 
-	static function getLuoguProblemBasicInfo($id) {
+	private static function getLuoguProblemBasicInfo($id) {
 		$remote_provider = static::$providers['luogu'];
 		$res = static::curl_get(static::getLuoguProblemUrl($id) . '?_contentOnly=1');
 
