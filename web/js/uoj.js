@@ -604,7 +604,13 @@ function require_monaco(config, callback) {
 		.script('/js/monaco-editor/min/vs/editor/editor.main.nls.js').wait()
 		.script('/js/monaco-editor/min/vs/editor/editor.main.nls.zh-cn.js').wait()
 		.script('/js/monaco-editor/min/vs/editor/editor.main.js').wait(function() {
-			$LAB.script('/js/monaco-themes.js').wait(callback);
+			$LAB.script('/js/monaco-themes.js').wait(function() {
+				if (config.markdown) {
+					$LAB.script('/js/blog-editor/monaco-markdown.js').wait(callback);
+				} else {
+					callback();
+				}
+			});
 		});
 }
 
