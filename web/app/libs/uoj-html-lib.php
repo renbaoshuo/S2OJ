@@ -809,7 +809,7 @@ class HackDetailsStyler {
 	public $show_score = false;
 	public $show_small_tip = false;
 	public $collapse_in = true;
-	public $accordion_flush = false;
+	public $accordion_flush = true;
 	public $fade_all_details = false;
 	public function getTestInfoClass($info) {
 		if ($info == 'Accepted' || $info == 'Extra Test Passed') {

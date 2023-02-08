@@ -190,7 +190,7 @@ h6,
 }
 
 .uoj-status-tle > .accordion-header > .accordion-button:hover,
-.uoj-status-tle > .accordion-header > .accordion-button::not(.collapsed),
+.uoj-status-tle > .accordion-header > .accordion-button:not(.collapsed),
 .uoj-status-tle
 	> .accordion-header
 	> .accordion-button
