@@ -114,12 +114,12 @@ function blog_editor_init(name, editor_config) {
 			});
 
 			bold_btn.click(function() {
-				monaco_editor_instance.trigger(monaco.KeyMod.CtrlCmd + monaco.KeyCode.KEY_B, '', {});
+				monaco_editor_instance.trigger('', 'markdown.extension.editing.toggleBold');
 				monaco_editor_instance.focus();
 			});
 
 			italic_btn.click(function() {
-				monaco_editor_instance.trigger(monaco.KeyMod.CtrlCmd + monaco.KeyCode.KEY_I, '', {});
+				monaco_editor_instance.trigger('', 'markdown.extension.editing.toggleItalic');
 				monaco_editor_instance.focus();
 			});
 
