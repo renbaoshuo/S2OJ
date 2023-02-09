@@ -1312,12 +1312,12 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 				});
 			}
 
-			div_submit_type_my.append(
+			div_account_data.append(
 				$('<div class="row mt-3 align-items-center" />')
 					.append($('<div class="col-sm-2" />').append('<label for="input-uoj_uojsessid" class="col-form-label">UOJSESSID</label>'))
 					.append($('<div class="col-sm-4" />').append(input_uoj_uojsessid))
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text mt-0" />').append('请填入 Cookie 中的 <code>UOJSESSID</code>。')))
-			).append(input_my_account_data);
+			);
 		}
 
 		$(this).append(
