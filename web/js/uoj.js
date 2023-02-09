@@ -1271,6 +1271,53 @@ $.fn.remote_submit_type_group = function(oj, pid, url, submit_type) {
 					.append($('<div class="col-sm-4" />').append(input_loj_token))
 					.append($('<div class="col-sm-6" />').append($('<div class="form-text mt-0" />').append('请前往 <a href="https://loj.ac" target="_blank">LibreOJ</a> 登录账号，然后输入在控制台中运行 <code>console.log(JSON.parse(localStorage.appState).token)</code> 的输出结果。')))
 			);
+		} else if (oj == 'uoj') {
+			var uoj_account_data = {"UOJSESSID": ""};
+			var input_uoj_uojsessid = $('<input class="form-control font-monospace" type="text" name="uoj_uojsessid" id="input-uoj_uojsessid" />');
+
+			if ('localStorage' in window) {
+				try {
+					var uoj_account_data_str = localStorage.getItem('uoj_remote_judge_uoj_account_data');
+					if (uoj_account_data_str) {
+						uoj_account_data = JSON.parse(uoj_account_data_str);
+					}
+				} catch (e) {}
+
+				var save_uoj_account_data = function() {
+					localStorage.setItem('uoj_remote_judge_uoj_account_data', JSON.stringify(uoj_account_data));
+				}
+			}
+
+			input_uoj_uojsessid.change(function() {
+				uoj_account_data.UOJSESSID = $(this).val();
+				input_my_account_data.val(JSON.stringify(uoj_account_data));
+				save_uoj_account_data();
+				my_account_validation_status.html('<span class="text-secondary">待验证</span>');
+			});
+
+			my_account_validation_btn.click(function() {
+				validate_my_account({
+					type: 'uoj',
+					UOJSESSID: input_uoj_uojsessid.val(),
+				});
+			});
+
+			input_my_account_data.val(JSON.stringify(uoj_account_data));
+			input_uoj_uojsessid.val(uoj_account_data.UOJSESSID);
+
+			if (uoj_account_data.UOJSESSID) {
+				validate_my_account({
+					type: 'uoj',
+					UOJSESSID: uoj_account_data.UOJSESSID,
+				});
+			}
+
+			div_submit_type_my.append(
+				$('<div class="row mt-3 align-items-center" />')
+					.append($('<div class="col-sm-2" />').append('<label for="input-uoj_uojsessid" class="col-form-label">UOJSESSID</label>'))
+					.append($('<div class="col-sm-4" />').append(input_uoj_uojsessid))
+					.append($('<div class="col-sm-6" />').append($('<div class="form-text mt-0" />').append('请填入 Cookie 中的 <code>UOJSESSID</code>。')))
+			).append(input_my_account_data);
 		}
 
 		$(this).append(

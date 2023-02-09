@@ -99,6 +99,29 @@ if ($type == 'luogu') {
 
 		return false;
 	}, 3);
+} else if ($type == 'uoj') {
+	$curl->setFollowLocation();
+	$curl->setCookie('UOJSESSID', UOJRequest::post('UOJSESSID', 'is_string', ''));
+
+	retry_loop(function () use (&$curl, &$res) {
+		$curl->get(UOJRemoteProblem::$providers['uoj']['url'] . '/login');
+
+		if ($curl->error) {
+			return false;
+		}
+
+		if (str_starts_with($curl->responseHeaders['Content-Type'], 'text/html')) {
+			if (str_contains($curl->response, '<title>登录')) {
+				return false;
+			}
+
+			$res = true;
+
+			return true;
+		}
+
+		return false;
+	}, 3);
 } else {
 	UOJResponse::page406();
 }
