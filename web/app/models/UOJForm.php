@@ -443,16 +443,16 @@ class UOJForm {
 		);
 
 		if ($config['preferred_lang'] == null || !isset($config['languages'][$config['preferred_lang']])) {
-			$preferred_lang = Cookie::get('uoj_preferred_language');
+			$config['preferred_lang'] = Cookie::get('uoj_preferred_language');
 		}
 
 		if ($config['preferred_lang'] == null || !isset($config['languages'][$config['preferred_lang']])) {
-			$preferred_lang = UOJLang::$default_preferred_language;
+			$config['preferred_lang'] = UOJLang::$default_preferred_language;
 		}
 
 		$langs_options_str = '';
 		foreach ($config['languages'] as $lang_code => $lang_display) {
-			$langs_options_str .= HTML::option($lang_code, $lang_display, $lang_code === $preferred_lang);
+			$langs_options_str .= HTML::option($lang_code, $lang_display, $lang_code == $config['preferred_lang']);
 		}
 
 		$text = json_encode(UOJLocale::get('problems::source code') . ': ' . HTML::tag('code', [], $config['filename']));
