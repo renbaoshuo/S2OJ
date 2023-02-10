@@ -442,11 +442,11 @@ class UOJForm {
 			'always_ok'
 		);
 
-		if ($config['preferred_lang'] == null || !isset($languages[$config['preferred_lang']])) {
+		if ($config['preferred_lang'] == null || !isset($config['languages'][$config['preferred_lang']])) {
 			$preferred_lang = Cookie::get('uoj_preferred_language');
 		}
 
-		if ($config['preferred_lang'] == null || !isset($languages[$config['preferred_lang']])) {
+		if ($config['preferred_lang'] == null || !isset($config['languages'][$config['preferred_lang']])) {
 			$preferred_lang = UOJLang::$default_preferred_language;
 		}
 
