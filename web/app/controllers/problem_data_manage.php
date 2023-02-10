@@ -65,26 +65,41 @@ function echoFilePre($file_name) {
 if ($_POST['problem_data_file_submit'] == 'submit') {
 	if ($_FILES["problem_data_file"]["error"] > 0) {
 		$errmsg = "Error: " . $_FILES["problem_data_file"]["error"];
-		becomeMsgPage('<div>' . $errmsg . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
+		UOJResponse::message('<div>' . HTML::escape($errmsg) . '</div><a href="">返回</a>');
 	} else {
-		$zip_mime_types = array('application/zip', 'application/x-zip', 'application/x-zip-compressed');
+		$zip_mime_types = ['application/zip', 'application/x-zip', 'application/x-zip-compressed'];
+
 		if (in_array($_FILES["problem_data_file"]["type"], $zip_mime_types) || $_FILES["problem_data_file"]["type"] == 'application/octet-stream' && substr($_FILES["problem_data_file"]["name"], -4) == '.zip') {
-			$up_filename = "/tmp/" . rand(0, 100000000) . "data.zip";
-			move_uploaded_file($_FILES["problem_data_file"]["tmp_name"], $up_filename);
 			$zip = new ZipArchive;
-			if ($zip->open($up_filename) === TRUE) {
-				$zip->extractTo("/var/uoj_data/upload/{$problem['id']}");
-				$zip->close();
-				exec("cd /var/uoj_data/upload/{$problem['id']}; if [ -z \"`find . -maxdepth 1 -type f`\" ]; then for sub_dir in `find -maxdepth 1 -type d ! -name .`; do mv -f \$sub_dir/* . && rm -rf \$sub_dir; done; fi");
-				echo "<script>alert('上传成功！')</script>";
-			} else {
-				$errmsg = "解压失败！";
-				becomeMsgPage('<div>' . $errmsg . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
+
+			try {
+				if ($zip->open($_FILES["problem_data_file"]["tmp_name"]) !== true) {
+					throw new UOJUploadFailedException('压缩文件打开失败');
+				}
+
+				if (!$zip->extractTo(UOJProblem::cur()->getUploadFolderPath())) {
+					throw new UOJUploadFailedException('压缩文件解压失败');
+				}
+
+				if (!$zip->close()) {
+					throw new UOJUploadFailedException('压缩文件关闭失败');
+				}
+			} catch (Exception $e) {
+				becomeMsgPage('<div>' . $e->getMessage() . '</div><a href="">返回</a>');
 			}
-			unlink($up_filename);
+
+			UOJLocalRun::execAnd([
+				['cd', UOJProblem::cur()->getUploadFolderPath()],
+				<<<'EOD'
+				if [ "$(find . -maxdepth 1 -type f)File" = "File" ];
+				then for sub_dir in "$(find -maxdepth 1 -type d ! -name .)";
+				do mv -f "$sub_dir"/* . && rm -rf "$sub_dir"; done; fi
+				EOD
+			]);
+
+			echo "<script>alert('上传成功！请点击「检验配置并同步数据」按钮同步数据。')</script>";
 		} else {
-			$errmsg = "请上传zip格式！";
-			becomeMsgPage('<div>' . $errmsg . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
+			becomeMsgPage('<div>请上传 zip 格式的文件！</div><a href="">返回</a>');
 		}
 	}
 }
