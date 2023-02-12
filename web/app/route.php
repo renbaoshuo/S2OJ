@@ -42,13 +42,13 @@ Route::group(
 		Route::any('/contest/{id}/registrants', '/contest_members.php');
 		Route::any('/contest/{id}/register', '/contest_registration.php');
 		Route::any('/contest/{id}/confirm', '/contest_confirmation.php');
+		Route::any('/contest/{id}/resources(?:/{sub_path})?', '/contest_resources.php');
 		Route::any('/contest/{id}/manage(?:/{tab})?', '/contest_manage.php');
 		Route::any('/contest/{id}/submissions', '/contest_inside.php?tab=submissions');
 		Route::any('/contest/{id}/standings', '/contest_inside.php?tab=standings');
 		Route::any('/contest/{id}/after_contest_standings', '/contest_inside.php?tab=after_contest_standings');
 		Route::any('/contest/{id}/self_reviews', '/contest_inside.php?tab=self_reviews');
 		Route::any('/contest/{id}/backstage', '/contest_inside.php?tab=backstage');
-		Route::any('/contest/{id}/standings_unfrozen', '/contest_inside.php?tab=standings_unfrozen');
 		Route::any('/contest/{contest_id}/problem/{id}', '/problem.php');
 		Route::any('/contest/{contest_id}/problem/{id}/statistics', '/problem_statistics.php');
 

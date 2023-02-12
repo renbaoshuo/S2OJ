@@ -1,11 +1,7 @@
 <?php
-requireLib('hljs');
-
 Auth::check() || redirectToLogin();
 UOJProblem::init(UOJRequest::get('id')) || UOJResponse::page404();
 
-$problem = UOJProblem::cur()->info;
-$problem_content = UOJProblem::cur()->queryContent();
 $user_can_view = UOJProblem::cur()->userCanView(Auth::user());
 
 if (!$user_can_view) {

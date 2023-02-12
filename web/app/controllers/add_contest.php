@@ -71,8 +71,9 @@ $time_form->handle = function (&$vdata) {
 
 	DB::insert([
 		"insert into contests",
-		"(name, start_time, last_min, status)", "values",
-		DB::tuple([$vdata['name'], $start_time_str, $vdata['last_min'], 'unfinished'])
+		DB::bracketed_fields(["name", "start_time", "last_min", "status", "extra_config"]),
+		"values",
+		DB::tuple([$vdata['name'], $start_time_str, $vdata['last_min'], 'unfinished', "{}"])
 	]);
 };
 $time_form->succ_href = "/contests";

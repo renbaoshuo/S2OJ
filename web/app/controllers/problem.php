@@ -358,7 +358,7 @@ if (UOJContest::cur()) {
 			<div class="card card-default mb-2">
 				<div class="card-body">
 					<h3 class="h4 card-title text-center">
-						<a class="text-decoration-none text-body" href="/contest/<?= UOJContest::info('id') ?>">
+						<a class="text-decoration-none text-body" href="<?= UOJContest::cur()->getUri() ?>">
 							<?= UOJContest::info('name') ?>
 						</a>
 					</h3>

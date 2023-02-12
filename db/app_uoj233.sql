@@ -181,7 +181,7 @@ CREATE TABLE `contests` (
   `last_min` int NOT NULL,
   `player_num` int NOT NULL DEFAULT '0',
   `status` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `extra_config` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '{}',
+  `extra_config` json NOT NULL,
   `zan` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `status` (`status`,`id`) USING BTREE
@@ -995,7 +995,8 @@ INSERT INTO `upgrades` (`name`, `status`, `updated_at`) VALUES
   ('21_problem_difficulty', 'up', now()),
   ('28_remote_judge', 'up', now()),
   ('31_problem_resources', 'up', now()),
-  ('36_decimal_score_range', 'up', now());
+  ('36_decimal_score_range', 'up', now()),
+  ('40_contest_resources', 'up', now());
 /*!40000 ALTER TABLE `upgrades` ENABLE KEYS */;
 UNLOCK TABLES;
 
