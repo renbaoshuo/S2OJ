@@ -67,33 +67,33 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 			$tabs_info = [
 				'dashboard' => [
 					'name' => UOJLocale::get('contests::contest dashboard'),
-					'url' => '/contest/' . UOJContest::info('id'),
+					'url' =>  UOJContest::cur()->getUri(),
 				],
 				'submissions' => [
 					'name' => UOJLocale::get('contests::contest submissions'),
-					'url' => '/contest/' . UOJContest::info('id') . '/submissions',
+					'url' => UOJContest::cur()->getUri('/submissions'),
 				],
 				'standings' => [
 					'name' => UOJLocale::get('contests::contest standings'),
-					'url' => '/contest/' . UOJContest::info('id') . '/standings',
+					'url' => UOJContest::cur()->getUri('/standings'),
 				],
 			];
 
 			if (UOJContest::cur()->progress() > CONTEST_TESTING) {
 				$tabs_info['after_contest_standings'] = [
 					'name' => UOJLocale::get('contests::after contest standings'),
-					'url' => '/contest/' . UOJContest::info('id') . '/after_contest_standings',
+					'url' => UOJContest::cur()->getUri('/after_contest_standings'),
 				];
 				$tabs_info['self_reviews'] = [
 					'name' => UOJLocale::get('contests::contest self reviews'),
-					'url' => '/contest/' . UOJContest::info('id') . '/self_reviews',
+					'url' => UOJContest::cur()->getUri('/self_reviews'),
 				];
 			}
 
 			if (UOJContest::cur()->userCanManage(Auth::user())) {
 				$tabs_info['backstage'] = [
 					'name' => UOJLocale::get('contests::contest backstage'),
-					'url' => '/contest/' . UOJContest::info('id') . '/backstage',
+					'url' => UOJContest::cur()->getUri('/backstage'),
 				];
 			}
 			?>
@@ -104,7 +104,6 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 
 		<div class="card card-default mb-2">
 			<div class="card-body">
-
 				<h1 class="text-center">
 					<?php if (UOJContest::cur()) : ?>
 						<?= UOJProblem::cur()->getTitle(['with' => 'letter', 'simplify' => true]) ?>
@@ -115,7 +114,9 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 
 				<hr />
 
-				<h2 class="text-center"><?= UOJLocale::get('problems::accepted submissions') ?></h2>
+				<h2 class="text-center">
+					<?= UOJLocale::get('problems::accepted submissions') ?>
+				</h2>
 				<div class="text-end mb-2">
 					<div class="btn-group btn-group-sm">
 						<a href="<?= UOJContext::requestURI() ?>" class="btn btn-secondary btn-xs <?= $submissions_sort_by_choice == 'time' ? 'active' : '' ?>" id="submissions-sort-by-run-time">
@@ -265,8 +266,15 @@ $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']
 						<?php endif ?>
 					</div>
 				</div>
-				<div class="card-footer bg-transparent">
-					比赛评价：<?= UOJContest::cur()->getZanBlock() ?>
+				<div class="list-group list-group-flush">
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						<span class="flex-shrink-0">
+							<?= UOJLocale::get('appraisal') ?>
+						</span>
+						<span>
+							<?= UOJContest::cur()->getZanBlock() ?>
+						</span>
+					</li>
 				</div>
 			</div>
 			<?php if (UOJContest::cur()->progress() <= CONTEST_IN_PROGRESS) : ?>

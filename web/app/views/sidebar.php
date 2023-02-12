@@ -8,8 +8,8 @@ $parsedown = HTML::parsedown(['username_with_color' => true]);
 		<?php $groups = UOJGroup::queryGroupsOfUser(Auth::user()); ?>
 		<?php if (!empty($groups)) : ?>
 			<div class="card card-default mb-2" id="group-user-announcements">
-				<div class="card-header fw-bold bg-transparent">
-					<?= UOJLocale::get('group announcements') ?>
+				<div class="card-header fw-bold">
+					<?= UOJLocale::get('groups') ?>
 				</div>
 				<ul class="list-group list-group-flush">
 					<?php foreach ($groups as $group) : ?>
@@ -36,12 +36,11 @@ $parsedown = HTML::parsedown(['username_with_color' => true]);
 					$assignments = array_merge($assignments, array_map(fn ($x) => UOJGroupAssignment::query($x, $group), $group->getActiveAssignmentIds()));
 				}
 
-				usort($assignments, fn ($a, $b) => $b->info['end_time']->getTimestamp() - $a->info['end_time']->getTimestamp());
-				$assignments = array_slice($assignments, 0, 5);
+				usort($assignments, fn ($a, $b) => $a->info['end_time']->getTimestamp() - $b->info['end_time']->getTimestamp());
 				?>
 				<?php if (!empty($assignments)) : ?>
 					<div class="card card-default mb-2" id="group-assignments">
-						<div class="card-header fw-bold bg-transparent">
+						<div class="card-header fw-bold">
 							<?= UOJLocale::get('assignments') ?>
 						</div>
 						<ul class="list-group list-group-flush">
@@ -65,8 +64,8 @@ $parsedown = HTML::parsedown(['username_with_color' => true]);
 	<?php if (!isset($upcoming_contests_hidden)) : ?>
 		<?php $upcoming_contests = UOJContest::queryUpcomingContests(Auth::user(), 5); ?>
 		<div class="card card-default mb-2" id="group-user-announcements">
-			<div class="card-header fw-bold bg-transparent">
-				近期比赛
+			<div class="card-header fw-bold">
+				<?= UOJLocale::get('contests::upcoming contests') ?>
 			</div>
 			<ul class="list-group list-group-flush">
 				<?php foreach ($upcoming_contests as $contest) : ?>

@@ -8,7 +8,7 @@ $time_form = new UOJForm('time');
 $time_form->addInput(
 	'name',
 	[
-		'label' => '比赛标题',
+		'label' => UOJLocale::get('contests::contest name'),
 		'default_value' => 'New Contest',
 		'validator_php' => function ($name, &$vdata) {
 			if ($name == '') {
@@ -35,8 +35,8 @@ $time_form->addInput(
 	'start_time',
 	[
 		'div_class' => 'mt-2',
-		'label' => '开始时间',
-		'default_value' => date("Y-m-d H:i:s"),
+		'label' => UOJLocale::get('contests::start time'),
+		'default_value' => UOJTime::$time_now_str,
 		'validator_php' => function ($str, &$vdata) {
 			try {
 				$vdata['start_time'] = new DateTime($str);
@@ -52,8 +52,9 @@ $time_form->addInput(
 	'last_min',
 	[
 		'div_class' => 'mt-2',
-		'label' => '时长（单位：分钟）',
+		'label' => UOJLocale::get('contests::duration'),
 		'default_value' => '180',
+		'help' => '单位为分钟。',
 		'validator_php' => function ($str, &$vdata) {
 			if (!validateUInt($str)) {
 				return '必须为一个整数';

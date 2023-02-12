@@ -115,7 +115,7 @@ class UOJGroup {
 			DB::lc(), "select list_id from groups_assignments",
 			"where", [
 				"group_id" => $this->info['id'],
-				["end_time", ">=", DB::raw("addtime(now(), '-72:00:00')")],
+				["end_time", ">=", DB::now()],
 			],
 			"order by end_time desc, list_id asc",
 			$limit == -1 ? "" : DB::limit($limit),

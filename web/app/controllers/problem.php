@@ -66,33 +66,33 @@ if (UOJContest::cur()) {
 	$tabs_info = [
 		'dashboard' => [
 			'name' => UOJLocale::get('contests::contest dashboard'),
-			'url' => '/contest/' . UOJContest::info('id'),
+			'url' =>  UOJContest::cur()->getUri(),
 		],
 		'submissions' => [
 			'name' => UOJLocale::get('contests::contest submissions'),
-			'url' => '/contest/' . UOJContest::info('id') . '/submissions',
+			'url' => UOJContest::cur()->getUri('/submissions'),
 		],
 		'standings' => [
 			'name' => UOJLocale::get('contests::contest standings'),
-			'url' => '/contest/' . UOJContest::info('id') . '/standings',
+			'url' => UOJContest::cur()->getUri('/standings'),
 		],
 	];
 
 	if (UOJContest::cur()->progress() > CONTEST_TESTING) {
 		$tabs_info['after_contest_standings'] = [
 			'name' => UOJLocale::get('contests::after contest standings'),
-			'url' => '/contest/' . UOJContest::info('id') . '/after_contest_standings',
+			'url' => UOJContest::cur()->getUri('/after_contest_standings'),
 		];
 		$tabs_info['self_reviews'] = [
 			'name' => UOJLocale::get('contests::contest self reviews'),
-			'url' => '/contest/' . UOJContest::info('id') . '/self_reviews',
+			'url' => UOJContest::cur()->getUri('/self_reviews'),
 		];
 	}
 
 	if (UOJContest::cur()->userCanManage(Auth::user())) {
 		$tabs_info['backstage'] = [
 			'name' => UOJLocale::get('contests::contest backstage'),
-			'url' => '/contest/' . UOJContest::info('id') . '/backstage',
+			'url' => UOJContest::cur()->getUri('/backstage'),
 		];
 	}
 }
@@ -200,7 +200,7 @@ if ($custom_test_enabled) {
 }
 
 if (empty($submission_requirement)) {
-	$no_more_submission = '当前题目未配置提交文件，请联系管理员！';
+	$no_more_submission = UOJLocale::get('problems::cannot submit');
 }
 
 if ($pre_submit_check_ret === true && !$no_more_submission) {
@@ -220,7 +220,7 @@ if ($pre_submit_check_ret === true && !$no_more_submission) {
 			'handleUpload'
 		);
 		$zip_answer_form->extra_validators[] = $submission_extra_validator;
-		$zip_answer_form->succ_href = $is_participating ? '/contest/' . UOJContest::info('id') . '/submissions' : '/submissions';
+		$zip_answer_form->succ_href = $is_participating ? UOJContest::cur()->getUri('/submissions') : '/submissions';
 		$zip_answer_form->runAtServer();
 	}
 
@@ -257,7 +257,7 @@ if ($pre_submit_check_ret === true && !$no_more_submission) {
 	}
 
 	$answer_form->extra_validator = $submission_extra_validator;
-	$answer_form->succ_href = $is_participating ? '/contest/' . UOJContest::info('id') . '/submissions' : '/submissions';
+	$answer_form->succ_href = $is_participating ? UOJContest::cur()->getUri('/submissions') : '/submissions';
 	$answer_form->runAtServer();
 }
 
@@ -302,9 +302,9 @@ if (UOJContest::cur()) {
 				}
 				?>
 				<div class="text-center small">
-					时间限制: <?= $time_limit ? "$time_limit s" : "N/A" ?>
+					<?= UOJLocale::get('problems::time limit') ?>: <?= $time_limit ? "$time_limit s" : "N/A" ?>
 					&emsp;
-					空间限制: <?= $memory_limit ? "$memory_limit MB" : "N/A" ?>
+					<?= UOJLocale::get('problems::memory limit') ?>: <?= $memory_limit ? "$memory_limit MB" : "N/A" ?>
 				</div>
 
 				<hr>
@@ -319,7 +319,7 @@ if (UOJContest::cur()) {
 							<hr>
 
 							<article class="mt-3 markdown-body remote-content">
-								<?= UOJProblem::cur()->queryContent()['remote_content'] ?>
+								<?= $problem_content['remote_content'] ?>
 							</article>
 						<?php endif ?>
 					</div>
@@ -370,8 +370,15 @@ if (UOJContest::cur()) {
 						<?php endif ?>
 					</div>
 				</div>
-				<div class="card-footer bg-transparent">
-					比赛评价：<?= UOJContest::cur()->getZanBlock() ?>
+				<div class="list-group list-group-flush">
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						<span class="flex-shrink-0">
+							<?= UOJLocale::get('appraisal') ?>
+						</span>
+						<span>
+							<?= UOJContest::cur()->getZanBlock() ?>
+						</span>
+					</li>
 				</div>
 			</div>
 			<?php if (UOJContest::cur()->progress() <= CONTEST_IN_PROGRESS) : ?>
@@ -406,7 +413,7 @@ if (UOJContest::cur()) {
 				<?php endif ?>
 				<?php if (!UOJContest::cur() || UOJContest::cur()->progress() >= CONTEST_FINISHED) : ?>
 					<li class="nav-item text-start">
-						<a href="/problem/<?= $problem['id'] ?>/solutions" class="nav-link" role="tab">
+						<a href="<?= UOJProblem::cur()->getUri('/solution') ?>" class="nav-link">
 							<i class="bi bi-journal-bookmark"></i>
 							<?= UOJLocale::get('problems::solutions') ?>
 						</a>
@@ -420,14 +427,14 @@ if (UOJContest::cur()) {
 				</li>
 				<?php if (UOJContest::cur() && UOJContest::cur()->userCanSeeProblemStatistics(Auth::user())) : ?>
 					<li class="nav-item text-start">
-						<a class="nav-link" href="/contest/<?= UOJContest::info('id') ?>/problem/<?= $problem['id'] ?>/statistics">
+						<a class="nav-link" href="<?= UOJContestProblem::cur()->getUri('/statistics') ?>">
 							<i class="bi bi-graph-up"></i>
 							<?= UOJLocale::get('problems::statistics') ?>
 						</a>
 					</li>
 				<?php elseif (!UOJContest::cur()) : ?>
 					<li class="nav-item text-start">
-						<a class="nav-link" href="/problem/<?= $problem['id'] ?>/statistics">
+						<a class="nav-link" href="<?= UOJProblem::cur()->getUri('/statistics') ?>">
 							<i class="bi bi-graph-up"></i>
 							<?= UOJLocale::get('problems::statistics') ?>
 						</a>
@@ -435,7 +442,7 @@ if (UOJContest::cur()) {
 				<?php endif ?>
 				<?php if (UOJProblem::cur()->userCanManage(Auth::user())) : ?>
 					<li class="nav-item text-start">
-						<a class="nav-link" href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">
+						<a class="nav-link" href="<?= UOJProblem::cur()->getUri('/manage/statement') ?>">
 							<i class="bi bi-sliders"></i>
 							<?= UOJLocale::get('problems::manage') ?>
 						</a>
@@ -457,7 +464,7 @@ if (UOJContest::cur()) {
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-center">
 					<span class="flex-shrink-0">
-						题目来源
+						<?= UOJLocale::get('problems::problem source') ?>
 					</span>
 					<span>
 						<?= UOJProblem::cur()->getProviderLink() ?>
@@ -520,21 +527,23 @@ if (UOJContest::cur()) {
 
 		<!-- 附件 -->
 		<div class="card mb-2">
-			<div class="card-header fw-bold">附件</div>
+			<div class="card-header fw-bold">
+				<?= UOJLocale::get('problems::attachments') ?>
+			</div>
 			<div class="list-group list-group-flush">
 				<?php if (UOJProblem::cur()->userCanDownloadTestData(Auth::user())) : ?>
 					<a class="list-group-item list-group-item-action" href="<?= HTML::url(UOJProblem::cur()->getMainDataUri()) ?>">
 						<i class="bi bi-hdd-stack"></i>
-						测试数据
+						<?= UOJLocale::get('problems::test data') ?>
 					</a>
 				<?php endif ?>
 				<a class="list-group-item list-group-item-action" href="<?= HTML::url(UOJProblem::cur()->getAttachmentUri()) ?>">
 					<i class="bi bi-download"></i>
-					附件下载
+					<?= UOJLocale::get('problems::attachments download') ?>
 				</a>
 				<a class="list-group-item list-group-item-action" href="<?= HTML::url(UOJProblem::cur()->getResourcesBaseUri()) ?>">
 					<i class="bi bi-folder2-open"></i>
-					相关资源
+					<?= UOJLocale::get('problems::resources') ?>
 				</a>
 			</div>
 		</div>

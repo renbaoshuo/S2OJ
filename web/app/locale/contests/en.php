@@ -2,6 +2,7 @@
 return [
 	'new contest' => 'New Contest',
 	'current or upcoming contests' => 'Current or upcoming contests',
+	'upcoming contests' => 'Upcoming contests',
 	'ended contests' => 'Ended contests',
 	'back to the contest' => 'Back to the contest',
 	'contest' => 'Contest',

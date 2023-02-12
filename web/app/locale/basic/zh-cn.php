@@ -16,7 +16,6 @@ return [
 	'groups' => '小组',
 	'add new group' => '添加新小组',
 	'group announcement' => '小组公告',
-	'group announcements' => '小组公告',
 	'users count' => '用户数量',
 	'submissions' => '提交记录',
 	'hacks' => 'Hack!',

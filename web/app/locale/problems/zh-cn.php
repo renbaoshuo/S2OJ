@@ -21,10 +21,11 @@ return [
 	'submissions statistics' => '统计提交情况',
 	'statistics' => '统计',
 	'solutions' => '题解',
+	'problem source' => '题目来源',
 	'run' => '运行',
 	'source code' => '源代码',
 	'text file' => '文本文件',
-	'zip file upload introduction' => function($str) {
+	'zip file upload introduction' => function ($str) {
 		return "请上传你要提交的文件，并命名为 {$str}。如果你提交了 zip 压缩包，我们会为你自动解压。";
 	},
 	'or upload files one by one' => '或者逐个上传：',
@@ -56,4 +57,11 @@ return [
 	'tags' => '标签',
 	'historical score' => '历史分数',
 	'uploader' => '上传者',
+	'time limit' => '时间限制',
+	'memory limit' => '内存限制',
+	'attachments' => '附件',
+	'test data' => '测试数据',
+	'attachments download' => '附件下载',
+	'resources' => '相关资源',
+	'cannot submit' => '当前题目未配置 <code>submission_requirement</code>，暂时无法提交。'
 ];

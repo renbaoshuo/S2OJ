@@ -16,7 +16,6 @@ return [
 	'groups' => 'Groups',
 	'add new group' => 'Add new group',
 	'group announcement' => 'Group Announcement',
-	'group announcements' => 'Group Announcements',
 	'users count' => 'Users',
 	'submissions' => 'Submissions',
 	'hacks' => 'Hack!',

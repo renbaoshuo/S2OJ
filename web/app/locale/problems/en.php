@@ -22,6 +22,7 @@ return [
 	'solutions' => 'Solutions',
 	'statistics' => 'Statistics',
 	'run' => 'Run',
+	'problem source' => 'Problem Source',
 	'source code' => 'Source code',
 	'text file' => 'Text file',
 	'zip file upload introduction' => function($str) {
@@ -56,4 +57,11 @@ return [
 	'tags' => 'Tags',
 	'historical score' => 'Historical Score',
 	'uploader' => 'Uploader',
+	'time limit' => 'Time limit',
+	'memory limit' => 'Memory limit',
+	'attachments' => 'Attachments',
+	'test data' => 'Test data',
+	'attachments download' => 'Attachments download',
+	'resources' => 'Resources',
+	'cannot submit' => 'This problem doesn\'t configured <code>submission_requirement</code>, so it cannot be submitted temporarily.',
 ];

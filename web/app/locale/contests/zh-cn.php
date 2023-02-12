@@ -2,6 +2,7 @@
 return [
 	'new contest' => '新建比赛',
 	'current or upcoming contests' => '正在进行或即将到来的比赛',
+	'upcoming contests' => '即将到来的比赛',
 	'ended contests' => '已结束的比赛',
 	'back to the contest' => '返回比赛',
 	'contest' => '比赛',
