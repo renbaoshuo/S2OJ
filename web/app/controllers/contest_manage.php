@@ -359,25 +359,156 @@ EOD);
 		dieWithJsonData(['status' => 'success', 'message' => '修改成功']);
 	};
 	$rule_form->setAjaxSubmit(<<<EOD
-function(res) {
-	if (res.status === 'success') {
-		$('#type-result-alert')
-			.html('修改成功！')
-			.addClass('alert-success')
-			.removeClass('alert-danger')
-			.show();
-	} else {
-		$('#type-result-alert')
-			.html('修改失败。' + (res.message || ''))
-			.removeClass('alert-success')
-			.addClass('alert-danger')
-			.show();
-	}
+		function(res) {
+			if (res.status === 'success') {
+				$('#type-result-alert')
+					.html('修改成功！')
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#type-result-alert')
+					.html('修改失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
 
-	$(window).scrollTop(0);
-}
-EOD);
+			setTimeout(function() {
+				$('#type-result-alert').hide();
+			}, 5000);
+
+			$(window).scrollTop(0);
+		}
+	EOD);
 	$rule_form->runAtServer();
+
+	$links = UOJContest::cur()->getAdditionalLinks();
+	$links_str = json_encode($links, JSON_FORCE_OBJECT);
+	$links_form = new UOJForm('links');
+	$links_form->add('contest_links', '', function ($str, &$vdata) {
+		$data = json_decode($str, true);
+		$new_data = [];
+
+		if ($data === null) return '不合法的 JSON';
+
+		foreach ($data as $idx => $link) {
+			$link_name = trim($link['name']);
+			$link_url = trim($link['url']);
+
+			if ($link_name && $link_url) {
+				$new_data[] = [
+					'name' => $link_name,
+					'url' => $link_url,
+				];
+			}
+		}
+
+		$vdata['links'] = $new_data;
+
+		return '';
+	}, null);
+	$links_form->appendHTML(<<<EOD
+		<div id="div-contest_links"></div>
+		<input type="hidden" name="contest_links" id="input-contest_links" value="">
+		<script>
+			var contest_links = {$links_str};
+			var contest_links_cnt = Object.keys(contest_links).length;
+
+			$(document).ready(function() {
+				$('#input-contest_links').val(JSON.stringify(contest_links));
+
+				function newLinkRow(idx) {
+					var div_link = $('<div class="row mt-2" />');
+					var input_link_name = $('<input type="text" class="form-control" placeholder="名称" />').val(contest_links[idx].name);
+					var input_link_url = $('<input type="text" class="form-control" placeholder="链接" />').val(contest_links[idx].url);
+					var btn_del_cur_link = $('<button type="button" class="btn btn-sm btn-outline-secondary" />').html('<i class="bi bi-x-lg"></i>');
+
+					input_link_name.change(function() {
+						contest_links[idx].name = input_link_name.val();
+						$('#input-contest_links').val(JSON.stringify(contest_links));
+					});
+					input_link_url.change(function() {
+						contest_links[idx].url = input_link_url.val();
+						$('#input-contest_links').val(JSON.stringify(contest_links));
+					});
+					btn_del_cur_link.click(function() {
+						contest_links[idx] = undefined;
+						$('#input-contest_links').val(JSON.stringify(contest_links));
+						div_link.remove();
+					});
+
+					div_link.append(
+						$('<div class="col-11" />').append(
+							$('<div class="row" />').append(
+								$('<div class="col-md-6" />').append(input_link_name)
+							).append(
+								$('<div class="col-md-6" />').append(input_link_url)
+							)
+						)
+					).append(
+						$('<div class="col-1 text-center" />').append(btn_del_cur_link)
+					);
+
+					return div_link;
+				};
+
+				$.map(contest_links, function(link, idx) {
+					$('#div-contest_links').append(newLinkRow(idx));
+				});
+
+				var row_add_link = $('<div class="row mt-2 justify-content-end" />');
+				var btn_add_link = $('<button type="button" class="btn btn-sm btn-outline-secondary" />').html('<i class="bi bi-plus-lg"></i>');
+				btn_add_link.click(function() {
+					contest_links[++contest_links_cnt] = {name:'', url:''};
+					row_add_link.before(newLinkRow(contest_links_cnt));
+				});
+
+				$('#div-contest_links').append(row_add_link.append($('<div class="col-1 text-center" />').append(btn_add_link)));
+			});
+		</script>
+	EOD);
+	$links_form->setAjaxSubmit(<<<EOD
+		function(res) {
+			if (res.status === 'success') {
+				$('#links-result-alert')
+					.html('修改成功！')
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#links-result-alert')
+					.html('修改失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
+
+			setTimeout(function() {
+				$('#links-result-alert').hide();
+			}, 5000);
+
+			$(window).scrollTop(0);
+		}
+	EOD);
+	$links_form->handle = function (&$vdata) {
+		$extra_config = UOJContest::info('extra_config');
+		$extra_config['links'] = $vdata['links'];
+		$esc_extra_config = json_encode($extra_config);
+
+		DB::update([
+			"update contests",
+			"set", [
+				"extra_config" => $esc_extra_config,
+			],
+			"where", [
+				"id" => UOJContest::info('id'),
+			],
+		]);
+
+		dieWithJsonData(['status' => 'success', 'message' => '修改成功']);
+	};
+	$links_form->runAtServer();
 }
 
 ?>
@@ -527,6 +658,9 @@ EOD);
 						<li class="nav-item">
 							<a class="nav-link active" href="#type" data-bs-toggle="tab" data-bs-target="#type">规则</a>
 						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#contest-links" data-bs-toggle="tab" data-bs-target="#contest-links">链接</a>
+						</li>
 					</ul>
 				</div>
 				<div class="card-body tab-content">
@@ -545,10 +679,14 @@ EOD);
 								</ul>
 								<h5>常见问题</h5>
 								<ul class="mb-0">
-									<li>暂无</li>
+									<li>团体赛推荐使用团体账号报名参赛以解锁全部功能。</li>
 								</ul>
 							</div>
 						</div>
+					</div>
+					<div class="tab-pane" id="contest-links">
+						<div id="links-result-alert" class="alert" role="alert" style="display: none"></div>
+						<?php $links_form->printHTML() ?>
 					</div>
 				</div>
 			</div>

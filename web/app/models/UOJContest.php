@@ -593,4 +593,24 @@ class UOJContest {
 		updateContestPlayerNum($this->info);
 		return true;
 	}
+
+	public function getResourcesFolderPath() {
+		return UOJContext::storagePath() . "/contest_resources/" . $this->info['id'];
+	}
+
+	public function getResourcesPath($name = '') {
+		return "{$this->getResourcesFolderPath()}/$name";
+	}
+
+	public function getResourcesBaseUri() {
+		return "/contest/{$this->info['id']}/resources";
+	}
+
+	public function getResourcesUri($name = '') {
+		return "{$this->getResourcesBaseUri()}/{$name}";
+	}
+
+	public function getAdditionalLinks() {
+		return $this->info['extra_config']['links'] ?: [];
+	}
 }

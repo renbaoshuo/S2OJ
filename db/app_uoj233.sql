@@ -181,7 +181,7 @@ CREATE TABLE `contests` (
   `last_min` int NOT NULL,
   `player_num` int NOT NULL DEFAULT '0',
   `status` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `extra_config` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '{}',
+  `extra_config` json NOT NULL,
   `zan` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `status` (`status`,`id`) USING BTREE

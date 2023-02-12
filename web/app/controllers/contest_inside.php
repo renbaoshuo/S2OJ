@@ -64,7 +64,7 @@ if (UOJContest::cur()->userCanStartFinalTest(Auth::user())) {
 		$start_test_form->config['confirm']['smart'] = true;
 		$start_test_form->runAtServer();
 	}
-	if ($contest['cur_progress'] >= CONTEST_TESTING && UOJContest::cur()->queryJudgeProgress()['fully_judged']) {
+	if ($contest['cur_progress'] == CONTEST_TESTING && UOJContest::cur()->queryJudgeProgress()['fully_judged']) {
 		$publish_result_form = new UOJForm('publish_result');
 		$publish_result_form->handle = function () {
 			UOJContest::announceOfficialResults();
@@ -492,133 +492,132 @@ function echoSelfReviews() {
 
 
 <div class="row">
+	<div <?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings' || $cur_tab == 'self_reviews') : ?> class="col-12" <?php else : ?> class="col-md-9" <?php endif ?>>
+		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
+		<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings' || $cur_tab == 'self_reviews') : ?>
+			<div class="d-none d-md-block text-center">
+				<h1 class="mt-2 mb-3"><?= $contest['name'] ?></h1>
+				<div class="small text-muted">
+					<?php if ($contest['cur_progress'] <= CONTEST_NOT_STARTED) : ?>
+						<?= UOJLocale::get('contests::not started') ?>
+					<?php elseif ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) : ?>
+						<?= UOJLocale::get('contests::in progress') ?>
+					<?php elseif ($contest['cur_progress'] <= CONTEST_PENDING_FINAL_TEST) : ?>
+						<?= UOJLocale::get('contests::pending final test') ?>
+					<?php elseif ($contest['cur_progress'] <= CONTEST_TESTING) : ?>
+						<?= UOJLocale::get('contests::final testing') ?>
+					<?php else : ?>
+						<?= UOJLocale::get('contests::ended') ?>
+					<?php endif ?>
+				</div>
+			</div>
+		<?php endif ?>
+		<div class="mt-3">
+			<?php
+			if ($cur_tab == 'dashboard') {
+				echoDashboard();
+			} elseif ($cur_tab == 'submissions') {
+				echoMySubmissions();
+			} elseif ($cur_tab == 'standings') {
+				echoStandings();
+			} elseif ($cur_tab == 'after_contest_standings') {
+				echoStandings(true);
+			} elseif ($cur_tab == 'backstage') {
+				echoBackstage();
+			} elseif ($cur_tab == 'self_reviews') {
+				echoSelfReviews();
+			}
+			?>
+		</div>
+	</div>
+
 	<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings' || $cur_tab == 'self_reviews') : ?>
-		<div class="col-12">
-		<?php else : ?>
-			<div class="col-md-9">
-			<?php endif ?>
-			<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
-			<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings' || $cur_tab == 'self_reviews') : ?>
-				<div class="d-none d-md-block text-center">
-					<h1 class="mt-2 mb-3"><?= $contest['name'] ?></h1>
-					<div class="small text-muted">
-						<?php if ($contest['cur_progress'] <= CONTEST_NOT_STARTED) : ?>
-							<?= UOJLocale::get('contests::not started') ?>
-						<?php elseif ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) : ?>
-							<?= UOJLocale::get('contests::in progress') ?>
-						<?php elseif ($contest['cur_progress'] <= CONTEST_PENDING_FINAL_TEST) : ?>
-							<?= UOJLocale::get('contests::pending final test') ?>
+	<?php else : ?>
+		<hr class="d-md-none" />
+
+		<div class="col-md-3">
+			<div class="card card-default mb-2">
+				<div class="card-body">
+					<h3 class="h4 card-title text-center">
+						<a class="text-decoration-none text-body" href="<?= UOJContest::cur()->getUri() ?>">
+							<?= UOJContest::info('name') ?>
+						</a>
+					</h3>
+					<div class="card-text text-center text-muted">
+						<?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) : ?>
+							<span id="contest-countdown"></span>
+							<script type="text/javascript">
+								$('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJTime::$time_now->getTimestamp() ?>, function() {}, '1.75rem', false);
+							</script>
 						<?php elseif ($contest['cur_progress'] <= CONTEST_TESTING) : ?>
-							<?= UOJLocale::get('contests::final testing') ?>
+							<?php $judge_progress = UOJContest::cur()->queryJudgeProgress() ?>
+							<?= $judge_progress['title'] ?> (<?= $judge_progress['rop'] ?>%)
 						<?php else : ?>
-							<?= UOJLocale::get('contests::ended') ?>
+							<?= UOJLocale::get('contests::contest ended') ?>
 						<?php endif ?>
 					</div>
 				</div>
-			<?php endif ?>
-			<div class="mt-3">
-				<?php
-				if ($cur_tab == 'dashboard') {
-					echoDashboard();
-				} elseif ($cur_tab == 'submissions') {
-					echoMySubmissions();
-				} elseif ($cur_tab == 'standings') {
-					echoStandings();
-				} elseif ($cur_tab == 'after_contest_standings') {
-					echoStandings(true);
-				} elseif ($cur_tab == 'backstage') {
-					echoBackstage();
-				} elseif ($cur_tab == 'self_reviews') {
-					echoSelfReviews();
-				}
-				?>
-			</div>
-			</div>
-
-			<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings' || $cur_tab == 'self_reviews') : ?>
-			<?php else : ?>
-				<div class="d-md-none">
-					<hr />
+				<div class="list-group list-group-flush">
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						<span class="flex-shrink-0">
+							<?= UOJLocale::get('appraisal') ?>
+						</span>
+						<span>
+							<?= UOJContest::cur()->getZanBlock() ?>
+						</span>
+					</li>
 				</div>
-				<div class="col-md-3">
-					<div class="card card-default mb-2">
-						<div class="card-body">
-							<h3 class="h4 card-title text-center">
-								<a class="text-decoration-none text-body" href="/contest/<?= $contest['id'] ?>">
-									<?= $contest['name'] ?>
-								</a>
-							</h3>
-							<div class="card-text text-center text-muted">
-								<?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) : ?>
-									<span id="contest-countdown"></span>
-									<script type="text/javascript">
-										$('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJTime::$time_now->getTimestamp() ?>, function() {}, '1.75rem', false);
-									</script>
-								<?php elseif ($contest['cur_progress'] <= CONTEST_TESTING) : ?>
-									<?php if ($contest['cur_progress'] < CONTEST_TESTING) : ?>
-										<?= UOJLocale::get('contests::contest pending final test') ?>
-									<?php else : ?>
-										<?php
-										$total = DB::selectCount("select count(*) from submissions where contest_id = {$contest['id']}");
-										$n_judged = DB::selectCount("select count(*) from submissions where contest_id = {$contest['id']} and status = 'Judged'");
-										$rop = $total == 0 ? 100 : (int)($n_judged / $total * 100);
-										?>
-										<?= UOJLocale::get('contests::final testing') ?>
-										(<?= $rop ?>%)
-									<?php endif ?>
-								<?php else : ?>
-									<?= UOJLocale::get('contests::contest ended') ?>
-								<?php endif ?>
-							</div>
-						</div>
-						<div class="card-footer bg-transparent">
-							比赛评价：<?= UOJContest::cur()->getZanBlock() ?>
-						</div>
-					</div>
+			</div>
 
-					<?php if (UOJContest::cur()->basicRule() === 'OI') : ?>
-						<p>此次比赛为 OI 赛制。</p>
-						<p><strong>注意：比赛时只显示测样例的结果。</strong></p>
-					<?php elseif (UOJContest::cur()->basicRule() === 'ACM') : ?>
-						<p>此次比赛为 ACM 赛制。</p>
-						<p><strong>封榜时间：<?= $contest['frozen_time']->format('Y-m-d H:i:s') ?></strong></p>
-					<?php elseif (UOJContest::cur()->basicRule() === 'IOI') : ?>
-						<p>此次比赛为 IOI 赛制。</p>
-						<p>比赛时显示的得分即最终得分。</p>
-					<?php endif ?>
+			<?php if (UOJContest::cur()->basicRule() === 'OI') : ?>
+				<p>此次比赛为 OI 赛制。</p>
+				<p><strong>注意：比赛时只显示测样例的结果。</strong></p>
+			<?php elseif (UOJContest::cur()->basicRule() === 'ACM') : ?>
+				<p>此次比赛为 ACM 赛制。</p>
+				<p><strong>封榜时间：<?= $contest['frozen_time']->format(UOJTime::FORMAT) ?></strong></p>
+			<?php elseif (UOJContest::cur()->basicRule() === 'IOI') : ?>
+				<p>此次比赛为 IOI 赛制。</p>
+				<p>比赛时显示的得分即最终得分。</p>
+			<?php endif ?>
 
-					<a href="/contest/<?= $contest['id'] ?>/registrants" class="btn btn-secondary d-block mt-2">
-						<?= UOJLocale::get('contests::contest registrants') ?>
+			<a href="<?= UOJContest::cur()->getUri('/registrants') ?>" class="btn btn-secondary d-block mt-2">
+				<?= UOJLocale::get('contests::contest registrants') ?>
+			</a>
+			<?php if ($is_manager) : ?>
+				<a href="<?= UOJContest::cur()->getUri('/manage') ?>" class="btn btn-primary d-block mt-2">
+					管理
+				</a>
+			<?php endif ?>
+			<?php if (isset($start_test_form)) : ?>
+				<div class="mt-2">
+					<?php $start_test_form->printHTML(); ?>
+				</div>
+			<?php endif ?>
+			<?php if (isset($publish_result_form)) : ?>
+				<div class="mt-2">
+					<?php $publish_result_form->printHTML(); ?>
+				</div>
+			<?php endif ?>
+
+			<!-- 附件 -->
+			<div class="card mt-3">
+				<div class="card-header fw-bold">
+					<?= UOJLocale::get('contests::links') ?>
+				</div>
+				<div class="list-group list-group-flush">
+					<a class="list-group-item list-group-item-action" href="<?= HTML::url(UOJContest::cur()->getResourcesBaseUri()) ?>">
+						<?= UOJLocale::get('contests::resources') ?>
 					</a>
-					<?php if ($is_manager) : ?>
-						<a href="/contest/<?= $contest['id'] ?>/manage" class="btn btn-primary d-block mt-2">
-							管理
-						</a>
-					<?php endif ?>
-					<?php if (isset($start_test_form)) : ?>
-						<div class="mt-2">
-							<?php $start_test_form->printHTML(); ?>
-						</div>
-					<?php endif ?>
-					<?php if (isset($publish_result_form)) : ?>
-						<div class="mt-2">
-							<?php $publish_result_form->printHTML(); ?>
-						</div>
-					<?php endif ?>
-					<?php if ($contest['extra_config']['links']) : ?>
-						<div class="card card-default border-info mt-3">
-							<div class="card-header bg-info">
-								<h3 class="card-title">比赛资料</h3>
-							</div>
-							<div class="list-group list-group-flush">
-								<?php foreach ($contest['extra_config']['links'] as $link) : ?>
-									<a href="/blogs/<?= $link[1] ?>" class="list-group-item"><?= $link[0] ?></a>
-								<?php endforeach ?>
-							</div>
-						</div>
-					<?php endif ?>
-				</div>
-			<?php endif ?>
-		</div>
 
-		<?php echoUOJPageFooter() ?>
+					<?php foreach (UOJContest::cur()->getAdditionalLinks() as $link) : ?>
+						<a class="list-group-item list-group-item-action" href="<?= $link['url'] ?>">
+							<?= HTML::escape($link['name']) ?>
+						</a>
+					<?php endforeach ?>
+				</div>
+			</div>
+		</div>
+	<?php endif ?>
+</div>
+
+<?php echoUOJPageFooter() ?>
