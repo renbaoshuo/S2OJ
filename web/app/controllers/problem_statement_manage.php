@@ -142,7 +142,7 @@ if (UOJProblem::info('type') == 'remote') {
 			'time_limit' => $data['time_limit'],
 			'memory_limit' => $data['memory_limit'],
 		];
-		$enc_extra_config = json_encode($extra_config);
+		$enc_extra_config = json_encode($extra_config, JSON_FORCE_OBJECT);
 
 		DB::update([
 			"update problems",

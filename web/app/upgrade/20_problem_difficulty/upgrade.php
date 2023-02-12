@@ -32,7 +32,7 @@ return function ($type) {
 					DB::update([
 						"update problems",
 						"set", [
-							"extra_config" => json_encode($extra_config),
+							"extra_config" => json_encode($extra_config, JSON_FORCE_OBJECT),
 						],
 						"where", [
 							"id" => $problem->info['id'],

@@ -91,7 +91,7 @@ $new_remote_problem_form->handle = function (&$vdata) {
 		'time_limit' => $data['time_limit'],
 		'memory_limit' => $data['memory_limit'],
 	];
-	$enc_extra_config = json_encode($extra_config);
+	$enc_extra_config = json_encode($extra_config, JSON_FORCE_OBJECT);
 
 	DB::insert([
 		"insert into problems",
