@@ -14,16 +14,34 @@ function dataNewProblem($id) {
 	]);
 }
 
-function dataClearProblemData($problem) {
-	$id = $problem['id'];
+function dataClearProblemData(UOJProblem $problem) {
+	$id = $problem->info['id'];
 	if (!validateUInt($id)) {
 		UOJLog::error("dataClearProblemData: hacker detected");
 		return "invalid problem id";
 	}
 
-	UOJLocalRun::exec(['rm', "/var/uoj_data/$id", '-r']);
-	UOJLocalRun::exec(['rm', "/var/uoj_data/upload/$id", '-r']);
+	UOJLocalRun::exec(['rm', $problem->getDataFolderPath(), '-r']);
+	UOJLocalRun::exec(['rm', $problem->getUploadFolderPath(), '-r']);
+	dataUpdateProblemLimits($problem, null, null);
 	dataNewProblem($id);
+}
+
+function dataUpdateProblemLimits(UOJProblem $problem, $time_limit, $memory_limit) {
+	$extra_config = $problem->getExtraConfig();
+
+	$extra_config['time_limit'] = $time_limit;
+	$extra_config['memory_limit'] = $memory_limit;
+
+	DB::update([
+		"update problems",
+		"set", [
+			'extra_config' => json_encode($extra_config, JSON_FORCE_OBJECT),
+		],
+		"where", [
+			"id" => $problem->info['id'],
+		],
+	]);
 }
 
 class SyncProblemDataHandler {
@@ -302,13 +320,15 @@ class SyncProblemDataHandler {
 			}
 
 			$this->requirement = [];
-			$this->problem_extra_config = $this->problem->getExtraConfig();;
+			$this->problem_extra_config = $this->problem->getExtraConfig();
+
 			if (!is_file("{$this->upload_dir}/problem.conf")) {
 				throw new UOJFileNotFoundException("problem.conf");
 			}
 
 			$this->problem_conf = getUOJConf("{$this->upload_dir}/problem.conf");
 			$this->final_problem_conf = $this->problem_conf;
+
 			if ($this->problem_conf === -1) {
 				throw new UOJFileNotFoundException("problem.conf");
 			} elseif ($this->problem_conf === -2) {
@@ -482,21 +502,11 @@ class SyncProblemDataHandler {
 			['mv', "{$this->id}.next.zip", "{$this->id}.zip", '-f'],
 		]);
 
-		DB::update([
-			"update problems",
-			"set", [
-				"extra_config" => DB::json_set(
-					'extra_config',
-					'$.time_limit',
-					$this->final_problem_conf['time_limit'] ? (float)$this->final_problem_conf['time_limit'] : null,
-					'$.memory_limit',
-					$this->final_problem_conf['memory_limit'] ? (int)$this->final_problem_conf['memory_limit'] : null,
-				),
-			],
-			"where", [
-				"id" => $this->id,
-			],
-		]);
+		dataUpdateProblemLimits(
+			$this->problem,
+			$this->final_problem_conf['time_limit'] ? (float)$this->final_problem_conf['time_limit'] : 1,
+			$this->final_problem_conf['memory_limit'] ? (int)$this->final_problem_conf['memory_limit'] : 256
+		);
 
 		return '';
 	}

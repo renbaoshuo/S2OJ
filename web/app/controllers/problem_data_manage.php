@@ -392,8 +392,8 @@ $data_form->config['confirm']['smart'] = true;
 $data_form->runAtServer();
 
 $clear_data_form = new UOJForm('clear_data');
-$clear_data_form->handle = function () use ($problem) {
-	dataClearProblemData($problem);
+$clear_data_form->handle = function () {
+	dataClearProblemData(UOJProblem::cur());
 };
 $clear_data_form->config['submit_container']['class'] = '';
 $clear_data_form->config['submit_button']['class'] = 'btn btn-danger d-block w-100';
