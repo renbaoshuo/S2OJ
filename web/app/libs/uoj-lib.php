@@ -13,7 +13,7 @@ function requireLib($name) { // html lib
 	$REQUIRE_LIB[$name] = '';
 }
 function requirePHPLib($name) { // uoj php lib
-	require $_SERVER['DOCUMENT_ROOT'] . '/app/libs/uoj-' . $name . '-lib.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/app/libs/uoj-' . $name . '-lib.php';
 }
 
 requirePHPLib('expection');
