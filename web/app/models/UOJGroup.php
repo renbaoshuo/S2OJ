@@ -86,8 +86,13 @@ class UOJGroup {
 		]));
 	}
 
-	public function getLatestGroupmatesAcceptedSubmissionIds(array $user = null, int $limit = 10) {
-		return array_map(fn ($x) => $x['id'], DB::selectAll([
+	public function getLatestGroupMatesAcceptedSubmissions(array $user = null, int $limit = 10) {
+		return array_map(function ($x) {
+			$submission = UOJSubmission::query($x['id']);
+			$submission->setProblem();
+
+			return $submission;
+		}, DB::selectAll([
 			"select", DB::fields(["id" => "max(id)"]),
 			"from submissions",
 			"where", [

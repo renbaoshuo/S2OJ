@@ -64,18 +64,15 @@ UOJGroup::cur()->userCanView(Auth::user(), ['ensure' => true]);
 					<?= UOJLocale::get('news') ?>
 				</h2>
 				<ul class="mb-0">
-					<?php foreach (UOJGroup::cur()->getLatestGroupmatesAcceptedSubmissionIds(Auth::user()) as $id) : ?>
-						<?php
-						$submission = UOJSubmission::query($id);
-						$submission->setProblem();
-						$user = UOJUser::query($submission->info['submitter']);
-						?>
-						<li>
-							<?= UOJUser::getLink($user) ?>
-							解决了问题
-							<?= $submission->problem->getLink(['with' => 'id']) ?>
-							(<time><?= $submission->info['submit_time'] ?></time>)
-						</li>
+					<?php foreach (UOJGroup::cur()->getLatestGroupMatesAcceptedSubmissions(Auth::user()) as $submission) : ?>
+						<?php if ($submission->userCanView(Auth::user())) : ?>
+							<li>
+								<?= UOJUser::getLink($submission->info['submitter']) ?>
+								解决了问题
+								<?= $submission->problem->getLink(['with' => 'id']) ?>
+								(<time><?= $submission->info['submit_time'] ?></time>)
+							</li>
+						<?php endif ?>
 					<?php endforeach ?>
 				</ul>
 			</div>
