@@ -125,6 +125,7 @@ class Auth {
 			}
 
 			$_SESSION['username'] = $myUser['username'];
+			$_SESSION['remember_token'] = $myUser['remember_token'];
 
 			return;
 		}
