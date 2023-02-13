@@ -398,6 +398,24 @@ EOD);
 
 		dieWithAlert('密码修改成功！');
 	}
+
+	if (isSuperUser(Auth::user())) {
+		$clear_remember_token_form = new UOJForm('clear_remember_token');
+		$clear_remember_token_form->handle = function () use ($user) {
+			DB::update([
+				"update user_info",
+				"set", [
+					"remember_token" => "",
+				],
+				"where", ["username" => $user['username']]
+			]);
+		};
+		$clear_remember_token_form->config['submit_container']['class'] = 'text-end';
+		$clear_remember_token_form->config['submit_button']['class'] = 'btn btn-sm btn-danger';
+		$clear_remember_token_form->config['submit_button']['text'] = '清除 remember_token（强制下线）';
+		$clear_remember_token_form->config['confirm']['smart'] = true;
+		$clear_remember_token_form->runAtServer();
+	}
 } elseif ($cur_tab == 'privilege') {
 	$users_default_permissions = UOJContext::getMeta('users_default_permissions');
 	$type_text = UOJLocale::get('user::normal user');
@@ -845,6 +863,12 @@ $pageTitle = $user['username'] == Auth::id()
 							<button type="submit" id="button-submit-change_password" name="submit-change_password" value="change_password" class="mt-3 btn btn-secondary">更新</button>
 						</div>
 					</form>
+
+					<?php if (isset($clear_remember_token_form)) : ?>
+						<hr />
+
+						<?php $clear_remember_token_form->printHTML() ?>
+					<?php endif ?>
 				</div>
 			</div>
 			<script>

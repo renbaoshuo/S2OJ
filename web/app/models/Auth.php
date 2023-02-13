@@ -33,35 +33,33 @@ class Auth {
 		return $myUser[$name];
 	}
 
-	public static function login($username, $remember = true) {
+	public static function login($username) {
 		if (!validateUsername($username)) {
 			return;
 		}
 
 		$_SESSION['username'] = $username;
 
-		if ($remember) {
-			$remember_token = DB::selectSingle([
-				"select remember_token from user_info",
+		$remember_token = DB::selectSingle([
+			"select remember_token from user_info",
+			"where", ["username" => $username]
+		]);
+
+		if ($remember_token == '') {
+			$remember_token = uojRandString(60);
+			DB::update([
+				"update user_info",
+				"set", ["remember_token" => $remember_token],
 				"where", ["username" => $username]
 			]);
-
-			if ($remember_token == '') {
-				$remember_token = uojRandString(60);
-				DB::update([
-					"update user_info",
-					"set", ["remember_token" => $remember_token],
-					"where", ["username" => $username]
-				]);
-			}
-
-			$_SESSION['last_login'] = time();
-			$_SESSION['remember_token'] = $remember_token;
-
-			$expire = time() + 60 * 60 * 24 * 7;
-			Cookie::safeSet('uoj_username', $username, $expire, '/', array('httponly' => true));
-			Cookie::safeSet('uoj_remember_token', $remember_token, $expire, '/', array('httponly' => true));
 		}
+
+		$_SESSION['last_login'] = time();
+		$_SESSION['remember_token'] = $remember_token;
+
+		$expire = time() + 60 * 60 * 24 * 7;
+		Cookie::safeSet('uoj_username', $username, $expire, '/', array('httponly' => true));
+		Cookie::safeSet('uoj_remember_token', $remember_token, $expire, '/', array('httponly' => true));
 
 		DB::update([
 			"update user_info",
@@ -75,7 +73,7 @@ class Auth {
 	public static function logout() {
 		session_unset();
 
-		Cookie::safeUnset(session_name(), '/');
+		Cookie::unsetVar(session_name(), '/');
 		Cookie::safeUnset('uoj_username', '/');
 		Cookie::safeUnset('uoj_remember_token', '/');
 
