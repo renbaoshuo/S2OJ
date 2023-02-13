@@ -524,17 +524,14 @@ $.fn.long_table = function(data, cur_page, header_row, get_row_str, config) {
 		}
 		
 		$(table_div).append(
-				typeof config.print_before_table === 'function' ? config.print_before_table() : ''
-			).append(
-				$('<div class="' + div_classes.join(' ') + '" />').append(
-					$('<table class="' + table_classes.join(' ') + '" />').append(
-						$('<thead />').append(header_row)
-					).append(
-						tbody
-					)
-			).append(
-				typeof config.print_after_table === 'function' ? config.print_after_table() : ''
-			)
+			$('<div class="' + div_classes.join(' ') + '" />')
+				.append(typeof config.print_before_table === 'function' ? config.print_before_table() : '')
+				.append(
+					$('<table class="' + table_classes.join(' ') + '" />')
+						.append($('<thead />').append(header_row))
+						.append(tbody)
+				)
+				.append(typeof config.print_after_table === 'function' ? config.print_after_table() : '')
 		);
 		
 		var get_page_li = function(p, h) {
