@@ -413,7 +413,7 @@ if (UOJContest::cur()) {
 				<?php endif ?>
 				<?php if (!UOJContest::cur() || UOJContest::cur()->progress() >= CONTEST_FINISHED) : ?>
 					<li class="nav-item text-start">
-						<a href="<?= UOJProblem::cur()->getUri('/solution') ?>" class="nav-link">
+						<a href="<?= UOJProblem::cur()->getUri('/solutions') ?>" class="nav-link">
 							<i class="bi bi-journal-bookmark"></i>
 							<?= UOJLocale::get('problems::solutions') ?>
 						</a>
