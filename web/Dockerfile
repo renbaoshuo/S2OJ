@@ -1,24 +1,23 @@
 FROM ubuntu:22.04
 
-ARG CLONE_ADDFLAG
-ARG USE_MIRROR
-ENV USE_MIRROR $USE_MIRROR
 SHELL ["/bin/bash", "-c"]
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV PKGS="php7.4 php7.4-yaml php7.4-xml php7.4-dev php7.4-zip php7.4-mysql php7.4-mbstring php7.4-gd php7.4-curl php7.4-imagick libseccomp-dev git vim ntp zip unzip curl wget apache2 libapache2-mod-xsendfile php-pear mysql-client build-essential fp-compiler re2c libseccomp-dev libyaml-dev python2.7 python3.10 python3-requests openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk language-pack-zh*"
-RUN if [[ "$USE_MIRROR" == "1" ]]; then\
-        sed -i "s@http://.*archive.ubuntu.com@https://mirrors.aliyun.com@g" /etc/apt/sources.list &&\
-        sed -i "s@http://.*security.ubuntu.com@https://mirrors.aliyun.com@g" /etc/apt/sources.list ;\
-    fi &&\
-    apt-get -o "Acquire::https::Verify-Peer=false" update && apt-get -o "Acquire::https::Verify-Peer=false" install -y --no-install-recommends gnupg ca-certificates &&\
-    echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu jammy main" | tee /etc/apt/sources.list.d/ondrej-php.list && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C &&\
-    if [[ "$USE_MIRROR" == "1" ]]; then\
-        find /etc/apt/sources.list.d/ -type f -name "*.list" -exec sed -i.bak -r 's#deb(-src)?\s*http(s)?://ppa.launchpad.net#deb\1 https://launchpad.proxy.ustclug.org#ig' {} \; &&\
-        find /etc/apt/sources.list.d/ -type f -name "*.list" -exec sed -i.bak -r 's#deb(-src)?\s*http(s)?://ppa.launchpadcontent.net#deb\1 https://launchpad.proxy.ustclug.org#ig' {} \; ;\
-    fi &&\
-    apt-get update --allow-unauthenticated &&\
-    (apt-get install -y --allow-unauthenticated --no-install-recommends -o Dpkg::Options::="--force-overwrite" -o APT::Acquire::Retries="30" --fix-missing $PKGS || apt-get install --fix-broken -y -o APT::Acquire::Retries="30")
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gnupg ca-certificates apt-transport-https && \
+    (echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu jammy main" | tee /etc/apt/sources.list.d/ondrej-php.list) && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C && \
+    apt-get update && \
+    for pkg in php7.4 php7.4-yaml php7.4-xml php7.4-dev php7.4-zip php7.4-mysql php7.4-mbstring php7.4-gd php7.4-curl php7.4-imagick libseccomp-dev git vim ntp zip unzip curl wget apache2 libapache2-mod-xsendfile php-pear mysql-client build-essential fp-compiler re2c libseccomp-dev libyaml-dev python2.7 python3.10 python3-requests openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk language-pack-zh-hans cron tzdata; do \
+        cnt=10 && \
+        while ! apt-get install -y "$pkg"; do \
+            if [ $cnt -le 0 ]; then \
+              echo "Failed to install $pkg" && \
+              exit 1; \
+            fi; \
+            cnt=$((cnt - 1)); \
+        done; \
+    done
 
 ADD . /opt/uoj
 WORKDIR /opt/uoj
