@@ -94,6 +94,9 @@ class UOJMail {
 					DB::update("update emails set send_time = now() where id = {$email['id']}");
 					echo '[UOJMail::cronSendEmail] ID: ' . $email['id'] . ' sent.' . "\n";
 				}
+			} else {
+				DB::update("update emails set send_time = now() where id = {$email['id']}");
+				echo '[UOJMail::cronSendEmail] ID: ' . $email['id'] . ' - empty email address.' . "\n";
 			}
 		}
 
