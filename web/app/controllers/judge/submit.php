@@ -72,7 +72,7 @@ function hackJudged() {
 	$up_out = $_FILES["std_output"]['tmp_name'];
 
 	if (!UOJHack::cur()->problem->needToReviewHack()) {
-		$err = dataAddHackPoint(UOJHack::cur()->problem->info, $up_in, $up_out);
+		$err = UOJHack::cur()->problem->addHackPoint($up_in, $up_out);
 		if ($err === '') {
 			unlink($input);
 			DB::update([

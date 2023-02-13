@@ -357,7 +357,7 @@ class UOJProblemConfigure {
 			}
 		}
 
-		$err = dataUpdateProblemConf($this->problem->info, $conf);
+		$err = $this->problem->updateProblemConf($conf);
 		if ($err) {
 			UOJResponse::message('<div>' . $err . '</div><a href="' . $this->href . '">返回</a>');
 		}

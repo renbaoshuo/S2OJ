@@ -70,32 +70,11 @@ if ($_POST['problem_data_file_submit'] == 'submit') {
 		$zip_mime_types = ['application/zip', 'application/x-zip', 'application/x-zip-compressed'];
 
 		if (in_array($_FILES["problem_data_file"]["type"], $zip_mime_types) || $_FILES["problem_data_file"]["type"] == 'application/octet-stream' && substr($_FILES["problem_data_file"]["name"], -4) == '.zip') {
-			$zip = new ZipArchive;
+			$errmsg = UOJProblem::cur()->uploadDataViaZipFile($_FILES["problem_data_file"]["tmp_name"]);
 
-			try {
-				if ($zip->open($_FILES["problem_data_file"]["tmp_name"]) !== true) {
-					throw new UOJUploadFailedException('压缩文件打开失败');
-				}
-
-				if (!$zip->extractTo(UOJProblem::cur()->getUploadFolderPath())) {
-					throw new UOJUploadFailedException('压缩文件解压失败');
-				}
-
-				if (!$zip->close()) {
-					throw new UOJUploadFailedException('压缩文件关闭失败');
-				}
-			} catch (Exception $e) {
-				becomeMsgPage('<div>' . $e->getMessage() . '</div><a href="">返回</a>');
+			if ($errmsg !== '') {
+				UOJResponse::message('<div>' . $errmsg . '</div><a href="">返回</a>');
 			}
-
-			UOJLocalRun::execAnd([
-				['cd', UOJProblem::cur()->getUploadFolderPath()],
-				<<<'EOD'
-				if [ "$(find . -maxdepth 1 -type f)File" = "File" ];
-				then for sub_dir in "$(find -maxdepth 1 -type d ! -name .)";
-				do mv -f "$sub_dir"/* . && rm -rf "$sub_dir"; done; fi
-				EOD
-			]);
 
 			echo "<script>alert('上传成功！请点击「检验配置并同步数据」按钮同步数据。')</script>";
 		} else {
@@ -372,18 +351,17 @@ if (isset($_GET['display_file'])) {
 }
 
 $hackable_form = new UOJForm('hackable');
-$hackable_form->handle = function () use ($problem) {
-	$problem['hackable'] = !$problem['hackable'];
-	$ret = dataSyncProblemData($problem);
+$hackable_form->handle = function () {
+	UOJProblem::cur()->info['hackable'] = !UOJProblem::cur()->info['hackable'];
+	$ret = UOJProblem::cur()->syncData(Auth::user());
 	if ($ret) {
-		becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
+		becomeMsgPage('<div>' . $ret . '</div><a href="">返回</a>');
 	}
 
-	$hackable = $problem['hackable'] ? 1 : 0;
 	DB::update([
 		"update problems",
-		"set", ["hackable" => $hackable],
-		"where", ["id" => $problem['id']]
+		"set", ["hackable" => UOJProblem::cur()->info['hackable']],
+		"where", ["id" => UOJProblem::info('id')]
 	]);
 };
 $hackable_form->config['submit_container']['class'] = '';
@@ -393,11 +371,11 @@ $hackable_form->config['confirm']['smart'] = true;
 $hackable_form->runAtServer();
 
 $data_form = new UOJForm('data');
-$data_form->handle = function () use ($problem) {
+$data_form->handle = function () {
 	set_time_limit(60 * 5);
-	$ret = dataSyncProblemData($problem, Auth::user());
+	$ret = UOJProblem::cur()->syncData(Auth::user());
 	if ($ret) {
-		becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
+		becomeMsgPage('<div>' . $ret . '</div><a href="">返回</a>');
 	}
 };
 $data_form->config['submit_container']['class'] = '';

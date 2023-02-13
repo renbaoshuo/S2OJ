@@ -38,7 +38,7 @@ if (UOJHack::cur()->userCanReview(Auth::user())) {
 		$new_in = "{$input}_in";
 		$new_out = "{$input}_out";
 		$reason = null;
-		$err = dataAddHackPoint(UOJHack::cur()->problem->info, $new_in, $new_out, $reason, Auth::user());
+		$err = UOJHack::cur()->problem->addHackPoint($new_in, $new_out, $reason, Auth::user());
 		$err === '' || UOJResponse::message($err);
 		unlink($new_in);
 		unlink($new_out);

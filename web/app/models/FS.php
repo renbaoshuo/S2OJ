@@ -3,11 +3,11 @@
 class FS {
 	public static function scandir(string $directory, $cfg = []) {
 		$cfg += [
-		    'exclude_dots' => true
+			'exclude_dots' => true
 		];
 		$entries = scandir($directory);
 		if ($cfg['exclude_dots']) {
-			$entries = array_filter($entries, fn($name) => $name !== '.' && $name !== '..');
+			$entries = array_values(array_filter($entries, fn ($name) => $name !== '.' && $name !== '..'));
 		}
 		return $entries;
 	}
@@ -27,17 +27,17 @@ class FS {
 
 	/**
 	 * @param int $type lock type. can be either LOCK_SH or LOCK_EX
-	*/
+	 */
 	public static function lock_file(string $path, int $type, callable $func) {
 		$lock_fp = fopen($path, 'c');
-		
+
 		if (!flock($lock_fp, $type | LOCK_NB)) {
 			UOJLog::error("lock failed: {$path}");
 			return false;
 		}
-		
+
 		$ret = $func();
-		
+
 		flock($lock_fp, LOCK_UN | LOCK_NB);
 
 		return $ret;
@@ -46,7 +46,7 @@ class FS {
 	public static function randomAvailableFileName($dir, $suffix = '') {
 		do {
 			$name = $dir . uojRandString(20) . $suffix;
-		} while (file_exists(UOJContext::storagePath().$name));
+		} while (file_exists(UOJContext::storagePath() . $name));
 		return $name;
 	}
 
@@ -56,9 +56,18 @@ class FS {
 
 	public static function randomAvailableSubmissionFileName() {
 		$num = uojRand(1, 10000);
-		if (!file_exists(UOJContext::storagePath()."/submission/$num")) {
-			system("mkdir ".UOJContext::storagePath()."/submission/$num");
+		if (!file_exists(UOJContext::storagePath() . "/submission/$num")) {
+			system("mkdir " . UOJContext::storagePath() . "/submission/$num");
 		}
 		return static::randomAvailableFileName("/submission/$num/");
+	}
+
+	public static function moveFilesInDir(string $src, string $dest) {
+		foreach (FS::scandir($src) as $name) {
+			if (!rename("{$src}/{$name}", "{$dest}/{$name}")) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
