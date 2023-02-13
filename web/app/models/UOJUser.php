@@ -247,7 +247,11 @@ class UOJUser {
 		return $custom_color ?: '#0d6efd';
 	}
 
-	public static function getLink($user) {
+	public static function getLink($user, $cfg = []) {
+		$cfg += [
+			'color' => true,
+		];
+
 		if (is_string($user)) {
 			$info = UOJUser::query($user);
 
@@ -267,7 +271,7 @@ class UOJUser {
 
 		return HTML::tag('span', [
 			'class' => 'uoj-username',
-			'data-color' => UOJUser::getUserColor($user),
+			'data-color' => $cfg['color'] ? UOJUser::getUserColor($user) : '',
 			'data-realname' => trim(HTML::escape($realname)),
 		], $user['username']);
 	}

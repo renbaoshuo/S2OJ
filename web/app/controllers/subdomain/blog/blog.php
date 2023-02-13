@@ -60,7 +60,7 @@ $comment_form->handle = function () {
 	$page = floor($rank / 20) + 1;
 
 	$uri = getLongTablePageUri($page) . '#' . "comment-{$comment_id}";
-	$user_link = UOJUser::getLink(Auth::user());
+	$user_link = UOJUser::getLink(Auth::user(), ['color' => false]);
 
 	foreach ($referrers as $referrer) {
 		$content = $user_link . ' 在博客 ' . $blog['title'] . ' 的评论里提到你：<a href="' . $uri . '">点击此处查看</a>';
@@ -137,7 +137,7 @@ $reply_form->handle = function (&$vdata) {
 	$page = floor($rank / 20) + 1;
 
 	$uri = getLongTablePageUri($page) . '#' . "comment-{$reply_id}";
-	$user_link = UOJUser::getLink(Auth::user());
+	$user_link = UOJUser::getLink(Auth::user(), ['color' => false]);
 
 	foreach ($referrers as $referrer) {
 		$content = $user_link . ' 在博客 ' . $blog['title'] . ' 的评论里提到你：<a href="' . $uri . '">点击此处查看</a>';
@@ -195,7 +195,7 @@ if (UOJUserBlog::userHasManagePermission(Auth::user())) {
 			sendSystemMsg(
 				$comment->info['poster'],
 				'评论隐藏通知',
-				"<p>" . UOJUser::getLink($comment->info['poster']) . " 您好：</p>" .
+				"<p>" . UOJUser::getLink($comment->info['poster'], ['color' => false]) . " 您好：</p>" .
 					"<p>您为博客 " . UOJBlog::cur()->getLink() . " 回复的评论 “" . substr($comment->info['content'], 0, 30) . "……” 已被管理员隐藏，隐藏原因为 “{$reason}”。</p>"
 			);
 		}

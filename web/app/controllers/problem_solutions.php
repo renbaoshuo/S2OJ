@@ -35,8 +35,8 @@ if (UOJRequest::post('submit-remove_solution') === 'remove_solution') {
 		sendSystemMsg(
 			$blog->info['poster'],
 			'题解移除通知',
-			"<p>" . UOJUser::getLink($blog->info['poster']) . " 您好：</p>" .
-				"<p>您为问题 " . UOJProblem::cur()->getLink(['with' => 'id']) . " 提交的题解 " . $blog->getLink() . " 已被" . (isSuperUser(Auth::user()) ? "管理员" : " " . UOJUser::getLink(Auth::user()) . " ") . "移除。</p>"
+			"<p>" . UOJUser::getLink($blog->info['poster'], ['color' => false]) . " 您好：</p>" .
+				"<p>您为问题 " . UOJProblem::cur()->getLink(['with' => 'id']) . " 提交的题解 " . $blog->getLink() . " 已被管理员移除。</p>"
 		);
 	}
 
