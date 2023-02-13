@@ -1025,7 +1025,8 @@ INSERT INTO `upgrades` (`name`, `status`, `updated_at`) VALUES
   ('28_remote_judge', 'up', now()),
   ('31_problem_resources', 'up', now()),
   ('36_decimal_score_range', 'up', now()),
-  ('40_contest_resources', 'up', now());
+  ('40_contest_resources', 'up', now()),
+  ('41_mail_notice', 'up', now());
 /*!40000 ALTER TABLE `upgrades` ENABLE KEYS */;
 UNLOCK TABLES;
 
