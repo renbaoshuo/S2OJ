@@ -3,31 +3,43 @@
 class Auth {
 	public static function check() {
 		global $myUser;
+
 		return $myUser !== null;
 	}
+
 	public static function id() {
 		global $myUser;
+
 		if ($myUser === null) {
 			return null;
 		}
+
 		return $myUser['username'];
 	}
+
 	public static function user() {
 		global $myUser;
+
 		return $myUser;
 	}
+
 	public static function property($name) {
 		global $myUser;
+
 		if (!$myUser) {
 			return false;
 		}
+
 		return $myUser[$name];
 	}
+
 	public static function login($username, $remember = true) {
 		if (!validateUsername($username)) {
 			return;
 		}
+
 		$_SESSION['username'] = $username;
+
 		if ($remember) {
 			$remember_token = DB::selectSingle([
 				"select remember_token from user_info",
@@ -44,6 +56,8 @@ class Auth {
 			}
 
 			$_SESSION['last_login'] = time();
+			$_SESSION['remember_token'] = $remember_token;
+
 			$expire = time() + 60 * 60 * 24 * 7;
 			Cookie::safeSet('uoj_username', $username, $expire, '/', array('httponly' => true));
 			Cookie::safeSet('uoj_remember_token', $remember_token, $expire, '/', array('httponly' => true));
@@ -54,13 +68,17 @@ class Auth {
 			"set", ["last_login_time" => UOJTime::$time_now_str],
 			"where", ["username" => $username]
 		]);
+
+		session_regenerate_id(true);
 	}
 
 	public static function logout() {
 		session_unset();
+
 		Cookie::safeUnset(session_name(), '/');
 		Cookie::safeUnset('uoj_username', '/');
 		Cookie::safeUnset('uoj_remember_token', '/');
+
 		DB::update([
 			"update user_info",
 			"set", ["remember_token" => ''],
@@ -79,25 +97,39 @@ class Auth {
 			if (!validateUsername($_SESSION['username'])) {
 				return;
 			}
+
 			$myUser = UOJUser::query($_SESSION['username']);
+
+			// 当 remember_token 不同时，注销登录
+			if ($_SESSION['remember_token'] !== $myUser['remember_token']) {
+				$myUser = null;
+				return;
+			}
+
 			return;
 		}
 
 		$remember_token = Cookie::safeGet('uoj_remember_token', '/');
 		if ($remember_token != null) {
 			$username = Cookie::safeGet('uoj_username', '/');
+
 			if (!validateUsername($username)) {
 				return;
 			}
+
 			$myUser = UOJUser::query($username);
+
 			if ($myUser['remember_token'] !== $remember_token) {
 				$myUser = null;
 				return;
 			}
+
 			$_SESSION['username'] = $myUser['username'];
+
 			return;
 		}
 	}
+
 	public static function init() {
 		global $myUser;
 
@@ -105,15 +137,18 @@ class Auth {
 		if ($myUser && UOJUser::getAccountStatus($myUser) != 'ok') {
 			$myUser = null;
 		}
+
 		if ($myUser) {
 			if (!isset($_SESSION['last_login'])) {
 				$_SESSION['last_login'] = strtotime($myUser['last_login_time']);
 			}
+
 			$myUser = UOJUser::updateVisitHistory($myUser, [
 				'remote_addr' => UOJContext::remoteAddr(),
 				'http_x_forwarded_for' => UOJContext::httpXForwardedFor(),
 				'http_user_agent' => UOJContext::httpUserAgent()
 			]);
+
 			$_SESSION['last_visited'] = time();
 		}
 	}

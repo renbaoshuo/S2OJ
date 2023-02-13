@@ -390,12 +390,13 @@ EOD);
 		DB::update([
 			"update user_info",
 			"set", [
-				'password' => getPasswordToStore($new_password, $user['username']),
+				"password" => getPasswordToStore($new_password, $user['username']),
+				"remember_token" => "",
 			],
 			"where", ["username" => $user['username']]
 		]);
 
-		dieWithJsonData(['status' => 'success', 'message' => '密码修改成功']);
+		dieWithAlert('密码修改成功！');
 	}
 } elseif ($cur_tab == 'privilege') {
 	$users_default_permissions = UOJContext::getMeta('users_default_permissions');

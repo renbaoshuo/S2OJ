@@ -559,6 +559,7 @@ if ($cur_tab == 'index') {
 			"update user_info",
 			"set", [
 				"password" => getPasswordToStore($password, $vdata['username']),
+				"remember_token" => '',
 			],
 			"where", [
 				"username" => $vdata['username'],

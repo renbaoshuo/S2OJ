@@ -36,6 +36,7 @@ function resetPassword() {
 		"update user_info",
 		"set", [
 			"password" => $newPW,
+			"remember_token" => '',
 			"extra" => DB::json_remove('extra', '$.reset_password_check_code', '$.reset_password_time'),
 		],
 		"where", [
