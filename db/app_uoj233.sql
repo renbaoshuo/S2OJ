@@ -444,7 +444,8 @@ CREATE TABLE `emails` (
   `send_time` datetime DEFAULT NULL,
   `priority` int NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `send_time` (`send_time`)
+  KEY `send_time` (`send_time`),
+  KEY `priority` (`priority`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

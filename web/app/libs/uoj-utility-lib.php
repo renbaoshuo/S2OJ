@@ -210,11 +210,11 @@ function sendSystemMsg($username, $title, $content) {
 	sendEmail($username, $title, $content);
 }
 
-function sendEmail($username, $title, $content) {
+function sendEmail($username, $title, $content, $priority = 0) {
 	DB::insert([
 		"insert into emails",
-		"(receiver, subject, content, created_at)",
-		"values", DB::tuple([$username, $title, $content, DB::now()])
+		"(receiver, subject, content, created_at, priority)",
+		"values", DB::tuple([$username, $title, $content, DB::now(), $priority])
 	]);
 }
 

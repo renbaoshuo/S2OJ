@@ -72,7 +72,7 @@ $forgot_form->handle = function (&$vdata) {
 		<li>转发源 IP:{$http_x_forwarded_for} </li>
 		<li>用户代理: {$user_agent}</li>
 	</ul>
-	EOD);
+	EOD, 5);
 
 	DB::update([
 		"update user_info",
