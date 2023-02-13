@@ -14,6 +14,10 @@ class ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900
     );
 
     public static $prefixLengthsPsr4 = array (
+        'W' => 
+        array (
+            'Webmozart\\Assert\\' => 17,
+        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
@@ -26,14 +30,20 @@ class ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900
         'G' => 
         array (
             'Gregwar\\' => 8,
+            'GO\\' => 3,
         ),
         'C' => 
         array (
             'Curl\\' => 5,
+            'Cron\\' => 5,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'Webmozart\\Assert\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webmozart/assert/src',
+        ),
         'Symfony\\Polyfill\\Php80\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
@@ -50,9 +60,17 @@ class ComposerStaticInit0d7c2cd5c2dbf2120e4372996869e900
         array (
             0 => __DIR__ . '/..' . '/gregwar/captcha/src/Gregwar',
         ),
+        'GO\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/peppeocchi/php-cron-scheduler/src/GO',
+        ),
         'Curl\\' => 
         array (
             0 => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl',
+        ),
+        'Cron\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron',
         ),
     );
 

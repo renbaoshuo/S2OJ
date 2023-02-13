@@ -66,12 +66,9 @@ class UOJContest {
 		calcStandings($contest, $data, $score, $standings, ['update_contests_submissions' => true]);
 
 		for ($i = 0; $i < count($standings); $i++) {
-			$user_link = UOJUser::getLink($standings[$i][2][0], ['color' => false]);
 			$tail = $standings[$i][0] == $total_score ? '，请继续保持。' : '，请继续努力！';
 
-			$content = '<p>' . $user_link . ' 您好：</p>';
-			$content .= '<p>' . '您参与的比赛 <a href="/contest/' . $contest['id'] . '">' . $contest['name'] . '</a> 现已公布成绩，您的成绩为 <a class="uoj-score" data-max="' . $total_score . '">' . $standings[$i][0] . '</a>' . $tail . '</p>';
-			sendSystemMsg($standings[$i][2][0], '比赛成绩公布通知', $content);
+			sendSystemMsg($standings[$i][2][0], '比赛成绩公布通知', '您参与的比赛 <a href="' . HTML::url('/contest/' . $contest['id']) . '">' . $contest['name'] . '</a> 现已公布成绩，您的成绩为 <a class="uoj-score" data-max="' . $total_score . '">' . $standings[$i][0] . '</a>' . $tail);
 			DB::update([
 				"update contests_registrants",
 				"set", ["final_rank" => $standings[$i][3]],

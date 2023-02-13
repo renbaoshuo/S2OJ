@@ -106,12 +106,9 @@ function getLongTablePageRawUri($page) {
 		unset($param['page']);
 	}
 
-	if ($param) {
-		return $path . '?' . http_build_query($param);
-	} else {
-		return $path;
-	}
+	return HTML::url($path, ['params' => $param]);
 }
+
 function getLongTablePageUri($page) {
 	return HTML::escape(getLongTablePageRawUri($page));
 }

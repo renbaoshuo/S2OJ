@@ -46,7 +46,7 @@ $forgot_form->handle = function (&$vdata) {
 	unset($_SESSION['phrase']);
 
 	if (!$user['email']) {
-		becomeMsgPage('用户未填写邮件地址，请联系管理员重置！');
+		becomeMsgPage('用户未填写邮件地址，请联系管理员重置密码！');
 	}
 
 	$oj_name = UOJConfig::$data['profile']['oj-name'];
@@ -54,7 +54,6 @@ $forgot_form->handle = function (&$vdata) {
 	$check_code = md5($user['username'] . "+" . $password . '+' . UOJTime::$time_now_str);
 	$sufs = base64url_encode($user['username'] . "." . $check_code);
 	$url = HTML::url("/reset_password", ['params' => ['p' => $sufs]]);
-	$oj_url = HTML::url('/');
 	$name = $user['username'];
 	$remote_addr = UOJContext::remoteAddr();
 	$http_x_forwarded_for = UOJContext::httpXForwardedFor();
@@ -64,53 +63,28 @@ $forgot_form->handle = function (&$vdata) {
 		$name .= ' (' . $user['realname'] . ')';
 	}
 
-	$html = <<<EOD
-<base target="_blank" />
+	sendEmail($user['username'], $oj_name_short . ' 密码找回', <<<EOD
+	<p>您最近告知我们需要重置您在 {$oj_name_short} 上账号的密码。请访问以下链接：<a href="{$url}">{$url}</a> (如果无法点击链接，请试着复制链接并粘贴至浏览器中打开。)</p>
+	<p>如果您没有请求重置密码，则忽略此信息。该链接将在 72 小时后自动过期失效。</p>
 
-<p>{$name} 您好，</p>
+	<ul>
+		<li>请求 IP: {$remote_addr}</li>
+		<li>转发源 IP:{$http_x_forwarded_for} </li>
+		<li>用户代理: {$user_agent}</li>
+	</ul>
+	EOD);
 
-<p>您最近告知我们需要重置您在 {$oj_name_short} 上账号的密码。请访问以下链接：<a href="{$url}">{$url}</a> (如果无法点击链接，请试着复制链接并粘贴至浏览器中打开。)</p>
-<p>如果您没有请求重置密码，则忽略此信息。该链接将在 72 小时后自动过期失效。</p>
+	DB::update([
+		"update user_info",
+		"set", [
+			'extra' => DB::json_set('extra', '$.reset_password_check_code', $check_code, '$.reset_password_time', UOJTime::$time_now_str),
+		],
+		"where", [
+			"username" => $user['username'],
+		],
+	]);
 
-<ul>
-<li><small>请求 IP: {$remote_addr} (转发来源: {$http_x_forwarded_for})</small></li>
-<li><small>用户代理: {$user_agent}</small></li>
-</ul>
-
-<p>{$oj_name}</p>
-<p><a href="{$oj_url}">{$oj_url}</a></p>
-EOD;
-
-	$mailer = UOJMail::noreply();
-	$mailer->addAddress($user['email'], $user['username']);
-	$mailer->Subject = $oj_name_short . " 密码找回";
-	$mailer->msgHTML($html);
-
-	$res = retry_loop(function () use (&$mailer) {
-		$res = $mailer->send();
-
-		if ($res) return true;
-
-		UOJLog::error($mailer->ErrorInfo);
-
-		return false;
-	});
-
-	if (!$res) {
-		becomeMsgPage('<div class="text-center"><h2>邮件发送失败，请重试！</h2><a href="">返回</a></div>');
-	} else {
-		DB::update([
-			"update user_info",
-			"set", [
-				'extra' => DB::json_set('extra', '$.reset_password_check_code', $check_code, '$.reset_password_time', UOJTime::$time_now_str),
-			],
-			"where", [
-				"username" => $user['username'],
-			],
-		]);
-
-		becomeMsgPage('<div class="text-center"><h2>邮件发送成功，请检查收件箱！</h2><span>如果邮件未出现在收件箱中，请检查垃圾箱。</span></div>');
-	}
+	becomeMsgPage('<div class="text-center"><h2>邮件已发送，请检查收件箱！</h2><span>如果邮件未出现在收件箱中，请检查垃圾箱。</span></div>');
 };
 $forgot_form->runAtServer();
 ?>

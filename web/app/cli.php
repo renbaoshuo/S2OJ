@@ -10,65 +10,79 @@ require $_SERVER['DOCUMENT_ROOT'] . '/app/libs/uoj-lib.php';
 $handlers = [
 	'upgrade:up' => function ($name) {
 		if (func_num_args() != 1) {
-			die("php7.4 cli.php upgrade:up <name>\n");
+			print("php cli.php upgrade:up <name>\n");
+			exit(1);
 		}
-		Upgrader::transaction(function() use ($name) {
+		Upgrader::transaction(function () use ($name) {
 			Upgrader::up($name);
 		});
-		die("finished!\n");
+		print("finished!\n");
 	},
 	'upgrade:down' => function ($name) {
 		if (func_num_args() != 1) {
-			die("php7.4 cli.php upgrade:down <name>\n");
+			print("php cli.php upgrade:down <name>\n");
+			exit(1);
 		}
-		Upgrader::transaction(function() use ($name) {
+		Upgrader::transaction(function () use ($name) {
 			Upgrader::down($name);
 		});
-		die("finished!\n");
+		print("finished!\n");
 	},
 	'upgrade:refresh' => function ($name) {
 		if (func_num_args() != 1) {
-			die("php7.4 cli.php upgrade:refresh <name>\n");
+			print("php cli.php upgrade:refresh <name>\n");
+			exit(1);
 		}
-		Upgrader::transaction(function() use ($name) {
+		Upgrader::transaction(function () use ($name) {
 			Upgrader::refresh($name);
 		});
-		die("finished!\n");
+		print("finished!\n");
 	},
 	'upgrade:remove' => function ($name) {
 		if (func_num_args() != 1) {
-			die("php7.4 cli.php upgrade:remove <name>\n");
+			print("php cli.php upgrade:remove <name>\n");
+			exit(1);
 		}
-		Upgrader::transaction(function() use ($name) {
+		Upgrader::transaction(function () use ($name) {
 			Upgrader::remove($name);
 		});
-		die("finished!\n");
+		print("finished!\n");
 	},
 	'upgrade:latest' => function () {
 		if (func_num_args() != 0) {
-			die("php7.4 cli.php upgrade:latest\n");
+			print("php cli.php upgrade:latest\n");
+			exit(1);
 		}
-		Upgrader::transaction(function() {
+		Upgrader::transaction(function () {
 			Upgrader::upgradeToLatest();
 		});
-		die("finished!\n");
+		print("finished!\n");
 	},
 	'upgrade:remove-all' => function () {
 		if (func_num_args() != 0) {
-			die("php7.4 cli.php upgrade:remove-all\n");
+			print("php cli.php upgrade:remove-all\n");
+			exit(1);
 		}
-		Upgrader::transaction(function() {
+		Upgrader::transaction(function () {
 			Upgrader::removeAll();
 		});
-		die("finished!\n");
+		print("finished!\n");
 	},
-	'help' => 'showHelp'
+	'email:send-all' => function () {
+		if (func_num_args() != 0) {
+			print("php cli.php email:send-all\n");
+			exit(1);
+		}
+		UOJMail::cronSendEmail();
+		print("finished!\n");
+	},
+	'help' => 'showHelp',
 ];
 
 function showHelp() {
 	global $handlers;
 	echo "UOJ Command-Line Interface\n";
-	echo "php7.4 cli.php <task-name> params1 params2 ...\n";
+	echo "php cli.php <task-name> params1 params2 ...\n";
 	echo "\n";
 	echo "The following tasks are available:\n";
 	foreach ($handlers as $cmd => $handler) {

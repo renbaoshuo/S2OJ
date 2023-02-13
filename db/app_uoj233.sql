@@ -430,6 +430,34 @@ LOCK TABLES `custom_test_submissions` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `emails`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `emails` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `receiver` varchar(20) NOT NULL,
+  `subject` varchar(100) NOT NULL,
+  `content` text NOT NULL,
+  `created_at` datetime NOT NULL,
+  `send_time` datetime DEFAULT NULL,
+  `priority` int NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `send_time` (`send_time`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `emails`
+--
+
+LOCK TABLES `emails` WRITE;
+/*!40000 ALTER TABLE `emails` DISABLE KEYS */;
+/*!40000 ALTER TABLE `emails` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `friend_links`
 --
 

@@ -79,6 +79,8 @@ initProgress(){
     #Start services
     service ntp restart
     service apache2 restart
+	service cron start
+	echo "* * * * * root /usr/bin/php7.4 /opt/uoj/web/app/scheduler.php" >> /etc/crontab
 	mkdir -p /opt/uoj/web/app/storage/submission
 	mkdir -p /opt/uoj/web/app/storage/tmp
 	mkdir -p /opt/uoj/web/app/storage/image_hosting

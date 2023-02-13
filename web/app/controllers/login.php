@@ -42,6 +42,22 @@ function handleLoginPost() {
 	}
 
 	Auth::login($user['username']);
+
+	$remote_addr = UOJContext::remoteAddr();
+	$http_x_forwarded_for = UOJContext::httpXForwardedFor();
+	$user_agent = UOJContext::httpUserAgent();
+	sendEmail($user['username'], '新登录', <<<EOD
+	<p>您收到这封邮件是因为有人通过以下方式登录了您的帐户：</p>
+
+	<ul>
+		<li>请求 IP: {$remote_addr}</li>
+		<li>转发源 IP:{$http_x_forwarded_for} </li>
+		<li>用户代理: {$user_agent}</li>
+	</ul>
+
+	<p>如果这是您进行的登录操作，请忽略此邮件。如果您没有进行过登录操作，请立即重置您账号的密码。</p>
+	EOD);
+
 	return "ok";
 }
 
