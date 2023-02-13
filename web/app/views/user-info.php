@@ -252,17 +252,24 @@
 		</div>
 		<div class="card mb-2">
 			<div class="card-body">
-				<?php $ac_problems = DB::selectAll("select a.problem_id as problem_id, b.title as title from best_ac_submissions a inner join problems b on a.problem_id = b.id where submitter = '{$user['username']}' order by id") ?>
+				<?php $ac_problems = DB::selectAll("select problem_id from best_ac_submissions where submitter = '{$user['username']}' order by problem_id") ?>
 				<h4 class="card-title">
 					<?= UOJLocale::get('accepted problems') . ': ' . UOJLocale::get('n problems in total', count($ac_problems)) ?>
 				</h4>
 				<ul class="nav uoj-ac-problems-list">
-					<?php foreach ($ac_problems as $problem) : ?>
-						<li class="nav-item">
-							<a class="nav-link rounded uoj-ac-problems-list-item" href="/problem/<?= $problem['problem_id'] ?>" role="button">
-								#<?= $problem['problem_id'] ?>. <?= $problem['title'] ?>
-							</a>
-						</li>
+					<?php foreach ($ac_problems as $prob) : ?>
+						<?php $problem = UOJProblem::query($prob['problem_id']) ?>
+						<?php if ($problem->userCanView(Auth::user())) : ?>
+							<li class="nav-item">
+								<?= $problem->getLink(['with' => 'id', 'class' => 'nav-link rounded uoj-ac-problems-list-item']) ?>
+							</li>
+						<?php else : ?>
+							<li class="nav-item">
+								<a class="nav-link disabled rounded" role="button">
+									#<?= $problem->info['id'] ?>. 隐藏的题目
+								</a>
+							</li>
+						<?php endif ?>
 					<?php endforeach ?>
 
 					<?php if (empty($ac_problems)) : ?>

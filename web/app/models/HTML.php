@@ -307,17 +307,17 @@ class HTML {
 	}
 
 	public static function link(?string $uri, $text, $cfg = []) {
-		$cfg += ['location' => 'main', 'escape' => true];
+		$cfg += ['location' => 'main', 'escape' => true, 'class' => ''];
 
 		if ($cfg['escape']) {
 			$text = HTML::escape($text);
 		}
 
 		if ($uri === null) {
-			return HTML::tag('a', [], $text);
+			return HTML::tag('a', ['class' => $cfg['class']], $text);
 		}
 
-		return HTML::tag('a', ['href' => HTML::url($uri, $cfg)], $text);
+		return HTML::tag('a', ['href' => HTML::url($uri, $cfg), 'class' => $cfg['class']], $text);
 	}
 
 	public static function autolink(string $url, array $attr = [], $cfg = []) {

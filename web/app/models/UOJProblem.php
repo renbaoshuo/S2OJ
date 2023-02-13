@@ -367,7 +367,7 @@ class UOJProblem {
 	}
 
 	public function getLink(array $cfg = []) {
-		return HTML::link($this->getUri(), $this->getTitle($cfg), ['escape' => false]);
+		return HTML::link($this->getUri(), $this->getTitle($cfg), ['escape' => false, 'class' => $cfg['class'] ?: '']);
 	}
 
 	public function getAttachmentUri() {
