@@ -206,6 +206,16 @@ function sendSystemMsg($username, $title, $content) {
 		"(receiver, title, content, send_time)",
 		"values", DB::tuple([$username, $title, $content, DB::now()])
 	]);
+
+	sendEmail($username, $title, $content);
+}
+
+function sendEmail($username, $title, $content, $priority = 0) {
+	DB::insert([
+		"insert into emails",
+		"(receiver, subject, content, created_at, priority)",
+		"values", DB::tuple([$username, $title, $content, DB::now(), $priority])
+	]);
 }
 
 function retry_loop(callable $f, $retry = 5, $ms = 10) {

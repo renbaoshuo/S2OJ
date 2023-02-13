@@ -153,7 +153,7 @@ $reply_form->handle = function (&$vdata) {
 	}
 	if ($blog['poster'] !== Auth::id() && !in_array($blog['poster'], $notified)) {
 		$notified[] = $blog['poster'];
-		$content = $user_link . '回复了您的博客 ' . $blog['title'] . ' ：<a href="' . $uri . '">点击此处查看</a>';
+		$content = $user_link . ' 回复了您的博客 ' . $blog['title'] . ' ：<a href="' . $uri . '">点击此处查看</a>';
 		sendSystemMsg($blog['poster'], '博客新回复通知', $content);
 	}
 
@@ -195,8 +195,7 @@ if (UOJUserBlog::userHasManagePermission(Auth::user())) {
 			sendSystemMsg(
 				$comment->info['poster'],
 				'评论隐藏通知',
-				"<p>" . UOJUser::getLink($comment->info['poster'], ['color' => false]) . " 您好：</p>" .
-					"<p>您为博客 " . UOJBlog::cur()->getLink() . " 回复的评论 “" . substr($comment->info['content'], 0, 30) . "……” 已被管理员隐藏，隐藏原因为 “{$reason}”。</p>"
+				"您为博客 " . UOJBlog::cur()->getLink() . " 回复的评论 “" . substr($comment->info['content'], 0, 30) . "……” 已被管理员隐藏，隐藏原因为 “{$reason}”。"
 			);
 		}
 	};
