@@ -458,7 +458,7 @@ if (UOJContest::cur()) {
 					<span class="flex-shrink-0">
 						<?= UOJLocale::get('problems::uploader') ?>
 					</span>
-					<span>
+					<span class="text-end">
 						<?= UOJProblem::cur()->getUploaderLink() ?>
 					</span>
 				</li>
@@ -466,7 +466,7 @@ if (UOJContest::cur()) {
 					<span class="flex-shrink-0">
 						<?= UOJLocale::get('problems::problem source') ?>
 					</span>
-					<span>
+					<span class="text-end">
 						<?= UOJProblem::cur()->getProviderLink() ?>
 					</span>
 				</li>
@@ -475,7 +475,7 @@ if (UOJContest::cur()) {
 						<span class="flex-shrink-0">
 							<?= UOJLocale::get('problems::difficulty') ?>
 						</span>
-						<span>
+						<span class="text-end">
 							<?= UOJProblem::cur()->getDifficultyHTML() ?>
 						</span>
 					</li>
@@ -484,9 +484,9 @@ if (UOJContest::cur()) {
 							<span class="flex-shrink-0">
 								<?= UOJLocale::get('problems::historical score') ?>
 							</span>
-							<?php $his_score = DB::selectSingle(["select max(score)", "from submissions", "where", ["problem_id" => UOJProblem::info('id'), "submitter" => Auth::id()]]) ?>
 
-							<a class="<?= is_null($his_score) ? '' : 'uoj-score' ?>" href="<?= HTML::url('/submissions', ['params' => ['problem_id' => UOJProblem::info('id'), 'submitter' => Auth::id()]]) ?>">
+							<?php $his_score = DB::selectSingle(["select max(score)", "from submissions", "where", ["problem_id" => UOJProblem::info('id'), "submitter" => Auth::id()]]) ?>
+							<a class="<?= is_null($his_score) ? '' : 'uoj-score' ?> text-end" href="<?= HTML::url('/submissions', ['params' => ['problem_id' => UOJProblem::info('id'), 'submitter' => Auth::id()]]) ?>">
 								<?= is_null($his_score) ? '无' : UOJSubmission::roundedScore($his_score) ?>
 							</a>
 						</li>
@@ -495,7 +495,7 @@ if (UOJContest::cur()) {
 						<span class="flex-shrink-0">
 							<?= UOJLocale::get('problems::tags') ?>
 						</span>
-						<span>
+						<span class="text-end">
 							<?php if (UOJProblem::info('is_hidden')) : ?>
 								<a href="<?= HTML::url('/problems', ['params' => ['is_hidden' => 'on']]) ?>">
 									<span class="badge text-bg-danger">
@@ -518,7 +518,7 @@ if (UOJContest::cur()) {
 					<span class="flex-shrink-0">
 						<?= UOJLocale::get('appraisal') ?>
 					</span>
-					<span>
+					<span class="text-end">
 						<?= UOJProblem::cur()->getZanBlock() ?>
 					</span>
 				</li>
