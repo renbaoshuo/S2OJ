@@ -413,7 +413,7 @@ if (UOJContest::cur()) {
 				<?php endif ?>
 				<?php if (!UOJContest::cur() || UOJContest::cur()->progress() >= CONTEST_FINISHED) : ?>
 					<li class="nav-item text-start">
-						<a href="<?= UOJProblem::cur()->getUri('/solutions') ?>" class="nav-link">
+						<a href="/problem/<?= UOJProblem::info('id') ?>/solutions" class="nav-link">
 							<i class="bi bi-journal-bookmark"></i>
 							<?= UOJLocale::get('problems::solutions') ?>
 						</a>
@@ -442,7 +442,7 @@ if (UOJContest::cur()) {
 				<?php endif ?>
 				<?php if (UOJProblem::cur()->userCanManage(Auth::user())) : ?>
 					<li class="nav-item text-start">
-						<a class="nav-link" href="<?= UOJProblem::cur()->getUri('/manage/statement') ?>">
+						<a class="nav-link" href="/problem/<?= UOJProblem::info('id') ?>/manage/statement">
 							<i class="bi bi-sliders"></i>
 							<?= UOJLocale::get('problems::manage') ?>
 						</a>
