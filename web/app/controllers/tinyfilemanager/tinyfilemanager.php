@@ -98,11 +98,6 @@ if (defined('FM_EMBED')) {
     restore_error_handler();
 }
 
-//Genrating CSRF Token
-if (empty($_SESSION['token'])) {
-    $_SESSION['token'] = bin2hex(random_bytes(32));
-}
-
 if (empty($auth_users)) {
     $use_auth = false;
 }
@@ -124,7 +119,6 @@ defined('FM_SELF_URL') || define('FM_SELF_URL', HTML::url('?'));
 // logout
 if (isset($_GET['logout'])) {
     unset($_SESSION[FM_SESSION_ID]['logged']);
-    unset( $_SESSION['token']); 
     fm_redirect(FM_SELF_URL);
 }
 
@@ -175,11 +169,11 @@ if ($ip_ruleset != 'OFF') {
 if ($use_auth) {
     if (isset($_SESSION[FM_SESSION_ID]['logged'], $auth_users[$_SESSION[FM_SESSION_ID]['logged']])) {
         // Logged
-    } elseif (isset($_POST['fm_usr'], $_POST['fm_pwd'], $_POST['token'])) {
+    } elseif (isset($_POST['fm_usr'], $_POST['fm_pwd'], $_POST['_token'])) {
         // Logging In
         sleep(1);
         if(function_exists('password_verify')) {
-            if (isset($auth_users[$_POST['fm_usr']]) && isset($_POST['fm_pwd']) && password_verify($_POST['fm_pwd'], $auth_users[$_POST['fm_usr']]) && verifyToken($_POST['token'])) {
+            if (isset($auth_users[$_POST['fm_usr']]) && isset($_POST['fm_pwd']) && password_verify($_POST['fm_pwd'], $auth_users[$_POST['fm_usr']]) && crsf_check()) {
                 $_SESSION[FM_SESSION_ID]['logged'] = $_POST['fm_usr'];
                 fm_set_msg(lng('You are logged in'));
                 fm_redirect(FM_ROOT_URL);
@@ -230,7 +224,7 @@ if ($use_auth) {
                                     <div class="mb-3">
                                         <?php fm_show_message(); ?>
                                     </div>
-                                    <input type="hidden" name="token" value="<?php echo htmlentities($_SESSION['token']); ?>" />
+									<?= HTML::hiddenToken() ?>
                                     <div class="mb-3">
                                         <button type="submit" class="btn btn-success btn-block w-100 mt-4" role="button">
                                             <?php echo lng('Login'); ?>
@@ -306,11 +300,8 @@ unset($p, $use_auth, $iconv_input_encoding, $use_highlightjs, $highlightjs_style
 /*************************** ACTIONS ***************************/
 
 // Handle all AJAX Request
-if ((isset($_SESSION[FM_SESSION_ID]['logged'], $auth_users[$_SESSION[FM_SESSION_ID]['logged']]) || !FM_USE_AUTH) && isset($_POST['ajax'], $_POST['token']) && !FM_READONLY) {
-    if(!verifyToken($_POST['token'])) {
-        header('HTTP/1.0 401 Unauthorized');
-        die("Invalid Token.");
-    }
+if ((isset($_SESSION[FM_SESSION_ID]['logged'], $auth_users[$_SESSION[FM_SESSION_ID]['logged']]) || !FM_USE_AUTH) && isset($_POST['ajax'], $_POST['_token']) && !FM_READONLY) {
+	crsf_defend();
 
     //search : get list of files from the current folder
     if(isset($_POST['type']) && $_POST['type']=="search") {
@@ -515,9 +506,9 @@ if ((isset($_SESSION[FM_SESSION_ID]['logged'], $auth_users[$_SESSION[FM_SESSION_
 }
 
 // Delete file / folder
-if (isset($_GET['del'], $_POST['token']) && !FM_READONLY) {
+if (isset($_GET['del'], $_POST['_token']) && !FM_READONLY) {
     $del = str_replace( '/', '', fm_clean_path( $_GET['del'] ) );
-    if ($del != '' && $del != '..' && $del != '.' && verifyToken($_POST['token'])) {
+    if ($del != '' && $del != '..' && $del != '.' && crsf_check()) {
         $path = FM_ROOT_PATH;
         if (FM_PATH != '') {
             $path .= '/' . FM_PATH;
@@ -537,10 +528,10 @@ if (isset($_GET['del'], $_POST['token']) && !FM_READONLY) {
 }
 
 // Create a new file/folder
-if (isset($_POST['newfilename'], $_POST['newfile'], $_POST['token']) && !FM_READONLY) {
+if (isset($_POST['newfilename'], $_POST['newfile'], $_POST['_token']) && !FM_READONLY) {
     $type = urldecode($_POST['newfile']);
     $new = str_replace( '/', '', fm_clean_path( strip_tags( $_POST['newfilename'] ) ) );
-    if (fm_isvalid_filename($new) && $new != '' && $new != '..' && $new != '.' && verifyToken($_POST['token'])) {
+    if (fm_isvalid_filename($new) && $new != '' && $new != '..' && $new != '.' && crsf_check()) {
         $path = FM_ROOT_PATH;
         if (FM_PATH != '') {
             $path .= '/' . FM_PATH;
@@ -643,11 +634,8 @@ if (isset($_GET['copy'], $_GET['finish']) && !FM_READONLY) {
 }
 
 // Mass copy files/ folders
-if (isset($_POST['file'], $_POST['copy_to'], $_POST['finish'], $_POST['token']) && !FM_READONLY) {
-
-    if(!verifyToken($_POST['token'])) {
-        fm_set_msg(lng('Invalid Token.'), 'error');
-    }
+if (isset($_POST['file'], $_POST['copy_to'], $_POST['finish'], $_POST['_token']) && !FM_READONLY) {
+    crsf_defend();
     
     // from
     $path = FM_ROOT_PATH;
@@ -710,10 +698,9 @@ if (isset($_POST['file'], $_POST['copy_to'], $_POST['finish'], $_POST['token']) 
 }
 
 // Rename
-if (isset($_POST['rename_from'], $_POST['rename_to'], $_POST['token']) && !FM_READONLY) {
-    if(!verifyToken($_POST['token'])) {
-        fm_set_msg("Invalid Token.", 'error');
-    }
+if (isset($_POST['rename_from'], $_POST['rename_to'], $_POST['_token']) && !FM_READONLY) {
+    crsf_defend();
+
     // old name
     $old = urldecode($_POST['rename_from']);
     $old = fm_clean_path($old);
@@ -741,10 +728,8 @@ if (isset($_POST['rename_from'], $_POST['rename_to'], $_POST['token']) && !FM_RE
 }
 
 // Download
-if (isset($_GET['dl'], $_POST['token'])) {
-    if(!verifyToken($_POST['token'])) {
-        fm_set_msg("Invalid Token.", 'error');
-    }
+if (isset($_GET['dl'], $_POST['_token'])) {
+    crsf_defend();
 
     $dl = urldecode($_GET['dl']);
     $dl = fm_clean_path($dl);
@@ -764,8 +749,8 @@ if (isset($_GET['dl'], $_POST['token'])) {
 
 // Upload
 if (!empty($_FILES) && !FM_READONLY) {
-    if(isset($_POST['token'])) {
-        if(!verifyToken($_POST['token'])) {
+    if(isset($_POST['_token'])) {
+        if(!crsf_check()) {
             $response = array ('status' => 'error','info' => "Invalid Token.");
             echo json_encode($response); exit();
         }
@@ -892,11 +877,8 @@ if (!empty($_FILES) && !FM_READONLY) {
 }
 
 // Mass deleting
-if (isset($_POST['group'], $_POST['delete'], $_POST['token']) && !FM_READONLY) {
-
-    if(!verifyToken($_POST['token'])) {
-        fm_set_msg(lng("Invalid Token."), 'error');
-    }
+if (isset($_POST['group'], $_POST['delete'], $_POST['_token']) && !FM_READONLY) {
+    crsf_defend();
 
     $path = FM_ROOT_PATH;
     if (FM_PATH != '') {
@@ -927,11 +909,8 @@ if (isset($_POST['group'], $_POST['delete'], $_POST['token']) && !FM_READONLY) {
 }
 
 // Pack files zip, tar
-if (isset($_POST['group'], $_POST['token']) && (isset($_POST['zip']) || isset($_POST['tar'])) && !FM_READONLY) {
-
-    if(!verifyToken($_POST['token'])) {
-        fm_set_msg(lng("Invalid Token."), 'error');
-    }
+if (isset($_POST['group'], $_POST['_token']) && (isset($_POST['zip']) || isset($_POST['tar'])) && !FM_READONLY) {
+    crsf_defend();
 
     $path = FM_ROOT_PATH;
     $ext = 'zip';
@@ -989,11 +968,9 @@ if (isset($_POST['group'], $_POST['token']) && (isset($_POST['zip']) || isset($_
 }
 
 // Unpack zip, tar
-if (isset($_POST['unzip'], $_POST['token']) && !FM_READONLY) {
+if (isset($_POST['unzip'], $_POST['_token']) && !FM_READONLY) {
 
-    if(!verifyToken($_POST['token'])) {
-        fm_set_msg(lng("Invalid Token."), 'error');
-    }
+   	crsf_defend();
 
     $unzip = urldecode($_POST['unzip']);
     $unzip = fm_clean_path($unzip);
@@ -1057,11 +1034,9 @@ if (isset($_POST['unzip'], $_POST['token']) && !FM_READONLY) {
 }
 
 // Change Perms (not for Windows)
-if (isset($_POST['chmod'], $_POST['token']) && !FM_READONLY && !FM_IS_WIN) {
+if (isset($_POST['chmod'], $_POST['_token']) && !FM_READONLY && !FM_IS_WIN) {
 
-    if(!verifyToken($_POST['token'])) {
-        fm_set_msg(lng("Invalid Token."), 'error');
-    }
+    crsf_defend();
     
     $path = FM_ROOT_PATH;
     if (FM_PATH != '') {
@@ -1195,7 +1170,7 @@ if (isset($_GET['upload']) && !FM_READONLY) {
                 <form action="<?php echo htmlspecialchars(FM_SELF_URL) . '?p=' . fm_enc(FM_PATH) ?>" class="dropzone card-tabs-container" id="fileUploader" enctype="multipart/form-data">
                     <input type="hidden" name="p" value="<?php echo fm_enc(FM_PATH) ?>">
                     <input type="hidden" name="fullpath" id="fullpath" value="<?php echo fm_enc(FM_PATH) ?>">
-                    <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+                    <?= HTML::hiddenToken() ?>
                     <div class="fallback">
                         <input name="file" type="file" multiple/>
                     </div>
@@ -1205,7 +1180,7 @@ if (isset($_GET['upload']) && !FM_READONLY) {
                     <form id="js-form-url-upload" class="row row-cols-lg-auto g-3 align-items-center" onsubmit="return upload_from_url(this);" method="POST" action="">
                         <input type="hidden" name="type" value="upload" aria-label="hidden" aria-hidden="true">
                         <input type="url" placeholder="URL" name="uploadurl" required class="form-control" style="width: 80%">
-                        <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+                        <?= HTML::hiddenToken() ?>
                         <button type="submit" class="btn btn-primary ms-3"><?php echo lng('Upload') ?></button>
                         <div class="lds-facebook"><div></div><div></div><div></div></div>
                     </form>
@@ -1284,7 +1259,7 @@ if (isset($_POST['copy']) && !FM_READONLY) {
                     <p class="custom-checkbox custom-control"><input type="checkbox" name="move" value="1" id="js-move-files" class="custom-control-input"><label for="js-move-files" class="custom-control-label ms-2"> <?php echo lng('Move') ?></label></p>
                     <p>
                         <b><a href="?p=<?php echo urlencode(FM_PATH) ?>" class="btn btn-outline-danger"><i class="fa fa-times-circle"></i> <?php echo lng('Cancel') ?></a></b>&nbsp;
-                        <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+                        <?= HTML::hiddenToken() ?>
                         <button type="submit" class="btn btn-success"><i class="fa fa-check-circle"></i> <?php echo lng('Copy') ?></button> 
                     </p>
                 </form>
@@ -1581,7 +1556,7 @@ if (isset($_GET['view'])) {
             </p>
             <div class="d-flex align-items-center mb-3">
                 <form method="post" class="d-inline ms-2" action="?p=<?php echo urlencode(FM_PATH) ?>&amp;dl=<?php echo urlencode($file) ?>">
-                    <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+					<?= HTML::hiddenToken() ?>
                     <button type="submit" class="btn btn-link text-decoration-none fw-bold p-0"><i class="fa fa-cloud-download"></i> <?php echo lng('Download') ?></button> &nbsp;
                 </form>
                 <b class="ms-2"><a href="<?php echo fm_enc($file_url) ?>" target="_blank"><i class="fa fa-external-link-square"></i> <?php echo lng('Open') ?></a></b>
@@ -1591,12 +1566,12 @@ if (isset($_GET['view'])) {
                     $zip_name = pathinfo($file_path, PATHINFO_FILENAME);
                     ?>
                     <form method="post" class="d-inline ms-2">
-                        <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+						<?= HTML::hiddenToken() ?>
                         <input type="hidden" name="unzip" value="<?php echo urlencode($file); ?>">
                         <button type="submit" class="btn btn-link text-decoration-none fw-bold p-0" style="font-size: 14px;"><i class="fa fa-check-circle"></i> <?php echo lng('UnZip') ?></button>
                     </form>&nbsp;
                     <form method="post" class="d-inline ms-2">
-                        <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+						<?= HTML::hiddenToken() ?>
                         <input type="hidden" name="unzip" value="<?php echo urlencode($file); ?>">
                         <input type="hidden" name="tofolder" value="1">
                         <button type="submit" class="btn btn-link text-decoration-none fw-bold p-0" style="font-size: 14px;" data-bs-toggle="tooltip" data-bs-title="UnZip to <?php echo fm_enc($zip_name) ?>"><i class="fa fa-check-circle"></i> <?php echo lng('UnZipToFolder') ?></button>
@@ -1832,7 +1807,7 @@ if (isset($_GET['chmod']) && !FM_READONLY && !FM_IS_WIN) {
                     </table>
 
                     <p>
-                       <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>"> 
+						<?= HTML::hiddenToken() ?> 
                         <b><a href="?p=<?php echo urlencode(FM_PATH) ?>" class="btn btn-outline-primary"><i class="fa fa-times-circle"></i> <?php echo lng('Cancel') ?></a></b>&nbsp;
                         <button type="submit" class="btn btn-success"><i class="fa fa-check-circle"></i> <?php echo lng('Change') ?></button>
                     </p>
@@ -1860,7 +1835,7 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
 <form action="" method="post" class="pt-3">
     <input type="hidden" name="p" value="<?php echo fm_enc(FM_PATH) ?>">
     <input type="hidden" name="group" value="1">
-    <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+    <?= HTML::hiddenToken() ?>
     <div class="table-responsive">
         <table class="table table-bordered table-hover table-sm <?php echo $tableTheme; ?>" id="main-table">
             <thead class="thead-white">
@@ -2068,19 +2043,6 @@ fm_show_footer();
 // --- END HTML ---
 
 // Functions
-
-/**
- * Verify CSRF TOKEN and remove after cerify
- * @param string $token
- * @return bool
- */
-function verifyToken($token) 
-{
-    if (hash_equals($_SESSION['token'], $token)) { 
-        return true;
-    }
-    return false;
-}
 
 /**
  * Delete  file or folder (recursively)
@@ -3507,7 +3469,7 @@ $isStickyNavBar = $sticky_navbar ? 'navbar-fixed' : 'navbar-normal';
 		<?= HTML::css_link('/css/highlightjs.github.min.css?v=11.6.0-20221005') ?>
 		<?= HTML::js_src('/js/highlightjs.min.js?v=11.6.0-20221005') ?>
     <?php endif; ?>
-    <script type="text/javascript">window.csrf = '<?php echo $_SESSION['token']; ?>';</script>
+    <script type="text/javascript">window.csrf = '<?= crsf_token() ?>';</script>
     <style>
         html { -moz-osx-font-smoothing: grayscale; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; height: 100%; scroll-behavior: smooth;}
         *,*::before,*::after { box-sizing: border-box;}
@@ -3682,7 +3644,7 @@ $isStickyNavBar = $sticky_navbar ? 'navbar-fixed' : 'navbar-normal';
                     <input type="text" name="newfilename" id="newfilename" value="" class="form-control" placeholder="<?php echo lng('Enter here...') ?>" required>
                 </div>
                 <div class="modal-footer">
-                    <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+					<?= HTML::hiddenToken() ?>
                     <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"><i class="fa fa-times-circle"></i> <?php echo lng('Cancel') ?></button>
                     <button type="submit" class="btn btn-success"><i class="fa fa-check-circle"></i> <?php echo lng('CreateNow') ?></button>
                 </div>
@@ -3723,7 +3685,7 @@ $isStickyNavBar = $sticky_navbar ? 'navbar-fixed' : 'navbar-normal';
             <h5 class="mb-3"><?php echo lng('Are you sure want to rename?') ?></h5>
             <p class="mb-1">
                 <input type="text" name="rename_to" id="js-rename-to" class="form-control" placeholder="<?php echo lng('Enter new file name') ?>" required>
-                <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+                <?= HTML::hiddenToken() ?>
                 <input type="hidden" name="rename_from" id="js-rename-from">
             </p>
           </div>
@@ -3746,7 +3708,7 @@ $isStickyNavBar = $sticky_navbar ? 'navbar-fixed' : 'navbar-normal';
               </div>
               <div class="modal-footer flex-nowrap p-0">
                 <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-end" data-bs-dismiss="modal"><?php echo lng('Cancel') ?></button>
-                <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+                <?= HTML::hiddenToken() ?>
                 <button type="submit" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" data-bs-dismiss="modal"><strong><?php echo lng('Okay') ?></strong></button>
               </div>
             </form>
@@ -3811,7 +3773,7 @@ $isStickyNavBar = $sticky_navbar ? 'navbar-fixed' : 'navbar-normal';
                 a.setAttribute("method", "POST"), a.setAttribute("action", "");
                 var o = document.createElement("textarea");
                 o.setAttribute("type", "textarea"), o.setAttribute("name", "savedata");
-                let cx = document.createElement("input"); cx.setAttribute("type", "hidden");cx.setAttribute("name", "token");cx.setAttribute("value", window.csrf);
+                let cx = document.createElement("input"); cx.setAttribute("type", "hidden");cx.setAttribute("name", "_token");cx.setAttribute("value", window.csrf);
                 var c = document.createTextNode(n);
                 o.appendChild(c), a.appendChild(o), a.appendChild(cx), document.body.appendChild(a), a.submit()
             }
