@@ -30,6 +30,10 @@ class Auth {
 			return false;
 		}
 
+		if (!isset($myUser[$name])) {
+			return false;
+		}
+
 		return $myUser[$name];
 	}
 

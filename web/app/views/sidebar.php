@@ -4,6 +4,18 @@ $parsedown = HTML::parsedown(['username_with_color' => true]);
 ?>
 
 <?php if (Auth::check()) : ?>
+	<?php if (!Auth::property('email')) : ?>
+		<div class="alert alert-warning d-flex align-items-center mb-2" role="alert">
+			<div class="flex-shrink-0 me-3">
+				<i class="fs-4 bi bi-exclamation-triangle-fill"></i>
+			</div>
+			<div>
+				<div class="fw-bold mb-2">请完善个人资料</div>
+				<div class="small">您还没有填写您的电子邮件地址，请前往 <a href="/user/<?= Auth::id() ?>/edit">个人资料编辑</a> 页面补全信息，以便接收最新的安全和功能通知。</div>
+			</div>
+		</div>
+	<?php endif ?>
+
 	<?php if (!isset($groups_hidden)) : ?>
 		<?php $groups = UOJGroup::queryGroupsOfUser(Auth::user()); ?>
 		<?php if (!empty($groups)) : ?>
