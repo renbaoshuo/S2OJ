@@ -1088,8 +1088,13 @@ if ($cur_tab == 'index') {
 		'default_value' => $submission_frequency['interval'],
 	]);
 	$submission_frequency_form->addInput('submission_frequency_limit', [
+		'type' => 'number',
 		'label' => '最大提交次数',
 		'help' => '在时间间隔内最多允许提交的次数。',
+		'input_attrs' => [
+			'min' => '0',
+			'step' => '1',
+		],
 		'default_value' => $submission_frequency['limit'],
 		'validator_php' => function ($x, &$vdata) {
 			if (!validateUInt($x)) {
