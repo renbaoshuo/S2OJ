@@ -63,6 +63,8 @@ function echoFilePre($file_name) {
 
 // 上传数据
 if ($_POST['problem_data_file_submit'] == 'submit') {
+	crsf_defend();
+
 	if ($_FILES["problem_data_file"]["error"] > 0) {
 		$errmsg = "Error: " . $_FILES["problem_data_file"]["error"];
 		UOJResponse::message('<div>' . HTML::escape($errmsg) . '</div><a href="">返回</a>');
@@ -625,6 +627,7 @@ if ($problem['hackable']) {
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<form action="" method="post" enctype="multipart/form-data" role="form">
+				<?= HTML::hiddenToken() ?>
 				<div class="modal-body">
 					<label class="form-label" for="problem_data_file">上传 zip 文件</label>
 					<input class="form-control" type="file" name="problem_data_file" id="problem_data_file" accept=".zip">
