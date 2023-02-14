@@ -99,7 +99,7 @@ $pag_config = [
 ];
 $pag = new Paginator($pag_config);
 ?>
-<?php echoUOJPageHeader(UOJLocale::get('problems lists')); ?>
+<?php echoUOJPageHeader(UOJList::info('title') . ' - 题单') ?>
 
 <div class="row">
 	<!-- left col -->
