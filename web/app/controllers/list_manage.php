@@ -26,7 +26,7 @@ if ($cur_tab == 'profile') {
 	$update_profile_form = new UOJForm('update_profile');
 	$update_profile_form->addInput('name', [
 		'label' => '标题',
-		'default_value' => UOJList::info('title'),
+		'default_value' => HTML::unescape(UOJList::info('title')),
 		'validator_php' => function ($title, &$vdata) {
 			if ($title == '') {
 				return '标题不能为空';

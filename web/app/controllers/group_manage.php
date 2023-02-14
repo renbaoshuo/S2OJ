@@ -32,7 +32,7 @@ if ($cur_tab == 'profile') {
 	$update_profile_form = new UOJForm('update_profile');
 	$update_profile_form->addInput('name', [
 		'label' => '名称',
-		'default_value' => UOJGroup::info('title'),
+		'default_value' => HTML::unescape(UOJGroup::info('title')),
 		'validator_php' => function ($title, &$vdata) {
 			if ($title == '') {
 				return '名称不能为空';

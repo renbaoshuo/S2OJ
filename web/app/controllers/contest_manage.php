@@ -37,64 +37,55 @@ if (!isset($tabs_info[$cur_tab])) {
 
 if ($cur_tab == 'profile') {
 	$profile_form = new UOJForm('time');
-	$profile_form->addInput(
-		'name',
-		[
-			'label' => '比赛标题',
-			'default_value' => UOJContest::info('name'),
-			'validator_php' => function ($name, &$vdata) {
-				if ($name == '') {
-					return '标题不能为空';
-				}
+	$profile_form->addInput('name',	[
+		'label' => '比赛标题',
+		'default_value' => HTML::unescape(UOJContest::info('name')),
+		'validator_php' => function ($name, &$vdata) {
+			if ($name == '') {
+				return '标题不能为空';
+			}
 
-				if (strlen($name) > 100) {
-					return '标题过长';
-				}
+			if (strlen($name) > 100) {
+				return '标题过长';
+			}
 
-				$name = HTML::escape($name);
+			$name = HTML::escape($name);
 
-				if ($name === '') {
-					return '无效编码';
-				}
+			if ($name === '') {
+				return '无效编码';
+			}
 
-				$vdata['name'] = $name;
+			$vdata['name'] = $name;
 
-				return '';
-			},
-		],
-	);
-	$profile_form->addInput(
-		'start_time',
-		[
-			'div_class' => 'mt-3',
-			'label' => '开始时间',
-			'default_value' => UOJContest::info('start_time_str'),
-			'validator_php' => function ($start_time, &$vdata) {
-				try {
-					$vdata['start_time'] = new DateTime($start_time);
-				} catch (Exception $e) {
-					return '无效时间格式';
-				}
-				return '';
-			},
-		]
-	);
-	$profile_form->addInput(
-		'last_min',
-		[
-			'div_class' => 'mt-3',
-			'label' => '时长',
-			'help' => '单位为分钟。',
-			'default_value' => UOJContest::info('last_min'),
-			'validator_php' => function ($last_min, &$vdata) {
-				if (!validateUInt($last_min)) {
-					return '必须为一个整数';
-				}
-				$vdata['last_min'] = $last_min;
-				return '';
-			},
-		]
-	);
+			return '';
+		},
+	]);
+	$profile_form->addInput('start_time', [
+		'div_class' => 'mt-3',
+		'label' => '开始时间',
+		'default_value' => UOJContest::info('start_time_str'),
+		'validator_php' => function ($start_time, &$vdata) {
+			try {
+				$vdata['start_time'] = new DateTime($start_time);
+			} catch (Exception $e) {
+				return '无效时间格式';
+			}
+			return '';
+		},
+	]);
+	$profile_form->addInput('last_min', [
+		'div_class' => 'mt-3',
+		'label' => '时长',
+		'help' => '单位为分钟。',
+		'default_value' => UOJContest::info('last_min'),
+		'validator_php' => function ($last_min, &$vdata) {
+			if (!validateUInt($last_min)) {
+				return '必须为一个整数';
+			}
+			$vdata['last_min'] = $last_min;
+			return '';
+		},
+	]);
 	$profile_form->handle = function (&$vdata) {
 		DB::update([
 			"update contests",
@@ -108,24 +99,24 @@ if ($cur_tab == 'profile') {
 		dieWithJsonData(['status' => 'success', 'message' => '修改成功']);
 	};
 	$profile_form->setAjaxSubmit(<<<EOD
-function(res) {
-	if (res.status === 'success') {
-		$('#result-alert')
-			.html('比赛信息修改成功！')
-			.addClass('alert-success')
-			.removeClass('alert-danger')
-			.show();
-	} else {
-		$('#result-alert')
-			.html('比赛信息修改失败。' + (res.message || ''))
-			.removeClass('alert-success')
-			.addClass('alert-danger')
-			.show();
-	}
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert')
+					.html('比赛信息修改成功！')
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert')
+					.html('比赛信息修改失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
 
-	$(window).scrollTop(0);
-}
-EOD);
+			$(window).scrollTop(0);
+		}
+	EOD);
 	$profile_form->runAtServer();
 } elseif ($cur_tab == 'problems') {
 	if (isset($_POST['submit-remove_problem']) && $_POST['submit-remove_problem'] == 'remove_problem') {
@@ -163,30 +154,27 @@ EOD);
 	}
 
 	$add_problem_form = new UOJForm('add_problem');
-	$add_problem_form->addInput(
-		'problem_id',
-		[
-			'label' => '题目 ID',
-			'validator_php' => function ($problem_id, &$vdata) {
-				$problem = UOJProblem::query($problem_id);
-				if (!$problem) {
-					return '题目不存在。';
-				}
+	$add_problem_form->addInput('problem_id', [
+		'label' => '题目 ID',
+		'validator_php' => function ($problem_id, &$vdata) {
+			$problem = UOJProblem::query($problem_id);
+			if (!$problem) {
+				return '题目不存在。';
+			}
 
-				if (!$problem->userCanManage(Auth::user())) {
-					return "无权添加此题目。";
-				}
+			if (!$problem->userCanManage(Auth::user())) {
+				return "无权添加此题目。";
+			}
 
-				if (UOJContest::cur()->hasProblem($problem)) {
-					return "题目已经在本场比赛中。";
-				}
+			if (UOJContest::cur()->hasProblem($problem)) {
+				return "题目已经在本场比赛中。";
+			}
 
-				$vdata['problem_id'] = $problem_id;
+			$vdata['problem_id'] = $problem_id;
 
-				return '';
-			},
-		]
-	);
+			return '';
+		},
+	]);
 	$add_problem_form->addSelect('judge_config', [
 		'div_class' => 'mt-3',
 		'label' => '评测设置',
@@ -241,24 +229,24 @@ EOD);
 	$add_problem_form->config['submit_button']['text'] = '添加';
 	$add_problem_form->config['submit_button']['class'] = 'btn btn-secondary mt-3';
 	$add_problem_form->setAjaxSubmit(<<<EOD
-function(res) {
-	if (res.status === 'success') {
-		$('#result-alert')
-			.html('添加成功！' + (res.message || ''))
-			.addClass('alert-success')
-			.removeClass('alert-danger')
-			.show();
-	} else {
-		$('#result-alert')
-			.html('添加失败。' + (res.message || ''))
-			.removeClass('alert-success')
-			.addClass('alert-danger')
-			.show();
-	}
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert')
+					.html('添加成功！' + (res.message || ''))
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert')
+					.html('添加失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
 
-	$(window).scrollTop(0);
-}
-EOD);
+			$(window).scrollTop(0);
+		}
+	EOD);
 	$add_problem_form->runAtServer();
 } elseif ($cur_tab == 'managers') {
 	$managers_form = newAddDelCmdForm(

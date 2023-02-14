@@ -11,6 +11,15 @@ class HTML {
 			return htmlspecialchars($str);
 		}
 	}
+
+	public static function unescape(?string $str) {
+		if ($str === null) {
+			return '';
+		} else {
+			return htmlspecialchars_decode($str);
+		}
+	}
+
 	public static function stripTags($str) {
 		return strip_tags($str);
 	}
