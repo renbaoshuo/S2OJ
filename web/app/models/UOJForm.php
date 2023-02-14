@@ -685,7 +685,11 @@ class UOJForm {
 		} else {
 			echo <<<EOD
 				if (ok) {
-					$("#button-submit-{$this->form_name}").addClass('disabled');
+					$("#button-submit-{$this->form_name}")
+						.addClass('disabled')
+						.css('width', $("#button-submit-{$this->form_name}").outerWidth())
+						.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+
 					$(this).submit(function () {
 						return false;
 					});
