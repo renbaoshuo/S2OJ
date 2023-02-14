@@ -6,7 +6,7 @@ return [
 	'banned user' => 'Banned User',
 	'tmp user' => 'Temporary User',
 	'real name' => 'Real name',
-	'belongs to these groups' => 'Belongs to these groups:',
+	'belongs to these groups' => 'Belongs to these groups',
 	'avatar source' => 'Avatar source',
 	'website' => 'Website',
 	'user type' => 'User type',

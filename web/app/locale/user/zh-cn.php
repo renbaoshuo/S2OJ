@@ -6,7 +6,7 @@ return [
 	'banned user' => '封禁用户',
 	'tmp user' => '临时用户',
 	'real name' => '真实姓名',
-	'belongs to these groups' => '属于这些小组：',
+	'belongs to these groups' => '属于这些小组',
 	'avatar source' => '头像来源',
 	'website' => '网址',
 	'user type' => '用户类型',

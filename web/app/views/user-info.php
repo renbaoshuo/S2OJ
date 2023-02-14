@@ -201,43 +201,111 @@
 		<?php if (!isset($is_blog_aboutme)) : ?>
 			<?php $groups = UOJGroup::queryGroupsOfUser($user) ?>
 			<div class="card mb-2">
-				<div class="card-body">
-					<h4 class="card-title">
-						<?= UOJLocale::get('user::belongs to these groups') ?>
-					</h4>
-					<ul class="mb-0">
-						<?php foreach ($groups as $group) : ?>
-							<li>
-								<?= $group->getLink() ?>
-							</li>
-						<?php endforeach ?>
-						<?php if (empty($groups)) : ?>
+				<div class="card-header fw-bold">
+					<?= UOJLocale::get('user::belongs to these groups') ?>
+				</div>
+				<ul class="list-group list-group-flush">
+					<?php foreach ($groups as $group) : ?>
+						<li class="list-group-item">
+							<?= $group->getLink(['class' => 'fw-bold']) ?>
+						</li>
+					<?php endforeach ?>
+					<?php if (empty($groups)) : ?>
+						<li class="list-group-item text-center">
 							<?= UOJLocale::get('none') ?>
-						<?php endif ?>
-					</ul>
+						</li>
+					<?php endif ?>
+				</ul>
+			</div>
+		<?php endif ?>
+
+		<?php if (isset($extra['acm'])) : ?>
+			<div class="card mb-2">
+				<div class="card-header fw-bold">ACM 队伍信息</div>
+				<div class="list-group list-group-flush">
+					<?php foreach ($extra['acm']['members'] as $mem) : ?>
+						<li class="list-group-item">
+							<b><?= HTML::escape($mem['name']) ?></b>（<?= HTML::escape($mem['organization']) ?>）
+						</li>
+					<?php endforeach ?>
 				</div>
 			</div>
 		<?php endif ?>
 
+		<?php if (isSuperUser(Auth::user())) : ?>
+			<div class="card mb-2">
+				<div class="card-header fw-bold">超级管理员可见信息</div>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item">
+						<div class="fw-bold mb-2">注册时间</div>
+						<?= $user['register_time'] ?>
+					</li>
+					<li class="list-group-item">
+						<div class="fw-bold mb-2">最后一次登录的 IP (remote_addr)</div>
+						<?= $user['remote_addr'] ?>
+					</li>
+					<li class="list-group-item">
+						<div class="fw-bold mb-2">最后一次登录的 IP (http_x_forwarded_for)</div>
+						<?= $user['http_x_forwarded_for'] ?>
+					</li>
+					<li class="list-group-item">
+						<div class="fw-bold mb-2">最后一次登录时间</div>
+						<?= $user['last_login_time'] ?>
+					</li>
+					<li class="list-group-item">
+						<div class="fw-bold mb-2">最后一次上线时间</div>
+						<?= $user['last_visit_time'] ?>
+					</li>
+					<li class="list-group-item">
+						<div class="fw-bold mb-2">过期时间</div>
+						<?= $user['expiration_time'] ?: '永不过期' ?>
+					</li>
+					<li class="list-group-item">
+						<div class="fw-bold mb-2">最近访问时使用的 IP 和终端</div>
+						<dl class="row">
+							<?php foreach ($extra['history'] as $vis) : ?>
+								<dt class="col-sm-3"><?= HTML::escape($vis['last']) ?></dt>
+								<dd class="col-sm-9">
+									<b>addr</b>: <?= HTML::escape($vis['addr']) ?>
+									<br>
+									<b>forwarded_addr</b>: <?= HTML::escape($vis['forwarded_addr']) ?>
+									<br>
+									<b>user_agent</b>: <?= HTML::escape($vis['ua']) ?>
+								</dd>
+							<?php endforeach ?>
+						</dl>
+					</li>
+				</ul>
+			</div>
+		<?php endif ?>
+
+		<?php
+		$ac_records = DB::selectAll([
+			"select", DB::bracketed_fields([
+				"submit_time" => "date_format(submit_time, '%Y-%m-%d')",
+				"problem_id",
+			]),
+			"from submissions",
+			"where", [
+				"submitter" => $user['username'],
+				"score" => 100,
+				["date(submit_time)", "between", DB::raw("date_sub(curdate(), interval 1 year) and curdate()")],
+			]
+		]);
+		$last_year_ac_cnt_by_day = [];
+		$last_year_ac_cnt = 0;
+		foreach ($ac_records as $record) {
+			$last_year_ac_cnt++;
+			$last_year_ac_cnt_by_day[$record["submit_time"]]++;
+		}
+		?>
 		<div class="card mb-2">
+			<div class="card-header fw-bold"><?= UOJLocale::get('n accepted in last year', $last_year_ac_cnt) ?></div>
 			<div class="card-body">
-				<?php
-				$_result = DB::query("select date_format(submit_time, '%Y-%m-%d'), problem_id from submissions where submitter = '{$user['username']}' and score = 100 and date(submit_time) between date_sub(curdate(), interval 1 year) and curdate()");
-				$result = [];
-				$vis = [];
-				$cnt = 0;
-				while ($row = DB::fetch($_result)) {
-					$cnt++;
-					$result[$row["date_format(submit_time, '%Y-%m-%d')"]]++;
-				}
-				?>
-				<h4 class="card-title">
-					<?= UOJLocale::get('n accepted in last year', $cnt) ?>
-				</h4>
 				<div id="accepted-graph" style="font-size: 14px"></div>
 				<script>
 					var accepted_graph_data = [
-						<?php foreach ($result as $key => $val) : ?> {
+						<?php foreach ($last_year_ac_cnt_by_day as $key => $val) : ?> {
 								date: '<?= $key ?>',
 								count: <?= $val ?>
 							},
@@ -250,12 +318,13 @@
 				</script>
 			</div>
 		</div>
+
+		<?php $ac_problems = DB::selectAll("select problem_id from best_ac_submissions where submitter = '{$user['username']}' order by problem_id") ?>
 		<div class="card mb-2">
+			<div class="card-header fw-bold">
+				<?= UOJLocale::get('accepted problems') . ': ' . UOJLocale::get('n problems in total', count($ac_problems)) ?>
+			</div>
 			<div class="card-body">
-				<?php $ac_problems = DB::selectAll("select problem_id from best_ac_submissions where submitter = '{$user['username']}' order by problem_id") ?>
-				<h4 class="card-title">
-					<?= UOJLocale::get('accepted problems') . ': ' . UOJLocale::get('n problems in total', count($ac_problems)) ?>
-				</h4>
 				<ul class="nav uoj-ac-problems-list">
 					<?php foreach ($ac_problems as $prob) : ?>
 						<?php $problem = UOJProblem::query($prob['problem_id']) ?>
@@ -278,36 +347,5 @@
 				</ul>
 			</div>
 		</div>
-
-		<?php if (isSuperUser(Auth::user())) : ?>
-			<div class="card card-default">
-				<ul class="list-group list-group-flush">
-					<li class="list-group-item">
-						<h5 class="list-group-item-heading">register time</h5>
-						<p class="list-group-item-text"><?= $user['register_time'] ?></p>
-					</li>
-					<li class="list-group-item">
-						<h5 class="list-group-item-heading">remote_addr</h5>
-						<p class="list-group-item-text"><?= $user['remote_addr'] ?></p>
-					</li>
-					<li class="list-group-item">
-						<h5 class="list-group-item-heading">http_x_forwarded_for</h5>
-						<p class="list-group-item-text"><?= $user['http_x_forwarded_for'] ?></p>
-					</li>
-					<li class="list-group-item">
-						<h5 class="list-group-item-heading">last_login_time</h5>
-						<p class="list-group-item-text"><?= $user['last_login_time'] ?></p>
-					</li>
-					<li class="list-group-item">
-						<h5 class="list-group-item-heading">last_visit_time</h5>
-						<p class="list-group-item-text"><?= $user['last_visit_time'] ?></p>
-					</li>
-					<li class="list-group-item">
-						<h5 class="list-group-item-heading">expiration_time</h5>
-						<p class="list-group-item-text"><?= $user['expiration_time'] ?></p>
-					</li>
-				</ul>
-			</div>
-		<?php endif ?>
 	</div>
 </div>
