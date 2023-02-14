@@ -36,6 +36,10 @@ class UOJContext {
 				'upload_image' => true,
 			],
 		],
+		'submission_frequency' => [
+			'interval' => 'PT1S',
+			'limit' => 1,
+		],
 	];
 
 	public static $data = [
@@ -156,6 +160,7 @@ class UOJContext {
 			"select value from meta",
 			"where", ['name' => $name]
 		]);
+
 		if ($value === null) {
 			return self::$meta_default[$name];
 		} else {
@@ -165,6 +170,7 @@ class UOJContext {
 
 	public static function setMeta($name, $value) {
 		$value = json_encode($value);
+
 		return DB::update([
 			"insert into meta", DB::bracketed_fields(['name', 'value', 'updated_at']),
 			"values", DB::tuple([$name, $value, DB::now()]),

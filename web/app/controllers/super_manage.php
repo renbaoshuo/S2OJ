@@ -38,6 +38,10 @@ $tabs_info = [
 		'name' => '图床管理',
 		'url' => "/super_manage/image_hosting",
 	],
+	'meta' => [
+		'name' => 'OJ 基础设置',
+		'url' => "/super_manage/meta",
+	],
 ];
 
 if (!isset($tabs_info[$cur_tab])) {
@@ -1068,6 +1072,41 @@ if ($cur_tab == 'index') {
 		]);
 	};
 	$change_user_image_total_size_limit_form->runAtServer();
+} elseif ($cur_tab == 'meta') {
+	$submission_frequency = UOJContext::getMeta('submission_frequency');
+	$submission_frequency_form = new UOJForm('submission_frequency');
+	$submission_frequency_form->addSelect('submission_frequency_interval', [
+		'label' => '时间间隔',
+		'options' => [
+			'PT1S' => '1 秒',
+			'PT10S' => '10 秒',
+			'PT1M' => '1 分钟',
+			'PT10M' => '10 分钟',
+			'PT30M' => '30 分钟',
+			'PT1H' => '1 小时',
+		],
+		'default_value' => $submission_frequency['interval'],
+	]);
+	$submission_frequency_form->addInput('submission_frequency_limit', [
+		'label' => '最大提交次数',
+		'help' => '在时间间隔内最多允许提交的次数。',
+		'default_value' => $submission_frequency['limit'],
+		'validator_php' => function ($x, &$vdata) {
+			if (!validateUInt($x)) {
+				return '不合法';
+			}
+			$vdata['limit'] = (int)$x;
+			return '';
+		},
+	]);
+	$submission_frequency_form->handle = function (&$vdata) {
+		UOJContext::setMeta('submission_frequency', [
+			'interval' => UOJRequest::post('submission_frequency_interval'),
+			'limit' => $vdata['limit'],
+		]);
+	};
+	$submission_frequency_form->succ_href = UOJContext::requestPath() . '#submission-frequency';
+	$submission_frequency_form->runAtServer();
 }
 ?>
 
@@ -1463,21 +1502,6 @@ if ($cur_tab == 'index') {
 					</div>
 				</div>
 			</div>
-
-			<script>
-				$(document).ready(function() {
-					// Javascript to enable link to tab
-					var hash = location.hash.replace(/^#/, '');
-					if (hash) {
-						bootstrap.Tab.jQueryInterface.call($('.nav-tabs a[href="#' + hash + '"]'), 'show').blur();
-					}
-
-					// Change hash for page-reload
-					$('.nav-tabs a').on('shown.bs.tab', function(e) {
-						window.location.hash = e.target.hash;
-					});
-				});
-			</script>
 		<?php elseif ($cur_tab === 'submissions') : ?>
 			<?php if (!isset($_GET['judging'])) : ?>
 				<div>
@@ -1660,9 +1684,48 @@ EOD;
 					<?php $change_user_image_total_size_limit_form->printHTML() ?>
 				</div>
 			</div>
+		<?php elseif ($cur_tab == 'meta') : ?>
+			<div class="card mt-3 mt-md-0">
+				<div class="card-header">
+					<ul class="nav nav-tabs card-header-tabs">
+						<li class="nav-item">
+							<a class="nav-link active" href="#submission-frequency" data-bs-toggle="tab" data-bs-target="#submission-frequency">提交频次限制</a>
+						</li>
+					</ul>
+				</div>
+				<div class="card-body">
+					<div class="tab-content">
+						<div class="tab-pane active" id="submission-frequency">
+							<div class="row">
+								<div class="col-md-6">
+									<?php $submission_frequency_form->printHTML() ?>
+								</div>
+								<div class="col-md-6">
+									此处可以设置用户的提交频次限制。请注意，过于严格的限制会导致用户无法正常提交题目。默认限制为 1 秒内最多提交 1 次。
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		<?php endif ?>
 	</div>
 	<!-- end right col -->
 </div>
+
+<script>
+	$(document).ready(function() {
+		// Javascript to enable link to tab
+		var hash = location.hash.replace(/^#/, '');
+		if (hash) {
+			bootstrap.Tab.jQueryInterface.call($('.nav-tabs a[href="#' + hash + '"]'), 'show').blur();
+		}
+
+		// Change hash for page-reload
+		$('.nav-tabs a').on('shown.bs.tab', function(e) {
+			window.location.hash = e.target.hash;
+		});
+	});
+</script>
 
 <?php echoUOJPageFooter() ?>

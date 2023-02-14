@@ -36,8 +36,10 @@ function crsf_defend() {
 }
 
 function submission_frequency_check() {
+	$submission_frequency = UOJContext::getMeta('submission_frequency');
+
 	$recent = clone UOJTime::$time_now;
-	$recent->sub(new DateInterval("PT1S"));
+	$recent->sub(new DateInterval($submission_frequency['interval']));
 	$num = DB::selectCount([
 		"select count(*) from submissions",
 		"where", [
@@ -45,54 +47,10 @@ function submission_frequency_check() {
 			["submit_time", ">=", $recent->format('Y-m-d H:i:s')]
 		]
 	]);
-	if ($num >= 1) {
+
+	if ($num >= max(1, $submission_frequency['limit'])) {
 		return false;
 	}
 
-	// use the implementation below if OJ is under attack
-	/*
-	// 1
-	$recent = clone UOJTime::$time_now;
-	$recent->sub(new DateInterval("PT3S"));
-	$num = DB::selectCount([
-		"select count(*) from submissions",
-		"where", [
-			"submitter" => Auth::id(),
-			["submit_time", ">=", $recent->format('Y-m-d H:i:s')]
-		]
-	]);
-	if ($num >= 1) {
-		return false;
-	}
-	
-	// 2
-	$recent = clone UOJTime::$time_now;
-	$recent->sub(new DateInterval("PT1M"));
-	$num = DB::selectCount([
-		"select count(*) from submissions",
-		"where", [
-			"submitter" => Auth::id(),
-			["submit_time", ">=", $recent->format('Y-m-d H:i:s')]
-		]
-	]);
-	if ($num >= 6) {
-		return false;
-	}
-	
-	// 3
-	$recent = clone UOJTime::$time_now;
-	$recent->sub(new DateInterval("PT30M"));
-	$num = DB::selectCount([
-		"select count(*) from submissions",
-		"where", [
-			"submitter" => Auth::id(),
-			["submit_time", ">=", $recent->format('Y-m-d H:i:s')]
-		]
-	]);
-	if ($num >= 30) {
-		return false;
-	}
-	*/
-	
 	return true;
 }
