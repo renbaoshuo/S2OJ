@@ -281,7 +281,7 @@
 
 		<?php
 		$ac_records = DB::selectAll([
-			"select", DB::bracketed_fields([
+			"select", DB::fields([
 				"submit_time" => "date_format(submit_time, '%Y-%m-%d')",
 				"problem_id",
 			]),
@@ -293,14 +293,12 @@
 			]
 		]);
 		$last_year_ac_cnt_by_day = [];
-		$last_year_ac_cnt = 0;
 		foreach ($ac_records as $record) {
-			$last_year_ac_cnt++;
 			$last_year_ac_cnt_by_day[$record["submit_time"]]++;
 		}
 		?>
 		<div class="card mb-2">
-			<div class="card-header fw-bold"><?= UOJLocale::get('n accepted in last year', $last_year_ac_cnt) ?></div>
+			<div class="card-header fw-bold"><?= UOJLocale::get('n accepted in last year', count($ac_records)) ?></div>
 			<div class="card-body">
 				<div id="accepted-graph" style="font-size: 14px"></div>
 				<script>
