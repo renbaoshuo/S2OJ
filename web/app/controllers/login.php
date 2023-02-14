@@ -51,7 +51,7 @@ function handleLoginPost() {
 
 	<ul>
 		<li>请求 IP: {$remote_addr}</li>
-		<li>转发源 IP:{$http_x_forwarded_for} </li>
+		<li>转发源 IP: {$http_x_forwarded_for} </li>
 		<li>用户代理: {$user_agent}</li>
 	</ul>
 
