@@ -2,7 +2,7 @@
 
 # S2OJ
 
-> 基于 Universal Online Judge 的在线测评系统。
+> 基于 Universal Online Judge 的在线测评系统。专为 [石家庄二中](http://www.sjzez.com) 设计。
 
 ## 特性
 
@@ -16,6 +16,7 @@
 - 博客功能，不仅可撰写图文内容，也可制作幻灯片。
 - 支持赛后总结功能，从点滴反思中汲取奋进力量。
 - 更细化的权限管理。
+- 支持 Codeforces、AtCoder、UniversalOJ、LibreOJ、洛谷等平台的 Remote Judge。
 - 其他应校内训练需求而新增的功能。
 
 ## 文档
