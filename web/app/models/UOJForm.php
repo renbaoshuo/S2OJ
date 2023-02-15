@@ -182,6 +182,7 @@ class UOJForm {
 			'type' => 'text',
 			'div_class' => '',
 			'input_class' => 'form-control',
+			'input_attrs' => [],
 			'default_value' => '',
 			'label' => '',
 			'label_class' => 'form-label',
@@ -211,7 +212,7 @@ class UOJForm {
 			'name' => $name,
 			'id' => "input-$name",
 			'placeholder' => $config['placeholder'],
-		], HTML::escape($config['default_value']));
+		] + $config['input_attrs'], HTML::escape($config['default_value']));
 		$html .= HTML::tag('div', ['class' => 'invalid-feedback', 'id' => "help-$name"], '');
 
 		if ($config['help']) {

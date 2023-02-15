@@ -195,8 +195,8 @@ ALTER TABLE `user_info`
   MODIFY `remember_token` char(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   MODIFY `motto` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';
 ALTER TABLE `user_info`
-  CHANGE `last_login` `last_login_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  CHANGE `last_visited` `last_visit_time` datetime DEFAULT CURRENT_TIMESTAMP;
+  CHANGE `last_login` `last_login_time` datetime DEFAULT NULL,
+  CHANGE `last_visited` `last_visit_time` datetime DEFAULT NULL;
 ALTER TABLE `user_info`
   ADD `expiration_time` datetime DEFAULT NULL AFTER `last_visit_time`,
   ADD `extra` json NOT NULL;

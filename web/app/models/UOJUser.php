@@ -50,18 +50,25 @@ class UOJUser {
 	}
 
 	public static function register($user, $cfg = []) {
+		$cfg += [
+			'extra' => [],
+		];
+
 		UOJUser::checkBasicInfo($user, $cfg);
 
 		$password = getPasswordToStore($user['password'], $user['username']);
+		$extra = [
+			'school' => $user['school'] ?: null,
+		] + $cfg['extra'];
 
 		$info = [
 			'username' => $user['username'],
+			'realname' => $user['realname'] ?: '',
 			'email' => $user['email'],
-			'school' => $user['school'] ?: '',
 			'password' => $password,
 			'svn_password' => uojRandString(20),
 			'register_time' => DB::now(),
-			'extra' => '{}'
+			'extra' => json_encode($extra, JSON_UNESCAPED_UNICODE),
 		];
 		// 0 means non-existence, false means DB error.
 		if (DB::selectExists("select 1 from user_info") === 0) {
@@ -77,10 +84,21 @@ class UOJUser {
 	}
 
 	public static function registerTmpAccount($user, $cfg = []) {
+		$cfg += [
+			'extra' => [],
+			'check_email' => false,
+			'type' => 'student',
+		];
+
 		UOJUser::checkBasicInfo($user, $cfg);
+
+		if (!isset($user['expiration_time'])) {
+			throw new UOJInvalidArgumentException('无效账号过期时间');
+		}
 
 		$password = getPasswordToStore($user['password'], $user['username']);
 		$extra = [
+			'school' => $user['school'] ?: null,
 			'permissions' => [
 				'problems' => [
 					'view' => false,
@@ -115,18 +133,19 @@ class UOJUser {
 					'upload_image' => false,
 				],
 			],
-		];
+		] + $cfg['extra'];
 
 		$info = [
 			'username' => $user['username'],
 			'usergroup' => 'T',
+			'usertype' => $cfg['type'],
+			'realname' => $user['realname'] ?: '',
 			'email' => $user['email'],
-			'school' => $user['school'] ?: '',
 			'password' => $password,
 			'svn_password' => uojRandString(20),
 			'register_time' => DB::now(),
 			'expiration_time' => $user['expiration_time'],
-			'extra' => json_encode($extra),
+			'extra' => json_encode($extra, JSON_UNESCAPED_UNICODE),
 		];
 
 		DB::insert([
@@ -139,32 +158,27 @@ class UOJUser {
 	}
 
 	public static function registerTmpACMTeamAccount($team, $cfg = []) {
+		$cfg += [
+			'check_email' => false,
+			'extra' => [],
+			'type' => 'team',
+		];
+
 		UOJUser::checkBasicInfo($team, $cfg);
 
 		if (!isset($team['expiration_time'])) {
 			throw new UOJInvalidArgumentException('无效账号过期时间');
 		}
 
-		$password = getPasswordToStore($team['password'], $team['username']);
-
-		$team['extra'] = json_encode([
+		$cfg['extra'] += [
 			'acm' => [
 				'contest_name' => $team['contest_name'],
 				'team_name' => $team['team_name'],
-				'members' => $team['members']
-			]
-		], JSON_UNESCAPED_UNICODE);
+				'members' => $team['members'],
+			],
+		];
 
-		DB::insert([
-			"insert into user_info",
-			"(usergroup, username, email, password, svn_password, register_time, expiration_time, extra)",
-			"values", DB::tuple([
-				'T', $team['username'], $team['email'], $password, uojRandString(20),
-				DB::now(), $team['expiration_time'], $team['extra']
-			])
-		]);
-
-		return $team;
+		return UOJUser::registerTmpAccount($team, $cfg);
 	}
 
 	public static function registerTmpACMTeamAccountFromText($text, $contest_name, $expiration_time) {
@@ -194,10 +208,45 @@ class UOJUser {
 			'contest_name' => $contest_name,
 			'expiration_time' => $expiration_time,
 			'team_name' => $fields[3],
-			'members' => $mem
+			'members' => $mem,
 		];
 
 		return UOJUser::registerTmpACMTeamAccount($team);
+	}
+
+	public static function convertACMTeamInfoToText($mem) {
+		$csv_array = [count($mem)];
+
+		foreach ($mem as $member) {
+			$csv_array[] = $member['name'];
+			$csv_array[] = $member['organization'];
+		}
+
+		return array_to_csv([$csv_array]);
+	}
+
+	public static function parseACMTeamInfoFromText($text) {
+		$fields = array_map('trim', str_getcsv($text));
+
+		if (empty($fields)) {
+			throw new UOJInvalidArgumentException('格式不合规范');
+		}
+
+		$num = (int)$fields[0];
+
+		if (count($fields) != 1 + $num * 2) {
+			throw new UOJInvalidArgumentException('格式不合规范');
+		}
+
+		$mem = [];
+		for ($i = 0; $i < $num; $i++) {
+			$mem[] = [
+				'name' => $fields[1 + $i * 2],
+				'organization' => $fields[1 + $i * 2 + 1]
+			];
+		}
+
+		return $mem;
 	}
 
 	public static function getAccountStatus($user) {
@@ -320,7 +369,7 @@ class UOJUser {
 		});
 	}
 
-	public static function getExtra($user) {
+	public static function getExtra($user, $key = null) {
 		$extra = json_decode($user['extra'], true);
 		if ($extra === null) {
 			$extra = [];
@@ -341,7 +390,12 @@ class UOJUser {
 			'avatar_source' => 'gravatar',
 			'username_color' => isSuperUser($user) ? '#9d3dcf' : '#0d6efd',
 		]);
-		return $extra;
+
+		if ($key == null) {
+			return $extra;
+		}
+
+		return $extra[$key];
 	}
 
 	public static function checkVisibility(string $code, array $user, ?array $viewer) {

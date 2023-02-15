@@ -40,35 +40,32 @@ if ($cur_tab == 'profile') {
 	$username = UOJLocale::get('username');
 	$avatar = UOJLocale::get('avatar');
 	$update_profile_form->appendHTML(<<<EOD
-	<div class="mb-3">
-		<label for="input-username" class="form-label">$username</label>
-		<input type="text" class="form-control" id="input-username" aria-describedby="help-username" value="{$user['username']}" disabled>
-		<div id="help-username" class="form-text">用户名不能被修改。</div>
-	</div>
-EOD);
-	if (isSuperUser(Auth::user())) {
-		$update_profile_form->addInput(
-			'realname',
-			[
-				'div_class' => 'mb-3',
-				'label' => UOJLocale::get('user::real name'),
-				'default_value' => $user['realname'],
-				'validator_php' => function ($realname, &$vdata) {
-					$vdata['realname'] = $realname;
+		<div class="mb-3">
+			<label for="input-username" class="form-label">$username</label>
+			<input type="text" class="form-control" id="input-username" aria-describedby="help-username" value="{$user['username']}" disabled>
+			<div id="help-username" class="form-text">用户名不能被修改。</div>
+		</div>
+	EOD);
+	if (isSuperUser(Auth::user()) && !isset($extra['acm'])) {
+		$update_profile_form->addInput('realname', [
+			'div_class' => 'mb-3',
+			'label' => UOJLocale::get('user::real name'),
+			'default_value' => $user['realname'],
+			'validator_php' => function ($realname, &$vdata) {
+				$vdata['realname'] = $realname;
 
-					return '';
-				},
-			]
-		);
+				return '';
+			},
+		]);
 	} else {
 		$real_name = UOJLocale::get('user::real name');
 		$update_profile_form->appendHTML(<<<EOD
-	<div class="mb-3">
-		<label for="input-realname" class="form-label">$real_name</label>
-		<input type="text" class="form-control" id="input-realname" aria-describedby="help-realname" value="{$user['realname']}" disabled>
-		<div id="help-realname" class="form-text">只有管理员才能修改用户的真实姓名。</div>
-	</div>
-EOD);
+			<div class="mb-3">
+				<label for="input-realname" class="form-label">$real_name</label>
+				<input type="text" class="form-control" id="input-realname" aria-describedby="help-realname" value="{$user['realname']}" disabled>
+				<div id="help-realname" class="form-text">只有管理员才能修改用户的真实姓名。</div>
+			</div>
+		EOD);
 	}
 	if (isTmpUser($user)) {
 		if (isSuperUser(Auth::user())) {
@@ -92,12 +89,12 @@ EOD);
 		} else {
 			$expiration_time = UOJLocale::get('user::expiration time');
 			$update_profile_form->appendHTML(<<<EOD
-		<div class="mb-3">
-			<label for="input-expiration_time" class="form-label">$expiration_time</label>
-			<input type="text" class="form-control" id="input-expiration_time" aria-describedby="help-expiration_time" value="{$user['expiration_time']}" disabled>
-			<div id="help-expiration_time" class="form-text">只有管理员才能修改用户的账号过期时间。</div>
-		</div>
-	EOD);
+				<div class="mb-3">
+					<label for="input-expiration_time" class="form-label">$expiration_time</label>
+					<input type="text" class="form-control" id="input-expiration_time" aria-describedby="help-expiration_time" value="{$user['expiration_time']}" disabled>
+					<div id="help-expiration_time" class="form-text">只有管理员才能修改用户的账号过期时间。</div>
+				</div>
+			EOD);
 		}
 	} else {
 		$expiration_time = UOJLocale::get('user::expiration time');
@@ -105,12 +102,12 @@ EOD);
 			? '只有用户组别为「临时用户」的用户才能被修改过期时间。'
 			: '只有管理员才能修改用户的账号过期时间。';
 		$update_profile_form->appendHTML(<<<EOD
-	<div class="mb-3">
-		<label for="input-expiration_time" class="form-label">$expiration_time</label>
-		<input type="text" class="form-control" id="input-expiration_time" aria-describedby="help-expiration_time" value="永不过期" disabled>
-		<div id="help-expiration_time" class="form-text">$expiration_help_text</div>
-	</div>
-EOD);
+			<div class="mb-3">
+				<label for="input-expiration_time" class="form-label">$expiration_time</label>
+				<input type="text" class="form-control" id="input-expiration_time" aria-describedby="help-expiration_time" value="永不过期" disabled>
+				<div id="help-expiration_time" class="form-text">$expiration_help_text</div>
+			</div>
+		EOD);
 	}
 	$update_profile_form->addCheckboxes('avatar_source', [
 		'div_class' => 'mb-3',
@@ -125,81 +122,69 @@ EOD);
 		],
 		'help' => UOJLocale::get('change avatar help'),
 	]);
-	$update_profile_form->addInput(
-		'email',
-		[
-			'div_class' => 'mb-3',
-			'type' => 'email',
-			'label' => UOJLocale::get('email'),
-			'default_value' => $user['email'] ?: '',
-			'validator_php' => function ($email, &$vdata) {
-				if ($email && !validateEmail($email)) {
-					return 'Email 格式不合法。';
-				}
+	$update_profile_form->addInput('email', [
+		'div_class' => 'mb-3',
+		'type' => 'email',
+		'label' => UOJLocale::get('email'),
+		'default_value' => $user['email'] ?: '',
+		'validator_php' => function ($email, &$vdata) {
+			if ($email && !validateEmail($email)) {
+				return 'Email 格式不合法。';
+			}
 
-				$vdata['email'] = $email;
+			$vdata['email'] = $email;
 
-				return '';
-			},
-		]
-	);
-	$update_profile_form->addInput(
-		'qq',
-		[
-			'div_class' => 'mb-3',
-			'label' => UOJLocale::get('QQ'),
-			'default_value' => $user['qq'] == 0 ? '' : $user['qq'],
-			'validator_php' => function ($qq, &$vdata) {
-				if ($qq && !validateQQ($qq)) {
-					return 'QQ 格式不合法。';
-				}
+			return '';
+		},
+	]);
+	$update_profile_form->addInput('qq', [
+		'div_class' => 'mb-3',
+		'label' => UOJLocale::get('QQ'),
+		'default_value' => $user['qq'] == 0 ? '' : $user['qq'],
+		'validator_php' => function ($qq, &$vdata) {
+			if ($qq && !validateQQ($qq)) {
+				return 'QQ 格式不合法。';
+			}
 
-				$vdata['qq'] = $qq;
+			$vdata['qq'] = $qq;
 
-				return '';
-			},
-		]
-	);
-	$update_profile_form->addInput(
-		'github',
-		[
-			'div_class' => 'mb-3',
-			'label' => 'GitHub',
-			'default_value' => $extra['social']['github'] ?: '',
-			'validator_php' => function ($github, &$vdata) {
-				if ($github && !validateGitHubUsername($github)) {
-					return 'GitHub 用户名不合法。';
-				}
+			return '';
+		},
+	]);
+	$update_profile_form->addInput('github', [
+		'div_class' => 'mb-3',
+		'label' => 'GitHub',
+		'default_value' => $extra['social']['github'] ?: '',
+		'validator_php' => function ($github, &$vdata) {
+			if ($github && !validateGitHubUsername($github)) {
+				return 'GitHub 用户名不合法。';
+			}
 
-				$vdata['github'] = $github;
+			$vdata['github'] = $github;
 
-				return '';
-			},
-		]
-	);
+			return '';
+		},
+	]);
 	if (isSuperUser(Auth::user())) {
-		$update_profile_form->addInput(
-			'school',
-			[
-				'div_class' => 'mb-3',
-				'label' => UOJLocale::get('school'),
-				'default_value' => $user['school'] ?: '',
-				'validator_php' => function ($school, &$vdata) {
-					$vdata['school'] = $school;
+		$update_profile_form->addInput('school', [
+			'div_class' => 'mb-3',
+			'label' => UOJLocale::get('school'),
+			'default_value' => $extra['school'] ?: '',
+			'validator_php' => function ($school, &$vdata) {
+				$vdata['school'] = $school;
 
-					return '';
-				},
-			]
-		);
+				return '';
+			},
+		]);
 	} else {
 		$school = UOJLocale::get('school');
 		$update_profile_form->appendHTML(<<<EOD
-	<div class="mb-3">
-		<label for="input-school" class="form-label">$school</label>
-		<input type="text" class="form-control" id="input-school" aria-describedby="help-school" value="{$user['school']}" disabled>
-		<div id="help-school" class="form-text">只有管理员才能修改用户所属学校。</div>
-	</div>
-EOD);
+			<div class="mb-3">
+				<label for="input-school" class="form-label">$school</label>
+				<input type="text" class="form-control" id="input-school" aria-describedby="help-school" value="{$extra['school']}" disabled>
+				<div id="help-school" class="form-text">只有管理员才能修改用户所属学校。</div>
+			</div>
+		EOD);
 	}
 	$update_profile_form->addCheckboxes('sex', [
 		'div_class' => 'mb-3',
@@ -214,57 +199,102 @@ EOD);
 			'F' => UOJLocale::get('female'),
 		],
 	]);
-	$update_profile_form->addInput(
-		'motto',
-		[
-			'div_class' => 'mb-3',
-			'label' => UOJLocale::get('motto'),
-			'default_value' => $user['motto'] ?: '',
-			'validator_php' => function ($motto, &$vdata) {
-				if (!validateMotto($motto)) {
-					return '格言格式不合法';
-				}
+	$update_profile_form->addInput('motto', [
+		'div_class' => 'mb-3',
+		'label' => UOJLocale::get('motto'),
+		'default_value' => $user['motto'] ?: '',
+		'validator_php' => function ($motto, &$vdata) {
+			if (!validateMotto($motto)) {
+				return '格言格式不合法';
+			}
 
-				$vdata['motto'] = $motto;
+			$vdata['motto'] = $motto;
 
-				return '';
-			},
-		]
-	);
-	$update_profile_form->addInput(
-		'codeforces',
-		[
-			'div_class' => 'mb-3',
-			'label' => UOJLocale::get('codeforces handle'),
-			'default_value' => $extra['social']['codeforces'] ?: '',
-			'validator_php' => function ($codeforces, &$vdata) {
-				if ($codeforces && !validateUsername($codeforces)) {
-					return 'Codeforces 用户名格式不合法。';
-				}
+			return '';
+		},
+	]);
+	$update_profile_form->addInput('codeforces', [
+		'div_class' => 'mb-3',
+		'label' => UOJLocale::get('codeforces handle'),
+		'default_value' => $extra['social']['codeforces'] ?: '',
+		'validator_php' => function ($codeforces, &$vdata) {
+			if ($codeforces && !validateUsername($codeforces)) {
+				return 'Codeforces 用户名格式不合法。';
+			}
 
-				$vdata['codeforces'] = $codeforces;
+			$vdata['codeforces'] = $codeforces;
 
-				return '';
-			},
-		]
-	);
-	$update_profile_form->addInput(
-		'website',
-		[
-			'div_class' => 'mb-3',
-			'label' => UOJLocale::get('user::website'),
-			'default_value' => $extra['social']['website'] ?: '',
-			'validator_php' => function ($url, &$vdata) {
-				if ($url && !validateURL($url)) {
-					return '链接格式不合法。';
-				}
+			return '';
+		},
+	]);
+	$update_profile_form->addInput('website', [
+		'div_class' => 'mb-3',
+		'label' => UOJLocale::get('user::website'),
+		'default_value' => $extra['social']['website'] ?: '',
+		'validator_php' => function ($url, &$vdata) {
+			if ($url && !validateURL($url)) {
+				return '链接格式不合法。';
+			}
 
-				$vdata['website'] = $url;
+			$vdata['website'] = $url;
 
-				return '';
-			},
-		]
-	);
+			return '';
+		},
+	]);
+
+	if (isset($extra['acm'])) {
+		$team_name = $extra['acm']['team_name'];
+		$team_info_text = UOJUser::convertACMTeamInfoToText($extra['acm']['members']);
+
+		if (isSuperUser(Auth::user())) {
+			$update_profile_form->addInput('acm_team_name', [
+				'div_class' => 'mb-3',
+				'label' => 'ACM 队伍名称',
+				'input_class' => 'form-control',
+				'default_value' => $team_name,
+				'validator_php' => function ($team_name, &$vdata) {
+					if (!is_string($team_name)) {
+						return '不合法的输入。';
+					}
+
+					$vdata['acm_team_name'] = $team_name;
+
+					return '';
+				},
+			]);
+			$update_profile_form->addInput('acm_members', [
+				'div_class' => 'mb-3',
+				'label' => 'ACM 队伍成员',
+				'input_class' => 'form-control font-monospace',
+				'default_value' => $team_info_text,
+				'validator_php' => function ($team_info_text, &$vdata) {
+					try {
+						$vdata['acm_members'] = UOJUser::parseACMTeamInfoFromText($team_info_text);
+					} catch (Exception $e) {
+						return $e->getMessage();
+					}
+
+					return '';
+				},
+			]);
+		} else {
+			$update_profile_form->appendHTML(<<<EOD
+				<div class="mb-3">
+					<label for="input-acm_team_name" class="form-label">ACM 队伍名称</label>
+					<input type="text" class="form-control" id="input-acm_team_name" aria-describedby="help-acm_team_name" value="{$team_name}" disabled>
+					<div id="help-acm_team_name" class="form-text">只有超级用户才能修改 ACM 队伍名称。</div>
+				</div>
+			EOD);
+			$update_profile_form->appendHTML(<<<EOD
+				<div class="mb-3">
+					<label for="input-acm_members" class="form-label">ACM 队伍成员</label>
+					<input type="text" class="form-control" id="input-acm_members" aria-describedby="help-acm_members" value="{$team_info_text}" disabled>
+					<div id="help-acm_members" class="form-text">只有超级用户才能修改 ACM 队伍信息。</div>
+				</div>
+			EOD);
+		}
+	}
+
 	if ($user['usergroup'] == 'B') {
 		$update_profile_form->appendHTML(<<<EOD
 			<div class="mb-3">
@@ -302,7 +332,7 @@ EOD);
 			],
 		]);
 	}
-	$update_profile_form->handle = function (&$vdata) use ($user) {
+	$update_profile_form->handle = function (&$vdata) use ($user, $extra) {
 		$data = [
 			'email' => $vdata['email'],
 			'qq' => $vdata['qq'],
@@ -312,7 +342,6 @@ EOD);
 
 		if (isSuperUser(Auth::user())) {
 			$data['realname'] = $vdata['realname'];
-			$data['school'] = $vdata['school'];
 
 			if (isTmpUser($user)) {
 				$data['expiration_time'] = $vdata['expiration_time']->format(UOJTime::FORMAT);
@@ -325,22 +354,28 @@ EOD);
 			"where", ["username" => $user['username']]
 		]);
 
+		$extra['avatar_source'] = $_POST['avatar_source'];
+		$extra['social']['github'] = $vdata['github'];
+		$extra['social']['codeforces'] = $vdata['codeforces'];
+		$extra['social']['website'] = $vdata['website'];
+
+		if (!(isTmpUser(Auth::user()) || isBannedUser(Auth::user()))) {
+			$extra['username_color'] = $_POST['username_color'];
+		}
+
+		if (isSuperUser(Auth::user())) {
+			$extra['school'] = $vdata['school'];
+
+			if (isset($extra['acm'])) {
+				$extra['acm']['team_name'] = $vdata['acm_team_name'];
+				$extra['acm']['members'] = $vdata['acm_members'];
+			}
+		}
+
 		DB::update([
 			"update user_info",
 			"set", [
-				'extra' => DB::json_set(
-					'extra',
-					'$.avatar_source',
-					$_POST['avatar_source'],
-					'$.social.github',
-					$vdata['github'],
-					'$.social.codeforces',
-					$vdata['codeforces'],
-					'$.social.website',
-					$vdata['website'],
-					'$.username_color',
-					$_POST['username_color']
-				),
+				'extra' => json_encode($extra, JSON_UNESCAPED_UNICODE),
 			],
 			"where", ["username" => $user['username']]
 		]);
@@ -351,24 +386,24 @@ EOD);
 	$update_profile_form->config['submit_button']['class'] = 'btn btn-secondary';
 	$update_profile_form->config['submit_button']['text'] = '更新';
 	$update_profile_form->setAjaxSubmit(<<<EOD
-function(res) {
-	if (res.status === 'success') {
-		$('#result-alert')
-			.html('个人信息修改成功！')
-			.addClass('alert-success')
-			.removeClass('alert-danger')
-			.show();
-	} else {
-		$('#result-alert')
-			.html('个人信息修改失败。' + (res.message || ''))
-			.removeClass('alert-success')
-			.addClass('alert-danger')
-			.show();
-	}
+		function(res) {
+			if (res.status === 'success') {
+				$('#result-alert')
+					.html('个人信息修改成功！')
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+			} else {
+				$('#result-alert')
+					.html('个人信息修改失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
 
-	$(window).scrollTop(0);
-}
-EOD);
+			$(window).scrollTop(0);
+		}
+	EOD);
 	$update_profile_form->runAtServer();
 } elseif ($cur_tab == 'password') {
 	if (isset($_POST['submit-change_password']) && $_POST['submit-change_password'] == 'change_password') {

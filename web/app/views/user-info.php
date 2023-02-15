@@ -38,10 +38,10 @@
 						</span>
 					<?php endif ?>
 				</li>
-				<?php if ($user['school']) : ?>
+				<?php if ($extra['school']) : ?>
 					<li class="list-group-item">
 						<i class="bi bi-person-badge-fill me-1"></i>
-						<?= $user['school'] ?>
+						<?= $extra['school'] ?>
 					</li>
 				<?php endif ?>
 				<?php if ($user['email']) : ?>
