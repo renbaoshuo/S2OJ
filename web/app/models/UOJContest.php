@@ -247,7 +247,7 @@ class UOJContest {
 
 				case 'no-details':
 				case 'full':
-					if ($result['status'] == 'Judged') {
+					if ($result['status'] == 'Judged' && !isset($result['final_result'])) {
 						$q += [
 							'result' => $submission['result'],
 							'score' => $result['score'],
