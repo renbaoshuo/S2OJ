@@ -5,33 +5,6 @@ define("CONTEST_PENDING_FINAL_TEST", 2);
 define("CONTEST_TESTING", 10);
 define("CONTEST_FINISHED", 20);
 
-function genMoreContestInfo(&$contest) {
-	$contest['start_time_str'] = $contest['start_time'];
-	$contest['start_time'] = new DateTime($contest['start_time']);
-	$contest['end_time'] = clone $contest['start_time'];
-	$contest['end_time']->add(new DateInterval("PT${contest['last_min']}M"));
-	$contest['end_time_str'] = $contest['end_time']->format('Y-m-d H:i:s');
-
-	if ($contest['status'] == 'unfinished') {
-		if (UOJTime::$time_now < $contest['start_time']) {
-			$contest['cur_progress'] = CONTEST_NOT_STARTED;
-		} elseif (UOJTime::$time_now < $contest['end_time']) {
-			$contest['cur_progress'] = CONTEST_IN_PROGRESS;
-		} else {
-			$contest['cur_progress'] = CONTEST_PENDING_FINAL_TEST;
-		}
-	} elseif ($contest['status'] == 'testing') {
-		$contest['cur_progress'] = CONTEST_TESTING;
-	} elseif ($contest['status'] == 'finished') {
-		$contest['cur_progress'] = CONTEST_FINISHED;
-	}
-	$contest['extra_config'] = json_decode($contest['extra_config'], true);
-
-	if (!isset($contest['extra_config']['standings_version'])) {
-		$contest['extra_config']['standings_version'] = 2;
-	}
-}
-
 function updateContestPlayerNum($contest) {
 	DB::update([
 		"update contests",

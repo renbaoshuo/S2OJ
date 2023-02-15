@@ -132,11 +132,11 @@ class UOJContest {
 			} elseif (UOJTime::$time_now < $this->info['end_time']) {
 				$this->info['cur_progress'] = CONTEST_IN_PROGRESS;
 			} else {
-				if ($this->info['extra_config']['basic_rule'] == 'IOI') {
-					$this->info['cur_progress'] = CONTEST_TESTING;
-				} else {
-					$this->info['cur_progress'] = CONTEST_PENDING_FINAL_TEST;
-				}
+				// if ($this->info['extra_config']['basic_rule'] == 'IOI') {
+				// 	$this->info['cur_progress'] = CONTEST_TESTING;
+				// } else {
+				$this->info['cur_progress'] = CONTEST_PENDING_FINAL_TEST;
+				// }
 			}
 		} elseif ($this->info['status'] == 'testing') {
 			$this->info['cur_progress'] = CONTEST_TESTING;
