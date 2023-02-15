@@ -14,14 +14,14 @@ return function ($type) {
 			DB::update([
 				"update user_info",
 				"set", [
-					"extra" => json_encode($extra, JSON_UNESCAPED_UNICODE)
+					"extra" => json_encode($extra, JSON_UNESCAPED_UNICODE),
 				],
 				"where", [
 					"username" => $user['username']
 				]
 			]);
 
-			echo "Updated user {$user['username']}. \n";
+			echo "Updated user {$user['username']} ({$extra['school']}).\n";
 		}
 	}
 };

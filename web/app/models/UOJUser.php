@@ -375,6 +375,7 @@ class UOJUser {
 			$extra = [];
 		}
 		mergeConfig($extra, [
+			'school' => null,
 			'permissions' => UOJContext::getMeta('users_default_permissions'),
 			'social' => [
 				'codeforces' => null,
@@ -391,7 +392,7 @@ class UOJUser {
 			'username_color' => isSuperUser($user) ? '#9d3dcf' : '#0d6efd',
 		]);
 
-		if ($key == null) {
+		if ($key === null) {
 			return $extra;
 		}
 
