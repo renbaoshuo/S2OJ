@@ -352,7 +352,7 @@ if ($cur_tab == 'index') {
 		'label' => '电子邮件',
 		'help' => '选填项。填写电子邮件后用户可自主进行密码重置。',
 		'validator_php' => function ($email, &$vdata) {
-			if (!validateEmail($email)) {
+			if ($email && !validateEmail($email)) {
 				return '邮件地址不合法';
 			}
 
