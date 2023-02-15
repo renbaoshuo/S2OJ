@@ -478,3 +478,13 @@ form.form-horizontal {
 .dropzone .dz-preview .dz-progress {
 	height: 6px !important;
 }
+
+/* Utils */
+
+.overflow-wrap-normal {
+	overflow-wrap: normal !important;
+}
+
+.white-space-pre {
+	white-space: pre !important;
+}

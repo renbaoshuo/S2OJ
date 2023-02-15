@@ -156,6 +156,9 @@ function isSuperUser($user) {
 function isTmpUser($user) {
 	return $user != null && $user['usergroup'] == 'T';
 }
+function isBannedUser($user) {
+	return $user != null && $user['usergroup'] == 'B';
+}
 function getProblemExtraConfig($problem) {
 	$extra_config = json_decode($problem['extra_config'], true);
 
@@ -290,4 +293,13 @@ function getAbsoluteUrl($relativeUrl, $baseUrl) {
 
 	// return absolute URL
 	return $scheme . '://' . $abs;
+}
+
+function array_to_csv($data, $delimiter = ',', $enclosure = '"', $escape_char = "\\") {
+	$f = fopen('php://memory', 'r+');
+	foreach ($data as $item) {
+		fputcsv($f, $item, $delimiter, $enclosure, $escape_char);
+	}
+	rewind($f);
+	return stream_get_contents($f);
 }

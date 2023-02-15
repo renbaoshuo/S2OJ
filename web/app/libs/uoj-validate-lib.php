@@ -109,6 +109,10 @@ function validateCommentId($id) {
 	return ['error' => '', 'store' => $comment];
 }
 
+function validateNothing($x) {
+	return '';
+}
+
 function is_short_string($str) {
 	return is_string($str) && strlen($str) <= 256;
 }

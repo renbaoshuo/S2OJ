@@ -527,6 +527,48 @@ if ($cur_tab == 'index') {
 	EOD);
 	$register_tmp_user_form->runAtServer();
 
+	$register_tmp_acm_team_form = new UOJForm('register_tmp_acm_team');
+	$register_tmp_acm_team_form->addTextArea('register_tmp_acm_team_table', [
+		'label' => '队伍信息',
+		'input_class' => 'form-control font-monospace overflow-x-scroll overflow-wrap-normal white-space-pre',
+		'help' => '一行一个队伍，格式形如 <code>ACM233_team23,123456,ACM233_team23@uoj.ac,Mike代表队,2,李麦克,麦麦大学,张麦克,克克大学</code>，依次表示用户名、密码、邮箱、队伍名、队伍人数、每个队员的姓名和单位信息。',
+		'validator_php' => 'validateNothing',
+	]);
+	$register_tmp_acm_team_form->addInput('expiration_time', [
+		'div_class' => 'mt-3',
+		'label' => '过期时间',
+		'default_value' => UOJTime::time2str((new DateTime())->add(new DateInterval('P7D'))->setTime(0, 0, 0)),
+		'validator_php' => function ($str, &$vdata) {
+			try {
+				$vdata['expiration_time'] = new DateTime($str);
+			} catch (Exception $e) {
+				return '无效时间格式';
+			}
+			return '';
+		},
+	]);
+	$register_tmp_acm_team_form->handle = function (&$vdata) {
+		$expiration_time = $vdata['expiration_time']->format('Y-m-d H:i:s');
+		$msg = '';
+
+		foreach (explode("\n", UOJRequest::post('register_tmp_acm_team_table')) as $raw_line) {
+			try {
+				if (trim($raw_line) === '') {
+					continue;
+				}
+
+				$team = UOJUser::registerTmpACMTeamAccountFromText($raw_line, '', $expiration_time);
+				$msg .= $team['username'] . ': success';
+			} catch (Exception $e) {
+				$msg .= $raw_line . ': ' . $e->getMessage();
+			}
+			$msg .= "\n";
+		}
+
+		UOJResponse::message(HTML::tag('pre', [], $msg));
+	};
+	$register_tmp_acm_team_form->runAtServer();
+
 	$change_password_form = new UOJForm('change_password');
 	$change_password_form->addInput('p_username', [
 		'label' => '用户名',
@@ -1327,6 +1369,9 @@ if ($cur_tab == 'index') {
 							<a class="nav-link" href="#new-tmp-user" data-bs-toggle="tab" data-bs-target="#new-tmp-user">新增临时用户</a>
 						</li>
 						<li class="nav-item">
+							<a class="nav-link" href="#new-acm-team-tmp-user" data-bs-toggle="tab" data-bs-target="#new-acm-team-tmp-user">新增 ACM 比赛用临时团队用户</a>
+						</li>
+						<li class="nav-item">
 							<a class="nav-link" href="#reset-password" data-bs-toggle="tab" data-bs-target="#reset-password">重置密码</a>
 						</li>
 						<li class="nav-item">
@@ -1385,7 +1430,7 @@ if ($cur_tab == 'index') {
 								function ($row) {
 									echo '<tr>';
 									echo '<td>', UOJUser::getLink($row), '</td>';
-									echo '<td>', HTML::escape($row['school']), '</td>';
+									echo '<td>', HTML::escape(UOJUser::getExtra($row, 'school')), '</td>';
 									echo '<td>';
 									switch ($row['usergroup']) {
 										case 'S':
@@ -1447,6 +1492,24 @@ if ($cur_tab == 'index') {
 										<li>请提醒用户及时修改初始密码，以免账号被盗导致教学资源流出。请勿设置过于简单的初始密码。</li>
 										<li>我们推荐在创建账号时输入号主的电子邮件地址以便后期发生忘记密码等情况时进行验证。</li>
 										<li>临时账号不具有任何权限，只能查看、参加已经用户报名了的比赛。创建账号后可以在「修改个人信息」页面中的「特权」选项卡为用户分配权限。特别地，如果该用户是外校学生，那么您可能需要禁用其 <b>所有权限</b>，并为其手动报名比赛。</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane" id="new-acm-team-tmp-user">
+							<div class="row">
+								<div class="col-md-8">
+									<?php $register_tmp_acm_team_form->printHTML() ?>
+								</div>
+								<div class="col-md-4">
+									<h5>注意事项</h5>
+									<ul class="mb-0">
+										<li><b>此处创建的用户只能在 ACM 比赛中使用，如需创建其他用户，请查看其他选项卡。</b></li>
+										<li>用户名推荐格式为 <code>ACM</code> + 比赛 ID + <code>_team</code> + 队伍编号，如用于比赛 233 的第 23 号队伍可以设置为 <code>ACM233_team23</code>。</li>
+										<li>请提醒用户及时修改初始密码。请勿设置过于简单的初始密码。</li>
+										<li>我们推荐在创建账号时输入号主的电子邮件地址以便后期发生忘记密码等情况时进行验证，如果不设置电子邮件地址，将该列留空即可。</li>
+										<li>临时账号不具有任何权限，只能查看、参加已经用户报名了的比赛。创建账号后可以在「修改个人信息」页面中的「特权」选项卡为用户分配权限。特别地，如果该用户是外校学生，那么您可能需要禁用其 <b>所有权限</b>，并为其手动报名比赛。</li>
+										<li>注意分隔符为英文逗号。解析时调用的是 PHP 的 <code>str_getcsv</code> 函数，遇到特殊字符请遵照 CSV 格式进行编码。<b>推荐在 Excel 中导出 CSV 格式的文件后再将内容复制到此处。</b></li>
 									</ul>
 								</div>
 							</div>
