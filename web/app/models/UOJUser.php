@@ -276,7 +276,7 @@ class UOJUser {
 		], $user['username']);
 	}
 
-	public static function getUpdatedExtraVisitHistory($history, $cur) {
+	public static function getUpdatedExtraVisitHistory($history, $cur = null) {
 		$new_h = [];
 		$oldest = clone UOJTime::$time_now;
 		$oldest->modify('-1 month');
@@ -386,13 +386,30 @@ class UOJUser {
 		return $cur;
 	}
 
+	public static function getMatchedVisitHistory($user, $info) {
+		$extra = UOJUser::getExtra($user);
+		$new_h = UOJUser::getUpdatedExtraVisitHistory($extra['history']);
+
+		foreach ($new_h as $history) {
+			if (
+				$history['addr'] == $info['addr'] &&
+				$history['forwarded_addr'] == $info['forwarded_addr'] &&
+				$history['ua'] == substr($info['ua'], 0, UOJUser::MAX_UA_LEN)
+			) {
+				return $history;
+			}
+		}
+
+		return null;
+	}
+
 	public static function updateVisitHistory($user, $info) {
 		$extra = UOJUser::getExtra($user);
 		$cur = [
 			'addr' => $info['remote_addr'],
 			'forwarded_addr' => $info['http_x_forwarded_for'],
 			'ua' => substr($info['http_user_agent'], 0, UOJUser::MAX_UA_LEN),
-			'last' => UOJTime::$time_now_str
+			'last' => UOJTime::$time_now_str,
 		];
 
 		$extra['history'] = UOJUser::getUpdatedExtraVisitHistory($extra['history'], $cur);
