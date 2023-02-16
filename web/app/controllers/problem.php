@@ -307,7 +307,25 @@ if (UOJContest::cur()) {
 					<?= UOJLocale::get('problems::memory limit') ?>: <?= $memory_limit ? "$memory_limit MB" : "N/A" ?>
 				</div>
 
-				<hr>
+				<hr />
+
+				<?php if (!UOJContest::cur()) : ?>
+					<?php $contest_problems = UOJProblem::cur()->findInContests(); ?>
+					<?php if (!empty($contest_problems)) : ?>
+						<div class="alert alert-light">
+							<h5 class="alert-heading"><?= UOJLocale::get('problems::the problem was used in the following contest') ?>:</h5>
+							<ul class="mb-0">
+								<?php foreach ($contest_problems as $cp) : ?>
+									<?php if ($cp->userCanView(Auth::user())) : ?>
+										<li><?= $cp->contest->getLink(['class' => 'alert-link text-decoration-underline']) ?></li>
+									<?php endif ?>
+								<?php endforeach ?>
+							</ul>
+						</div>
+
+						<hr />
+					<?php endif ?>
+				<?php endif ?>
 
 				<div class="tab-content">
 					<div class="tab-pane active" id="statement">

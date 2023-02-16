@@ -63,5 +63,6 @@ return [
 	'test data' => '测试数据',
 	'attachments download' => '附件下载',
 	'resources' => '相关资源',
-	'cannot submit' => '当前题目未配置 <code>submission_requirement</code>，暂时无法提交。'
+	'cannot submit' => '当前题目未配置 <code>submission_requirement</code>，暂时无法提交。',
+	'the problem was used in the following contest' => '该题目被以下比赛使用',
 ];

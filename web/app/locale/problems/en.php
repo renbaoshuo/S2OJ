@@ -64,4 +64,5 @@ return [
 	'attachments download' => 'Attachments download',
 	'resources' => 'Resources',
 	'cannot submit' => 'This problem doesn\'t configured <code>submission_requirement</code>, so it cannot be submitted temporarily.',
+	'the problem was used in the following contest' => 'The problem was used in the following contest',
 ];
