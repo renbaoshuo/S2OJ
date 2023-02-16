@@ -46,7 +46,7 @@ $all_tags = DB::selectAll("select distinct tag from blogs_tags where blog_id in 
 			</div>
 		<?php endif ?>
 		<div class="card border-info mt-3">
-			<div class="card-header bg-info">标签</div>
+			<div class="card-header fw-bold bg-info">标签</div>
 			<div class="card-body">
 				<?php if ($all_tags) : ?>
 					<?php foreach ($all_tags as $tag) : ?>

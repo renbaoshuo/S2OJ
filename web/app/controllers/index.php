@@ -83,8 +83,8 @@ $friend_links = DB::selectAll([
 			<img class="media-object img-thumbnail" src="/images/logo.png" alt="Logo" />
 		</div>
 		<div class="card card-default mb-2">
-			<div class="card-header bg-white">
-				<b><?= UOJLocale::get('countdowns') ?></b>
+			<div class="card-header fw-bold">
+				<?= UOJLocale::get('countdowns') ?>
 			</div>
 			<div class="card-body">
 				<ul class="list-unstyled mb-0">
@@ -116,8 +116,8 @@ $friend_links = DB::selectAll([
 		<?php endif ?>
 
 		<div class="card card-default mb-2">
-			<div class="card-header bg-white">
-				<b><?= UOJLocale::get('friend links') ?></b>
+			<div class="card-header fw-bold">
+				<?= UOJLocale::get('friend links') ?>
 			</div>
 			<div class="card-body">
 				<ul class="ps-3 mb-0">

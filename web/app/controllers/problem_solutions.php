@@ -279,7 +279,7 @@ $pag = new Paginator($pag_config);
 		</div>
 
 		<div class="card card-default mb-2">
-			<div class="card-header bg-transparent fw-bold">
+			<div class="card-header fw-bold">
 				增加题解
 			</div>
 			<div class="card-body">
