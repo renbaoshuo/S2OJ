@@ -9,6 +9,9 @@ if (!isset($PageMainTitleOnSmall)) {
 if (!isset($ShowPageHeader)) {
 	$ShowPageHeader = true;
 }
+if (!isset($PageContainerClass)) {
+	$PageContainerClass = 'container';
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?= UOJLocale::locale() ?>">
@@ -245,4 +248,4 @@ if (!isset($ShowPageHeader)) {
 		<?php uojIncludeView($PageNav, array('REQUIRE_LIB' => $REQUIRE_LIB)) ?>
 	<?php endif ?>
 
-	<div class="uoj-content container flex-fill">
+	<div class="uoj-content <?= $PageContainerClass ?> flex-fill">

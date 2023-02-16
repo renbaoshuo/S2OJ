@@ -488,3 +488,17 @@ form.form-horizontal {
 .white-space-pre {
 	white-space: pre !important;
 }
+
+/* Contest Nav */
+
+.uoj-content.container-fluid .uoj-contest-nav {
+	padding-left: 0.75rem !important;
+	padding-right: 0.75rem !important;
+}
+
+@media (max-width: 1200px) {
+	.uoj-content.container-fluid .uoj-contest-nav {
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+	}
+}

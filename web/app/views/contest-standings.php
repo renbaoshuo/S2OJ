@@ -4,7 +4,7 @@
 	</h4>
 <?php endif ?>
 
-<div id="standings"></div>
+<div id="standings" class="container"></div>
 
 <script type="text/javascript">
 	var contest_rule = <?= json_encode($contest['extra_config']['basic_rule']) ?>;
@@ -18,6 +18,10 @@
 	var myname = <?= json_encode(Auth::id()) ?>;
 	var after_contest = <?= json_encode(isset($after_contest) && $after_contest) ?>;
 	var first_accepted = {};
+
+	if (problems.length > 8) {
+		$('#standings').removeClass('container');
+	}
 
 	$(document).ready(showStandings());
 </script>

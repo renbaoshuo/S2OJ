@@ -8,6 +8,8 @@ Auth::check() || redirectToLogin();
 UOJContest::init(UOJRequest::get('id')) || UOJResponse::page404();
 UOJContest::cur()->userCanView(Auth::user(), ['ensure' => true, 'check-register' => true]);
 
+$PageContainerClass = 'container';
+
 $contest = UOJContest::info();
 $is_manager = UOJContest::cur()->userCanManage(Auth::user());
 
@@ -235,7 +237,13 @@ if ($cur_tab == 'dashboard') {
 	} else {
 		$reply_question = null;
 	}
+} elseif ($cur_tab == 'standings') {
+	$PageContainerClass = 'container-fluid';
+} elseif ($cur_tab == 'after_contest_standings') {
+	$PageContainerClass = 'container-fluid';
 } elseif ($cur_tab == 'self_reviews') {
+	$PageContainerClass = 'container-fluid';
+
 	$self_reviews_update_form = new UOJForm('self_reviews_update');
 	$self_reviews_update_form->config['ctrl_enter_submit'] = true;
 	$self_reviews_update_form->addHidden('self_reviews_update__username', '', function ($username, &$vdata) {
@@ -471,7 +479,14 @@ function echoSelfReviews() {
 	] + UOJContest::cur()->queryResult());
 }
 ?>
-<?php echoUOJPageHeader($tabs_info[$cur_tab]['name'] . ' - ' . UOJContest::info('name') . ' - ' . UOJLocale::get('contests::contest')) ?>
+
+<?php
+
+echoUOJPageHeader($tabs_info[$cur_tab]['name'] . ' - ' . UOJContest::info('name') . ' - ' . UOJLocale::get('contests::contest'), [
+	'PageContainerClass' => $PageContainerClass,
+]);
+
+?>
 
 <div class="text-center d-md-none mb-3">
 	<h1><?= $contest['name'] ?></h1>
@@ -493,7 +508,7 @@ function echoSelfReviews() {
 
 <div class="row">
 	<div <?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings' || $cur_tab == 'self_reviews') : ?> class="col-12" <?php else : ?> class="col-md-9" <?php endif ?>>
-		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
+		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills container uoj-contest-nav') ?>
 		<?php if ($cur_tab == 'standings' || $cur_tab == 'after_contest_standings' || $cur_tab == 'self_reviews') : ?>
 			<div class="d-none d-md-block text-center">
 				<h1 class="mt-2 mb-3"><?= $contest['name'] ?></h1>

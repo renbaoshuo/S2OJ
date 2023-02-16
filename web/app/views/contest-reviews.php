@@ -40,8 +40,8 @@ foreach ($contest_data['people'] as $person) {
 ?>
 
 <?php if ($contest['extra_config']['basic_rule'] === 'ACM') : ?>
-	<div class="text-warning">
-		ACM 比赛的赛后总结暂时不支持显示附加信息。
+	<div class="text-warning-emphasis text-center">
+		ACM 比赛的赛后总结暂时不支持显示罚时、附加题等信息。
 	</div>
 <?php endif ?>
 
@@ -74,8 +74,8 @@ foreach ($contest_data['people'] as $person) {
 			standings,
 			1,
 			'<tr>' +
-			'<th style="width:2em">#</th>' +
-			'<th style="width:8em">' + uojLocale('username') + '</th>' +
+			'<th style="width:3em">#</th>' +
+			'<th style="width:14em">' + uojLocale('username') + '</th>' +
 			'<th style="width:5em">' + uojLocale('contests::total score') + '</th>' +
 			$.map(problems, function(col, idx) {
 				return '<th style="width:10em">' + '<a href="/contest/' + contest_id + '/problem/' + col + '" class="text-decoration-none">' + String.fromCharCode('A'.charCodeAt(0) + idx) + '</a>' + '</th>';

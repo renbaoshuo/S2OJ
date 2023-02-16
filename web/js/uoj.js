@@ -1762,10 +1762,7 @@ function setACMStandingsTH(th, i, meta) {
 	if (i == -3) {
 		return $(th).css('width', '3em').text('#');
 	} else if (i == -2) {
-		if (problems.length <= 10) {
-			$(th).css('width', '14em');
-		}
-		return $(th).text(uojLocale('username'));
+		return $(th).css('width', '14em').text(uojLocale('username'));
 	} else if (i == -1) {
 		return $(th).css('width', '5em').text(uojLocale('contests::total score'));
 	}
