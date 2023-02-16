@@ -315,9 +315,13 @@ if (UOJContest::cur()) {
 						<div class="alert alert-light">
 							<h5 class="alert-heading"><?= UOJLocale::get('problems::the problem was used in the following contest') ?>:</h5>
 							<ul class="mb-0">
+								<?php usort($contest_problems, fn ($a, $b) => $a->contest->info['start_time'] < $b->contest->info['start_time']); ?>
 								<?php foreach ($contest_problems as $cp) : ?>
 									<?php if ($cp->userCanView(Auth::user())) : ?>
-										<li><?= $cp->contest->getLink(['class' => 'alert-link text-decoration-underline']) ?></li>
+										<li>
+											<?= $cp->contest->getLink(['class' => 'alert-link text-decoration-underline']) ?>
+											<small>(<?= $cp->contest->info['start_time_str'] ?>)</small>
+										</li>
 									<?php endif ?>
 								<?php endforeach ?>
 							</ul>
