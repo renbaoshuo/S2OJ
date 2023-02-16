@@ -231,6 +231,8 @@ function echoSubmissionsList($cond, $tail, $config, $user) {
 		'submissions.status',
 		'submissions.result_error',
 		'submissions.score',
+		'submissions.hide_score_to_others',
+		'submissions.hidden_score',
 	];
 
 	if (!isset($config['problem'])) {
