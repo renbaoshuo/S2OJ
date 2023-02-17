@@ -507,8 +507,14 @@ form.form-horizontal {
 
 .submission-layout {
 	/* display: grid; */
-	grid-template-columns: 75% 25%;
+	grid-template-columns: 70% 30%;
 	grid-template-rows: auto 1fr;
+}
+
+@media (min-width: 992px) {
+	.submission-layout {
+		grid-template-columns: 75% 25%;
+	}
 }
 
 .submission-left-col {
