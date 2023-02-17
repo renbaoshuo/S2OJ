@@ -609,13 +609,17 @@ class UOJSubmission {
 				switch ($id) {
 					case 'submitter':
 						$submitter = UOJUser::query($this->info['submitter']);
+						$user_profile_url = HTML::url('/user/' . $this->info['submitter']);
 
 						echo '<div class="pb-2">';
-						echo HTML::empty_tag('img', [
+						echo HTML::tag('a', [
+							'href' => $user_profile_url,
+							'class' => 'd-inline-block me-2',
+						], HTML::empty_tag('img', [
 							'src' => HTML::avatar_addr($submitter, 64),
-							'class' => 'uoj-user-avatar rounded me-2',
+							'class' => 'uoj-user-avatar rounded',
 							'style' => 'width: 2rem; height: 2rem;',
-						]);
+						]));
 						echo UOJUser::getLink($submitter);
 						echo '</div>';
 
