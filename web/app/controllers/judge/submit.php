@@ -57,6 +57,15 @@ function hackJudged() {
 
 	if (!$result['score']) {
 		return;
+	} else {
+		$problem_link = UOJHack::cur()->problem->getLink();
+		$submission_link = UOJHack::cur()->submission->getLink();
+		$hacker_link = UOJUser::getLink(UOJHack::info('hacker'), ['color' => false]);
+		$hack_link = UOJHack::cur()->getLink();
+
+		sendSystemMsg(UOJHack::info('owner'), '提交被 Hack 通知', <<<EOD
+			您对题目 {$problem_link} 的提交 {$submission_link} 被 {$hacker_link} 成功 Hack，请查看 Hack {$hack_link} 获取详情。
+		EOD);
 	}
 	if (!$ok) {
 		return;

@@ -111,7 +111,7 @@ trait UOJSubmissionLikeTrait {
 		return $this->info['id'];
 	}
 	public function getLink() {
-		return '<a class="text-decoration-none" href="' . $this->getUri() . '">#' . $this->info['id'] . '</a></td>';
+		return '<a class="text-decoration-none" href="' . HTML::url($this->getUri()) . '">#' . $this->info['id'] . '</a>';
 	}
 
 	public function getResult($key = null) {
