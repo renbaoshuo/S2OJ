@@ -220,11 +220,20 @@ class UOJBlog {
 
 	public function getSolutionProblem() {
 		return UOJProblem::query(DB::selectSingle([
-			DB::lc(), "select problem_id from problems_solutions",
+			"select problem_id from problems_solutions",
 			"where", [
 				"blog_id" => $this->info['id'],
 			],
 		]));
+	}
+
+	public function getReplyCnt() {
+		return DB::selectCount([
+			"select count(*) from blogs_comments",
+			"where", [
+				"blog_id" => $this->info['id'],
+			]
+		]);
 	}
 }
 

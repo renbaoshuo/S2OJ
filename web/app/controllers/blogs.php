@@ -2,6 +2,69 @@
 requirePHPLib('form');
 
 Auth::check() || redirectToLogin();
+
+function echoBlogItem($info) {
+	$blog = new UOJBlog($info);
+	$poster = UOJUser::query($blog->info['poster']);
+
+	echo '<div class="list-group-item">';
+	echo     '<div class="row gy-2">';
+
+	echo         '<div class="col-md-3 d-flex gap-2">';
+	echo             '<div class="">';
+	echo HTML::tag('a', [
+		'href' => HTML::url('/user/' . $poster['username']),
+		'class' => 'd-inline-block me-2',
+	], HTML::empty_tag('img', [
+		'src' => HTML::avatar_addr($poster, 64),
+		'class' => 'uoj-user-avatar rounded',
+		'style' => 'width: 3rem; height: 3rem;',
+	]));
+	echo             '</div>';
+	echo             '<div class="d-flex flex-column gap-1">';
+	echo                 '<div>', UOJUser::getLink($poster), '</div>';
+	echo                 '<div class="hstack gap-2 flex-wrap small text-muted">';
+	echo                     '<span>', '<i class="bi bi-chat-dots"></i> ', $blog->getReplyCnt(), ' </span>';
+	echo                     '<span>', '<i class="bi bi-hand-thumbs-up"></i> ', $blog->info['zan'], ' </span>';
+	echo                 '</div>';
+	echo             '</div>';
+	echo         '</div>';
+
+	echo         '<div class="col-md-6">';
+	echo             '<div>';
+	echo                 $blog->getLink();
+	if ($blog->info['is_hidden']) {
+		echo             ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
+	}
+	echo             '</div>';
+	echo             '<div class="mt-1 text-muted small">', '<i class="bi bi-clock"></i> ', $blog->info['post_time'], '</div>';
+	echo         '</div>';
+
+	$newest = $blog->queryNewestComment();
+
+	echo         '<div class="col-md-3 small vstack gap-1">';
+	if ($newest) {
+		echo         '<div>最新评论: ', UOJUser::getLink($newest['poster']), '</div>';
+		echo         '<div class="text-muted" style="line-height: 1.5rem">', '<i class="bi bi-clock"></i> ', $newest['post_time'], '</div>';
+	} else {
+		echo         '<div>暂无评论</div>';
+	}
+	echo         '</div>';
+
+	echo     '</div>';
+	echo '</div>';
+}
+
+$pag = new Paginator([
+	'page_len' => 10,
+	'table_name' => 'blogs',
+	'col_names' => ['id', 'poster', 'title', 'post_time', 'active_time', 'zan', 'is_hidden'],
+	'cond' => '1',
+	'tail' => 'order by post_time desc',
+	'post_filter' => function ($info) {
+		return (new UOJBlog($info))->userCanView(Auth::user());
+	},
+]);
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('blogs')) ?>
 
@@ -32,46 +95,23 @@ Auth::check() || redirectToLogin();
 		</div>
 		<!-- end title container -->
 
-		<?php
-		echoLongTable(
-			['id', 'poster', 'title', 'post_time', 'zan', 'is_hidden'],
-			'blogs',
-			'1',
-			'order by post_time desc',
-			<<<EOD
-				<tr>
-					<th>标题</th>
-					<th style="width:200px">发表者</th>
-					<th style="width:200px">发表日期</th>
-					<th style="width:50px" class="text-center">评价</th>
-				</tr>
-			EOD,
-			function ($info) {
-				$blog = new UOJBlog($info);
+		<div class="card mt-3">
+			<div class="list-group list-group-flush">
+				<?php if ($pag->isEmpty()) : ?>
+					<div class="list-group-item text-center">
+						<?= UOJLocale::get('none') ?>
+					</div>
+				<?php endif ?>
 
-				echo '<tr>';
-				echo '<td>';
-				echo $blog->getLink();
-				if ($blog->info['is_hidden']) {
-					echo ' <span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ', UOJLocale::get('hidden'), '</span> ';
-				}
-				echo '</td>';
-				echo '<td>' . UOJUser::getLink($blog->info['poster']) . '</td>';
-				echo '<td>' . $blog->info['post_time'] . '</td>';
-				echo '<td class="text-center">' . ClickZans::getCntBlock($blog->info['zan']) . '</td>';
-				echo '</tr>';
-			},
-			[
-				'page_len' => 10,
-				'div_classes' => ['card', 'my-3', 'table-responsive'],
-				'table_classes' => ['table', 'uoj-table', 'mb-0'],
-				'post_filter' => function ($info) {
-					return (new UOJBlog($info))->userCanView(Auth::user());
-				},
-			]
-		);
-		?>
+				<?php foreach ($pag->get() as $idx => $row) : ?>
+					<?php echoBlogItem($row) ?>
+				<?php endforeach ?>
+			</div>
+		</div>
 
+		<div class="mt-3">
+			<?= $pag->pagination() ?>
+		</div>
 	</div>
 
 	<!-- right col -->
