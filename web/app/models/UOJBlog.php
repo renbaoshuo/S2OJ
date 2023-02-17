@@ -220,7 +220,7 @@ class UOJBlog {
 
 	public function getSolutionProblem() {
 		return UOJProblem::query(DB::selectSingle([
-			DB::lc(), "select 1 from problems_solutions",
+			DB::lc(), "select problem_id from problems_solutions",
 			"where", [
 				"blog_id" => $this->info['id'],
 			],
