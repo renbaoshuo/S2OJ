@@ -983,24 +983,6 @@ function echoHacksList($cond, $tail, $config, $user) {
 	);
 }
 
-function echoBlog($blog, $config = array()) {
-	global $REQUIRE_LIB;
-
-	$default_config = array(
-		'blog' => $blog,
-		'show_title_only' => false,
-		'is_preview' => false
-	);
-	foreach ($default_config as $key => $val) {
-		if (!isset($config[$key])) {
-			$config[$key] = $val;
-		}
-	}
-
-	$config['REQUIRE_LIB'] = $REQUIRE_LIB;
-
-	uojIncludeView('blog-preview', $config);
-}
 function echoBlogTag($tag) {
 	echo ' <a class="uoj-blog-tag">', '<span class="badge bg-secondary">', HTML::escape($tag), '</span></a> ';
 }

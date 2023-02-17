@@ -3,7 +3,7 @@ requirePHPLib('form');
 
 Auth::check() || redirectToLogin();
 
-function echoBlogItem($info) {
+function echoBlog($info) {
 	$blog = new UOJBlog($info);
 	$poster = UOJUser::query($blog->info['poster']);
 
@@ -60,7 +60,7 @@ $pag = new Paginator([
 	'table_name' => 'blogs',
 	'col_names' => ['id', 'poster', 'title', 'post_time', 'active_time', 'zan', 'is_hidden'],
 	'cond' => '1',
-	'tail' => 'order by post_time desc',
+	'tail' => 'order by post_time desc, id desc',
 	'post_filter' => function ($info) {
 		return (new UOJBlog($info))->userCanView(Auth::user());
 	},
@@ -104,7 +104,7 @@ $pag = new Paginator([
 				<?php endif ?>
 
 				<?php foreach ($pag->get() as $idx => $row) : ?>
-					<?php echoBlogItem($row) ?>
+					<?php echoBlog($row) ?>
 				<?php endforeach ?>
 			</div>
 		</div>
