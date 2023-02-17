@@ -394,7 +394,7 @@ if ($_POST['image_upload_file_submit'] == 'submit') {
 
 <?php
 $pag_config = [
-	'page_len' => 40,
+	'page_len' => 20,
 	'col_names' => ['*'],
 	'table_name' => 'users_images',
 	'cond' => "uploader = '{$myUser['username']}'",

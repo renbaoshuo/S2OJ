@@ -36,7 +36,7 @@ EOD,
 				echo '</tr>';
 			},
 			[
-				'page_len' => 40,
+				'page_len' => 25,
 				'div_classes' => ['card', 'my-3'],
 				'table_classes' => ['table', 'uoj-table', 'mb-0'],
 			]

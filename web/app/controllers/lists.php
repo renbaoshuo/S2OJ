@@ -94,7 +94,7 @@ $pag = new Paginator([
 	'table_name' => 'lists',
 	'cond' => $cond,
 	'tail' => "order by id desc",
-	'page_len' => 40,
+	'page_len' => 50,
 	'post_filter' => function ($info) {
 		return (new UOJList($info))->userCanView(Auth::user());
 	}

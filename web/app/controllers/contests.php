@@ -86,7 +86,7 @@ $table_header .= '<th style="width:180px;">' . UOJLocale::get('appraisal') . '</
 $table_header .= '</tr>';
 
 $table_config = [
-	'page_len' => 40,
+	'page_len' => 50,
 	'div_classes' => ['card', 'mb-3'],
 	'table_classes' => ['table', 'uoj-table', 'mb-0', 'text-center'],
 ];
@@ -104,7 +104,7 @@ echoLongTable(
 	'order by start_time asc, id asc',
 	$table_header,
 	'echoContest',
-	$table_config
+	$table_config + ['echo_full' => true],
 );
 
 if ($rest_second <= 86400) {

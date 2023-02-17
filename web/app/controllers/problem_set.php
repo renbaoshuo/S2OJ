@@ -229,7 +229,7 @@ $pag = new Paginator([
 	],
 	'cond' => $cond,
 	'tail' => "order by id asc",
-	'page_len' => 40,
+	'page_len' => 50,
 	'post_filter' => function ($problem) {
 		return (new UOJProblem($problem))->userCanView(Auth::user());
 	}
