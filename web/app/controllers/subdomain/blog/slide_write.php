@@ -42,18 +42,15 @@ if ($blog) {
 	$blog_editor->blog_url = null;
 }
 
-function insertBlog($data) {
+function insertSlide($data) {
 	DB::insert([
 		"insert into blogs",
-		"(title, content, content_md, poster, is_hidden, post_time, active_time)",
+		"(type, title, content, content_md, poster, is_hidden, post_time, active_time)",
 		"values", DB::tuple([
-			$data['title'], $data['content'], $data['content_md'],
+			"S", $data['title'], $data['content'], $data['content_md'],
 			UOJUserBlog::id(), $data['is_hidden'], DB::now(), DB::now()
 		])
 	]);
-}
-function insertSlide($data) {
-	DB::insert("insert into blogs (type, title, content, content_md, poster, is_hidden, post_time) values ('S', '" . DB::escape($data['title']) . "', '" . DB::escape($data['content']) . "', '" . DB::escape($data['content_md']) . "', '" . Auth::id() . "', {$data['is_hidden']}, now())");
 }
 
 $blog_editor->save = function ($data) {
