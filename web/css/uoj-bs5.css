@@ -502,3 +502,26 @@ form.form-horizontal {
 		padding-right: 0 !important;
 	}
 }
+
+/* Submission Page */
+
+.submission-layout {
+	/* display: grid; */
+	grid-template-columns: 75% 25%;
+	grid-template-rows: auto 1fr;
+}
+
+.submission-left-col {
+	grid-column: 1;
+	grid-row: 1 / span 2;
+}
+
+.submission-right-col {
+	grid-column: 2;
+	grid-row: 1;
+}
+
+.submission-right-control-panel {
+	grid-column: 2;
+	grid-row: 2;
+}

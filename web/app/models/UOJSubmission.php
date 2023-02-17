@@ -588,8 +588,6 @@ class UOJSubmission {
 			$cfg['show_actual_score'] = $this->viewerCanSeeScore($viewer);
 		}
 
-		$show_status_details = $this->viewerCanSeeStatusDetailsHTML($viewer);
-
 		$rows = [
 			'id' => 'ID',
 			'submitter' => UOJLocale::get('problems::submitter'),
@@ -624,8 +622,8 @@ class UOJSubmission {
 						break;
 					default:
 						echo '<div class="d-flex justify-content-between align-items-center">';
-						echo     '<span class="flex-shrink-0">', $name, '</span>';
-						echo     '<span class="text-end">', $this->echoStatusBarTD($id, $cfg), '</span>';
+						echo     '<span class="flex-shrink-0 me-2">', $name, '</span>';
+						echo     '<span class="text-end text-truncate d-inline-block">', $this->echoStatusBarTD($id, $cfg), '</span>';
 						echo '</div>';
 
 						break;
@@ -635,17 +633,6 @@ class UOJSubmission {
 
 		echo     '</div>';
 		echo '</div>';
-
-		if ($show_status_details) {
-			echo '<div class="card">';
-			echo     '<table>';
-			echo         '<tr id="', "status_details_{$this->info['id']}", '" class="">';
-			echo             $this->getStatusDetailsHTML();
-			echo         '</tr>';
-			echo         '<script type="text/javascript">update_judgement_status_details(' . $this->info['id'] . ')</script>';
-			echo     '</table>';
-			echo '</div>';
-		}
 	}
 
 	public function delete() {

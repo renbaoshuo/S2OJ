@@ -41,7 +41,7 @@ if ($can_see_minor) {
 		redirectTo(UOJSubmission::cur()->getUriForNewTID($tid));
 	};
 	$minor_rejudge_form->config['submit_button']['class'] = 'list-group-item list-group-item-action border-start-0 border-end-0 list-group-item-secondary';
-	$minor_rejudge_form->config['submit_button']['text'] = '偷偷重新测试';
+	$minor_rejudge_form->config['submit_button']['text'] = '<i class="bi bi-arrow-clockwise"></i> 偷偷重新测试';
 	$minor_rejudge_form->config['submit_container']['class'] = '';
 	$minor_rejudge_form->runAtServer();
 }
@@ -94,7 +94,7 @@ if (UOJSubmission::cur()->isLatest()) {
 			UOJSubmission::rejudgeById(UOJSubmission::info('id'));
 		};
 		$rejudge_form->config['submit_button']['class'] = 'list-group-item list-group-item-action border-start-0 border-end-0 list-group-item-secondary';
-		$rejudge_form->config['submit_button']['text'] = '重新测试';
+		$rejudge_form->config['submit_button']['text'] = '<i class="bi bi-arrow-clockwise"></i> 重新测试';
 		$rejudge_form->config['submit_container']['class'] = '';
 		$rejudge_form->runAtServer();
 	}
@@ -105,7 +105,7 @@ if (UOJSubmission::cur()->isLatest()) {
 			UOJSubmission::cur()->delete();
 		};
 		$delete_form->config['submit_button']['class'] = 'list-group-item list-group-item-action border-start-0 border-end-0 list-group-item-danger';
-		$delete_form->config['submit_button']['text'] = '删除此提交记录';
+		$delete_form->config['submit_button']['text'] = '<i class="bi bi-trash-3"></i> 删除此提交记录';
 		$delete_form->config['submit_container']['class'] = '';
 		$delete_form->config['confirm']['text'] = '你真的要删除这条提交记录吗？';
 		$delete_form->succ_href = "/submissions";
@@ -118,7 +118,7 @@ if (UOJSubmission::cur()->isLatest()) {
 			UOJSubmission::cur()->deleteThisMinorVersion();
 		};
 		$delete_form->config['submit_button']['class'] = 'list-group-item list-group-item-action border-start-0 border-end-0 list-group-item-danger';
-		$delete_form->config['submit_button']['text'] = '删除当前历史记录（保留其他历史记录）';
+		$delete_form->config['submit_button']['text'] = '<i class="bi bi-trash-3"></i> 删除当前历史记录';
 		$delete_form->config['submit_container']['class'] = '';
 		$delete_form->config['confirm']['text'] = '你真的要删除这条历史记录吗？删除这条历史记录不会影响其他的历史记录。';
 		$delete_form->succ_href = UOJSubmission::cur()->getUriForLatest();
@@ -167,7 +167,12 @@ if (UOJSubmission::cur()->hasJudged()) {
 			'card_body' => false,
 		];
 	} else {
-		// TODO: 您当前无法查看详细信息
+		$tabs['details'] = [
+			'name' => '详细信息',
+			'displayer' => function () {
+				echo '<div>您无权查看当前提交的详细信息。</div>';
+			},
+		];
 	}
 
 	if ($perm['manager_view'] && isset($submission_result['final_result'])) {
@@ -182,14 +187,29 @@ if (UOJSubmission::cur()->hasJudged()) {
 		];
 	}
 } else {
-	// TODO: move judge_status from UOJSubmission::echoStatusCard() to here
+	$show_status_details = UOJSubmission::cur()->viewerCanSeeStatusDetailsHTML(Auth::user());
+
+	$tabs['details'] = [
+		'name' => '详细信息',
+		'displayer' => function () {
+			echo '<div class="card-body rounded-bottom">';
+			echo     '<table class="w-100">';
+			echo         '<tr id="status_details_' . UOJSubmission::info('id') . '">';
+			echo             UOJSubmission::cur()->getStatusDetailsHTML();
+			echo         '</tr>';
+			echo         '<script>update_judgement_status_details(' . UOJSubmission::info('id') . ')</script>';
+			echo     '</table>';
+			echo '</div>';
+		},
+		'card_body' => false,
+	];
 }
 
 if ($perm['content'] || $perm['manager_view']) {
 	$tabs['source'] = [
 		'name' => '源代码',
 		'displayer' => function () {
-			echo '<div class="list-group list-group-flush">';
+			echo '<div class="list-group list-group-flush rounded-bottom">';
 			UOJSubmission::cur()->echoContent(['list_group' => true]);
 			echo '</div>';
 		},
@@ -243,29 +263,6 @@ if (isset($hack_form)) {
 	<?= UOJLocale::get('problems::submission') . ' #' . $submission['id'] ?>
 </h1>
 
-<style>
-	.submission-layout {
-		/* display: grid; */
-		grid-template-columns: minmax(0, calc(100% - 25% - var(--bs-gutter-x))) auto;
-		grid-template-rows: auto 1fr;
-	}
-
-	.submission-left-col {
-		grid-column: 1;
-		grid-row: 1 / span 2;
-	}
-
-	.submission-right-col {
-		grid-column: 2;
-		grid-row: 1;
-	}
-
-	.submission-right-control-panel {
-		grid-column: 2;
-		grid-row: 2;
-	}
-</style>
-
 <div class="row mt-3 submission-layout d-md-grid">
 	<div class="submission-right-col">
 		<?php UOJSubmission::cur()->echoStatusCard(['show_actual_score' => $perm['score'], 'id_hidden' => true], Auth::user()) ?>
@@ -314,7 +311,6 @@ if (isset($hack_form)) {
 	</div>
 
 	<div class="submission-right-control-panel">
-
 		<?php if (
 			isset($minor_rejudge_form) ||
 			isset($rejudge_form) ||
@@ -325,7 +321,7 @@ if (isset($hack_form)) {
 					操作
 				</div>
 
-				<div class="list-group list-group-flush">
+				<div class="list-group list-group-flush rounded-bottom">
 					<?php if (isset($minor_rejudge_form)) : ?>
 						<?php $minor_rejudge_form->printHTML() ?>
 					<?php endif ?>
