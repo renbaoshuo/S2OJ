@@ -8,7 +8,7 @@ UOJGroup::init(UOJRequest::get('id')) || UOJResponse::page404();
 UOJGroup::cur()->userCanView(Auth::user(), ['ensure' => true]);
 ?>
 
-<?php echoUOJPageHeader('小组：' . UOJGroup::info('title')) ?>
+<?php echoUOJPageHeader(UOJGroup::info('title') . ' - 小组') ?>
 
 <div class="row">
 	<!-- left col -->

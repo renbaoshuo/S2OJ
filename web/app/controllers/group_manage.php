@@ -219,82 +219,44 @@ if ($cur_tab == 'profile') {
 	$hidden_time = new DateTime();
 	$hidden_time->sub(new DateInterval('P3D'));
 } elseif ($cur_tab == 'users') {
-	if (isset($_POST['submit-remove_user']) && $_POST['submit-remove_user'] == 'remove_user') {
-		$user = UOJUser::query(UOJRequest::post('remove_username'));
-
-		if (!$user) {
-			dieWithAlert('用户不存在。');
-		}
-
-		if (!UOJGroup::cur()->hasUser($user)) {
-			dieWithAlert('该用户不在小组中。');
-		}
-
-		DB::delete([
-			"delete from groups_users",
-			"where", [
-				"username" => $user['username'],
-				"group_id" => UOJGroup::info('id'),
-			],
-		]);
-
-		dieWithAlert('移除成功！');
-	}
-
-	$add_new_user_form = new UOJForm('add_new_user');
-	$add_new_user_form->addInput('new_username', [
-		'label' => '用户名',
-		'validator_php' => function ($username, &$vdata) {
+	$users_form = newAddDelCmdForm(
+		'users',
+		function ($username) {
 			$user = UOJUser::query($username);
 
 			if (!$user) {
 				return '用户不存在。';
 			}
 
-			if (UOJGroup::cur()->hasUser($user)) {
-				return '该用户已经在小组中';
-			}
-
-			$vdata['username'] = $user['username'];
-
 			return '';
 		},
-	]);
-	$add_new_user_form->config['submit_button']['class'] = 'btn btn-secondary';
-	$add_new_user_form->config['submit_button']['text'] = '添加';
-	$add_new_user_form->handle = function (&$vdata) {
-		DB::insert([
-			"insert into groups_users",
-			DB::bracketed_fields(["group_id", "username"]),
-			"values",
-			DB::tuple([
-				UOJGroup::info('id'),
-				$vdata['username']
-			]),
-		]);
-
-		dieWithJsonData(['status' => 'success', 'message' => '已将用户名为 ' . $vdata['username'] . ' 的用户添加到本小组。']);
-	};
-	$add_new_user_form->setAjaxSubmit(<<<EOD
-		function(res) {
-			if (res.status === 'success') {
-				$('#result-alert')
-					.html('用户添加成功！' + (res.message || ''))
-					.addClass('alert-success')
-					.removeClass('alert-danger')
-					.show();
-			} else {
-				$('#result-alert')
-					.html('用户添加失败。' + (res.message || ''))
-					.removeClass('alert-success')
-					.addClass('alert-danger')
-					.show();
+		function ($type, $username) {
+			if ($type === '+') {
+				DB::insert([
+					"insert into groups_users",
+					DB::bracketed_fields(["group_id", "username"]),
+					"values",
+					DB::tuple([
+						UOJGroup::info('id'),
+						$username,
+					]),
+				]);
+			} else if ($type === '-') {
+				DB::delete([
+					"delete from groups_users",
+					"where", [
+						"group_id" => UOJGroup::info('id'),
+						"username" => $username,
+					],
+				]);
 			}
-
-			$(window).scrollTop(0);
-		}
-	EOD);
-	$add_new_user_form->runAtServer();
+		},
+		null,
+		[
+			'help' => '命令格式：命令一行一个，<code>+baoshuo</code> 表示把用户名为 <code>baoshuo</code> 的用户加入小组，<code>-baoshuo</code> 表示把用户名为 <code>baoshuo</code> 的用户从小组中移除。',
+		]
+	);
+	$users_form->runAtServer();
 }
 ?>
 <?php echoUOJPageHeader('管理 - ' . UOJGroup::info('title')); ?>
@@ -429,67 +391,32 @@ if ($cur_tab == 'profile') {
 			</div>
 		<?php elseif ($cur_tab == 'users') : ?>
 			<div class="card mt-3 mt-md-0">
-				<div class="card-header">
-					<ul class="nav nav-tabs card-header-tabs" role="tablist">
-						<li class="nav-item">
-							<a class="nav-link active" href="#users" data-bs-toggle="tab" data-bs-target="#users">用户列表</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="#add-user" data-bs-toggle="tab" data-bs-target="#add-user">添加用户</a>
-						</li>
-					</ul>
-				</div>
 				<div class="card-body">
-					<div class="tab-content">
-						<div class="tab-pane active" id="users">
-							<?php
-							echoLongTable(
-								['*'],
-								'groups_users',
-								["group_id" => UOJGroup::info('id')],
-								'order by username asc',
-								<<<EOD
-									<tr>
-										<th>用户名</th>
-										<th>操作</th>
-									</tr>
-								EOD,
-								function ($row) {
-									echo HTML::tag_begin('tr');
-									echo HTML::tag('td', [], UOJUser::getLink($row['username']));
-									echo '<td>';
-									echo '<form class="d-inline-block" method="POST" onsubmit=\'return confirm("你真的要从小组中移除这个用户吗？")\'>'
-										. HTML::hiddenToken()
-										. '<input type="hidden" name="remove_username" value="' . $row['username'] . '">'
-										. '<button class="btn btn-link text-danger text-decoration-none p-0" type="submit" name="submit-remove_user" value="remove_user">移除</button>'
-										. '</form>';
-									echo '</td>';
-									echo HTML::tag_end('tr');
-								},
-								[
-									'page_len' => 10,
-									'div_classes' => ['table-responsive'],
-									'table_classes' => ['table', 'align-middle'],
-								]
-							);
-							?>
-						</div>
-						<div class="tab-pane" id="add-user">
-							<div id="result-alert" class="alert" role="alert" style="display: none"></div>
-							<div class="row row-cols-1 row-cols-md-2">
-								<div class="col">
-									<?php $add_new_user_form->printHTML() ?>
-								</div>
-								<div class="col">
-									<h5>注意事项</h5>
-									<ul class="mb-0">
-										<li>添加用户前请确认用户名是否正确以免带来不必要的麻烦。</li>
-										<li>用户被添加到小组后将自动被加入组内的所有作业排行中。</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
+					<?php
+					echoLongTable(
+						['*'],
+						'groups_users',
+						["group_id" => UOJGroup::info('id')],
+						'order by username asc',
+						<<<EOD
+							<tr>
+								<th>用户名</th>
+							</tr>
+						EOD,
+						function ($row) {
+							echo HTML::tag_begin('tr');
+							echo HTML::tag('td', [], UOJUser::getLink($row['username']));
+							echo HTML::tag_end('tr');
+						},
+						[
+							'page_len' => 10,
+							'div_classes' => ['table-responsive'],
+							'table_classes' => ['table', 'align-middle'],
+						]
+					);
+					?>
+
+					<?php $users_form->printHTML() ?>
 				</div>
 			</div>
 		<?php endif ?>
