@@ -627,7 +627,7 @@ class UOJSubmission {
 					default:
 						echo '<div class="d-flex justify-content-between align-items-center">';
 						echo     '<span class="flex-shrink-0 me-2">', $name, '</span>';
-						echo     '<span class="text-end text-truncate d-inline-block">', $this->echoStatusBarTD($id, $cfg), '</span>';
+						echo     '<span class="text-end text-truncate d-inline-block">', $this->echoStatusBarTD($id, $cfg + ['time_font_size' => 'normal']), '</span>';
 						echo '</div>';
 
 						break;

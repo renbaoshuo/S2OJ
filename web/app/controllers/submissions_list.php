@@ -5,6 +5,8 @@ Auth::check() || redirectToLogin();
 
 $conds = [];
 $config = [
+	'time_format' => 'friendly',
+	'time_font_size' => 'normal',
 	'judge_time_hidden' => true,
 	'table_config' => [
 		'div_classes' => ['card', 'mb-3', 'table-responsive'],

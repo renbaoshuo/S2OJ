@@ -252,6 +252,11 @@ trait UOJSubmissionLikeTrait {
 
 
 	protected function echoStatusBarTDBase($name, array $cfg) {
+		$cfg += [
+			'time_format' => 'normal',
+			'time_font_size' => 'small',
+		];
+
 		switch ($name) {
 			case 'id':
 				echo $this->getLink();
@@ -277,21 +282,31 @@ trait UOJSubmissionLikeTrait {
 				break;
 			case 'used_memory':
 				if ($cfg['show_actual_score']) {
-					echo $this->info['used_memory'] . 'kb';
+					echo $this->info['used_memory'] . 'KB';
 				} else {
 					echo '/';
 				}
 				break;
 			case 'tot_size':
 				if ($this->info['tot_size'] < 1024) {
-					echo $this->info['tot_size'] . 'b';
+					echo $this->info['tot_size'] . 'B';
 				} else {
-					echo sprintf("%.1f", $this->info['tot_size'] / 1024) . 'kb';
+					echo sprintf("%.1f", $this->info['tot_size'] / 1024) . 'KB';
 				}
 				break;
 			case 'submit_time':
 			case 'judge_time':
-				echo '<small>', $this->info[$name], '</small>';
+				if ($cfg['time_font_size'] == 'small') {
+					echo '<small>';
+				}
+				if ($cfg['time_format'] == 'friendly') {
+					echo UOJTime::userFriendlyFormat($this->info[$name]);
+				} else {
+					echo $this->info[$name];
+				}
+				if ($cfg['time_font_size'] == 'small') {
+					echo '</small>';
+				}
 				break;
 			default:
 				echo '?';
