@@ -472,7 +472,7 @@ class JudgmentDetailsPrinter {
 			echo  	'<button type="button" class="accordion-button py-2 px-3 collapsed uoj-submission-result-item" data-bs-toggle="collapse" data-bs-parent="#', $accordion_parent, '" data-bs-target="#', $accordion_collapse, '">';
 
 			echo 		'<div class="row w-100">';
-			echo 			'<div class="col-sm-4">';
+			echo 			'<div class="col-sm-3">';
 			if ($subtask_title !== '') {
 				echo 		    '<h3 class="fs-5 mb-0">', $subtask_title, ': ', '</h3>';
 			} else {
@@ -503,7 +503,7 @@ class JudgmentDetailsPrinter {
 
 			if ($subtask_memory >= 0) {
 				echo '<div class="col-sm-2">';
-				echo '<i class="bi bi-memory"></i> ', $subtask_memory, ' kB';
+				echo '<i class="bi bi-memory"></i> ', $subtask_memory, ' KB';
 				echo '</div>';
 			}
 
@@ -549,7 +549,7 @@ class JudgmentDetailsPrinter {
 				echo '<button type="button" class="accordion-button py-2 px-3 collapsed uoj-submission-result-item">';
 			}
 			echo '<div class="row w-100">';
-			echo '<div class="col-sm-4">';
+			echo '<div class="col-sm-3">';
 			if ($test_num > 0) {
 				echo '<h4 class="fs-5 mb-0">', 'Test #', $test_num, '</h4>';
 			} else {
@@ -580,7 +580,7 @@ class JudgmentDetailsPrinter {
 
 			if ($test_memory >= 0) {
 				echo '<div class="col-sm-2">';
-				echo '<i class="bi bi-memory"></i> ', $test_memory, ' kB';
+				echo '<i class="bi bi-memory"></i> ', $test_memory, ' KB';
 				echo '</div>';
 			}
 
@@ -620,8 +620,8 @@ class JudgmentDetailsPrinter {
 				echo '<button class="accordion-button py-2 px-3 collapsed uoj-submission-result-item">';
 			}
 			echo '<div class="row w-100">';
-			echo '<div class="col-sm-4">';
-			echo '<h4 class="card-title">', 'Custom Test', '</h4>';
+			echo '<div class="col-sm-3">';
+			echo '<h4 class="fs-5 mb-0">', 'Custom Test', '</h4>';
 			echo '</div>';
 
 			echo '<div class="col-sm uoj-status-text">';
@@ -637,7 +637,7 @@ class JudgmentDetailsPrinter {
 
 			if ($test_memory >= 0) {
 				echo '<div class="col-sm-2">';
-				echo '<i class="bi bi-memory"></i> ', $test_memory, ' kB';
+				echo '<i class="bi bi-memory"></i> ', $test_memory, ' KB';
 				echo '</div>';
 			}
 

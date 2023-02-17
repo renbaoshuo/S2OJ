@@ -275,23 +275,23 @@ trait UOJSubmissionLikeTrait {
 				break;
 			case 'used_time':
 				if ($cfg['show_actual_score']) {
-					echo $this->info['used_time'] . 'ms';
+					echo $this->info['used_time'] . ' ms';
 				} else {
 					echo '/';
 				}
 				break;
 			case 'used_memory':
 				if ($cfg['show_actual_score']) {
-					echo $this->info['used_memory'] . 'KB';
+					echo $this->info['used_memory'] . ' KB';
 				} else {
 					echo '/';
 				}
 				break;
 			case 'tot_size':
 				if ($this->info['tot_size'] < 1024) {
-					echo $this->info['tot_size'] . 'B';
+					echo $this->info['tot_size'] . ' B';
 				} else {
-					echo sprintf("%.1f", $this->info['tot_size'] / 1024) . 'KB';
+					echo sprintf("%.1f", $this->info['tot_size'] / 1024) . ' KB';
 				}
 				break;
 			case 'submit_time':
