@@ -40,14 +40,14 @@ if ($can_see_minor) {
 		$tid = DB::insert_id();
 		redirectTo(UOJSubmission::cur()->getUriForNewTID($tid));
 	};
-	$minor_rejudge_form->config['submit_button']['class'] = 'btn btn-sm btn-primary';
+	$minor_rejudge_form->config['submit_button']['class'] = 'list-group-item list-group-item-action border-start-0 border-end-0 list-group-item-secondary';
 	$minor_rejudge_form->config['submit_button']['text'] = '偷偷重新测试';
-	$minor_rejudge_form->config['submit_container']['class'] = 'd-inline-block text-end';
+	$minor_rejudge_form->config['submit_container']['class'] = '';
 	$minor_rejudge_form->runAtServer();
 }
 
 if (UOJSubmission::cur()->isLatest()) {
-	if (UOJSubmission::cur()->preHackCheck()) {
+	if (UOJSubmission::cur()->preHackCheck() && ($perm['content'] || $perm['manager_view'])) {
 		$hack_form = new UOJForm('hack');
 		$hack_form->addTextFileInput('input', ['filename' => 'input.txt']);
 		$hack_form->addCheckBox('use_formatter', [
@@ -93,9 +93,9 @@ if (UOJSubmission::cur()->isLatest()) {
 		$rejudge_form->handle = function () {
 			UOJSubmission::rejudgeById(UOJSubmission::info('id'));
 		};
-		$rejudge_form->config['submit_button']['class'] = 'btn btn-sm btn-primary';
+		$rejudge_form->config['submit_button']['class'] = 'list-group-item list-group-item-action border-start-0 border-end-0 list-group-item-secondary';
 		$rejudge_form->config['submit_button']['text'] = '重新测试';
-		$rejudge_form->config['submit_container']['class'] = 'text-end d-inline-block';
+		$rejudge_form->config['submit_container']['class'] = '';
 		$rejudge_form->runAtServer();
 	}
 
@@ -104,10 +104,10 @@ if (UOJSubmission::cur()->isLatest()) {
 		$delete_form->handle = function () {
 			UOJSubmission::cur()->delete();
 		};
-		$delete_form->config['submit_button']['class'] = 'btn btn-sm btn-danger';
+		$delete_form->config['submit_button']['class'] = 'list-group-item list-group-item-action border-start-0 border-end-0 list-group-item-danger';
 		$delete_form->config['submit_button']['text'] = '删除此提交记录';
-		$delete_form->config['submit_container']['class'] = 'text-end d-inline-block';
-		$delete_form->config['confirm']['smart'] = true;
+		$delete_form->config['submit_container']['class'] = '';
+		$delete_form->config['confirm']['text'] = '你真的要删除这条提交记录吗？';
 		$delete_form->succ_href = "/submissions";
 		$delete_form->runAtServer();
 	}
@@ -117,126 +117,231 @@ if (UOJSubmission::cur()->isLatest()) {
 		$delete_form->handle = function () {
 			UOJSubmission::cur()->deleteThisMinorVersion();
 		};
-		$delete_form->config['submit_button']['class'] = 'btn btn-sm btn-danger';
+		$delete_form->config['submit_button']['class'] = 'list-group-item list-group-item-action border-start-0 border-end-0 list-group-item-danger';
 		$delete_form->config['submit_button']['text'] = '删除当前历史记录（保留其他历史记录）';
-		$delete_form->config['submit_container']['class'] = 'text-end d-inline-block';
-		$delete_form->config['confirm']['smart'] = true;
+		$delete_form->config['submit_container']['class'] = '';
+		$delete_form->config['confirm']['text'] = '你真的要删除这条历史记录吗？删除这条历史记录不会影响其他的历史记录。';
 		$delete_form->succ_href = UOJSubmission::cur()->getUriForLatest();
 		$delete_form->runAtServer();
 	}
 }
+
+$tabs = [];
+
+if (UOJSubmission::cur()->hasJudged()) {
+	if ($perm['high_level_details']) {
+		$tabs['details'] = [
+			'name' => '详细信息',
+			'card_body' => false,
+			'displayer' => function () use ($perm, $submission_result) {
+				echo '<div class="card-body p-0">';
+				$styler = new SubmissionDetailsStyler();
+				if (!$perm['low_level_details']) {
+					$styler->fade_all_details = true;
+					$styler->show_small_tip = false;
+				}
+				echoJudgmentDetails($submission_result['details'], $styler, 'details');
+				echo '</div>';
+			}
+		];
+
+		if ($perm['manager_view'] && !$perm['low_level_details']) {
+			$tabs['all-details'] = [
+				'name' => '详细信息（管理员）',
+				'displayer' => function () use ($submission_result) {
+					echo '<div class="card-body p-0">';
+					echoSubmissionDetails($submission_result['details'], 'all_details');
+					echo '</div>';
+				},
+				'card_body' => false,
+			];
+		}
+	} else if ($perm['manager_view']) {
+		$tabs['manager-details'] = [
+			'name' => '详细信息（管理员）',
+			'displayer' => function () use ($submission_result) {
+				echo '<div class="card-body p-0">';
+				echoSubmissionDetails($submission_result['details'], 'details');
+				echo '</div>';
+			},
+			'card_body' => false,
+		];
+	} else {
+		// TODO: 您当前无法查看详细信息
+	}
+
+	if ($perm['manager_view'] && isset($submission_result['final_result'])) {
+		$tabs['final-details'] = [
+			'name' => '终测结果预测（管理员）',
+			'displayer' => function () use ($submission_result) {
+				echo '<div class="card-body p-0">';
+				echoSubmissionDetails($submission_result['final_result']['details'], 'final_details');
+				echo '</div>';
+			},
+			'card_body' => false,
+		];
+	}
+} else {
+	// TODO: move judge_status from UOJSubmission::echoStatusCard() to here
+}
+
+if ($perm['content'] || $perm['manager_view']) {
+	$tabs['source'] = [
+		'name' => '源代码',
+		'displayer' => function () {
+			echo '<div class="list-group list-group-flush">';
+			UOJSubmission::cur()->echoContent(['list_group' => true]);
+			echo '</div>';
+		},
+		'card_body' => false,
+	];
+}
+
+if ($perm['manager_view']) {
+	$tabs['judger'] = [
+		'name' => '测评机信息',
+		'displayer' => function () {
+			if (empty(UOJSubmission::info('judger'))) {
+				echo '暂无';
+			} else {
+				$judger = DB::selectFirst([
+					"select * from judger_info",
+					"where", [
+						"judger_name" => UOJSubmission::info('judger')
+					]
+				]);
+				if (!$judger) {
+					echo '测评机信息损坏';
+				} else {
+					echo '<strong>', $judger['display_name'], ': </strong>', $judger['description'];
+				}
+			}
+		},
+	];
+}
+
+if (isset($hack_form)) {
+	$tabs['hack'] = [
+		'name' => 'Hack!',
+		'displayer' => function () use (&$hack_form) {
+			echo <<<EOD
+				<div class="small text-danger mb-3">
+					Hack 功能是给大家互相查错用的。请勿故意提交错误代码，然后自己 Hack 自己、贼喊捉贼哦（故意贼喊捉贼会予以封禁处理）。
+				</div>
+			EOD;
+			$hack_form->printHTML();
+		},
+	];
+}
 ?>
-<script>
-	var problem_id = parseInt('<?= $submission['problem_id'] ?>');
-</script>
-<?php echoUOJPageHeader(UOJLocale::get('problems::submission') . ' #' . $submission['id']) ?>
+
+<?php echoUOJPageHeader(UOJLocale::get('problems::submission') . ' #' . $submission['id'], [
+	'PageContainerClass' => 'container-xxl',
+]) ?>
 
 <h1>
 	<?= UOJLocale::get('problems::submission') . ' #' . $submission['id'] ?>
 </h1>
 
-<?php UOJSubmission::cur()->echoStatusTable(['show_actual_score' => $perm['score'], 'id_hidden' => true], Auth::user()) ?>
+<style>
+	.submission-layout {
+		/* display: grid; */
+		grid-template-columns: minmax(0, calc(100% - 25% - var(--bs-gutter-x))) auto;
+		grid-template-rows: auto 1fr;
+	}
 
-<?php
-if ($perm['score']) {
-	HTML::echoPanel('mb-3', '测评历史', function () {
-		UOJSubmissionHistory::cur()->echoTimeline();
-	});
-}
-?>
+	.submission-left-col {
+		grid-column: 1;
+		grid-row: 1 / span 2;
+	}
 
-<?php
-if ($perm['manager_view']) {
-	HTML::echoPanel('mb-3', '测评机信息（管理员可见）', function () {
-		if (empty(UOJSubmission::info('judger'))) {
-			echo '暂无';
-		} else {
-			$judger = DB::selectFirst([
-				"select * from judger_info",
-				"where", [
-					"judger_name" => UOJSubmission::info('judger')
-				]
-			]);
-			if (!$judger) {
-				echo '测评机信息损坏';
-			} else {
-				echo '<strong>', $judger['display_name'], ': </strong>', $judger['description'];
-			}
-		}
-	});
-}
-?>
+	.submission-right-col {
+		grid-column: 2;
+		grid-row: 1;
+	}
 
-<?php if ($perm['content'] || $perm['manager_view']) : ?>
-	<div class="copy-button-container">
-		<?php UOJSubmission::cur()->echoContent() ?>
+	.submission-right-control-panel {
+		grid-column: 2;
+		grid-row: 2;
+	}
+</style>
+
+<div class="row mt-3 submission-layout d-md-grid">
+	<div class="submission-right-col">
+		<?php UOJSubmission::cur()->echoStatusCard(['show_actual_score' => $perm['score'], 'id_hidden' => true], Auth::user()) ?>
 	</div>
 
-	<?php if (isset($hack_form)) : ?>
-		<p class="text-center">
-			这程序好像有点 Bug，我给组数据试试？ <button id="button-display-hack" type="button" class="btn btn-danger btn-xs">Hack!</button>
-		</p>
-		<div class="card mb-3" id="div-form-hack" style="display: none">
-			<div class="card-header">提交 Hack</div>
-			<div class="card-body">
-				<?php $hack_form->printHTML() ?>
+	<div class="submission-left-col">
+		<?php
+		if ($perm['score']) {
+			HTML::echoPanel('mb-3', '测评历史', function () {
+				UOJSubmissionHistory::cur()->echoTimeline();
+			});
+		}
+		?>
+
+		<div class="card mb-3">
+			<div class="card-header">
+				<ul class="nav nav-tabs card-header-tabs" role="tablist">
+					<?php $idx = 0; ?>
+					<?php foreach ($tabs as $id => $tab) : ?>
+						<li class="nav-item">
+							<a class="nav-link <?php if ($idx++ == 0) : ?>active<?php endif ?>" href="#<?= $id ?>" data-bs-toggle="tab" data-bs-target="#<?= $id ?>">
+								<?= $tab['name'] ?>
+							</a>
+						</li>
+					<?php endforeach ?>
+				</ul>
 			</div>
-			<div class="card-footer bg-transparent small text-center text-danger">
-				Hack 功能是给大家互相查错用的。请勿故意提交错误代码，然后自己 Hack 自己、贼喊捉贼哦（故意贼喊捉贼会予以封禁处理）
+
+			<div class="tab-content">
+				<?php $idx = 0; ?>
+				<?php foreach ($tabs as $id => $tab) : ?>
+					<div class="tab-pane fade <?php if ($idx++ == 0) : ?>active show<?php endif ?>" id="<?= $id ?>" role="tabpanel">
+						<?php if (!isset($tab['card_body']) || $tab['card_body']) : ?>
+							<div class="card-body">
+							<?php endif ?>
+
+							<?php $tab['displayer']() ?>
+
+							<?php if (!isset($tab['card_body']) || $tab['card_body']) : ?>
+							</div>
+						<?php endif ?>
+					</div>
+				<?php endforeach ?>
 			</div>
 		</div>
-		<script type="text/javascript">
-			$(document).ready(function() {
-				$('#button-display-hack').click(function() {
-					$('#div-form-hack').toggle('fast');
-				});
-			});
-		</script>
-	<?php endif ?>
-<?php endif ?>
+	</div>
 
-<?php
-if (UOJSubmission::cur()->hasJudged()) {
-	if ($perm['high_level_details']) {
-		HTML::echoPanel(['card' => 'mb-3', 'body' => 'p-0'], UOJLocale::get('details'), function () use ($perm, $submission_result) {
-			$styler = new SubmissionDetailsStyler();
-			if (!$perm['low_level_details']) {
-				$styler->fade_all_details = true;
-				$styler->show_small_tip = false;
-			}
-			echoJudgmentDetails($submission_result['details'], $styler, 'details');
+	<div class="submission-right-control-panel">
 
-			if ($perm['manager_view'] && !$perm['low_level_details']) {
-				echo '<hr />';
-				echo '<h4 class="text-info">全部详细信息（管理员可见）</h4>';
-				echoSubmissionDetails($submission_result['details'], 'all_details');
-			}
-		});
-	} else if ($perm['manager_view']) {
-		HTML::echoPanel(['card' => 'mb-3', 'body' => 'p-0'], '详细（管理员可见）', function () use ($submission_result) {
-			echoSubmissionDetails($submission_result['details'], 'details');
-		});
-	}
-	if ($perm['manager_view'] && isset($submission_result['final_result'])) {
-		HTML::echoPanel(['card' => 'mb-3', 'body' => 'p-0'], '终测结果预测（管理员可见）', function () use ($submission_result) {
-			echoSubmissionDetails($submission_result['final_result']['details'], 'final_details');
-		});
-	}
-}
-?>
+		<?php if (
+			isset($minor_rejudge_form) ||
+			isset($rejudge_form) ||
+			isset($delete_form)
+		) : ?>
+			<div class="card mb-3">
+				<div class="card-header fw-bold">
+					操作
+				</div>
 
-<div class="d-flex gap-2 justify-content-end">
-	<?php if (isset($minor_rejudge_form)) : ?>
-		<?php $minor_rejudge_form->printHTML() ?>
-	<?php endif ?>
+				<div class="list-group list-group-flush">
+					<?php if (isset($minor_rejudge_form)) : ?>
+						<?php $minor_rejudge_form->printHTML() ?>
+					<?php endif ?>
 
-	<?php if (isset($rejudge_form)) : ?>
-		<?php $rejudge_form->printHTML() ?>
-	<?php endif ?>
+					<?php if (isset($rejudge_form)) : ?>
+						<?php $rejudge_form->printHTML() ?>
+					<?php endif ?>
 
-	<?php if (isset($delete_form)) : ?>
-		<?php $delete_form->printHTML() ?>
-	<?php endif ?>
+					<?php if (isset($delete_form)) : ?>
+						<?php $delete_form->printHTML() ?>
+					<?php endif ?>
+				</div>
+			</div>
+		<?php endif ?>
+	</div>
 </div>
+
 
 <?php echoUOJPageFooter() ?>

@@ -484,7 +484,7 @@ class JudgmentDetailsPrinter {
 				echo 		'<div class="col-sm-2">';
 				echo        '<i class="bi bi-clipboard-check"></i> ', $subtask_score, ' pts';
 				echo 		'</div>';
-				echo 		'<div class="col-sm-2 uoj-status-text">';
+				echo 		'<div class="col-sm uoj-status-text">';
 				echo 		$this->styler->getTestInfoIcon($subtask_info);
 				echo 			htmlspecialchars($subtask_info);
 				echo 		'</div>';
@@ -561,12 +561,12 @@ class JudgmentDetailsPrinter {
 				echo '<div class="col-sm-2">';
 				echo '<i class="bi bi-clipboard-check"></i> ', $test_score, ' pts';
 				echo '</div>';
-				echo '<div class="col-sm-2 uoj-status-text">';
+				echo '<div class="col-sm uoj-status-text">';
 				echo $this->styler->getTestInfoIcon($test_info);
 				echo htmlspecialchars($test_info);
 				echo '</div>';
 			} else {
-				echo '<div class="col-sm-4 uoj-status-text">';
+				echo '<div class="col-sm uoj-status-text">';
 				echo $this->styler->getTestInfoIcon($test_info);
 				echo htmlspecialchars($test_info);
 				echo '</div>';
@@ -624,7 +624,7 @@ class JudgmentDetailsPrinter {
 			echo '<h4 class="card-title">', 'Custom Test', '</h4>';
 			echo '</div>';
 
-			echo '<div class="col-sm-4 uoj-status-text">';
+			echo '<div class="col-sm uoj-status-text">';
 			echo $this->styler->getTestInfoIcon($test_info);
 			echo htmlspecialchars($test_info);
 			echo '</div>';

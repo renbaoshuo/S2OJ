@@ -136,20 +136,38 @@ trait UOJSubmissionLikeTrait {
 		return isset($content[$key]) ? $content[$key] : null;
 	}
 
-	public function echoContent() {
+	public function echoContent($cfg = []) {
+		$cfg += [
+			'list_group' => false,
+		];
+
 		$content = $this->getContent();
 		if (!$content) {
 			return false;
 		}
 
+		$card_class = 'card mb-3';
+		$card_header_class = 'card-header fw-bold';
+		$card_body_class = 'card-body';
+		$card_footer_class = 'card-footer';
+
+		if ($cfg['list_group']) {
+			$card_class = 'list-group-item';
+			$card_header_class = 'fw-bold mb-2';
+			$card_body_class = '';
+			$card_footer_class = 'text-end mt-2';
+		}
+
 		if ($content['remote_submission_id']) {
 			echo <<<EOD
-				<div class="card mb-3">
-					<div class="card-header fw-bold">
+				<div class="{$card_class}">
+					<div class="{$card_header_class}">
 						远程提交
 					</div>
-					<div class="card-body">
-						远程提交 ID：{$content['remote_submission_id']}
+					<div class="{$card_body_class}">
+						远程提交 ID: {$content['remote_submission_id']}
+						<br>
+						源代码请在「详细信息」选项卡查看。
 					</div>
 				</div>
 			EOD;
@@ -160,11 +178,11 @@ trait UOJSubmissionLikeTrait {
 		$zip_file = new ZipArchive();
 		if ($zip_file->open(UOJContext::storagePath() . $content['file_name'], ZipArchive::RDONLY) !== true) {
 			echo <<<EOD
-				<div class="card mb-3">
-					<div class="card-header text-bg-danger fw-bold">
+				<div class="{$card_class}">
+					<div class="{$card_header_class}">
 						提交内容
 					</div>
-					<div class="card-body">
+					<div class="{$card_body_class} text-danger">
 						木有
 					</div>
 				</div>
@@ -195,16 +213,16 @@ trait UOJSubmissionLikeTrait {
 				$footer_text .= UOJLang::getLanguageDisplayName($file_language);
 				$sh_class = UOJLang::getLanguagesCSSClass($file_language);
 				echo <<<EOD
-                <div class="card mb-3">
-                    <div class="card-header fw-bold">
-                        {$req['name']}
-                    </div>
-                    <div class="card-body">
-                        <pre class="mb-0"><code class="$sh_class bg-light rounded p-3">{$file_content}\n</code></pre>
-                    </div>
-                    <div class="card-footer">$footer_text</div>
-                </div>
-                EOD;
+					<div class="{$card_class}">
+						<div class="{$card_header_class}">
+							{$req['name']}
+						</div>
+						<div class="{$card_body_class} copy-button-container">
+							<pre class="mb-0"><code class="$sh_class bg-light rounded p-3">{$file_content}\n</code></pre>
+						</div>
+						<div class="{$card_footer_class}">$footer_text</div>
+					</div>
+				EOD;
 			} elseif ($req['type'] == "text") {
 				$file_content = $zip_file->getFromName("{$req['file_name']}", 504);
 				if ($file_content === false) {
@@ -215,16 +233,16 @@ trait UOJSubmissionLikeTrait {
 				$file_content = uojTextEncode($file_content, array('allow_CR' => true, 'html_escape' => true));
 				$footer_text = UOJLocale::get('problems::text file');
 				echo <<<EOD
-                <div class="card mb-3">
-                    <div class="card-header">
-                        {$req['file_name']}
-                    </div>
-                    <div class="card-body">
-                        <pre class="mb-0 bg-light rounded p-3">\n{$file_content}\n</pre>
-                    </div>
-                    <div class="card-footer">$footer_text</div>
-                </div>
-                EOD;
+					<div class="{$card_class}">
+						<div class="{$card_header_class}">
+							{$req['file_name']}
+						</div>
+						<div class="{$card_body_class}">
+							<pre class="mb-0 bg-light rounded p-3">\n{$file_content}\n</pre>
+						</div>
+						<div class="{$card_footer_class}">{$footer_text}</div>
+					</div>
+				EOD;
 			}
 		}
 		$zip_file->close();

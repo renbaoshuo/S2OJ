@@ -536,7 +536,7 @@ class UOJSubmission {
 		}
 		echo '</tr>';
 		if ($show_status_details) {
-			echo '<tr id="', "status_details_{$this->info['id']}", '" class="info">';
+			echo '<tr id="', "status_details_{$this->info['id']}", '" class="">';
 			echo $this->getStatusDetailsHTML();
 			echo '</tr>';
 			echo '<script type="text/javascript">update_judgement_status_details(' . $this->info['id'] . ')</script>';
@@ -581,6 +581,71 @@ class UOJSubmission {
 		echo '</tbody>';
 		echo '</table>';
 		echo '</div>';
+	}
+
+	public function echoStatusCard(array $cfg, array $viewer = null) {
+		if (!isset($cfg['show_actual_score'])) {
+			$cfg['show_actual_score'] = $this->viewerCanSeeScore($viewer);
+		}
+
+		$show_status_details = $this->viewerCanSeeStatusDetailsHTML($viewer);
+
+		$rows = [
+			'id' => 'ID',
+			'submitter' => UOJLocale::get('problems::submitter'),
+			'problem' => UOJLocale::get('problems::problem'),
+			'result' => UOJLocale::get('problems::result'),
+			'used_time' => UOJLocale::get('problems::used time'),
+			'used_memory' => UOJLocale::get('problems::used memory'),
+			'language' => UOJLocale::get('problems::language'),
+			'tot_size' => UOJLocale::get('problems::file size'),
+			'submit_time' => UOJLocale::get('problems::submit time'),
+			'judge_time' => UOJLocale::get('problems::judge time'),
+		];
+
+		echo '<div class="card mb-3">';
+		echo     '<div class="card-body vstack gap-2">';
+
+		foreach ($rows as $id => $name) {
+			if (!isset($cfg["{$id}_hidden"])) {
+				switch ($id) {
+					case 'submitter':
+						$submitter = UOJUser::query($this->info['submitter']);
+
+						echo '<div class="pb-2">';
+						echo HTML::empty_tag('img', [
+							'src' => HTML::avatar_addr($submitter, 64),
+							'class' => 'uoj-user-avatar rounded me-2',
+							'style' => 'width: 2rem; height: 2rem;',
+						]);
+						echo UOJUser::getLink($submitter);
+						echo '</div>';
+
+						break;
+					default:
+						echo '<div class="d-flex justify-content-between align-items-center">';
+						echo     '<span class="flex-shrink-0">', $name, '</span>';
+						echo     '<span class="text-end">', $this->echoStatusBarTD($id, $cfg), '</span>';
+						echo '</div>';
+
+						break;
+				}
+			}
+		}
+
+		echo     '</div>';
+		echo '</div>';
+
+		if ($show_status_details) {
+			echo '<div class="card">';
+			echo     '<table>';
+			echo         '<tr id="', "status_details_{$this->info['id']}", '" class="">';
+			echo             $this->getStatusDetailsHTML();
+			echo         '</tr>';
+			echo         '<script type="text/javascript">update_judgement_status_details(' . $this->info['id'] . ')</script>';
+			echo     '</table>';
+			echo '</div>';
+		}
 	}
 
 	public function delete() {
