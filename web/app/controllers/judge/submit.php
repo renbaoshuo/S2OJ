@@ -150,7 +150,7 @@ $problem_ban_list = array_map(fn ($x) => $x['id'], DB::selectAll([
 ]));
 
 if ($problem_ban_list) {
-	$assignCond[] = ["problem_id", "not in", DB::rawtuple($problem_ban_list)];
+	$assignCond[] = ["submissions.problem_id", "not in", DB::rawtuple($problem_ban_list)];
 }
 
 if ($_POST['judger_name'] == "remote_judger") {
@@ -170,7 +170,7 @@ if ($_POST['judger_name'] == "remote_judger") {
 }
 
 if ($problem_ban_list) {
-	$assignCond[] = ["problem_id", "not in", DB::rawtuple($problem_ban_list)];
+	$assignCond[] = ["submissions.problem_id", "not in", DB::rawtuple($problem_ban_list)];
 }
 
 $submission = null;
@@ -180,8 +180,8 @@ function querySubmissionToJudge($status, $set_q) {
 
 	for ($times = 0; $times < 10; $times++) {
 		$submission = DB::selectFirst([
-			"select id from submissions",
-			"where", array_merge(["status" => $status], $assignCond),
+			"select submissions.id from submissions",
+			"where", array_merge(["submissions.status" => $status], $assignCond),
 			"order by id limit 1"
 		]);
 		if (!$submission) {
@@ -218,8 +218,9 @@ function queryMinorSubmissionToJudge($status, $set_q) {
 	for ($times = 0; $times < 10; $times++) {
 		$submission = null;
 		$his = DB::selectFirst([
-			"select id, submission_id from submissions_history",
-			"where", ["status" => $status, "major" => 0], // $assignCond is removed!!! fix this bug in the future!
+			"select submissions_history.id, submissions_history.submission_id from submissions_history",
+			"inner join submissions on submissions.id = submissions_history.submission_id",
+			"where", array_merge(["submissions_history.status" => $status, "submissions_history.major" => 0], $assignCond),
 			"order by id limit 1"
 		]);
 		if (!$his) {
@@ -266,8 +267,8 @@ function queryCustomTestSubmissionToJudge() {
 
 	while (true) {
 		$submission = DB::selectFirst([
-			"select id, problem_id, content from custom_test_submissions",
-			"where", array_merge(["judge_time" => null], $assignCond),
+			"select id, problem_id, content from custom_test_submissions as submissions",
+			"where", array_merge(["submissions.judge_time" => null], $assignCond),
 			"order by id limit 1"
 		]);
 		if (!$submission) {
@@ -279,10 +280,10 @@ function queryCustomTestSubmissionToJudge() {
 			"update custom_test_submissions",
 			"set", [
 				"judge_time" => DB::now(),
-				"status" => 'Judging'
+				"status" => 'Judging',
 			], "where", [
 				"id" => $submission['id'],
-				"judge_time" => null
+				"judge_time" => null,
 			]
 		]);
 		if (DB::affected_rows() == 1) {
@@ -306,8 +307,9 @@ function queryHackToJudge() {
 		}
 
 		$hack = DB::selectFirst([
-			"select id, submission_id, input, input_type from hacks",
-			"where", array_merge(["judge_time" => null], $assignCond),
+			"select hacks.id, hacks.submission_id, hacks.input, hacks.input_type from hacks",
+			"inner join submissions on submissions.id = hacks.submission_id",
+			"where", array_merge(["hacks.judge_time" => null], $assignCond),
 			"order by id limit 1"
 		]);
 		if (!$hack) {
