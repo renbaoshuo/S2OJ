@@ -255,6 +255,7 @@ trait UOJSubmissionLikeTrait {
 		$cfg += [
 			'time_format' => 'normal',
 			'time_font_size' => 'small',
+			'unknown_char' => '/',
 		];
 
 		switch ($name) {
@@ -275,23 +276,31 @@ trait UOJSubmissionLikeTrait {
 				break;
 			case 'used_time':
 				if ($cfg['show_actual_score']) {
-					echo $this->info['used_time'] . ' ms';
+					if ($this->info['used_time'] < 1000) {
+						echo $this->info['used_time'] . ' ms';
+					} else {
+						echo sprintf("%.2f", $this->info['used_time'] / 1000) . ' s';
+					}
 				} else {
-					echo '/';
+					echo $cfg['unknown_char'];
 				}
 				break;
 			case 'used_memory':
 				if ($cfg['show_actual_score']) {
-					echo $this->info['used_memory'] . ' KB';
+					if ($this->info['used_memory'] < 1024) {
+						echo $this->info['used_memory'] . ' KB';
+					} else {
+						echo sprintf("%.2f", $this->info['used_memory'] / 1024) . ' MB';
+					}
 				} else {
-					echo '/';
+					echo $cfg['unknown_char'];
 				}
 				break;
 			case 'tot_size':
 				if ($this->info['tot_size'] < 1024) {
 					echo $this->info['tot_size'] . ' B';
 				} else {
-					echo sprintf("%.1f", $this->info['tot_size'] / 1024) . ' KB';
+					echo sprintf("%.2f", $this->info['tot_size'] / 1024) . ' KB';
 				}
 				break;
 			case 'submit_time':

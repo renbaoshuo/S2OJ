@@ -144,6 +144,13 @@ class UOJSubmission {
 		if ($ret === false) {
 			unlink(UOJContext::storagePath() . $zip_file_name);
 			UOJLog::error('submission failed.');
+			UOJResponse::page500('submission failed.');
+
+			return false;
+		} else {
+			$id = DB::insert_id();
+
+			return $id;
 		}
 	}
 
@@ -476,6 +483,10 @@ class UOJSubmission {
 	}
 
 	public function echoStatusBarTD($name, array $cfg) {
+		$cfg += [
+			'result_badge' => false,
+		];
+
 		switch ($name) {
 			case 'result':
 				if (empty($cfg['no_link'])) {
@@ -497,13 +508,34 @@ class UOJSubmission {
 					} else {
 						$actual_score = $this->getActualScore();
 						if ($actual_score === null) {
-							echo $tag_st, ' class="small text-decoration-none">', $this->info['result_error'], $tag_ed;
+							if ($cfg['result_badge']) {
+								echo $tag_st, ' class="fs-5"><span class="badge text-white bg-warning">', $this->info['result_error'], '</span>', $tag_ed;
+							} else {
+								echo $tag_st, ' class="small text-decoration-none">', $this->info['result_error'], $tag_ed;
+							}
 						} else {
-							echo $tag_st, ' class="uoj-score text-decoration-none">', $actual_score, $tag_ed;
+							echo $tag_st, ' class="vstack gap-1 d-inline-flex">';
+							if ($cfg['result_badge']) {
+								echo '<span class="fs-5">';
+								if ($actual_score == 100) {
+									// rgb(0, 204, 0)
+									echo '<span class="badge text-white bg-success">', 'Accepted', '</span>';
+								} else {
+									// rgb(204, 0, 0)
+									echo '<span class="badge text-white bg-danger">', 'Unaccepted', '</span>';
+								}
+								echo '</span>';
+							}
+							echo '<span class="uoj-score">', $actual_score, '</span>';
+							echo $tag_ed;
 						}
 					}
 				} else {
-					echo $tag_st, '" class="small text-decoration-none">', $this->publicStatus(), $tag_ed;
+					if ($cfg['result_badge']) {
+						echo $tag_st, ' class="fs-5"><span class="badge text-bg-primary">', $this->publicStatus(), '</span>', $tag_ed;
+					} else {
+						echo $tag_st, ' class="small text-decoration-none">', $this->publicStatus(), $tag_ed;
+					}
 				}
 				break;
 			case 'language':

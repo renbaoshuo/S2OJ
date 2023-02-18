@@ -188,7 +188,7 @@ class Paginator {
 		}
 
 		$html = '';
-		$html .= '<ul class="pagination my-0 justify-content-center">';
+		$html .= '<ul class="pagination my-0 justify-content-center flex-wrap">';
 		if ($prev_page !== false) {
 			$html .= '<li class="page-item"><a class="page-link" href="' . $this->getPageUri(1) . '""><i class="bi bi-chevron-double-left"></i></a></li>';
 			$html .= '<li class="page-item"><a class="page-link" href="' . $this->getPageUri($prev_page) . '"><i class="bi bi-chevron-left"></i></a></li>';

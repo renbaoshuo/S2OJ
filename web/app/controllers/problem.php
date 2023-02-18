@@ -136,7 +136,13 @@ function handleUpload($zip_file_name, $content, $tot_size) {
 		}
 	}
 
-	UOJSubmission::onUpload($zip_file_name, $content, $tot_size, $is_participating);
+	$id = UOJSubmission::onUpload($zip_file_name, $content, $tot_size, $is_participating);
+
+	if ($is_participating) {
+		// redirect by UOJForm
+	} else {
+		redirectTo("/submission/$id");
+	}
 }
 function handleCustomTestUpload($zip_file_name, $content, $tot_size) {
 	UOJCustomTestSubmission::onUpload($zip_file_name, $content, $tot_size);

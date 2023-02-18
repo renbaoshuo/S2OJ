@@ -3,7 +3,9 @@ requirePHPLib('judger');
 
 Auth::check() || redirectToLogin();
 
-$conds = [];
+$conds = [
+	UOJSubmission::sqlForUserCanView(Auth::user()),
+];
 $config = [
 	'time_format' => 'friendly',
 	'time_font_size' => 'normal',
@@ -44,6 +46,83 @@ if ($q_lang != null) {
 if (!$conds) {
 	$conds = '1';
 }
+
+function echoSubmissionItem($info) {
+	$submission = new UOJSubmission($info);
+	$submission->setProblem();
+	$submitter = UOJUser::query($submission->info['submitter']);
+	$cfg = [
+		'show_actual_score' => $submission->viewerCanSeeScore(Auth::user()),
+		'unknown_char' => '?',
+		'result_badge' => true,
+	];
+
+	echo '<div class="list-group-item">';
+	echo     '<div class="row gy-2 align-items-center">';
+
+	echo         '<div class="col-lg-3 col-sm-8 d-flex gap-2">';
+	echo             '<div class="d-flex align-items-center">';
+	echo HTML::tag('a', [
+		'href' => HTML::url('/user/' . $submitter['username']),
+		'class' => 'd-inline-block me-2',
+	], HTML::empty_tag('img', [
+		'src' => HTML::avatar_addr($submitter, 64),
+		'class' => 'uoj-user-avatar rounded',
+		'style' => 'width: 2.5rem; height: 2.5rem;',
+	]));
+	echo             '</div>';
+	echo             '<div class="d-flex flex-column gap-1">';
+	echo                 '<div>', UOJUser::getLink($submitter), '</div>';
+	echo                 '<div class="small text-muted">', '<i class="bi bi-clock"></i> ', UOJTime::userFriendlyFormat($submission->info['submit_time']), '</div>';
+	echo             '</div>';
+	echo         '</div>';
+
+	echo         '<div class="col-lg-2 col-sm-4">';
+	echo             '<div>', $submission->echoStatusBarTD('result', $cfg), '</div>';
+	echo         '</div>';
+
+	echo         '<div class="col-lg-4 col-sm-12 text-truncate">';
+	echo             $submission->problem->getLink();
+	echo         '</div>';
+
+	$lang = UOJLang::getLanguageDisplayName($submission->info['language']);
+
+	echo         '<div class="col-lg-3 small text-muted">';
+	echo             '<span class="d-inline-block">', '<i class="bi bi-hourglass-split"></i> ', $submission->echoStatusBarTD('used_time', $cfg), '</span>', ' / ';
+	echo             '<span class="d-inline-block">', '<i class="bi bi-memory"></i> ', $submission->echoStatusBarTD('used_memory', $cfg), '</span>', ' / ';
+	echo             '<span class="d-inline-block">', '<i class="bi bi-file-code"></i> ', $submission->echoStatusBarTD('tot_size', $cfg), '</span>';
+	if ($lang != '/') {
+		echo         ' / <span class="d-inline-block">', $lang, '</span> ';
+	}
+	echo         '</div>';
+
+	echo     '</div>';
+	echo '</div>';
+}
+
+$pag = new Paginator([
+	'page_len' => 10,
+	'table_name' => 'submissions',
+	'col_names' => [
+		'id',
+		'problem_id',
+		'contest_id',
+		'submitter',
+		'used_time',
+		'used_memory',
+		'tot_size',
+		'language',
+		'submit_time',
+		'status_details',
+		'status',
+		'result_error',
+		'score',
+		'hide_score_to_others',
+		'hidden_score',
+	],
+	'cond' => $conds,
+	'tail' => 'order by id desc',
+]);
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('submissions')) ?>
 
@@ -55,13 +134,13 @@ if (!$conds) {
 	<form id="form-search" class="row gy-2 gx-3 align-items-end mb-3" target="_self" method="GET">
 		<div id="form-group-problem_id" class="col-auto">
 			<label for="input-problem_id" class="form-label">
-				<?= UOJLocale::get('problems::problem id') ?>:
+				<?= UOJLocale::get('problems::problem id') ?>
 			</label>
 			<input type="text" class="form-control form-control-sm" name="problem_id" id="input-problem_id" value="<?= $q_problem_id ?>" style="width:4em" />
 		</div>
 		<div id="form-group-submitter" class="col-auto">
 			<label for="input-submitter" class="form-label">
-				<?= UOJLocale::get('username') ?>:
+				<?= UOJLocale::get('username') ?>
 			</label>
 			<div class="input-group input-group-sm">
 				<input type="text" class="form-control form-control-sm" name="submitter" id="input-submitter" value="<?= $q_submitter ?>" maxlength="20" style="width:10em" />
@@ -81,7 +160,7 @@ if (!$conds) {
 		</div>
 		<div id="form-group-score" class="col-auto">
 			<label for="input-min_score" class="form-label">
-				<?= UOJLocale::get('score range') ?>:
+				<?= UOJLocale::get('score range') ?>
 			</label>
 			<div class="input-group input-group-sm">
 				<input type="text" class="form-control" name="min_score" id="input-min_score" value="<?= $q_min_score ?>" maxlength="15" style="width:4em" placeholder="0" />
@@ -91,7 +170,7 @@ if (!$conds) {
 		</div>
 		<div id="form-group-language" class="col-auto">
 			<label for="input-language" class="form-label">
-				<?= UOJLocale::get('problems::language') ?>:
+				<?= UOJLocale::get('problems::language') ?>
 			</label>
 			<select class="form-select form-select-sm" id="input-language" name="language">
 				<option value="">All</option>
@@ -101,11 +180,29 @@ if (!$conds) {
 			</select>
 		</div>
 		<div class="col-auto">
-			<button type="submit" id="submit-search" class="btn btn-secondary btn-sm ml-2"><?= UOJLocale::get('search') ?></button>
+			<button type="submit" id="submit-search" class="btn btn-secondary btn-sm ml-2">
+				<?= UOJLocale::get('search') ?>
+			</button>
 		</div>
 	</form>
 </div>
 
-<?php echoSubmissionsList($conds, 'order by id desc', $config, Auth::user()) ?>
+<div class="card mb-3">
+	<div class="list-group list-group-flush">
+		<?php if ($pag->isEmpty()) : ?>
+			<div class="list-group-item text-center">
+				<?= UOJLocale::get('none') ?>
+			</div>
+		<?php endif ?>
+
+		<?php foreach ($pag->get() as $idx => $row) : ?>
+			<?php echoSubmissionItem($row) ?>
+		<?php endforeach ?>
+	</div>
+</div>
+
+<div class="">
+	<?= $pag->pagination() ?>
+</div>
 
 <?php echoUOJPageFooter() ?>
