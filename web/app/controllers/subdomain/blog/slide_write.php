@@ -42,6 +42,19 @@ if ($blog) {
 	$blog_editor->blog_url = null;
 }
 
+function updateBlog($id, $data) {
+	DB::update([
+		"update blogs",
+		"set", [
+			"title" => $data['title'],
+			"content" => $data['content'],
+			"content_md" => $data['content_md'],
+			"is_hidden" => $data['is_hidden'],
+		],
+		"where", ["id" => $id]
+	]);
+}
+
 function insertSlide($data) {
 	DB::insert([
 		"insert into blogs",
