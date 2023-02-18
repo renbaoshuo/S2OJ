@@ -110,11 +110,11 @@ function htmlspecialchars(str)
 
 function getColOfScore(score) {
 	if (score == 0) {
-		return ColorConverter.toStr(ColorConverter.toRGB(new HSV(0, 100, 80)));
+		return ColorConverter.toStr(ColorConverter.toRGB(new HSV(0, 76, 86)));
 	} else if (score == 100) {
-		return ColorConverter.toStr(ColorConverter.toRGB(new HSV(120, 100, 80)));
+		return ColorConverter.toStr(ColorConverter.toRGB(new HSV(130, 89, 72)));
 	} else {
-		return ColorConverter.toStr(ColorConverter.toRGB(new HSV(30 + score * 60 / 100, 100, 90)));
+		return ColorConverter.toStr(ColorConverter.toRGB(new HSV(30 + score * 60 / 100, 83, 89)));
 	}
 }
 

@@ -503,6 +503,16 @@ form.form-horizontal {
 	}
 }
 
+/* Submissions List */
+
+.uoj-accepted-badge {
+	background-color: rgb(20 184 48) !important;
+}
+
+.uoj-unaccepted-badge {
+	background-color: rgb(219 53 53) !important;
+}
+
 /* Submission Page */
 
 .submission-layout {

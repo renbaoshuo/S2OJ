@@ -519,10 +519,10 @@ class UOJSubmission {
 								echo '<span class="fs-5">';
 								if ($actual_score == 100) {
 									// rgb(0, 204, 0)
-									echo '<span class="badge text-white bg-success">', 'Accepted', '</span>';
+									echo '<span class="badge text-white uoj-accepted-badge">', 'Accepted', '</span>';
 								} else {
 									// rgb(204, 0, 0)
-									echo '<span class="badge text-white bg-danger">', 'Unaccepted', '</span>';
+									echo '<span class="badge text-white uoj-unaccepted-badge">', 'Unaccepted', '</span>';
 								}
 								echo '</span>';
 							}
