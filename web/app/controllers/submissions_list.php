@@ -87,7 +87,7 @@ function echoSubmissionItem($info) {
 
 	$lang = UOJLang::getLanguageDisplayName($submission->info['language']);
 
-	echo         '<div class="col-lg-3 small text-muted">';
+	echo         '<div class="col-lg-3 ps-2 small text-muted">';
 	echo             '<span class="d-inline-block">', '<i class="bi bi-hourglass-split"></i> ', $submission->echoStatusBarTD('used_time', $cfg), '</span>', ' / ';
 	echo             '<span class="d-inline-block">', '<i class="bi bi-memory"></i> ', $submission->echoStatusBarTD('used_memory', $cfg), '</span>', ' / ';
 	echo             '<span class="d-inline-block">', '<i class="bi bi-file-code"></i> ', $submission->echoStatusBarTD('tot_size', $cfg), '</span>';
