@@ -514,7 +514,7 @@ class UOJSubmission {
 								echo $tag_st, ' class="small text-decoration-none">', $this->info['result_error'], $tag_ed;
 							}
 						} else {
-							echo $tag_st, ' class="vstack gap-1 d-inline-flex">';
+							echo $tag_st, ' class="vstack d-inline-flex">';
 							if ($cfg['result_badge']) {
 								echo '<span class="fs-5">';
 								if ($actual_score == 100) {
