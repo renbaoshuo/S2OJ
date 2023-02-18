@@ -188,7 +188,7 @@ $pag = new Paginator([
 </div>
 
 <div class="card mb-3">
-	<div class="list-group list-group-flush">
+	<div class="list-group list-group-flush" style="--bs-list-group-item-padding-y: 0.325rem;">
 		<?php if ($pag->isEmpty()) : ?>
 			<div class="list-group-item text-center">
 				<?= UOJLocale::get('none') ?>
