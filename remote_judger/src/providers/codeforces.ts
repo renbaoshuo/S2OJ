@@ -148,7 +148,7 @@ export default class CodeforcesProvider implements IBasicProvider {
   }
 
   async getCsrfToken(url: string, referer = '') {
-    const { text: html } = await this.get(url).set('Referer', referer);
+    const { text: html, header } = await this.get(url).set('Referer', referer);
     const {
       window: { document },
     } = new JSDOM(html);
@@ -164,6 +164,7 @@ export default class CodeforcesProvider implements IBasicProvider {
       )?.getAttribute('content'),
       ftaa,
       bfaa,
+      header,
     ];
   }
 
@@ -198,8 +199,7 @@ export default class CodeforcesProvider implements IBasicProvider {
 
     if (!this.account.handle) return false;
 
-    const [csrf, ftaa, bfaa] = await this.getCsrfToken('/enter');
-    const { header } = await this.get('/enter');
+    const [csrf, ftaa, bfaa, header] = await this.getCsrfToken('/enter');
 
     if (header['set-cookie']) {
       this.cookie = header['set-cookie'];
