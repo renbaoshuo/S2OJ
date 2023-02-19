@@ -56,8 +56,13 @@ function echoSubmissionItem($info) {
 		'unknown_char' => '?',
 		'result_badge' => true,
 	];
+	$show_status_details = $submission->viewerCanSeeStatusDetailsHTML(Auth::user());
 
-	echo '<div class="list-group-item">';
+	if ($show_status_details) {
+		echo '<div class="list-group-item bg-warning bg-opacity-25">';
+	} else {
+		echo '<div class="list-group-item">';
+	}
 	echo     '<div class="row gy-2 align-items-center">';
 
 	echo         '<div class="col-lg-3 col-sm-8 d-flex gap-2">';
@@ -98,6 +103,17 @@ function echoSubmissionItem($info) {
 
 	echo     '</div>';
 	echo '</div>';
+
+	if ($show_status_details) {
+		echo '<div class="list-group-item">';
+		echo     '<table class="w-100">';
+		echo         '<tr id="status_details_' . $submission->info['id'] . '">';
+		echo             $submission->getStatusDetailsHTML();
+		echo         '</tr>';
+		echo         '<script>update_judgement_status_details(' . $submission->info['id'] . ')</script>';
+		echo     '</table>';
+		echo '</div>';
+	}
 }
 
 $pag = new Paginator([

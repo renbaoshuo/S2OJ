@@ -532,7 +532,7 @@ class UOJSubmission {
 					}
 				} else {
 					if ($cfg['result_badge']) {
-						echo $tag_st, ' class="fs-5"><span class="badge text-bg-primary">', $this->publicStatus(), '</span>', $tag_ed;
+						echo $tag_st, ' class="fs-5"><span class="badge text-white bg-primary">', $this->publicStatus(), '</span>', $tag_ed;
 					} else {
 						echo $tag_st, ' class="small text-decoration-none">', $this->publicStatus(), $tag_ed;
 					}
