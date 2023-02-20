@@ -1,5 +1,7 @@
 -- InnoDB
 ALTER TABLE `best_ac_submissions` ENGINE=InnoDB TABLESPACE `innodb_system`;
+ALTER TABLE `contests` ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+ALTER TABLE `contests_submissions` ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ALTER TABLE `judger_info` COLLATE=utf8mb4_unicode_ci;
 ALTER TABLE `problems_contents` COLLATE=utf8mb4_unicode_ci;
 ALTER TABLE `submissions` ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

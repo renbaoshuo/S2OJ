@@ -359,7 +359,7 @@ class UOJSubmission {
 								])
 							])
 						], DB::for_update()
-					]);
+					]);	
 					DB::update(["update submissions", "set", $cfg['set_q'], "where", [$cond]]);
 				});
 			} else {

@@ -185,7 +185,7 @@ CREATE TABLE `contests` (
   `zan` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `status` (`status`,`id`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -337,7 +337,7 @@ CREATE TABLE `contests_submissions` (
   `cnt` int DEFAULT NULL,
   `n_failures` int DEFAULT NULL,
   PRIMARY KEY (`contest_id`,`submitter`,`problem_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

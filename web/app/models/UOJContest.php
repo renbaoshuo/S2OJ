@@ -191,114 +191,127 @@ class UOJContest {
 		ignore_user_abort(true);
 		set_time_limit(0);
 
-		DB::update([
-			"update contests",
-			"set", ["status" => 'testing'],
-			"where", ["id" => $this->info['id']]
-		]);
-
-		if (DB::affected_rows() !== 1) {
-			// 已经有其他人开始评测了，不进行任何操作
-			return;
-		}
-
-		$res = DB::selectAll([
-			"select id, problem_id, content, result, submitter, hide_score_to_others from submissions",
-			"where", ["contest_id" => $this->info['id']]
-		]);
-		foreach ($res as $submission) {
-			$content = json_decode($submission['content'], true);
-
-			if (isset($content['final_test_config'])) {
-				$content['config'] = $content['final_test_config'];
-				unset($content['final_test_config']);
-			}
-
-			if (isset($content['first_test_config'])) {
-				unset($content['first_test_config']);
-			}
-
-			$q = [
-				'content' => json_encode($content),
-			];
-
-			$problem_judge_type = $this->info['extra_config']["problem_{$submission['problem_id']}"] ?: $this->defaultProblemJudgeType();
-			$result = json_decode($submission['result'], true);
-
-			switch ($problem_judge_type) {
-				case 'sample':
-					if (isset($result['final_result']) && $result['final_result']['status'] == 'Judged') {
-						$q += [
-							'result' => json_encode($result['final_result']),
-							'score' => $result['final_result']['score'],
-							'used_time' => $result['final_result']['time'],
-							'used_memory' => $result['final_result']['memory'],
-							'judge_time' => $this->info['end_time_str'],
-							'status' => 'Judged',
-						];
-
-						if ($submission['hide_score_to_others']) {
-							$q['hidden_score'] = $q['score'];
-							$q['score'] = null;
-						}
-					}
-
-					break;
-
-				case 'no-details':
-				case 'full':
-					if ($result['status'] == 'Judged' && !isset($result['final_result'])) {
-						$q += [
-							'result' => $submission['result'],
-							'score' => $result['score'],
-							'used_time' => $result['time'],
-							'used_memory' => $result['memory'],
-							'judge_time' => $this->info['end_time_str'],
-							'status' => 'Judged',
-						];
-
-						if ($submission['hide_score_to_others']) {
-							$q['hidden_score'] = $q['score'];
-							$q['score'] = null;
-						}
-					}
-
-					break;
-			}
-
-			UOJSubmission::rejudgeById($submission['id'], [
-				'reason_text' => HTML::stripTags($this->info['name']) . ' 最终测试',
-				'reason_url' => HTML::url(UOJContest::cur()->getUri()),
-				'set_q' => $q,
+		DB::transaction(function () {
+			$status = DB::selectSingle([
+				"select status from contests",
+				"where", ["id" => $this->info['id']],
+				DB::for_update(),
 			]);
-		}
 
-		// warning: check if this command works well when the database is not MySQL
-		DB::update([
-			"update submissions",
-			"set", [
-				"score = hidden_score",
-				"hidden_score = NULL",
-				"hide_score_to_others = 0"
-			], "where", [
-				"contest_id" => $this->info['id'],
-				"hide_score_to_others" => 1
-			]
-		]);
+			if ($status !== 'unfinished') {
+				// 已经有其他人开始评测了，不进行任何操作
+				return;
+			}
 
-		$updated = [];
-		foreach ($res as $submission) {
-			$submitter = $submission['submitter'];
-			$pid = $submission['problem_id'];
-			if (isset($updated[$submitter]) && isset($updated[$submitter][$pid])) {
-				continue;
+			$res = DB::selectAll([
+				"select id, problem_id, content, result, submitter, hide_score_to_others from submissions",
+				"where", ["contest_id" => $this->info['id']],
+				DB::for_update(),
+			]);
+			foreach ($res as $submission) {
+				$content = json_decode($submission['content'], true);
+
+				if (isset($content['final_test_config'])) {
+					$content['config'] = $content['final_test_config'];
+					unset($content['final_test_config']);
+				}
+
+				if (isset($content['first_test_config'])) {
+					unset($content['first_test_config']);
+				}
+
+				$q = [
+					'content' => json_encode($content),
+				];
+
+				$problem_judge_type = $this->info['extra_config']["problem_{$submission['problem_id']}"] ?: $this->defaultProblemJudgeType();
+				$result = json_decode($submission['result'], true);
+
+				switch ($problem_judge_type) {
+					case 'sample':
+						if (isset($result['final_result']) && $result['final_result']['status'] == 'Judged') {
+							$q += [
+								'result' => json_encode($result['final_result']),
+								'score' => $result['final_result']['score'],
+								'used_time' => $result['final_result']['time'],
+								'used_memory' => $result['final_result']['memory'],
+								'judge_time' => $this->info['end_time_str'],
+								'status' => 'Judged',
+							];
+
+							if ($submission['hide_score_to_others']) {
+								$q['hidden_score'] = $q['score'];
+								$q['score'] = null;
+							}
+						}
+
+						break;
+
+					case 'no-details':
+					case 'full':
+						if ($result['status'] == 'Judged' && !isset($result['final_result'])) {
+							$q += [
+								'result' => $submission['result'],
+								'score' => $result['score'],
+								'used_time' => $result['time'],
+								'used_memory' => $result['memory'],
+								'judge_time' => $this->info['end_time_str'],
+								'status' => 'Judged',
+							];
+
+							if ($submission['hide_score_to_others']) {
+								$q['hidden_score'] = $q['score'];
+								$q['score'] = null;
+							}
+						}
+
+						break;
+				}
+
+				UOJSubmission::rejudgeById($submission['id'], [
+					'reason_text' => HTML::stripTags($this->info['name']) . ' 最终测试',
+					'reason_url' => HTML::url(UOJContest::cur()->getUri()),
+					'set_q' => $q,
+				]);
 			}
-			updateBestACSubmissions($submitter, $pid);
-			if (!isset($updated[$submitter])) {
-				$updated[$submitter] = [];
+
+			// warning: check if this command works well when the database is not MySQL
+			DB::update([
+				"update submissions",
+				"set", [
+					"score = hidden_score",
+					"hidden_score = NULL",
+					"hide_score_to_others = 0"
+				], "where", [
+					"contest_id" => $this->info['id'],
+					"hide_score_to_others" => 1
+				]
+			]);
+
+			$updated = [];
+			foreach ($res as $submission) {
+				$submitter = $submission['submitter'];
+				$pid = $submission['problem_id'];
+				if (isset($updated[$submitter]) && isset($updated[$submitter][$pid])) {
+					continue;
+				}
+				updateBestACSubmissions($submitter, $pid);
+				if (!isset($updated[$submitter])) {
+					$updated[$submitter] = [];
+				}
+				$updated[$submitter][$pid] = true;
 			}
-			$updated[$submitter][$pid] = true;
-		}
+
+			DB::update([
+				"update contests",
+				"set", [
+					"status" => "testing",
+				],
+				"where", [
+					"id" => $this->info['id'],
+				],
+			]);
+		});
 	}
 
 	public function queryJudgeProgress() {
