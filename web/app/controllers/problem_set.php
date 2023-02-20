@@ -88,21 +88,23 @@ function getProblemTR($info) {
 
 	$html = HTML::tag_begin('tr', ['class' => 'text-center']);
 	$html .= HTML::tag('td', ['class' => $info['submission_id'] ? 'table-success' : ''], "#{$info['id']}");
-	$html .= HTML::tag_begin('td', ['class' => 'text-start']);
+	$html .= HTML::tag_begin('td', ['class' => 'text-start align-middle']);
 	$html .= $problem->getLink(['with' => 'none']);
 	if ($problem->isUserOwnProblem(Auth::user())) {
-		$html .= ' <a href="/problems?my=on"><span class="badge text-white bg-info">' . UOJLocale::get('problems::my problem') . '</span></a> ';
+		$html .= ' <a href="/problems?my=on"><span class="badge text-white bg-info align-middle">' . UOJLocale::get('problems::my problem') . '</span></a> ';
 	}
 	if ($info['type'] == 'remote') {
-		$html .= ' ' . HTML::tag('a', ['class' => 'badge text-bg-success', 'href' => '/problems/remote'], '远端评测题');
+		$html .= ' ' . HTML::tag('a', ['class' => 'badge text-bg-success align-middle', 'href' => '/problems/remote'], '远端评测题');
 	}
 	if ($info['is_hidden']) {
-		$html .= ' <a href="/problems?is_hidden=on"><span class="badge text-bg-danger"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span></a> ';
+		$html .= ' <a href="/problems?is_hidden=on"><span class="badge text-bg-danger align-middle"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span></a> ';
 	}
 	if (isset($_COOKIE['show_tags_mode'])) {
+		echo HTML::tag_begin('span', ['class' => 'float-end']);
 		foreach ($problem->queryTags() as $tag) {
-			$html .= ' <a class="uoj-problem-tag">' . '<span class="badge bg-secondary">' . HTML::escape($tag) . '</span>' . '</a> ';
+			$html .= ' <a class="uoj-problem-tag">' . '<span class="badge bg-secondary align-middle">' . HTML::escape($tag) . '</span>' . '</a> ';
 		}
+		echo HTML::tag_end('span');
 	}
 	$html .= HTML::tag_end('td');
 	if (isset($_COOKIE['show_submit_mode'])) {
@@ -110,11 +112,13 @@ function getProblemTR($info) {
 
 		$html .= HTML::tag(
 			'td',
-			[],
+			[
+				'class' => 'align-middle',
+			],
 			HTML::tag(
 				'div',
 				[
-					'class' => 'progress',
+					'class' => 'progress h-100',
 					'data-bs-toggle' => 'tooltip',
 					'data-bs-title' => "{$info['ac_num']} / {$info['submit_num']}",
 					'data-bs-placement' => 'bottom',
