@@ -93,6 +93,33 @@
 		}
 	});
 
+	turndownService.addRule('katexInline', {
+		filter: function(node) {
+			return node.nodeName === 'SPAN' && node.getAttribute('class') === 'katex';
+		},
+
+		escapeContent: function() {
+			return false;
+		},
+
+		replacement: function(content, node, options) {
+			return '$' + $('.katex-mathml annotation[encoding="application/x-tex"]', node).html() + '$';
+		}
+	});
+	turndownService.addRule('katexInline', {
+		filter: function(node) {
+			return node.nodeName === 'SPAN' && node.getAttribute('class') === 'katex-display';
+		},
+
+		escapeContent: function() {
+			return false;
+		},
+
+		replacement: function(content, node, options) {
+			return '$$\n' + $('.katex-mathml annotation[encoding="application/x-tex"]', node).html() + '\n$$';
+		}
+	});
+
 	$(document).ready(function() {
 		$('#html').on('input', function() {
 			$('#markdown').val(turndownService.turndown($('#html').val()));
