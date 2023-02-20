@@ -326,16 +326,18 @@
 				<ul class="nav uoj-ac-problems-list">
 					<?php foreach ($ac_problems as $prob) : ?>
 						<?php $problem = UOJProblem::query($prob['problem_id']) ?>
-						<?php if ($problem->userCanView(Auth::user())) : ?>
-							<li class="nav-item">
-								<?= $problem->getLink(['with' => 'id', 'class' => 'nav-link rounded uoj-ac-problems-list-item']) ?>
-							</li>
-						<?php else : ?>
-							<li class="nav-item">
-								<a class="nav-link disabled rounded" role="button">
-									#<?= $problem->info['id'] ?>. 隐藏的题目
-								</a>
-							</li>
+						<?php if ($problem) : ?>
+							<?php if ($problem->userCanView(Auth::user())) : ?>
+								<li class="nav-item">
+									<?= $problem->getLink(['with' => 'id', 'class' => 'nav-link rounded uoj-ac-problems-list-item']) ?>
+								</li>
+							<?php else : ?>
+								<li class="nav-item">
+									<a class="nav-link disabled rounded" role="button">
+										#<?= $problem->info['id'] ?>. 隐藏的题目
+									</a>
+								</li>
+							<?php endif ?>
 						<?php endif ?>
 					<?php endforeach ?>
 
