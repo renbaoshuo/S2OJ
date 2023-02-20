@@ -321,7 +321,7 @@ if (isset($hack_form)) {
 					操作
 				</div>
 
-				<div class="list-group list-group-flush rounded-bottom">
+				<div class="list-group list-group-flush rounded-bottom overflow-hidden">
 					<?php if (isset($minor_rejudge_form)) : ?>
 						<?php $minor_rejudge_form->printHTML() ?>
 					<?php endif ?>
