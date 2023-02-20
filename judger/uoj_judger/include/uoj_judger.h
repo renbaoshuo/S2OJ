@@ -1805,7 +1805,7 @@ void judger_init(int argc, char **argv) {
 	PointInfo::show_out = conf_str("show_out", "on") == "on";
 	PointInfo::show_res = conf_str("show_res", "on") == "on";
 
-	string score_type = conf_str("score_type", "int");
+	string score_type = conf_str("score_type", "real-2");
 	if (score_type == "int") {
 		score_t::mode = SM_INT;
 	} else {

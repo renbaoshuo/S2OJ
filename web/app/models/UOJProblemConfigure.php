@@ -75,7 +75,7 @@ class UOJProblemConfigure {
 		$this->simple_form->appendHTML(static::getCardHeader('基本信息'));
 		$this->addSelect($this->simple_form, 'use_builtin_judger', ['on' => '默认', 'off' => '自定义 Judger'], '测评逻辑', 'on');
 		$this->addSelect($this->simple_form, 'use_builtin_checker', self::$supported_checkers, '比对函数', 'ncmp');
-		$this->addSelect($this->simple_form, 'score_type', self::$supported_score_types, '测试点分数数值类型', 'int');
+		$this->addSelect($this->simple_form, 'score_type', self::$supported_score_types, '测试点分数数值类型', 'real-2');
 		$this->simple_form->appendHTML(static::getCardFooter());
 
 		$this->simple_form->appendHTML(static::getCardHeader('数据配置'));
