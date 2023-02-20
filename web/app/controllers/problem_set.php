@@ -100,11 +100,11 @@ function getProblemTR($info) {
 		$html .= ' <a href="/problems?is_hidden=on"><span class="badge text-bg-danger align-middle"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span></a> ';
 	}
 	if (isset($_COOKIE['show_tags_mode'])) {
-		echo HTML::tag_begin('span', ['class' => 'float-end']);
+		$html .= HTML::tag_begin('span', ['class' => 'float-end']);
 		foreach ($problem->queryTags() as $tag) {
 			$html .= ' <a class="uoj-problem-tag">' . '<span class="badge bg-secondary align-middle">' . HTML::escape($tag) . '</span>' . '</a> ';
 		}
-		echo HTML::tag_end('span');
+		$html .= HTML::tag_end('span');
 	}
 	$html .= HTML::tag_end('td');
 	if (isset($_COOKIE['show_submit_mode'])) {
