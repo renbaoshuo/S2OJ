@@ -123,7 +123,7 @@ function getUserLink(username, realname, color) {
 		return '';
 	}
 	var text = username;
-	var style = '';
+	var className = 'uoj-username';
 	if (username.charAt(0) == '@') {
 		username = username.substr(1);
 	}
@@ -131,16 +131,16 @@ function getUserLink(username, realname, color) {
 		text = text + ' <span class="uoj-realname d-inline-block">(' + realname + ')</span>';
 	}
 	if (color) {
-		style += 'color: ' + color + ';';
+		className += ' uoj-username-' + color;
 	}
-	return '<a class="uoj-username" href="' + uojHome + '/user/' + username + '" ' + 'style="' + style + '">' + text + '</a>';
+	return '<a class="' + className + '" href="' + uojHome + '/user/' + username + '">' + text + '</a>';
 }
 function getUserSpan(username, realname, color) {
 	if (!username) {
 		return '';
 	}
 	var text = username;
-	var style = '';
+	var className = 'uoj-username';
 	if (username.charAt(0) == '@') {
 		username = username.substr(1);
 	}
@@ -148,9 +148,9 @@ function getUserSpan(username, realname, color) {
 		text = text + ' <span class="uoj-realname d-inline-block">(' + realname + ')</span>';
 	}
 	if (color) {
-		style += 'color: ' + color + ';';
+		className += ' uoj-username-' + color;
 	}
-	return '<span class="uoj-username" ' + 'style="' + style + '">' + text + '</span>';
+	return '<span class="' + className + '">' + text + '</span>';
 }
 
 function replaceWithHighlightUsername() {
@@ -602,6 +602,8 @@ function require_monaco(config, callback) {
 		.script('/js/monaco-editor/min/vs/editor/editor.main.nls.zh-cn.js').wait()
 		.script('/js/monaco-editor/min/vs/editor/editor.main.js').wait(function() {
 			$LAB.script('/js/monaco-themes.js').wait(function() {
+				update_monaco_theme(getPreferredTheme());
+
 				if (config.markdown) {
 					$LAB.script('/js/blog-editor/monaco-markdown.js').wait(callback);
 				} else {
@@ -609,6 +611,16 @@ function require_monaco(config, callback) {
 				}
 			});
 		});
+}
+
+function update_monaco_theme(theme) {
+	if (!('monaco' in window)) return;
+
+	if (theme == 'dark') {
+		monaco.editor.setTheme('github-dark');
+	} else {
+		monaco.editor.setTheme('github');
+	}
 }
 
 function get_monaco_mode(lang) {
@@ -1365,7 +1377,7 @@ $.fn.problem_conf_preview = function(problem_conf) {
 			res += key + ' ' + value + '\n';
 		}
 
-		$(this).html('<pre class="bg-light mb-0 p-3"><code>' + res + '</code></pre>');
+		$(this).html('<pre class="bg-body-tertiary mb-0 p-3"><code>' + res + '</code></pre>');
 	});
 }
 
@@ -1698,7 +1710,8 @@ function showCommentReplies(id, replies) {
 					).append(
 						user_can_hide_comment
 							? $('<li class="list-inline-item" />').append(
-								$('<a href="#" class="text-warning-emphasis text-decoration-none p-0" />').data('comment-id', reply.id).text('隐藏').click(function() {
+								$('<a href="#" class="text-warning-emphasis text-decoration-none p-0" />').data('comment-id', reply.id).text('隐藏').click(function(event) {
+									event.preventDefault();
 									toggleModalHideComment(reply.id, reply.content);
 								})
 							)
@@ -2118,8 +2131,75 @@ $(document).ready(function() {
 	});	
 });
 
+/**
+ * Fallback user avatar
+ */
 $(document).ready(function() {
 	$('img.uoj-user-avatar').on('error', function() {
+		// same as gravatar d=mm
 		$(this).attr('src', 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4NzIgODcyIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMCAwaDg3MnY4NzJIMHoiLz48cGF0aCBmaWxsPSIjYzVjNWM1IiBkPSJNMCAwdjg3MmgxMTBhMzI3IDM4MyAwIDAxMjM2LTM0NSAxOTUgMTk1IDAgMDEtMTA0LTE3MiAxOTUgMTk1IDAgMDExOTUtMTk1IDE5NSAxOTUgMCAwMTE5NSAxOTUgMTk1IDE5NSAwIDAxLTEwNiAxNzMgMzI3IDM4MyAwIDAxMjM2IDM0NGgxMTBWMHoiLz48L3N2Zz4=');
 	});
 });
+
+function getPreferredTheme() {
+	if (!('localStorage' in window)) return 'light';
+
+	var storedTheme = localStorage.getItem('theme');
+
+	if (storedTheme) {
+		return storedTheme;
+	}
+
+	return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+/**
+ * Theme toggler
+ */
+(function() {
+	if (!('localStorage' in window)) return;
+
+	var storedTheme = localStorage.getItem('theme');
+
+	function setTheme(theme) {
+		if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+			document.documentElement.setAttribute('data-bs-theme', 'dark');
+			update_monaco_theme('dark');
+		} else {
+			document.documentElement.setAttribute('data-bs-theme', theme);
+			update_monaco_theme(theme == 'auto' ? 'light' : theme);
+		}
+	}
+
+	setTheme(getPreferredTheme());
+
+	function showActiveTheme(theme) {
+		var currentIcon = $('.theme-icon-active').attr('data-icon');
+		var newIcon = $('[data-bs-theme-value="' + theme +'"] .theme-icon').attr('data-icon');
+
+		$('[data-bs-theme-value]').removeClass('active');
+		$('[data-bs-theme-value="' + theme +'"]').addClass('active');
+		$('.theme-icon-active')
+			.removeClass(currentIcon)
+			.addClass(newIcon)
+			.attr('data-icon', newIcon);
+	}
+
+	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+		if (storedTheme !== 'light' || storedTheme !== 'dark') {
+			setTheme(getPreferredTheme());
+		}
+	});
+
+	$(document).ready(function() {
+		showActiveTheme(getPreferredTheme());
+
+		$('[data-bs-theme-value]').click(function() {
+			var theme = $(this).data('bs-theme-value');
+
+			localStorage.setItem('theme', theme);
+			setTheme(theme);
+			showActiveTheme(theme);
+		});
+	});
+})();

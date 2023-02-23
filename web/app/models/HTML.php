@@ -1,4 +1,29 @@
 <?php
+class CustomClassDef extends HTMLPurifier_AttrDef {
+	private $classes, $prefixes;
+
+	public function __construct($classes, $prefixes) {
+		$this->classes = $classes;
+		$this->prefixes = is_array($prefixes) ? join('|', $prefixes) : $prefixes;
+	}
+
+	public function validate($string, $config, $context) {
+		$classes = preg_split('/\s+/', $string);
+		$valid_classes = [];
+
+		foreach ($classes as $class) {
+			if (
+				in_array($class, $this->classes) ||
+				preg_match("/^({$this->prefixes})/i", $class)
+			) {
+
+				$valid_classes[] = $class;
+			}
+		}
+
+		return join(' ', $valid_classes);
+	}
+}
 
 class HTML {
 	public static function escape(?string $str, $cfg = []) {
@@ -454,7 +479,7 @@ class HTML {
 				'data-src' => 'URI',
 			],
 			'span' => [
-				'class' => 'Enum#uoj-username',
+				'class' => new CustomClassDef(['uoj-username'], ['uoj-username-']),
 				'data-realname' => 'Text',
 				'data-color' => 'Color',
 			],
@@ -485,7 +510,7 @@ class HTML {
 			'del' => [],
 			'br' => [],
 			'span' => [
-				'class' => 'Enum#uoj-username',
+				'class' => new CustomClassDef(['uoj-username'], ['uoj-username-']),
 				'data-realname' => 'Text',
 				'data-color' => 'Color',
 			],

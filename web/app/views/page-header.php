@@ -188,7 +188,7 @@ if (!isset($PageContainerClass)) {
 	<?php endif ?>
 
 	<?php if (isset($REQUIRE_LIB['hljs'])) : ?>
-		<?= HTML::css_link('/css/highlightjs.github.min.css?v=11.6.0-20221005') ?>
+		<?= HTML::css_link('/css/highlightjs.github.min.css?v=11.6.0-20230223') ?>
 		<?= HTML::js_src('/js/highlightjs.min.js?v=11.6.0-20221005') ?>
 		<script>
 			$(document).ready(function() {
@@ -242,7 +242,7 @@ if (!isset($PageContainerClass)) {
 
 <body class="d-flex flex-column min-vh-100
 	<?php if ($ShowPageHeader) : ?>
-		bg-light
+		bg-body-tertiary
 	<?php endif ?>">
 	<?php if ($ShowPageHeader) : ?>
 		<?php uojIncludeView($PageNav, array('REQUIRE_LIB' => $REQUIRE_LIB)) ?>

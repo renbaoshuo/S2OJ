@@ -73,7 +73,7 @@ class UOJProblemDataDisplayer {
 
 		echo '<h5 class="mb-1">', HTML::escape($file_name), '</h5>';
 		echo '<div class="text-muted small mb-1 font-monospace">', $mimetype, '</div>';
-		echo '<pre class="bg-light rounded uoj-pre">', "\n";
+		echo '<pre class="bg-body-tertiary rounded uoj-pre">', "\n";
 		$type = $mimetype == 'binary' ? 'binary' : 'text';
 		echo HTML::escape(uojStringPreview($content, $max_len, $type));
 		echo "\n</pre>";

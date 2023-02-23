@@ -50,7 +50,7 @@ function echoFilePre($file_name) {
 
 	echo '<h5 class="mb-1">', htmlspecialchars($file_name), '</h5>';
 	echo '<div class="text-muted small mb-1 font-monospace">', $mimetype, '</div>';
-	echo '<pre class="bg-light rounded uoj-pre">', "\n";
+	echo '<pre class="bg-body-tertiary rounded uoj-pre">', "\n";
 
 	$output_limit = 1000;
 	if (strStartWith($mimetype, 'text/')) {
@@ -124,7 +124,7 @@ $info_form->appendHTML(<<<EOD
 <div class="form-group row">
 	<label class="col-sm-3 control-label">提交文件配置</label>
 	<div class="col-sm-9">
-		<pre class="uoj-pre bg-light rounded">
+		<pre class="uoj-pre bg-body-tertiary rounded">
 $esc_submission_requirement
 </pre>
 	</div>
@@ -135,7 +135,7 @@ $info_form->appendHTML(<<<EOD
 <div class="form-group row">
 	<label class="col-sm-3 control-label">其它配置</label>
 	<div class="col-sm-9">
-		<pre class="uoj-pre bg-light rounded">
+		<pre class="uoj-pre bg-body-tertiary rounded">
 $esc_extra_config
 </pre>
 	</div>
