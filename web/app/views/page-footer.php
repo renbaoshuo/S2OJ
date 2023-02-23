@@ -11,7 +11,7 @@ if (!isset($ShowPageFooter)) {
 		</script>
 	<?php endif ?>
 
-	<footer class="bg-white text-muted pt-3 pb-4 mt-4" style="font-size: 0.9em">
+	<footer class="bg-body text-muted pt-3 pb-4 mt-4" style="font-size: 0.9em">
 		<div class="container d-lg-flex justify-content-lg-between">
 			<div>
 				<div>

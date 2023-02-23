@@ -174,7 +174,7 @@ if (UOJUserBlog::userHasManagePermission(Auth::user())) {
 	]);
 	$hide_form->addInput('comment_hide_reason', [
 		'div_class' => 'mt-3',
-		'label' => '自定义隐藏理由',
+		'label' => '自定义隐藏理由（当上方隐藏理由为自定义时有效）',
 		'default_value' => '该评论由于违反社区规定，已被管理员隐藏',
 		'validator_php' => 'validateString',
 	]);
@@ -327,9 +327,10 @@ $comments_pag = new Paginator([
 
 <script>
 	$('.uoj-blog-hide-comment-btn').each(function() {
-		$(this).click(function() {
+		$(this).click(function(event) {
 			var comment_id = $(this).data('comment-id');
-
+			
+			event.preventDefault();
 			toggleModalHideComment(comment_id, $('#comment-content-' + comment_id).html());
 		});
 	})

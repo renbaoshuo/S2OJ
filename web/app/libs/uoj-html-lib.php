@@ -355,7 +355,7 @@ function echoSubmissionContent($submission, $requirement) {
 			echo '<h4 class="card-title">' . $req['name'] . '</h4>';
 			echo '</div>';
 			echo '<div class="card-body">';
-			echo '<pre><code class="' . $sh_class . ' bg-light rounded p-3">' . $file_content . "\n" . '</code></pre>';
+			echo '<pre><code class="' . $sh_class . ' bg-body-tertiary rounded p-3">' . $file_content . "\n" . '</code></pre>';
 			echo '</div>';
 			echo '<div class="card-footer">' . $footer_text . '</div>';
 			echo '</div>';
@@ -369,7 +369,7 @@ function echoSubmissionContent($submission, $requirement) {
 			echo '<h4 class="card-title">' . $req['file_name'] . '</h4>';
 			echo '</div>';
 			echo '<div class="card-body">';
-			echo '<pre class="bg-light rounded p-3 ">', "\n" . $file_content . "\n" . '</pre>';
+			echo '<pre class="bg-body-tertiary rounded p-3 ">', "\n" . $file_content . "\n" . '</pre>';
 			echo '</div>';
 			echo '<div class="card-footer">' . $footer_text . '</div>';
 			echo '</div>';
@@ -406,7 +406,7 @@ class JudgmentDetailsPrinter {
 	}
 	private function _print(DOMElement $node) {
 		if ($node->nodeName == 'error') {
-			echo '<pre class="bg-light rounded p-3">', "\n";
+			echo '<pre class="bg-body-tertiary rounded p-3">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 		} elseif ($node->nodeName == 'remote-result-container') {
@@ -432,7 +432,7 @@ class JudgmentDetailsPrinter {
 			$language = $node->getAttribute("language");
 			echo '<div class="border-bottom p-3 copy-button-container">';
 			echo '<div class="fw-bold mb-2">源代码</div>';
-			echo '<pre class="mb-0"><code class="language-', $language, ' bg-light rounded p-3">';
+			echo '<pre class="mb-0"><code class="language-', $language, ' bg-body-tertiary rounded p-3">';
 			$this->_print_c($node);
 			echo "</code></pre>";
 			echo '</div>';
@@ -662,22 +662,22 @@ class JudgmentDetailsPrinter {
 			}
 		} elseif ($node->nodeName == 'in') {
 			echo '<h4 class="fs-6 fw-bold">输入文件</h4>';
-			echo '<pre class="bg-light p-3 rounded">', "\n";
+			echo '<pre class="bg-body-tertiary p-3 rounded">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 		} elseif ($node->nodeName == 'out') {
 			echo '<h4 class="fs-6 fw-bold">程序输出</h4>';
-			echo '<pre class="bg-light p-3 rounded">', "\n";
+			echo '<pre class="bg-body-tertiary p-3 rounded">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 		} elseif ($node->nodeName == 'ans') {
 			echo '<h4 class="fs-6 fw-bold">答案文件</h4>';
-			echo '<pre class="bg-light p-3 rounded">', "\n";
+			echo '<pre class="bg-body-tertiary p-3 rounded">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 		} elseif ($node->nodeName == 'res') {
 			echo '<h4 class="fs-6 fw-bold"><span>检查器信息</span></h4>';
-			echo '<pre class="bg-light p-3 rounded">', "\n";
+			echo '<pre class="bg-body-tertiary p-3 rounded">', "\n";
 			if ($node->hasChildNodes()) {
 				$this->_print_c($node);
 			} else {
@@ -698,7 +698,7 @@ class JudgmentDetailsPrinter {
 				}
 				echo '<h4 class="mb-2">', $node->getAttribute("title"), ":</h4>";
 			}
-			echo '<pre class="bg-light p-3 rounded">', "\n";
+			echo '<pre class="bg-body-tertiary p-3 rounded">', "\n";
 			$this->_print_c($node);
 			echo "\n</pre>";
 			echo '</div>';

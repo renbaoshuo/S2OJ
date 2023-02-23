@@ -294,7 +294,7 @@ h6,
 
 .markdown-body pre {
 	padding: 1em;
-	background-color: rgba(var(--bs-light-rgb));
+	background-color: var(--bs-tertiary-bg);
 }
 
 .markdown-body table th[align='left'] {

@@ -100,7 +100,6 @@ function blog_editor_init(name, editor_config) {
 					enabled: false,
 				},
 				wordWrap: 'on',
-				theme: 'vs',
 				unicodeHighlight: {
 					ambiguousCharacters: false,
 				},

@@ -35,7 +35,7 @@ foreach ($problem_configure->problem_conf->conf as $key => $val) {
 			<div class="card-header fw-bold">problem.conf 预览</div>
 
 			<div class="card-body p-0" id="problem-conf-preview">
-				<pre class="bg-light mb-0 p-3"><code><?= $problem_conf_str ?></code></pre>
+				<pre class="bg-body-tertiary mb-0 p-3"><code><?= $problem_conf_str ?></code></pre>
 			</div>
 
 			<div class="card-footer bg-transparent small text-muted">
