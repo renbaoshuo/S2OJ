@@ -544,8 +544,9 @@ form.form-horizontal {
 
 /* Username color */
 
+.uoj-username,
 .uoj-username-blue {
-	color: #0d6efd;
+	color: #1e88e5;
 }
 
 .uoj-username-green {
@@ -578,4 +579,43 @@ form.form-horizontal {
 
 .uoj-username-brown {
 	color: #996600;
+}
+
+/* Dark: Username color */
+
+[data-bs-theme='dark'] .uoj-username,
+[data-bs-theme='dark'] .uoj-username-blue {
+	color: #218bff;
+}
+
+[data-bs-theme='green'] .uoj-username-green {
+	color: #19a140;
+}
+
+[data-bs-theme='dark'] .uoj-username-pink {
+	color: #bf3989;
+}
+
+[data-bs-theme='dark'] .uoj-username-red {
+	color: #cf222e;
+}
+
+[data-bs-theme='dark'] .uoj-username-orange {
+	color: #e16f24;
+}
+
+[data-bs-theme='dark'] .uoj-username-cyan {
+	color: #00acc1;
+}
+
+[data-bs-theme='dark'] .uoj-username-purple {
+	color: #9366e5;
+}
+
+[data-bs-theme='dark'] .uoj-username-gray {
+	color: #8c959f;
+}
+
+[data-bs-theme='dark'] .uoj-username-brown {
+	color: #996f1c;
 }
