@@ -634,6 +634,10 @@ class UOJSubmission {
 			'judge_time' => UOJLocale::get('problems::judge time'),
 		];
 
+		if (!$this->problem || !($this->problem instanceof UOJContestProblem)) {
+			$cfg['contest_hidden'] = true;
+		}
+
 		echo '<div class="card mb-3">';
 		echo     '<div class="card-body vstack gap-2">';
 

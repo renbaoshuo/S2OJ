@@ -266,7 +266,7 @@ trait UOJSubmissionLikeTrait {
 				break;
 			case 'problem':
 				if ($this->problem) {
-					if ($cfg['contest_problem_letter']) {
+					if ($cfg['contest_problem_letter'] && $this->problem instanceof UOJContestProblem) {
 						echo $this->problem->getLink($cfg['problem_title'] + ['with' => 'letter', 'simplify' => true]);
 					} else {
 						echo $this->problem->getLink($cfg['problem_title']);
@@ -276,7 +276,7 @@ trait UOJSubmissionLikeTrait {
 				}
 				break;
 			case 'contest':
-				if ($this->problem && $this->problem->contest) {
+				if ($this->problem && $this->problem instanceof UOJContestProblem) {
 					echo $this->problem->contest->getLink();
 				} else {
 					echo '<span class="text-danger">?</span>';
