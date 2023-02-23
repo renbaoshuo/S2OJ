@@ -265,7 +265,11 @@ if (isset($hack_form)) {
 
 <div class="row mt-3 submission-layout d-md-grid">
 	<div class="submission-right-col">
-		<?php UOJSubmission::cur()->echoStatusCard(['show_actual_score' => $perm['score'], 'id_hidden' => true], Auth::user()) ?>
+		<?php UOJSubmission::cur()->echoStatusCard([
+			'show_actual_score' => $perm['score'],
+			'contest_problem_letter' => true,
+			'id_hidden' => true,
+		], Auth::user()) ?>
 	</div>
 
 	<div class="submission-left-col">

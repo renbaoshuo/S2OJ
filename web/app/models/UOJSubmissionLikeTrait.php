@@ -256,6 +256,8 @@ trait UOJSubmissionLikeTrait {
 			'time_format' => 'normal',
 			'time_font_size' => 'small',
 			'unknown_char' => '/',
+			'contest_problem_letter' => false,
+			'problem_title' => [],
 		];
 
 		switch ($name) {
@@ -264,11 +266,21 @@ trait UOJSubmissionLikeTrait {
 				break;
 			case 'problem':
 				if ($this->problem) {
-					echo $this->problem->getLink(isset($cfg['problem_title']) ? $cfg['problem_title'] : []);
+					if ($cfg['contest_problem_letter']) {
+						echo $this->problem->getLink($cfg['problem_title'] + ['with' => 'letter', 'simplify' => true]);
+					} else {
+						echo $this->problem->getLink($cfg['problem_title']);
+					}
 				} else {
 					echo '<span class="text-danger">?</span>';
 				}
 				break;
+			case 'contest':
+				if ($this->problem && $this->problem->contest) {
+					echo $this->problem->contest->getLink();
+				} else {
+					echo '<span class="text-danger">?</span>';
+				}
 			case 'submitter':
 			case 'owner':
 			case 'hacker':

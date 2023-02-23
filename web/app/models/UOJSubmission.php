@@ -621,9 +621,10 @@ class UOJSubmission {
 		}
 
 		$rows = [
-			'id' => 'ID',
 			'submitter' => UOJLocale::get('problems::submitter'),
+			'id' => 'ID',
 			'problem' => UOJLocale::get('problems::problem'),
+			'contest' => UOJLocale::get('contests::contest'),
 			'result' => UOJLocale::get('problems::result'),
 			'used_time' => UOJLocale::get('problems::used time'),
 			'used_memory' => UOJLocale::get('problems::used memory'),
