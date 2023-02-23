@@ -426,8 +426,11 @@ function echoMySubmissions() {
 	$options = [];
 	$options[] = ['value' => 'all', 'text' => '所有题目'];
 	for ($i = 0; $i < count($problems); $i++) {
-		$letter = chr(ord('A') + $i);
-		$options[] = ['value' => $letter, 'text' => "{$letter} 题"];
+		$problem = UOJContestProblem::query($problems[$i]);
+		$options[] = [
+			'value' => $problem->getLetter(),
+			'text' => $problem->getTitle(['with' => 'letter', 'simplify' => true]),
+		];
 	}
 
 	$chosen = UOJRequest::get('p');
@@ -455,7 +458,7 @@ function echoMySubmissions() {
 		'show_all_submissions_status' => Cookie::get('show_all_submissions') !== null,
 		'options' => $options,
 		'chosen' => $chosen,
-		'conds' => $conds
+		'conds' => $conds,
 	]);
 }
 
