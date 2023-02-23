@@ -299,7 +299,7 @@ if ($cur_tab == 'profile') {
 		$update_profile_form->appendHTML(<<<EOD
 			<div class="mb-3">
 				<label for="input-username_color" class="form-label">用户名颜色</label>
-				<input type="text" class="form-control" id="input-username_color" aria-describedby="help-username_color" value="棕色 - #996600" disabled>
+				<input type="text" class="form-control" id="input-username_color" aria-describedby="help-username_color" value="棕色" disabled>
 				<div id="help-username_color" class="form-text">被封禁的用户无法修改用户名颜色。</div>
 			</div>
 		EOD);
@@ -307,29 +307,22 @@ if ($cur_tab == 'profile') {
 		$update_profile_form->appendHTML(<<<EOD
 			<div class="mb-3">
 				<label for="input-username_color" class="form-label">用户名颜色</label>
-				<input type="text" class="form-control" id="input-username_color" aria-describedby="help-username_color" value="灰色 - #707070" disabled>
+				<input type="text" class="form-control" id="input-username_color" aria-describedby="help-username_color" value="灰色" disabled>
 				<div id="help-username_color" class="form-text">临时用户无法修改用户名颜色。</div>
 			</div>
 		EOD);
 	} else {
-		$additional_colors = [];
+		$username_colors = UOJUser::USERNAME_COLORS['user'];
 
 		if (isSuperUser($user)) {
-			$additional_colors['#9d3dcf'] = '紫色 - #9d3dcf';
+			$username_colors += UOJUser::USERNAME_COLORS['admin'];
 		}
 
 		$update_profile_form->addSelect('username_color', [
 			'div_class' => 'mb-3',
 			'label' => '用户名颜色',
 			'default_value' => $extra['username_color'],
-			'options' => $additional_colors + [
-				'#0d6efd' => '蓝色 - #0d6efd',
-				'#2da44e' => '绿色 - #2da44e',
-				'#e85aad' => '粉色 - #e85aad',
-				'#f32a38' => '红色 - #f32a38',
-				'#f57c00' => '橙色 - #f57c00',
-				'#00acc1' => '青色 - #00acc1',
-			],
+			'options' => $username_colors,
 		]);
 	}
 	$update_profile_form->handle = function (&$vdata) use ($user, $extra) {

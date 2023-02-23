@@ -11,6 +11,21 @@ class UOJUser {
 	const MAX_UA_LEN = 300;
 	const MAX_HISTORY_LEN = 20;
 
+	// Don't forget to change values in `models/HTML.php` and `css/uoj-bs5.css`
+	const USERNAME_COLORS = [
+		'user' => [
+			'blue' => 'Blue',
+			'green' => 'Green',
+			'pink' => 'Pink',
+			'red' => 'Red',
+			'orange' => 'Orange',
+			'cyan' => 'Cyan',
+		],
+		'admin' => [
+			'purple' => 'Purple',
+		],
+	];
+
 	public static $visibility_codes = [
 		'all' => [
 			'html' => '',
@@ -277,23 +292,23 @@ class UOJUser {
 
 	public static function getUserColor2($usergroup, $custom_color = null) {
 		if ($usergroup == 'B') {
-			return '#996600';
+			return 'brown';
 		}
 
 		if ($usergroup == 'T') {
-			return '#707070';
+			return 'gray';
 		}
 
 		if ($usergroup == 'S') {
-			return $custom_color ?: '#9d3dcf';
+			return $custom_color ?: 'purple';
 		}
 
 		// 前管理员设置颜色为紫色的，颜色改为蓝色
-		if ($custom_color == '#9d3dcf') {
-			return '#0d6efd';
+		if ($custom_color == 'purple') {
+			return 'blue';
 		}
 
-		return $custom_color ?: '#0d6efd';
+		return $custom_color ?: 'blue';
 	}
 
 	public static function getLink($user, $cfg = []) {
@@ -318,10 +333,12 @@ class UOJUser {
 			$realname = '';
 		}
 
+		$color = $cfg['color'] ? UOJUser::getUserColor($user) : '';
+
 		return HTML::tag('span', [
-			'class' => 'uoj-username',
-			'data-color' => $cfg['color'] ? UOJUser::getUserColor($user) : '',
+			'class' => "uoj-username uoj-username-{$color}",
 			'data-realname' => trim(HTML::escape($realname)),
+			'data-color' => $color,
 		], $user['username']);
 	}
 

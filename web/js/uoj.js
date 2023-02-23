@@ -123,7 +123,7 @@ function getUserLink(username, realname, color) {
 		return '';
 	}
 	var text = username;
-	var style = '';
+	var className = 'uoj-username';
 	if (username.charAt(0) == '@') {
 		username = username.substr(1);
 	}
@@ -131,16 +131,16 @@ function getUserLink(username, realname, color) {
 		text = text + ' <span class="uoj-realname d-inline-block">(' + realname + ')</span>';
 	}
 	if (color) {
-		style += 'color: ' + color + ';';
+		className += ' uoj-username-' + color;
 	}
-	return '<a class="uoj-username" href="' + uojHome + '/user/' + username + '" ' + 'style="' + style + '">' + text + '</a>';
+	return '<a class="' + className + '" href="' + uojHome + '/user/' + username + '">' + text + '</a>';
 }
 function getUserSpan(username, realname, color) {
 	if (!username) {
 		return '';
 	}
 	var text = username;
-	var style = '';
+	var className = 'uoj-username';
 	if (username.charAt(0) == '@') {
 		username = username.substr(1);
 	}
@@ -148,9 +148,9 @@ function getUserSpan(username, realname, color) {
 		text = text + ' <span class="uoj-realname d-inline-block">(' + realname + ')</span>';
 	}
 	if (color) {
-		style += 'color: ' + color + ';';
+		className += ' uoj-username-' + color;
 	}
-	return '<span class="uoj-username" ' + 'style="' + style + '">' + text + '</span>';
+	return '<span class="' + className + '">' + text + '</span>';
 }
 
 function replaceWithHighlightUsername() {

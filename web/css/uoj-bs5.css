@@ -541,3 +541,41 @@ form.form-horizontal {
 	grid-column: 2;
 	grid-row: 2;
 }
+
+/* Username color */
+
+.uoj-username-blue {
+	color: #0d6efd;
+}
+
+.uoj-username-green {
+	color: #2da44e;
+}
+
+.uoj-username-pink {
+	color: #e85aad;
+}
+
+.uoj-username-red {
+	color: #f32a38;
+}
+
+.uoj-username-orange {
+	color: #f57c00;
+}
+
+.uoj-username-cyan {
+	color: #00acc1;
+}
+
+.uoj-username-purple {
+	color: #9d3dcf;
+}
+
+.uoj-username-gray {
+	color: #707070;
+}
+
+.uoj-username-brown {
+	color: #996600;
+}
