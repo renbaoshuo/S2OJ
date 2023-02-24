@@ -121,6 +121,6 @@ class ClickZans {
 
 		if ($cnt < 0) $display_cnt = '-?';
 
-		return '<span class="' . $cls . '"><span class="uoj-click-zan-cnt">[<strong>' . $display_cnt . '</strong>]</span></span>';
+		return '<span class="' . $cls . '"><span class="uoj-click-zan-cnt" title="' . $cnt . '">[<strong>' . $display_cnt . '</strong>]</span></span>';
 	}
 }

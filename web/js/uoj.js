@@ -334,7 +334,7 @@ $.fn.click_zan_block = function() {
 		$(this)
 			.append(up_node)
 			.append(down_node)
-			.append($('<span class="uoj-click-zan-cnt">[<strong>' + display_cnt + '</strong>]</span>'));
+			.append($('<span class="uoj-click-zan-cnt" title="' + cnt + '">[<strong>' + display_cnt + '</strong>]</span>'));
 	});
 }
 
