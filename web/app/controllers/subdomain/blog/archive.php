@@ -129,7 +129,7 @@ $all_tags = DB::selectAll([
 											<?php endforeach ?>
 										</td>
 										<td><?= $blog->info['post_time'] ?></td>
-										<td><?= ClickZans::getBlock('B', $blog->info['id'], $blog->info['zan'], null, false) ?></td>
+										<td><?= ClickZans::getCntBlock($blog->info['zan']) ?></td>
 									</tr>
 								<?php endforeach ?>
 							</tbody>
