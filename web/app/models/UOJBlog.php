@@ -122,6 +122,14 @@ class UOJBlog {
 		}
 	}
 
+	public function getDisplayZanCnt() {
+		$display_zan = $this->info['zan'] > 0 ? "+{$this->info['zan']}" : $this->info['zan'];
+
+		if ($this->info['zan'] < 0) $display_zan = '-';
+
+		return $display_zan;
+	}
+
 	public function queryNewestComment() {
 		return DB::selectFirst([
 			"select * from blogs_comments",

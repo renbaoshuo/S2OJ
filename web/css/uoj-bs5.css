@@ -619,15 +619,3 @@ form.form-horizontal {
 [data-bs-theme='dark'] .uoj-username-brown {
 	color: #996f1c;
 }
-
-/* Dark: Table Colors */
-
-[data-bs-theme='dark'] .table-success {
-	--bs-table-bg: #d1e7ddb9;
-	--bs-table-border-color: #bcd0c7b9;
-}
-
-[data-bs-theme='dark'] .table-warning {
-	--bs-table-bg: #fff3cdb9;
-	--bs-table-border-color: #e6dbb9b9;
-}
