@@ -54,9 +54,15 @@ for ($i = count($data) - 1; $i > 0; $i--) {
 }
 
 $submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']) ? 'time' : 'tot_size';
+
+if (UOJContest::cur()) {
+	$PageTitle = UOJProblem::cur()->getTitle(['with' => 'letter', 'simplify' => true]);
+} else {
+	$PageTitle = UOJProblem::cur()->getTitle(['with' => 'id']);
+}
 ?>
 
-<?php echoUOJPageHeader(HTML::stripTags(UOJProblem::info('title')) . ' - ' . UOJLocale::get('problems::statistics')) ?>
+<?php echoUOJPageHeader($PageTitle . ' - ' . UOJLocale::get('problems::statistics')) ?>
 
 <div class="row">
 	<!-- left col -->
