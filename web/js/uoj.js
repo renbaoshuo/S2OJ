@@ -326,11 +326,15 @@ $.fn.click_zan_block = function() {
 			e.preventDefault();
 			click_zan(id, type, -1, node);
 		});
+
+		var display_cnt = cnt > 0 ? '+' + cnt : cnt;
+
+		if (cnt < 0) display_cnt = '-';
 		
 		$(this)
 			.append(up_node)
 			.append(down_node)
-			.append($('<span class="uoj-click-zan-cnt">[<strong>' + (cnt > 0 ? '+' + cnt : cnt) + '</strong>]</span>'));
+			.append($('<span class="uoj-click-zan-cnt">[<strong>' + display_cnt + '</strong>]</span>'));
 	});
 }
 

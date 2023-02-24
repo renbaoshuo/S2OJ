@@ -23,7 +23,7 @@ class ClickZans {
 				return true;
 		}
 	}
-	
+
 	public static function query($id, $type, $user) {
 		if ($user == null) {
 			return 0;
@@ -44,13 +44,13 @@ class ClickZans {
 
 	public static function click($id, $type, $user, $delta) {
 		if (!DB::$in_transaction) {
-			return DB::transaction(fn() => ClickZans::click($id, $type, $user, $delta));
+			return DB::transaction(fn () => ClickZans::click($id, $type, $user, $delta));
 		}
 
 		$table_name = ClickZans::getTable($type);
-		
+
 		$cur = ClickZans::query($id, $type, $user);
-		
+
 		$row = DB::selectFirst([
 			"select zan from", DB::table($table_name),
 			"where", ['id' => $id], DB::for_update()
@@ -58,7 +58,7 @@ class ClickZans {
 		if (!$row) {
 			return '<div class="text-danger">failed</div>';
 		}
-		
+
 		if ($cur != $delta) {
 			$cur += $delta;
 			if ($cur == 0) {
@@ -68,11 +68,11 @@ class ClickZans {
 						'username' => Auth::id(),
 						'type' => $type,
 						'target_id' => $id
-                    ]
+					]
 				]);
 			} elseif ($cur != $delta) {
 				DB::update([
-					"update click_zans", 
+					"update click_zans",
 					"set", ['val' => $cur],
 					"where", [
 						'username' => Auth::id(),
@@ -96,17 +96,17 @@ class ClickZans {
 		} else {
 			$cnt = $row['zan'];
 		}
-		
+
 		return ClickZans::getBlock($type, $id, $cnt, $cur);
 	}
-	
+
 	public static function getBlock($type, $id, $cnt, $val = null) {
 		if ($val === null) {
 			$val = ClickZans::query($id, $type, Auth::user());
 		}
-		return '<div class="uoj-click-zan-block" data-id="'.$id.'" data-type="'.$type.'" data-val="'.$val.'" data-cnt="'.$cnt.'"></div>';
+		return '<div class="uoj-click-zan-block" data-id="' . $id . '" data-type="' . $type . '" data-val="' . $val . '" data-cnt="' . $cnt . '"></div>';
 	}
-	
+
 	public static function getCntBlock($cnt) {
 		$cls = 'uoj-click-zan-block-';
 		if ($cnt > 0) {
@@ -116,6 +116,11 @@ class ClickZans {
 		} else {
 			$cls .= 'neutral';
 		}
-		return '<span class="'.$cls.'"><span class="uoj-click-zan-cnt">[<strong>' . ($cnt > 0 ? '+' . $cnt : $cnt) . '</strong>]</span></span>';
+
+		$display_cnt = $cnt > 0 ? '+' . $cnt : $cnt;
+
+		if ($cnt < 0) $display_cnt = '-';
+
+		return '<span class="' . $cls . '"><span class="uoj-click-zan-cnt">[<strong>' . $display_cnt . '</strong>]</span></span>';
 	}
 }
