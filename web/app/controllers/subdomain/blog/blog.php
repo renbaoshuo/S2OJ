@@ -9,20 +9,46 @@ UOJBlog::cur()->belongsToUserBlog() || UOJResponse::page404();
 UOJBlog::cur()->userCanView(Auth::user()) || UOJResponse::page403();
 
 $blog = UOJBlog::info();
+$purifier = HTML::purifier();
+$parsedown = HTML::parsedown([
+	'username_with_color' => true,
+]);
 
 function getCommentContentToDisplay($comment) {
-	if (!$comment['is_hidden']) {
-		return $comment['content'];
-	} else if (UOJUserBlog::userHasManagePermission(Auth::user())) {
-		return '<span class="text-muted mb-3">【' . HTML::escape($comment['reason_to_hide']) . '】</span>' . $comment['content'];
-	} else {
-		return '<span class="text-muted">【' . HTML::escape($comment['reason_to_hide']) . '】</span>';
+	global $purifier, $parsedown;
+
+	$rendered = $purifier->purify($parsedown->text($comment['content']));
+
+	if ($comment['is_hidden']) {
+		$esc_hide_reason = $comment['reason_to_hide'];
+		$res = <<<EOD
+		<div class="alert alert-warning d-flex align-items-center my-0" role="alert">
+			<div class="flex-shrink-0 me-3">
+				<i class="fs-4 bi bi-exclamation-triangle-fill"></i>
+			</div>
+			<div>
+				<div class="fw-bold mb-2">该评论被隐藏</div>
+				<div class="small">{$esc_hide_reason}</div>
+			</div>
+		</div>
+		EOD;
+
+		if (UOJUserBlog::userHasManagePermission(Auth::user())) {
+			$res .= <<<EOD
+			<div class="mt-2">{$rendered}</div>
+			EOD;
+		}
+
+		return $res;
 	}
+
+	return $rendered;
 }
 
 $comment_form = new UOJForm('comment');
 $comment_form->addTextArea('comment', [
 	'label' => '内容',
+	'help' => '评论支持 Markdown 语法。可以用 <code>@mike</code> 来提到 <code>mike</code> 这个用户，<code>mike</code> 会被高亮显示。如果你真的想打 <code>@</code> 这个字符，请用 <code>@@</code>。',
 	'validator_php' => function ($comment) {
 		if (!Auth::check()) {
 			return '请先登录';
@@ -257,22 +283,24 @@ $comments_pag = new Paginator([
 			$asrc = HTML::avatar_addr($poster, 80);
 
 			$replies = DB::selectAll([
-				"select id, poster, content, post_time, is_hidden, reason_to_hide from blogs_comments",
+				"select id, poster, content, post_time, is_hidden, reason_to_hide, zan from blogs_comments",
 				"where", ["reply_id" => $comment['id']],
 				"order by id"
 			]);
 			foreach ($replies as $idx => $reply) {
 				$reply_user = UOJUser::query($reply['poster']);
+				$replies[$idx]['poster_avatar'] = HTML::avatar_addr($reply_user, 80);
 				$replies[$idx]['poster_realname'] = $reply_user['realname'];
 				$replies[$idx]['poster_username_color'] = UOJUser::getUserColor($reply_user);
 				$replies[$idx]['content'] = getCommentContentToDisplay($reply);
+				$replies[$idx]['click_zan_block'] = ClickZans::getBlock('BC', $reply['id'], $reply['zan']);
 			}
 			$replies_json = json_encode($replies);
 		?>
 			<div id="comment-<?= $comment['id'] ?>" class="list-group-item">
 				<div class="d-flex">
-					<div class="mr-3 flex-shrink-0">
-						<a href="<?= HTML::url('/user/' . $poster['username']) ?>" class="d-none d-sm-block text-decoration-none">
+					<div class="d-none d-sm-block mr-3 flex-shrink-0">
+						<a href="<?= HTML::url('/user/' . $poster['username']) ?>">
 							<img class="rounded uoj-user-avatar" src="<?= $asrc ?>" alt="Avatar of <?= $poster['username'] ?>" width="64" height="64" />
 						</a>
 					</div>
@@ -285,7 +313,7 @@ $comments_pag = new Paginator([
 								<?= ClickZans::getBlock('BC', $comment['id'], $comment['zan']) ?>
 							</div>
 						</div>
-						<div class="comment-content my-2" id="comment-content-<?= $comment['id'] ?>"><?= getCommentContentToDisplay($comment) ?></div>
+						<div class="comment-content markdown-body my-2" id="comment-content-<?= $comment['id'] ?>"><?= getCommentContentToDisplay($comment) ?></div>
 						<ul class="list-inline mb-0 text-end">
 							<li class="list-inline-item small text-muted">
 								<?= $comment['post_time'] ?>
@@ -304,11 +332,11 @@ $comments_pag = new Paginator([
 							</li>
 						</ul>
 						<?php if ($replies) : ?>
-							<div id="replies-<?= $comment['id'] ?>" class="rounded bg-secondary bg-opacity-10 border"></div>
+							<div id="replies-<?= $comment['id'] ?>" class="rounded bg-secondary-subtle mt-2 border"></div>
+							<script>
+								showCommentReplies('<?= $comment['id'] ?>', <?= $replies_json ?>);
+							</script>
 						<?php endif ?>
-						<script type="text/javascript">
-							showCommentReplies('<?= $comment['id'] ?>', <?= $replies_json ?>);
-						</script>
 					</div>
 				</div>
 			</div>
@@ -318,7 +346,6 @@ $comments_pag = new Paginator([
 <?= $comments_pag->pagination() ?>
 
 <h3 class="mt-4">发表评论</h3>
-<p>可以用 @mike 来提到 mike 这个用户，mike 会被高亮显示。如果你真的想打“@”这个字符，请用“@@”。</p>
 <?php $comment_form->printHTML() ?>
 
 <div id="div-form-reply" style="display:none">
@@ -329,7 +356,7 @@ $comments_pag = new Paginator([
 	$('.uoj-blog-hide-comment-btn').each(function() {
 		$(this).click(function(event) {
 			var comment_id = $(this).data('comment-id');
-			
+
 			event.preventDefault();
 			toggleModalHideComment(comment_id, $('#comment-content-' + comment_id).html());
 		});

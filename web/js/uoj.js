@@ -176,6 +176,10 @@ $.fn.uoj_honor = function() {
 	});
 }
 
+function getClickZanBlock(type, id, cnt, val) {
+	return '<div class="uoj-click-zan-block" data-id="' + id + '" data-type="' + type + '" data-val="' + val + '" data-cnt="' + cnt + '"></div>';
+}
+
 function showErrorHelp(name, err) {
 	if (err) {
 		$('#div-' + name).addClass('has-validation has-error');
@@ -291,6 +295,11 @@ $.fn.click_zan_block = function() {
 		var type = $(this).data('type');
 		var val = parseInt($(this).data('val'));
 		var cnt = parseInt($(this).data('cnt'));
+		var rendered = $(this).attr('data-click-zan-rendered');
+
+		if (rendered == 'true') {
+			return;
+		}
 		if (isNaN(cnt)) {
 			return;
 		}
@@ -330,8 +339,9 @@ $.fn.click_zan_block = function() {
 		var display_cnt = cnt > 0 ? '+' + cnt : cnt;
 
 		if (cnt < 0) display_cnt = '-?';
-		
+	
 		$(this)
+			.attr('data-click-zan-rendered', 'true')
 			.append(up_node)
 			.append(down_node)
 			.append($('<span class="uoj-click-zan-cnt" title="' + cnt + '">[<strong>' + display_cnt + '</strong>]</span>'));
@@ -1707,25 +1717,41 @@ function showCommentReplies(id, replies) {
 		function(reply) {
 			return $('<tr id="' + 'comment-' + reply.id + '" />').append(
 				$('<td />').append(
-					$('<div class="comment-content">' + getUserLink(reply.poster, reply.poster_realname, reply.poster_username_color) + '：' + reply.content + '</div>')
-				).append(
-					$('<ul class="text-end mb-0 list-inline" />').append(
-						'<li class="list-inline-item small text-muted">' + reply.post_time + '</li>'
+					$('<div class="d-flex" />').append(
+						$('<div class="d-none d-sm-block mr-3 flex-shrink-0" />').append(
+							$('<a />').append(
+								$('<img class="rounded uoj-user-avatar" width="64" height="64" />').attr('src', reply.poster_avatar)
+							).attr('href', uojHome + '/user/' + reply.poster)
+						)
 					).append(
-						user_can_hide_comment
-							? $('<li class="list-inline-item" />').append(
-								$('<a href="#" class="text-warning-emphasis text-decoration-none p-0" />').data('comment-id', reply.id).text('隐藏').click(function(event) {
-									event.preventDefault();
-									toggleModalHideComment(reply.id, reply.content);
-								})
+						$('<div id="comment-body-' + reply.id + '" class="flex-grow-1 ms-3" />').append(
+							$('<div class="row justify-content-between flex-wrap g-0" />').append(
+								$('<div class="col-auto" />').append(getUserLink(reply.poster, reply.poster_realname, reply.poster_username_color))
+							).append(
+								$('<div class="col-auto" />').append(reply.click_zan_block)
 							)
-							: ''
-					).append(
-						$('<li class="list-inline-item" />').append(
-							$('<a href="#">回复</a>').click(function (e) {
-								e.preventDefault();
-								toggleFormReply(reply.id, '回复 @' + reply.poster + '：');
-							})
+						).append(
+							$('<div class="comment-content markdown-body my-2" />').attr('id', 'comment-content-' + reply.id).html(reply.content)
+						).append(
+							$('<ul class="text-end mb-0 list-inline" />').append(
+								'<li class="list-inline-item small text-muted">' + reply.post_time + '</li>'
+							).append(
+								user_can_hide_comment
+									? $('<li class="list-inline-item" />').append(
+										$('<a href="#" class="text-warning-emphasis text-decoration-none p-0" />').data('comment-id', reply.id).text('隐藏').click(function(event) {
+											event.preventDefault();
+											toggleModalHideComment(reply.id, reply.content);
+										})
+									)
+									: ''
+							).append(
+								$('<li class="list-inline-item" />').append(
+									$('<a href="#">回复</a>').click(function (e) {
+										e.preventDefault();
+										toggleFormReply(reply.id, '回复 @' + reply.poster + '：');
+									})
+								)
+							)
 						)
 					)
 				)

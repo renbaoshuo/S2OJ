@@ -62,7 +62,7 @@ class UOJMarkdown extends ParsedownMath {
 			$mentioned_user = UOJUser::query($matches[1]);
 
 			if ($mentioned_user) {
-				$color = '#0d6efd';
+				$color = 'blue';
 
 				if ($this->options['username_with_color']) {
 					$color = UOJUser::getUserColor($mentioned_user);
@@ -74,7 +74,7 @@ class UOJMarkdown extends ParsedownMath {
 						'name' => 'span',
 						'text' => '@' . $mentioned_user['username'],
 						'attributes' => [
-							'class' => 'uoj-username',
+							'class' => "uoj-username uoj-username-{$color}",
 							'data-realname' => UOJUser::getRealname($mentioned_user),
 							'data-color' => $color,
 						],
