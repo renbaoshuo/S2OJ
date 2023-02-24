@@ -329,7 +329,7 @@ $.fn.click_zan_block = function() {
 
 		var display_cnt = cnt > 0 ? '+' + cnt : cnt;
 
-		if (cnt < 0) display_cnt = '-';
+		if (cnt < 0) display_cnt = '-?';
 		
 		$(this)
 			.append(up_node)

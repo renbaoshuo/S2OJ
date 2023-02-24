@@ -123,9 +123,9 @@ class UOJBlog {
 	}
 
 	public function getDisplayZanCnt() {
-		$display_zan = $this->info['zan'] > 0 ? "+{$this->info['zan']}" : $this->info['zan'];
+		$display_zan = $this->info['zan'];
 
-		if ($this->info['zan'] < 0) $display_zan = '-';
+		if ($this->info['zan'] < 0) $display_zan = '-?';
 
 		return $display_zan;
 	}
