@@ -19,7 +19,7 @@ function getProblemTR($info) {
 		$html .= ' <span class="badge text-white bg-info align-middle">' . UOJLocale::get('problems::my problem') . '</span> ';
 	}
 	if ($info['type'] == 'remote') {
-		HTML::tag('a', ['class' => 'badge text-bg-success align-middle', 'href' => '/problems/remote'], '远端评测题');
+		$html .= ' ' . HTML::tag('a', ['class' => 'badge text-bg-success align-middle', 'href' => '/problems/remote'], '远端评测题');
 	}
 	if ($info['is_hidden']) {
 		$html .= ' <span class="badge text-bg-danger align-middle"><i class="bi bi-eye-slash-fill"></i> ' . UOJLocale::get('hidden') . '</span> ';
