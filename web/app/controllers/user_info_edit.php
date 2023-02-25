@@ -424,7 +424,7 @@ if ($cur_tab == 'profile') {
 			"where", ["username" => $user['username']]
 		]);
 
-		dieWithAlert('密码修改成功！');
+		dieWithJsonData(['status' => 'success', 'message' => '密码修改成功，请重新 <a href="/login">登录</a>。']);
 	}
 
 	if (isSuperUser(Auth::user())) {
