@@ -349,45 +349,46 @@ $.fn.click_zan_block = function() {
 }
 
 // count down
-function getCountdownStr(t, font_size, color = true) {
+function getCountdownStr(t, config) {
 	var x = Math.floor(t);
 	var ss = toFilledStr(x % 60, '0', 2);
 	x = Math.floor(x / 60);
 	var mm = toFilledStr(x % 60, '0', 2);
 	x = Math.floor(x / 60);
 	var hh = x.toString();
+
+	var style = '';
+
+	if (config.font_size) {
+		style += 'font-size: ' + config.font_size + ';';
+	}
 	
-	var res = '<span style="font-size:' + font_size + '">';
-	res += '<span '
-	if (color) res += ' style="color:' + getColOfScore(Math.min(t / 10800 * 100, 100)) + '" ';
-	res += ' >' + hh + '</span>';
+	var res = '<span style="' + style + '">';
+	res += '<span>' + hh + '</span>';
 	res += ':';
-	res += '<span '
-	if (color) res += ' style="color:' + getColOfScore(mm / 60 * 100) + '" ';
-	res += ' >' + mm + '</span>';
+	res += '<span>' + mm + '</span>';
 	res += ':';
-	res += '<span ';
-	if (color) res += ' style="color:' + getColOfScore(ss / 60 * 100) + '" ';
-	res +=' >' + ss + '</span>';
-	res += '</span>'
+	res += '<span>' + ss + '</span>';
+	res += '</span>';
 	return res;
 }
 
-$.fn.countdown = function(rest, callback, font_size = '30px', color = true) {
+$.fn.countdown = function(rest, config = {}) {
 	return this.each(function() {
 		var start = new Date().getTime();
 		var cur_rest = rest != undefined ? rest : parseInt($(this).data('rest'));
+		config = $.merge(config, JSON.parse($(this).data('config') || '{}'));
 		var cur = this;
 		var countdown = function() {
 			var passed = Math.floor((new Date().getTime() - start) / 1000);
 			if (passed >= cur_rest) {
-				$(cur).html(getCountdownStr(0, font_size, color));
-				if (callback != undefined) {
+				$(cur).html(getCountdownStr(0, config));
+				if (config.callback != undefined) {
 					callback();
 				}
 			} else {
-				$(cur).html(getCountdownStr(cur_rest - passed, font_size, color));
-				setTimeout(countdown, 1000);
+				$(cur).html(getCountdownStr(cur_rest - passed, config));
+				setTimeout(countdown, 500);
 			}
 		}
 		countdown();

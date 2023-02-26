@@ -315,7 +315,7 @@ class UOJContest {
 	}
 
 	public function queryJudgeProgress() {
-		if ($this->basicRule() == 'OI' && $this->progress() < CONTEST_TESTING) {
+		if (/* $this->basicRule() == 'OI' && */$this->progress() < CONTEST_TESTING) {
 			$rop = 0;
 			$title = UOJLocale::get('contests::contest pending final test');
 			$fully_judged = false;
@@ -622,5 +622,61 @@ class UOJContest {
 
 	public function getAdditionalLinks() {
 		return $this->info['extra_config']['links'] ?: [];
+	}
+
+	public function getContestCard($cfg = []) {
+		$cfg += [
+			'class' => 'mb-2',
+		];
+
+		$res = '';
+		$res .= <<<EOD
+		<div class="card mb-2">
+			<div class="card-body">
+				<h3 class="h4 card-title text-center">
+					<a class="text-decoration-none text-body" href="{$this->getUri()}">
+						{$this->info['name']}
+					</a>
+				</h3>
+				<div class="card-text text-center text-muted">
+		EOD;
+
+		if ($this->progress() <= CONTEST_IN_PROGRESS) {
+			$res .= HTML::tag('span', [
+				'class' => 'countdown fs-3',
+				'data-rest' => $this->info['end_time']->getTimestamp() - UOJTime::$time_now->getTimestamp(),
+			], ' ');
+		} else if ($this->progress() <= CONTEST_TESTING) {
+			$judge_progress = $this->queryJudgeProgress();
+
+			$res .= HTML::tag('span', [], "{$judge_progress['title']} ({$judge_progress['rop']})");
+		} else {
+			$res .= HTML::tag('span', [], UOJLocale::get('contests::contest ended'));
+		}
+
+		$res .= <<<EOD
+				</div>
+			</div>
+			<div class="list-group list-group-flush">
+		EOD;
+
+		$appraisal = UOJLocale::get('appraisal');
+		$res .= <<<EOD
+				<div class="list-group-item d-flex justify-content-between align-items-center">
+					<span class="flex-shrink-0 me-2">
+						{$appraisal}
+					</span>
+					<span class="text-end">
+						{$this->getZanBlock()}
+					</span>
+				</div>
+		EOD;
+
+		$res .= <<<EOD
+			</div>
+		</div>
+		EOD;
+
+		return $res;
 	}
 }

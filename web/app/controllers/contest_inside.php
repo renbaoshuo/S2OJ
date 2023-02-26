@@ -554,38 +554,7 @@ echoUOJPageHeader($tabs_info[$cur_tab]['name'] . ' - ' . UOJContest::info('name'
 		<hr class="d-md-none" />
 
 		<div class="col-md-3">
-			<div class="card card-default mb-2">
-				<div class="card-body">
-					<h3 class="h4 card-title text-center">
-						<a class="text-decoration-none text-body" href="<?= UOJContest::cur()->getUri() ?>">
-							<?= UOJContest::info('name') ?>
-						</a>
-					</h3>
-					<div class="card-text text-center text-muted">
-						<?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) : ?>
-							<span id="contest-countdown"></span>
-							<script type="text/javascript">
-								$('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJTime::$time_now->getTimestamp() ?>, function() {}, '1.75rem', false);
-							</script>
-						<?php elseif ($contest['cur_progress'] <= CONTEST_TESTING) : ?>
-							<?php $judge_progress = UOJContest::cur()->queryJudgeProgress() ?>
-							<?= $judge_progress['title'] ?> (<?= $judge_progress['rop'] ?>%)
-						<?php else : ?>
-							<?= UOJLocale::get('contests::contest ended') ?>
-						<?php endif ?>
-					</div>
-				</div>
-				<div class="list-group list-group-flush">
-					<li class="list-group-item d-flex justify-content-between align-items-center">
-						<span class="flex-shrink-0">
-							<?= UOJLocale::get('appraisal') ?>
-						</span>
-						<span>
-							<?= UOJContest::cur()->getZanBlock() ?>
-						</span>
-					</li>
-				</div>
-			</div>
+			<?= UOJContest::cur()->getContestCard() ?>
 
 			<?php if (UOJContest::cur()->basicRule() === 'OI') : ?>
 				<p>此次比赛为 OI 赛制。</p>

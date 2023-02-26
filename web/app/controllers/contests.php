@@ -112,11 +112,14 @@ if ($rest_second <= 86400) {
 	echo <<<EOD
 <div class="text-center bot-buffer-lg">
 <div class="text-secondary">$upcoming_contest_name 倒计时</div>
-<div id="contest-countdown"></div>
-<script type="text/javascript">
-$('#contest-countdown').countdown($rest_second, function() {
-	if (confirm($notification)) {
-		window.location.href = "$upcoming_contest_href";
+<div class="text-secondary" id="contest-countdown"></div>
+<script>
+$('#contest-countdown').countdown($rest_second, {
+	font_size: '30px',
+	callback: function() {
+		if (confirm($notification)) {
+			window.location.href = "$upcoming_contest_href";
+		}
 	}
 });
 </script>

@@ -386,38 +386,7 @@ if (UOJContest::cur()) {
 	<!-- right col -->
 	<aside class="col-lg-3 mt-3 mt-lg-0">
 		<?php if (UOJContest::cur()) : ?>
-			<!-- Contest card -->
-			<div class="card card-default mb-2">
-				<div class="card-body">
-					<h3 class="h4 card-title text-center">
-						<a class="text-decoration-none text-body" href="<?= UOJContest::cur()->getUri() ?>">
-							<?= UOJContest::info('name') ?>
-						</a>
-					</h3>
-					<div class="card-text text-center text-muted">
-						<?php if (UOJContest::cur()->progress() <= CONTEST_IN_PROGRESS) : ?>
-							<span id="contest-countdown"></span>
-						<?php else : ?>
-							<?= UOJLocale::get('contests::contest ended') ?>
-						<?php endif ?>
-					</div>
-				</div>
-				<div class="list-group list-group-flush">
-					<li class="list-group-item d-flex justify-content-between align-items-center">
-						<span class="flex-shrink-0">
-							<?= UOJLocale::get('appraisal') ?>
-						</span>
-						<span>
-							<?= UOJContest::cur()->getZanBlock() ?>
-						</span>
-					</li>
-				</div>
-			</div>
-			<?php if (UOJContest::cur()->progress() <= CONTEST_IN_PROGRESS) : ?>
-				<script>
-					$('#contest-countdown').countdown(<?= UOJContest::info('end_time')->getTimestamp() - UOJTime::$time_now->getTimestamp() ?>, function() {}, '1.75rem', false);
-				</script>
-			<?php endif ?>
+			<?= UOJContest::cur()->getContestCard() ?>
 		<?php endif ?>
 
 		<!-- 题目导航卡片 -->

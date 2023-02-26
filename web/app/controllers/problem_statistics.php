@@ -258,42 +258,13 @@ if (UOJContest::cur()) {
 	<!-- right col -->
 	<aside class="col-lg-3 mt-3 mt-lg-0">
 		<?php if (UOJContest::cur()) : ?>
-			<!-- Contest card -->
-			<div class="card card-default mb-2">
-				<div class="card-body">
-					<h3 class="h4 card-title text-center">
-						<?= UOJContest::cur()->getLink(['class' => 'text-body']) ?>
-					</h3>
-					<div class="card-text text-center text-muted">
-						<?php if (UOJContest::cur()->progress() <= CONTEST_IN_PROGRESS) : ?>
-							<span id="contest-countdown"></span>
-						<?php else : ?>
-							<?= UOJLocale::get('contests::contest ended') ?>
-						<?php endif ?>
-					</div>
-				</div>
-				<div class="list-group list-group-flush">
-					<li class="list-group-item d-flex justify-content-between align-items-center">
-						<span class="flex-shrink-0">
-							<?= UOJLocale::get('appraisal') ?>
-						</span>
-						<span>
-							<?= UOJContest::cur()->getZanBlock() ?>
-						</span>
-					</li>
-				</div>
-			</div>
-			<?php if (UOJContest::cur()->progress() <= CONTEST_IN_PROGRESS) : ?>
-				<script type="text/javascript">
-					$('#contest-countdown').countdown(<?= UOJContest::info('end_time')->getTimestamp() - UOJTime::$time_now->getTimestamp() ?>, function() {}, '1.75rem', false);
-				</script>
-			<?php endif ?>
+			<?= UOJContest::cur()->getContestCard() ?>
 		<?php endif ?>
 
 		<div class="card card-default mb-2">
 			<ul class="nav nav-pills nav-fill flex-column" role="tablist">
 				<li class="nav-item text-start">
-					<a class="nav-link" role="tab" <?php if (UOJContest::cur()) : ?> href="/contest/<?= UOJContest::info('id') ?>/problem/<?= UOJProblem::info('id') ?>" <?php else : ?> href="/problem/<?= UOJProblem::info('id') ?>" <?php endif ?>>
+					<a class="nav-link" role="tab" href="<?= UOJProblem::cur()->getUri() ?>">
 						<i class="bi bi-journal-text"></i>
 						<?= UOJLocale::get('problems::statement') ?>
 					</a>

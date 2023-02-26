@@ -92,10 +92,7 @@ $parsedown = HTML::parsedown(['username_with_color' => true]);
 									<?php if ($rest_seconds > 86400) : ?>
 										<?= UOJLocale::get('contests::will start in x days', ceil($rest_seconds / 86400)) ?>
 									<?php else : ?>
-										<div id="contest-<?= $contest->info['id'] ?>-countdown"></div>
-										<script>
-											$('#contest-<?= $contest->info['id'] ?>-countdown').countdown(<?= $rest_seconds ?>, function() {}, 'inherit', false);
-										</script>
+										<div class="countdown" data-rest="<?= $rest_seconds ?>"></div>
 									<?php endif ?>
 								<?php endif ?>
 							</div>
