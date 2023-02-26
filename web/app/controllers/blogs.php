@@ -25,7 +25,7 @@ function echoBlog($info) {
 	echo                 '<div>', UOJUser::getLink($poster), '</div>';
 	echo                 '<div class="hstack gap-2 flex-wrap small text-muted">';
 	echo                     '<span>', '<i class="bi bi-chat-dots"></i> ', $blog->getReplyCnt(), ' </span>';
-	echo                     '<span title="', $blog->info['zan'], '">', '<i class="bi bi-hand-thumbs-up"></i> ', $blog->getDisplayZanCnt(), ' </span>';
+	echo                     '<span class="uoj-click-zan-cnt-inline" title="', $blog->info['zan'], '">', '<i class="bi bi-hand-thumbs-up"></i> ', $blog->getDisplayZanCnt(), ' </span>';
 	echo                 '</div>';
 	echo             '</div>';
 	echo         '</div>';
