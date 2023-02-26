@@ -116,8 +116,9 @@ h6,
 	margin-right: 5px;
 }
 
-.uoj-click-zan-cnt {
-	cursor: help;
+.uoj-click-zan-cnt,
+.uoj-click-zan-cnt-inline {
+	pointer-events: none;
 }
 
 .uoj-click-zan-block-cur-up .uoj-click-zan-up {
