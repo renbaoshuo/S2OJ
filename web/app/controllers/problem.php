@@ -302,43 +302,47 @@ if (UOJContest::cur()) {
 				if (UOJProblem::info('type') == 'local') {
 					$time_limit = $conf instanceof UOJProblemConf ? $conf->getVal('time_limit', 1) : null;
 					$memory_limit = $conf instanceof UOJProblemConf ? $conf->getVal('memory_limit', 256) : null;
+					$judge_type = $conf instanceof UOJProblemConf ? $conf->getNonTraditionalJudgeType() : null;
 				} else if (UOJProblem::info('type') == 'remote') {
 					$time_limit = UOJProblem::cur()->getExtraConfig('time_limit');
 					$memory_limit = UOJProblem::cur()->getExtraConfig('memory_limit');
+					$judge_type = 'remote_judge';
 				}
 				?>
 				<div class="text-center small">
 					<?= UOJLocale::get('problems::time limit') ?>: <?= $time_limit ? "$time_limit s" : "N/A" ?>
 					&emsp;
 					<?= UOJLocale::get('problems::memory limit') ?>: <?= $memory_limit ? "$memory_limit MB" : "N/A" ?>
+					&emsp;
+					<?= UOJLocale::get('problems::judge type') ?>: <?= $judge_type ? (UOJLocale::get("problems::judge type $judge_type") ?: $judge_type) : "N/A" ?>
 				</div>
 
 				<hr />
 
-				<?php if (!UOJContest::cur()) : ?>
-					<?php $contest_problems = UOJProblem::cur()->findInContests(); ?>
-					<?php if (!empty($contest_problems)) : ?>
-						<div class="alert alert-light">
-							<h5 class="alert-heading"><?= UOJLocale::get('problems::the problem was used in the following contest') ?>:</h5>
-							<ul class="mb-0">
-								<?php usort($contest_problems, fn ($a, $b) => $a->contest->info['start_time'] < $b->contest->info['start_time']); ?>
-								<?php foreach ($contest_problems as $cp) : ?>
-									<?php if ($cp->userCanView(Auth::user())) : ?>
-										<li>
-											<?= $cp->contest->getLink(['class' => 'alert-link text-decoration-underline']) ?>
-											<small>(<?= $cp->contest->info['start_time_str'] ?>)</small>
-										</li>
-									<?php endif ?>
-								<?php endforeach ?>
-							</ul>
-						</div>
-
-						<hr />
-					<?php endif ?>
-				<?php endif ?>
-
 				<div class="tab-content">
 					<div class="tab-pane active" id="statement">
+						<?php if (!UOJContest::cur()) : ?>
+							<?php $contest_problems = UOJProblem::cur()->findInContests(); ?>
+							<?php if (!empty($contest_problems)) : ?>
+								<div class="alert alert-light">
+									<h5 class="alert-heading"><?= UOJLocale::get('problems::the problem was used in the following contest') ?>:</h5>
+									<ul class="mb-0">
+										<?php usort($contest_problems, fn ($a, $b) => $a->contest->info['start_time'] < $b->contest->info['start_time']); ?>
+										<?php foreach ($contest_problems as $cp) : ?>
+											<?php if ($cp->userCanView(Auth::user())) : ?>
+												<li>
+													<?= $cp->contest->getLink(['class' => 'alert-link text-decoration-underline']) ?>
+													<small>(<?= $cp->contest->info['start_time_str'] ?>)</small>
+												</li>
+											<?php endif ?>
+										<?php endforeach ?>
+									</ul>
+								</div>
+
+								<hr />
+							<?php endif ?>
+						<?php endif ?>
+
 						<article class="mt-3 markdown-body">
 							<?= $problem_content['statement'] ?>
 						</article>
