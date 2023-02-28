@@ -141,6 +141,9 @@ if (isset($_POST['user_msg'])) {
 			height: calc(100ch - 10rem);
 		}
 	}
+	#conversations {
+		border-radius: var(--bs-border-radius) !important;
+	}
 </style>
 
 <div class="card overflow-hidden-md chat-container">
