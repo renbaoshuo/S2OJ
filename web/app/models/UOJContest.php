@@ -649,7 +649,7 @@ class UOJContest {
 		} else if ($this->progress() <= CONTEST_TESTING) {
 			$judge_progress = $this->queryJudgeProgress();
 
-			$res .= HTML::tag('span', [], "{$judge_progress['title']} ({$judge_progress['rop']})");
+			$res .= HTML::tag('span', [], "{$judge_progress['title']} ({$judge_progress['rop']}%)");
 		} else {
 			$res .= HTML::tag('span', [], UOJLocale::get('contests::contest ended'));
 		}
