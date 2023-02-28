@@ -64,9 +64,9 @@ $comment_form->addTextArea('comment', [
 ]);
 $comment_form->handle = function () {
 	global $blog, $comment_form;
-	$comment = HTML::escape($_POST['comment']);
+	$comment = $_POST['comment'];
 
-	list($comment, $referrers) = uojHandleAtSign($comment, "/post/{$blog['id']}");
+	list(, $referrers) = uojHandleAtSign($comment, "/post/{$blog['id']}");
 
 	DB::insert([
 		"insert into blogs_comments",
@@ -99,7 +99,7 @@ $comment_form->handle = function () {
 	}
 
 	UOJBlog::cur()->updateActiveTime();
-	$comment_form->succ_href = getLongTablePageRawUri($page);
+	$comment_form->succ_href = getLongTablePageRawUri($page) . "#comment-{$comment_id}";
 };
 $comment_form->config['ctrl_enter_submit'] = true;
 $comment_form->runAtServer();
@@ -139,9 +139,9 @@ $reply_form->addTextArea('reply_comment', [
 ]);
 $reply_form->handle = function (&$vdata) {
 	global $blog, $reply_form;
-	$comment = HTML::escape($_POST['reply_comment']);
+	$comment = $_POST['reply_comment'];
 
-	list($comment, $referrers) = uojHandleAtSign($comment, "/post/{$blog['id']}");
+	list(, $referrers) = uojHandleAtSign($comment, "/post/{$blog['id']}");
 
 	$reply_id = $_POST['reply_id'];
 
@@ -185,7 +185,7 @@ $reply_form->handle = function (&$vdata) {
 
 	UOJBlog::cur()->updateActiveTime();
 
-	$reply_form->succ_href = getLongTablePageRawUri($page);
+	$reply_form->succ_href = getLongTablePageRawUri($page) . "#comment-{$comment_id}";
 };
 $reply_form->config['ctrl_enter_submit'] = true;
 $reply_form->runAtServer();
