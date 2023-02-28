@@ -221,7 +221,7 @@ if (UOJUserBlog::userHasManagePermission(Auth::user())) {
 			sendSystemMsg(
 				$comment->info['poster'],
 				'评论隐藏通知',
-				"您为博客 " . UOJBlog::cur()->getLink() . " 回复的评论 “" . substr($comment->info['content'], 0, 30) . "……” 已被管理员隐藏，隐藏原因为 “{$reason}”。"
+				"您为博客 " . UOJBlog::cur()->getLink() . " 回复的评论 “" . substr(HTML::stripTags($comment->info['content']), 0, 30) . "……” 已被管理员隐藏，隐藏原因为 “{$reason}”。"
 			);
 		}
 	};
