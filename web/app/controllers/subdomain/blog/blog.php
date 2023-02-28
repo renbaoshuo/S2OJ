@@ -56,8 +56,8 @@ $comment_form->addTextArea('comment', [
 		if (!$comment) {
 			return '评论不能为空';
 		}
-		if (strlen($comment) > 1000) {
-			return '不能超过1000个字节';
+		if (strlen($comment) > 2000) {
+			return '不能超过 2000 个字节';
 		}
 		return '';
 	},
@@ -131,8 +131,8 @@ $reply_form->addTextArea('reply_comment', [
 		if (!$comment) {
 			return '评论不能为空';
 		}
-		if (strlen($comment) > 140) {
-			return '不能超过140个字节';
+		if (strlen($comment) > 1000) {
+			return '不能超过 1000 个字节';
 		}
 		return '';
 	},
