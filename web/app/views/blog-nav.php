@@ -1,8 +1,10 @@
-<div class="navbar navbar-light navbar-expand-md bg-body shadow-sm mb-4" role="navigation">
-
+<div class="navbar navbar-light navbar-expand-md bg-body shadow-sm
+<?php if (!isset($disable_navbar_margin_bottom)) : ?>
+mb-4
+<?php endif ?>
+" role="navigation">
 	<div class="container">
-
-		<a class="navbar-brand" href="<?= HTML::blog_url(UOJUserBlog::id(), '/') ?>">
+		<a class="navbar-brand fw-normal" href="<?= HTML::blog_url(UOJUserBlog::id(), '/') ?>">
 			<img src="<?= HTML::avatar_addr(UOJUserBlog::user(), 48) ?>" alt="Logo" width="24" height="24" class="d-inline-block align-text-top uoj-user-avatar" />
 			<?= UOJUserBlog::id() ?>
 		</a>

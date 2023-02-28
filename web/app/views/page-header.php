@@ -1,4 +1,3 @@
-<!-- Made with 💖 by Baoshuo ( https://baoshuo.ren ) -->
 <?php
 if (!isset($PageMainTitle)) {
 	$PageMainTitle = UOJConfig::$data['profile']['oj-name'];
@@ -12,7 +11,12 @@ if (!isset($ShowPageHeader)) {
 if (!isset($PageContainerClass)) {
 	$PageContainerClass = 'container';
 }
+
+$new_user_msg_num = DB::selectCount("select count(*) from user_msg where receiver = '" . Auth::id() . "' and read_time is null");
+$new_system_msg_num = DB::selectCount("select count(*) from user_system_msg where receiver = '" . Auth::id() . "' and read_time is null");
+$new_msg_tot = $new_user_msg_num + $new_system_msg_num;
 ?>
+<!-- Made with 💖 by Baoshuo ( https://baoshuo.ren ) -->
 <!DOCTYPE html>
 <html lang="<?= UOJLocale::locale() ?>">
 
@@ -243,7 +247,11 @@ if (!isset($PageContainerClass)) {
 <body class="d-flex flex-column min-vh-100
 	<?php if ($ShowPageHeader) : ?>
 		bg-body-tertiary
-	<?php endif ?>">
+	<?php endif ?>
+	<?php if (isset($PageBodyClass)) : ?>
+		<?= $PageBodyClass ?>
+	<?php endif ?>
+	">
 	<?php if ($ShowPageHeader) : ?>
 		<?php uojIncludeView($PageNav, array('REQUIRE_LIB' => $REQUIRE_LIB)) ?>
 	<?php endif ?>

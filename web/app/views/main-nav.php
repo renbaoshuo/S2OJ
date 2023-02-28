@@ -1,9 +1,3 @@
-<?php
-$new_user_msg_num = DB::selectCount("select count(*) from user_msg where receiver = '" . Auth::id() . "' and read_time is null");
-$new_system_msg_num = DB::selectCount("select count(*) from user_system_msg where receiver = '" . Auth::id() . "' and read_time is null");
-$new_msg_tot = $new_user_msg_num + $new_system_msg_num;
-?>
-
 <div class="navbar navbar-light navbar-expand-md bg-body shadow-sm
 <?php if (!isset($disable_navbar_margin_bottom)) : ?>
 mb-4
