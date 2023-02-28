@@ -136,9 +136,18 @@ if (isset($_POST['user_msg'])) {
 <h1>私信</h1>
 
 <style>
+	#conversations {
+		border-radius: var(--bs-border-radius) !important;
+	}
+
 	@media (min-width: 768px) {
 		.chat-container {
 			height: calc(100ch - 10rem);
+		}
+		
+		#conversations {
+			border-top-right-radius: 0 !important;
+			border-bottom-right-radius: 0 !important;
 		}
 	}
 </style>
