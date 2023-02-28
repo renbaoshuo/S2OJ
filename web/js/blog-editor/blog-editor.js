@@ -22,13 +22,17 @@ function blog_editor_init(name, editor_config) {
 	var preview_btn = $('<button type="button" class="btn btn-secondary btn-sm"><i class="bi bi-eye"></i></button>');
 	var bold_btn = $('<button type="button" class="btn btn-secondary btn-sm ml-2"><i class="bi bi-type-bold"></i></button>');
 	var italic_btn = $('<button type="button" class="btn btn-secondary btn-sm"><i class="bi bi-type-italic"></i></button>');
-	
+	var strike_btn = $('<button type="button" class="btn btn-secondary btn-sm"><i class="bi bi-type-strikethrough"></i></button>');
+	var divider_btn = $('<button type="button" class="btn btn-secondary btn-sm"><i class="bi bi-dash"></i></button>');
+
 	bootstrap.Tooltip.jQueryInterface.call(save_btn, { container: 'body', title: '保存 (Ctrl-S)' });
 	bootstrap.Tooltip.jQueryInterface.call(preview_btn, { container: 'body', title: '预览 (Ctrl-D)'	});
 	bootstrap.Tooltip.jQueryInterface.call(bold_btn, { container: 'body', title: '粗体 (Ctrl-B)' });
 	bootstrap.Tooltip.jQueryInterface.call(italic_btn, { container: 'body', title: '斜体 (Ctrl-I)' });
+	bootstrap.Tooltip.jQueryInterface.call(strike_btn, { container: 'body', title: '删除线 (Alt-S)' });
+	bootstrap.Tooltip.jQueryInterface.call(divider_btn, { container: 'body', title: '分割线 (Alt-D)' });
 
-	var all_btn = [save_btn, preview_btn, bold_btn, italic_btn];
+	var all_btn = [save_btn, preview_btn, bold_btn, italic_btn, strike_btn, divider_btn];
 	
 	// init toolbar
 	var toolbar = $('<div class="btn-toolbar"></div>');
@@ -39,6 +43,8 @@ function blog_editor_init(name, editor_config) {
 	toolbar.append($('<div class="btn-group"></div>')
 		.append(bold_btn)
 		.append(italic_btn)
+		.append(strike_btn)
+		.append(divider_btn)
 	);
 	
 	function set_saved(val) {
@@ -81,11 +87,11 @@ function blog_editor_init(name, editor_config) {
 	// init editor
 	if (input_content_md[0]) {
 		div_container_editor.empty();
-		div_container_editor.wrap('<div class="blog-content-md-editor"></div>');
+		div_container_editor.wrap('<div class="blog-content-md-editor border rounded" />');
 		var blog_contend_md_editor = div_container_editor.parent();
-		blog_contend_md_editor.prepend($('<div class="blog-content-md-editor-toolbar"></div>').append(toolbar));
-		div_container_editor.wrap('<div class="blog-content-md-editor-in border"></div>');
-		div_container_editor.append($('<div class="border d-flex justify-content-center align-items-center" style="width: 100%; height: 500px;" />').append('<div class="spinner-border text-muted" style="width: 3rem; height: 3rem;" />'));
+		blog_contend_md_editor.prepend($('<div class="blog-content-md-editor-toolbar bg-secondary-subtle px-2 py-1 border-bottom rounded-top" />').append(toolbar));
+		div_container_editor.wrap('<div class="blog-content-md-editor-in rounded-bottom overflow-hidden" />');
+		div_container_editor.append($('<div class="d-flex justify-content-center align-items-center" style="width: 100%; height: 500px;" />').append('<div class="spinner-border text-muted" style="width: 3rem; height: 3rem;" />'));
 
 		require_monaco({
 			markdown: true,
@@ -122,6 +128,16 @@ function blog_editor_init(name, editor_config) {
 				monaco_editor_instance.focus();
 			});
 
+			strike_btn.click(function() {
+				monaco_editor_instance.trigger('', 'markdown.extension.editing.toggleStrikethrough');
+				monaco_editor_instance.focus();
+			});
+
+			divider_btn.click(function() {
+				monaco_editor_instance.trigger('keyboard', 'type', { text: "\n---\n" });
+				monaco_editor_instance.focus();
+			});
+
 			monaco_editor_instance.addAction({
 				id: 'save',
 				label: 'Save',
@@ -136,15 +152,28 @@ function blog_editor_init(name, editor_config) {
 			});
 
 			monaco_editor_instance.addAction({
-				id: 'italic',
-				label: 'Italic',
+				id: 'preview',
+				label: 'Preview',
 				keybindings: [
-					monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyI,
+					monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyD,
 				],
 				precondition: null,
 				keybindingContext: null,
 				run: function(ed) {
-					italic_btn.click();
+					preview_btn.click();
+				},
+			});
+
+			monaco_editor_instance.addAction({
+				id: 'divider',
+				label: 'Divider',
+				keybindings: [
+					monaco.KeyMod.Alt | monaco.KeyCode.KeyD,
+				],
+				precondition: null,
+				keybindingContext: null,
+				run: function(ed) {
+					divider_btn.click();
 				},
 			});
 

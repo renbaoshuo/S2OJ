@@ -189,6 +189,7 @@ class UOJBlogEditor {
 				echoUOJPageHeader('博客预览', [
 					'ShowPageHeader' => false,
 					'REQUIRE_LIB' => $req_lib,
+					'PageBodyClass' => 'py-3',
 				]);
 
 				echo '<article class="markdown-body">';

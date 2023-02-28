@@ -667,24 +667,6 @@ function get_monaco_mode(lang) {
 }
 
 // auto save
-function autosave_locally(interval, name, target) {
-	if (typeof(Storage) === "undefined") {
-		console.log('autosave_locally: Sorry! No Web Storage support..');
-		return;
-	}
-	var url = window.location.href;
-	var hp = url.indexOf('#');
-	var uri = hp == -1 ? url : url.substr(0, hp);
-	var full_name = name + '@' + uri;
-
-	target.val(localStorage.getItem(full_name));
-	var save = function() {
-		localStorage.setItem(full_name, target.val());
-		setTimeout(save, interval);
-	};
-	setTimeout(save, interval);
-}
-
 function autosave_locally_monaco(interval, name, monaco_instance) {
 	if (typeof(Storage) === "undefined") {
 		console.log('autosave_locally_monaco: Sorry! No Web Storage support..');
@@ -762,7 +744,7 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 				monaco_editor_instance = monaco.editor.create(div_editor[0], {
 					language: mode,
 					automaticLayout: true,
-					fontSize: "14px",
+					fontSize: "16px",
 				});
 
 				$('#' + spinner_id).css('display', 'none !important');
