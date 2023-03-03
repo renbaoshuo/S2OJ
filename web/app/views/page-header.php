@@ -79,7 +79,7 @@ $new_msg_tot = $new_user_msg_num + $new_system_msg_num;
 		<!-- UOJ blog editor -->
 		<?php $REQUIRE_LIB['jquery.hotkeys'] = '' ?>
 		<?php $REQUIRE_LIB['switch'] = '' ?>
-		<?= HTML::css_link('/css/blog-editor.css') ?>
+		<?= HTML::css_link('/css/blog-editor.css?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
 		<?= HTML::js_src('/js/blog-editor/blog-editor.js?v=' . UOJConfig::$data['profile']['s2oj-version']) ?>
 	<?php endif ?>
 
