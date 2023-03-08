@@ -26,6 +26,16 @@ class UOJUser {
 		],
 	];
 
+	const AVAILABLE_COLORS = [
+		'blue',
+		'green',
+		'pink',
+		'red',
+		'orange',
+		'cyan',
+		'purple',
+	];
+
 	public static $visibility_codes = [
 		'all' => [
 			'html' => '',
@@ -336,7 +346,7 @@ class UOJUser {
 		$color = $cfg['color'] ? UOJUser::getUserColor($user) : '';
 
 		return HTML::tag('span', [
-			'class' => "uoj-username uoj-username-{$color}",
+			'class' => "uoj-username",
 			'data-realname' => trim(HTML::escape($realname)),
 			'data-color' => $color,
 		], $user['username']);

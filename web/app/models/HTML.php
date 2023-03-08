@@ -510,9 +510,9 @@ class HTML {
 			'del' => [],
 			'br' => [],
 			'span' => [
-				'class' => new CustomClassDef(['uoj-username'], ['uoj-username-']),
+				'class' => 'Enum#uoj-username,' . implode(',', array_map(fn ($c) => "uoj-username-{$c}", UOJUser::AVAILABLE_COLORS)),
 				'data-realname' => 'Text',
-				'data-color' => 'Color',
+				'data-color' => 'Enum#' . implode(',', UOJUser::AVAILABLE_COLORS),
 			],
 		];
 
