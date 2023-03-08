@@ -481,7 +481,7 @@ class HTML {
 			'span' => [
 				'class' => new CustomClassDef(['uoj-username'], ['uoj-username-']),
 				'data-realname' => 'Text',
-				'data-color' => 'Color',
+				'data-color' => 'Enum#' . implode(',', UOJUser::AVAILABLE_COLORS),
 			],
 			'img' => ['width' => 'Text'],
 		]);
@@ -510,7 +510,7 @@ class HTML {
 			'del' => [],
 			'br' => [],
 			'span' => [
-				'class' => 'Enum#uoj-username,' . implode(',', array_map(fn ($c) => "uoj-username-{$c}", UOJUser::AVAILABLE_COLORS)),
+				'class' => new CustomClassDef(['uoj-username'], ['uoj-username-']),
 				'data-realname' => 'Text',
 				'data-color' => 'Enum#' . implode(',', UOJUser::AVAILABLE_COLORS),
 			],
