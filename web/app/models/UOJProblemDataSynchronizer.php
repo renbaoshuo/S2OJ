@@ -215,8 +215,7 @@ class UOJProblemDataSynchronizer {
 		try {
 			putUOJConf("{$this->upload_dir}/problem.conf", $new_problem_conf);
 
-			$this->_sync();
-			return '';
+			return $this->_sync();
 		} catch (Exception $e) {
 			return $e->getMessage();
 		}
