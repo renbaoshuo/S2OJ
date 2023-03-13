@@ -121,6 +121,10 @@ function validateCodeforcesProblemId($str) {
 	return preg_match('/^(|GYM)[1-9][0-9]{0,5}[A-Z][1-9]?$/', $str);
 }
 
+function validateAtCoderProblemId($str) {
+	return preg_match('/^(\w+)([a-z][1-9]?)$/', $str);
+}
+
 function validateLuoguProblemId($str) {
 	return preg_match('/^P[1-9][0-9]{3,5}$/', $str);
 }

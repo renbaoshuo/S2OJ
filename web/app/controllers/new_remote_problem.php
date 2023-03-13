@@ -28,8 +28,8 @@ $new_remote_problem_form->addInput('remote_problem_id', [
 		} else if ($remote_oj === 'atcoder') {
 			$id = trim(strtolower($id));
 
-			if (!validateString($id)) {
-				return '不合法的题目 ID';
+			if (!validateAtCoderProblemId($id)) {
+				return '不合法的字符串';
 			}
 
 			$vdata['remote_problem_id'] = $id;
@@ -149,10 +149,10 @@ $new_remote_problem_form->runAtServer();
 								<ul class="mb-3">
 									<li><a href="https://codeforces.com/problemset">Codeforces</a></li>
 									<li><a href="https://codeforces.com/gyms">Codeforces::Gym</a>（题号前加 <code>GYM</code>）</li>
-									<li><a href="https://atcoder.jp/contests/archive">AtCoder</a></li>
+									<li><a href="https://atcoder.jp/contests/archive">AtCoder</a>（请以原题目链接中附带的题号为准，显示题号与实际题号的对应关系可能错误）</li>
 									<li><a href="https://uoj.ac/problems">UniversalOJ</a></li>
 									<li><a href="https://loj.ac/p">LibreOJ</a></li>
-									<li><a href="https://www.luogu.com.cn/problem/list">洛谷</a></li>
+									<li><a href="https://www.luogu.com.cn/problem/list">洛谷</a>（不能使用公用账号提交）</li>
 								</ul>
 							</li>
 							<li>在导入题目前请先搜索题库中是否已经存在相应题目，避免重复添加。</li>
