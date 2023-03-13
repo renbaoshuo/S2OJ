@@ -350,6 +350,8 @@ export default class LuoguProvider implements IBasicProvider {
           '</remote-result-table>' +
           '</remote-result-container>';
 
+        details += '<tests>';
+
         if (data.detail.judgeResult.subtasks.length === 1) {
           details += Object.entries(
             data.detail.judgeResult.subtasks[0].testCases
@@ -375,6 +377,8 @@ export default class LuoguProvider implements IBasicProvider {
             )
             .join('\n');
         }
+
+        details += '</tests>';
 
         return await end({
           id: `R${id}`,
