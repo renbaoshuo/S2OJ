@@ -48,7 +48,7 @@ function getCommentContentToDisplay($comment) {
 $comment_form = new UOJForm('comment');
 $comment_form->addMarkdownEditor('comment', [
 	'label' => '内容',
-	'help' => '评论支持 Markdown 语法。可以用 <code>@mike</code> 来提到 <code>mike</code> 这个用户，<code>mike</code> 会被高亮显示。如果你真的想打 <code>@</code> 这个字符，请用 <code>@@</code>。',
+	'help' => '评论支持 Markdown 语法。可以用 <code>@mike</code> 来提到 <code>mike</code> 这个用户，<code>mike</code> 会被高亮显示。',
 	'validator_php' => function ($comment) {
 		if (!Auth::check()) {
 			return '请先登录';
