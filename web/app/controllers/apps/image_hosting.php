@@ -194,7 +194,7 @@ if ($_POST['image_upload_file_submit'] == 'submit') {
 							<div class="input-group">
 								<input type="text" class="form-control" id="input-captcha" name="captcha" placeholder="<?= UOJLocale::get('enter verification code') ?>" maxlength="20" />
 								<span class="input-group-text p-0 overflow-hidden rounded-0" style="border-bottom-right-radius: var(--bs-border-radius) !important">
-									<img id="captcha" class="col w-100 h-100" src="/captcha">
+									<img id="captcha" class="col w-100 h-100" src="/captcha" alt="Captcha">
 								</span>
 							</div>
 							<div class="mt-3" id="modal-help-message" style="display: none"></div>
