@@ -42,8 +42,16 @@ uojLocaleData = {
 	},
 	"editor::upload from local": {
 		"en": "Local file",
-		"zh-cn": "本地文件"
-	}
+		"zh-cn": "本地文件",
+	},
+	"editor::edit": {
+		"en": "Edit",
+		"zh-cn": "编辑",
+	},
+	"editor::preview": {
+		"en": "Preview",
+		"zh-cn": "预览",
+	},
 };
 
 function uojLocale(name) {
@@ -873,7 +881,7 @@ $.fn.text_file_form_group = function(name, text) {
 				monaco_editor_instance = monaco.editor.create(div_editor[0], {
 					language: 'text',
 					automaticLayout: true,
-					fontSize: "14px",
+					fontSize: "16px",
 				});
 
 				$('#' + spinner_id).css('display', 'none !important');
@@ -1643,6 +1651,148 @@ function custom_test_onsubmit(response_text, div_result, url) {
 		});
 	};
 	setTimeout(update, 500);
+}
+
+// markdown input editor
+$.fn.markdown_input_editor = function(name, type, text) {
+	return this.each(function() {
+		var input_editor_name = name;
+		var input_editor_id = 'input-' + name + '_editor';
+		var spinner_id = 'spinner-' + name + '_editor';
+		var div_editor_id = 'div-' + name + '_editor';
+		var div_preview_id = 'div-' + name + '_preview';
+
+		var btn_editor = $('<button class="nav-link" type="button" />').attr('data-bs-target', '#' + div_editor_id + '_edit').attr('data-bs-toggle', 'tab').text(uojLocale('editor::edit')).addClass('active');
+		var btn_preview = $('<button class="nav-link" type="button" />').attr('data-bs-target', '#' + div_editor_id + '_preview').attr('data-bs-toggle', 'tab').text(uojLocale('editor::preview'));
+
+		var div_editor = $('<div id="' + div_editor_id + '" style="height: 350px" />')
+			.append(
+				$('<div id="' + spinner_id + '" class="d-flex justify-content-center align-items-center" style="width: 100%; height: 350px;" />')
+					.append('<div class="spinner-border text-muted" style="width: 3rem; height: 3rem;" />')
+				);
+		var div_preview = $('<div id="' + div_preview_id + '" style="min-height: 350px" />');
+
+		var monaco_editor_instance = null;
+		var monaco_editor_init = function() {
+			require_monaco({ markdown: true }, function() {
+				if (monaco_editor_instance != null) {
+					return;
+				}
+
+				$(div_editor).empty();
+
+				monaco_editor_instance = monaco.editor.create(div_editor[0], {
+					language: 'markdown-math',
+					automaticLayout: true,
+					fontSize: "16px",
+					minimap: {
+						enabled: false,
+					},
+					wordWrap: 'on',
+					unicodeHighlight: {
+						ambiguousCharacters: false,
+					},
+				});
+
+				$('#' + spinner_id).css('display', 'none !important');
+				$(div_editor).addClass('overflow-hidden rounded-bottom').show();
+
+				monaco_editor_instance.getModel().setValue(text);
+				monaco_editor_instance.onDidChangeModelContent(function () {
+					$('#' + input_editor_id).val(monaco_editor_instance.getModel().getValue());
+				});
+
+				require(['MonacoMarkdown'], function(MonacoMarkdown) {
+					var extension = new MonacoMarkdown.MonacoMarkdownExtension();
+					extension.activate(monaco_editor_instance);
+				});
+			});
+		}
+
+		$(this)
+			.append(
+				$('<div class="card" />')
+					.append(
+						$('<div class="card-header" />').append(
+							$('<ul class="nav nav-tabs card-header-tabs">')
+								.append($('<li class="nav-item" />').append(btn_editor))
+								.append($('<li class="nav-item" />').append(btn_preview))
+						)
+					)
+					.append(
+						$('<div class="card-body tab-content p-0" />')
+							.append(
+								$('<div class="tab-pane active" />')
+									.attr('id', div_editor_id + '_edit')
+									.append(div_editor)
+							)
+							.append(
+								$('<div class="tab-pane" />')
+									.attr('id', div_editor_id + '_preview')
+									.append(div_preview)
+							)
+					)
+			)
+			.append($('<input type="hidden" name="' + input_editor_name + '" id="' + input_editor_id + '"/>').val(text));
+
+		bootstrap.Tab.jQueryInterface.call(btn_editor);
+		bootstrap.Tab.jQueryInterface.call(btn_preview).on('shown.bs.tab', function () {
+			$(div_preview)
+				.empty()
+				.append(
+					$('<div class="d-flex justify-content-center align-items-center" style="width: 100%; height: 350px;" />')
+						.append('<div class="spinner-border text-muted" style="width: 3rem; height: 3rem;" />')
+				);
+			
+			var render = function () {
+				$.ajax({
+					url: '/api/markdown',
+					type: 'POST',
+					dataType: 'text',
+					data: {
+						markdown: $('#' + input_editor_id).val(),
+						purifier_type: type,
+						parsedown_type: type,
+					},
+					success: function (html) {
+						$(div_preview).empty().append($('<div class="markdown-body p-3" />').html(html)).uoj_highlight();
+						if (window.MathJax) window.MathJax.typeset();
+					},
+					error: function () {
+						var btn_retry = $('<button type="button" class="btn btn-link p-0 alert-link" />').text('retry').click(function() {
+							$(div_preview)
+								.empty()
+								.append(
+									$('<div class="d-flex justify-content-center align-items-center" style="width: 100%; height: 350px;" />')
+										.append('<div class="spinner-border text-muted" style="width: 3rem; height: 3rem;" />')
+								);
+							
+							render();
+						});
+	
+						$(div_preview).empty().append(
+							$('<div class="m-3 alert alert-danger" />')
+								.append('<span>Render failed, </span>')
+								.append('<span>please </span>')
+								.append(btn_retry)
+						);
+					},
+				});
+			}
+
+			render();
+		});
+
+		var check_monaco_editor_init = function() {
+			if (div_editor.is(':visible')) {
+				monaco_editor_init();
+			} else {
+				setTimeout(check_monaco_editor_init, 1);
+			}
+		}
+
+		check_monaco_editor_init();
+	});
 }
 
 // hide comment
