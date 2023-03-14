@@ -64,10 +64,9 @@ if ($cur_tab == 'profile') {
 		'option_div_class' => 'form-check d-inline-block ms-2',
 		'default_value' => UOJGroup::info('is_hidden'),
 	]);
-	$update_profile_form->addTextArea('announcement', [
+	$update_profile_form->addMarkdownEditor('announcement', [
 		'div_class' => 'mt-3',
 		'label' => '公告',
-		'input_class' => 'form-control font-monospace',
 		'default_value' => UOJGroup::info('announcement'),
 		'help' => '公告支持 Markdown 语法。',
 		'validator_php' => function ($announcement, &$vdata) {
@@ -287,11 +286,11 @@ if ($cur_tab == 'profile') {
 			<div class="card mt-3 mt-md-0">
 				<div class="card-body">
 					<div id="result-alert" class="alert" role="alert" style="display: none"></div>
-					<div class="row row-cols-1 row-cols-md-2">
-						<div class="col">
-							<?= $update_profile_form->printHTML() ?>
+					<div class="row">
+						<div class="col-md-8">
+							<?php $update_profile_form->printHTML() ?>
 						</div>
-						<div class="col">
+						<div class="col-md-4">
 							<h5>注意事项</h5>
 							<ul class="mb-0">
 								<li>隐藏的小组无法被普通用户查看，即使该用户属于本小组。</li>
