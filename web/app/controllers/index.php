@@ -90,15 +90,17 @@ $friend_links = DB::selectAll([
 				<ul class="list-unstyled mb-0">
 					<?php foreach ($countdowns as $countdown) : ?>
 						<?php
-						$enddate = strtotime($countdown['end_time']);
-						$nowdate = time();
-						$diff = ceil(($enddate - $nowdate) / (24 * 60 * 60));
+						$end_time = UOJTime::str2time($countdown['end_time'])->getTimestamp();
+						$now_time = UOJTime::$time_now->getTimestamp();
+						$diff = floor(($end_time - $now_time) / (24 * 60 * 60));
 						?>
 						<li>
 							<?php if ($diff > 0) : ?>
-								<?= UOJLocale::get('x days until countdown title', $countdown['title'], $diff) ?>
+								<?= UOJLocale::get('x days before countdown {title}', $countdown['title'], $diff) ?>
+							<?php elseif ($diff == 0) : ?>
+								<?= UOJLocale::get('{rest} before countdown {title}', $countdown['title'], $end_time - $now_time) ?>
 							<?php else : ?>
-								<?= UOJLocale::get("countdown title has begun", $countdown['title']) ?>
+								<?= UOJLocale::get("countdown {title} has begun", $countdown['title']) ?>
 							<?php endif ?>
 						</li>
 					<?php endforeach ?>

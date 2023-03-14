@@ -190,7 +190,7 @@ if ($cur_tab == 'index') {
 				return '标题不能为空';
 			}
 
-			$vdata['title'] = $title;
+			$vdata['title'] = HTML::escape($title);
 
 			return '';
 		},

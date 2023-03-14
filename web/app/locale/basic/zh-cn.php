@@ -90,10 +90,13 @@ return [
 	'male' => '男',
 	'female' => '女',
 	'countdowns' => '倒计时',
-	'countdown title has begun' => function($title) {
+	'countdown {title} has begun' => function($title) {
 		return "<b>$title</b> 已开始。";
 	},
-	'x days until countdown title' => function($title, $days) {
+	'{rest} before countdown {title}' => function ($title, $rest_seconds) {
+		return "距离 <b>$title</b> 还有 " . '<b><span class="countdown" data-rest="' . $rest_seconds . '">不足 1 天</span></b>。';
+	},
+	'x days before countdown {title}' => function($title, $days) {
 		return "距离 <b>$title</b> 还有 <b>$days</b> 天。";
 	},
 	'friend links' => '常用链接',

@@ -25,7 +25,7 @@ return [
 	'all the announcements' => 'All the Announcements……',
 	'solved' => 'Solved',
 	'top solver' => 'Top solver',
-	'n accepted in last year' => function($n) {
+	'n accepted in last year' => function ($n) {
 		return "Submitted $n AC code" . ($n > 1 ? "s" : "") . " in last year";
 	},
 	'help' => 'Help',
@@ -53,8 +53,8 @@ return [
 	'browse' => 'Browse',
 	'score range' => 'Score range',
 	'details' => 'Details',
-	'hours' => function($h) {
-		return "$h ".($h <= 1 ? 'hour' : 'hours');
+	'hours' => function ($h) {
+		return "$h " . ($h <= 1 ? 'hour' : 'hours');
 	},
 	'title' => 'Title',
 	'content' => 'Content',
@@ -64,15 +64,15 @@ return [
 	'user profile' => 'User profile',
 	'send private message' => 'Send private message',
 	'modify my profile' => 'Modify my profile',
-	'modify his profile' => function($name) {
+	'modify his profile' => function ($name) {
 		return "Modify $name's profile";
 	},
-	'visit his blog' => function($name) {
+	'visit his blog' => function ($name) {
 		return "Visit $name's blog";
 	},
 	'accepted problems' => 'Accepted problems',
-	'n problems in total' => function($n) {
-		return "$n ".($n <= 1 ? 'problem' : 'problems');
+	'n problems in total' => function ($n) {
+		return "$n " . ($n <= 1 ? 'problem' : 'problems');
 	},
 	'please enter your password for authorization' => 'Please enter your password for authorization',
 	'please enter your new profile' => 'Please enter your new profile',
@@ -90,11 +90,14 @@ return [
 	'male' => 'Male',
 	'female' => 'Female',
 	'countdowns' => 'Countdowns',
-	'countdown title has begun' => function($title) {
+	'countdown {title} has begun' => function ($title) {
 		return "<b>$title</b> has begun.";
 	},
-	'x days until countdown title' => function($title, $days) {
-		return "<b>$days</b> ".($days <= 1 ? 'day' : 'days')." until <b>$title</b>.";
+	'{rest} before countdown {title}' => function ($title, $rest_seconds) {
+		return '<b><span class="countdown" data-rest="' . $rest_seconds . '">less than a day</span></b>' . " before <b>$title</b>.";
+	},
+	'x days before countdown {title}' => function ($title, $days) {
+		return "<b>$days</b> " . ($days <= 1 ? 'day' : 'days') . " before <b>$title</b>.";
 	},
 	'friend links' => 'Frequently Used Links',
 	'server time' => 'Server Time',
