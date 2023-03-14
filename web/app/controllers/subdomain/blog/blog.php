@@ -46,9 +46,9 @@ function getCommentContentToDisplay($comment) {
 }
 
 $comment_form = new UOJForm('comment');
-$comment_form->addTextArea('comment', [
+$comment_form->addMarkdownEditor('comment', [
 	'label' => '内容',
-	'help' => '评论支持 Markdown 语法。可以用 <code>@mike</code> 来提到 <code>mike</code> 这个用户，<code>mike</code> 会被高亮显示。如果你真的想打 <code>@</code> 这个字符，请用 <code>@@</code>。',
+	'help' => '评论支持 Markdown 语法。可以用 <code>@mike</code> 来提到 <code>mike</code> 这个用户，<code>mike</code> 会被高亮显示。',
 	'validator_php' => function ($comment) {
 		if (!Auth::check()) {
 			return '请先登录';
@@ -62,6 +62,7 @@ $comment_form->addTextArea('comment', [
 		return '';
 	},
 ]);
+$comment_form->config['ctrl_enter_submit'] = true;
 $comment_form->handle = function () {
 	global $blog, $comment_form;
 	$comment = $_POST['comment'];
@@ -122,7 +123,7 @@ $reply_form->addHidden(
 	},
 	null
 );
-$reply_form->addTextArea('reply_comment', [
+$reply_form->addMarkdownEditor('reply_comment', [
 	'label' => '内容',
 	'validator_php' => function ($comment) {
 		if (!Auth::check()) {

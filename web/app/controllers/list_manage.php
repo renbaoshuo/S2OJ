@@ -25,6 +25,7 @@ if (!isset($tabs_info[$cur_tab])) {
 if ($cur_tab == 'profile') {
 	$update_profile_form = new UOJForm('update_profile');
 	$update_profile_form->addInput('name', [
+		'div_class' => 'mb-3',
 		'label' => '标题',
 		'default_value' => HTML::unescape(UOJList::info('title')),
 		'validator_php' => function ($title, &$vdata) {
@@ -47,7 +48,7 @@ if ($cur_tab == 'profile') {
 		},
 	]);
 	$update_profile_form->addCheckboxes('is_hidden', [
-		'div_class' => 'mt-3',
+		'div_class' => 'mb-3',
 		'label' => '可见性',
 		'label_class' => 'me-3',
 		'select_class' => 'd-inline-block',
@@ -59,6 +60,7 @@ if ($cur_tab == 'profile') {
 		],
 	]);
 	$update_profile_form->addInput('tags', [
+		'div_class' => 'mb-3',
 		'label' => '标签',
 		'default_value' => implode(', ', UOJList::cur()->queryTags()),
 		'validator_php' => function ($tags_str, &$vdata) {
@@ -93,7 +95,7 @@ if ($cur_tab == 'profile') {
 		},
 		'help' => '多个标签请使用逗号隔开。'
 	]);
-	$update_profile_form->addTextArea('content_md', [
+	$update_profile_form->addMarkdownEditor('content_md', [
 		'label' => '描述',
 		'default_value' => UOJList::cur()->queryContent()['content_md'],
 		'validator_php' => function ($content_md, &$vdata) {
@@ -237,11 +239,11 @@ if ($cur_tab == 'profile') {
 			<div class="card mt-3 mt-md-0">
 				<div class="card-body">
 					<div id="result-alert" class="alert" role="alert" style="display: none"></div>
-					<div class="row row-cols-1 row-cols-md-2">
-						<div class="col">
+					<div class="row">
+						<div class="col-md-8">
 							<?= $update_profile_form->printHTML() ?>
 						</div>
-						<div class="col mt-3 mt-md-0">
+						<div class="col-md-4">
 							<h5>注意事项</h5>
 							<ul class="mb-0">
 								<li>隐藏的题单无法被普通用户查看。</li>

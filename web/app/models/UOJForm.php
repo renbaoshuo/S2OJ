@@ -507,6 +507,50 @@ class UOJForm {
 		$this->config['has_file'] = true;
 	}
 
+	public function addMarkdownEditor($name, $config = []) {
+		$config += [
+			'div_class' => '',
+			'default_value' => '',
+			'label' => '',
+			'label_class' => 'form-label',
+			'placeholder' => '',
+			'help' => '',
+			'help_class' => 'form-text',
+			'validator_php' => function ($str, &$vdata) {
+				return '';
+			},
+			'validator_js' => null,
+		];
+
+		$html = '';
+		$html .= HTML::tag_begin('div', ['class' => $config['div_class'], 'id' => "div-$name"]);
+
+		$default_value = json_encode($config['default_value']);
+
+		if ($config['label']) {
+			$html .= HTML::tag('label', [
+				'class' => $config['label_class'],
+				'for' => "input-$name",
+				'id' => "label-$name"
+			], $config['label']);
+		}
+
+		$html .= <<<EOD
+			<div id="{$name}-markdown-input-container"></div>
+			<script>
+				$('#{$name}-markdown-input-container').markdown_input_editor("{$name}", "default", {$default_value});
+			</script>
+		EOD;
+
+		if ($config['help']) {
+			$html .= HTML::tag('div', ['class' => $config['help_class']], $config['help']);
+		}
+
+		$html .= HTML::tag_end('div');
+
+		$this->add($name, $html, $config['validator_php'], $config['validator_js']);
+	}
+
 	public function printHTML() {
 		echo HTML::tag_begin('form', [
 			'action' => UOJContext::requestURI(),
