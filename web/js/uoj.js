@@ -403,8 +403,8 @@ function update_judgement_status_details(id) {
 
 $(document).ready(function() {
 	function update() {
-		$.get("/submission-status-details", {
-				get: update_judgement_status_list
+		$.get("/api/submission/submission_status_details", {
+				get: update_judgement_status_list,
 			},
 			function(data) {
 				for (var i = 0; i < update_judgement_status_list.length; i++) {

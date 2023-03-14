@@ -54,7 +54,6 @@ Route::group(
 
 		Route::any('/submissions', '/submissions_list.php');
 		Route::any('/submission/{id}', '/submission.php');
-		Route::any('/submission-status-details', '/submission_status_details.php');
 
 		Route::any('/hacks', '/hack_list.php');
 		Route::any('/hack/{id}', '/hack.php');
