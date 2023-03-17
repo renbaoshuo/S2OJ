@@ -49,7 +49,7 @@ class UOJRemoteProblem {
 			'short_name' => '洛谷',
 			'url' => 'https://www.luogu.com.cn',
 			'languages' => ['C', 'C++98', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Java8', 'Pascal'],
-			'submit_type' => ['my', 'archive'],
+			'submit_type' => ['archive'],
 		],
 	];
 
