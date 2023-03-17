@@ -51,6 +51,16 @@ class UOJRemoteProblem {
 			'languages' => ['C', 'C++98', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Java8', 'Pascal'],
 			'submit_type' => ['archive'],
 		],
+		'qoj' => [
+			'name' => 'Qingyu Online Judge',
+			'short_name' => 'QOJ',
+			'url' => 'https://qoj.ac',
+			'not_exist_texts' => [
+				'未找到该页面',
+			],
+			'languages' => ['C', 'C++98', 'C++11', 'C++', 'C++17', 'C++20', 'Python3', 'Python2.7', 'Java8', 'Java11', 'Pascal'],
+			'submit_type' => ['bot'],
+		],
 	];
 
 	private static function curl_get($url) {
@@ -103,6 +113,10 @@ class UOJRemoteProblem {
 
 	private static function getLuoguProblemUrl($id) {
 		return static::$providers['luogu']['url'] . '/problem/' . $id;
+	}
+
+	private static function getQojProblemUrl($id) {
+		return static::$providers['qoj']['url'] . '/problem/' . $id;
 	}
 
 	private static function getCodeforcesProblemBasicInfoFromHtml($id, $html) {
@@ -205,6 +219,55 @@ class UOJRemoteProblem {
 		];
 	}
 
+	private static function getUojLikeProblemBasicInfoFromHtml($id, $html, $oj = 'uoj') {
+		$remote_provider = static::$providers[$oj];
+
+		$dom = new \IvoPetkov\HTML5DOMDocument();
+		$dom->loadHTML($html);
+
+		$title_dom = $dom->querySelector('.page-header');
+		$title_matches = [];
+		preg_match('/^#[1-9][0-9]*\. (.*)$/', trim($title_dom->textContent), $title_matches);
+		$title = "【{$remote_provider['short_name']}{$id}】{$title_matches[1]}";
+
+		$statement_dom = $dom->querySelector('.uoj-article');
+		$statement = HTML::tag('h3', [], '题目描述');
+
+		foreach ($statement_dom->querySelectorAll('a') as &$elem) {
+			$href = $elem->getAttribute('href');
+			$href = getAbsoluteUrl($href, $remote_provider['url']);
+			$elem->setAttribute('href',  $href);
+		}
+
+		$statement .= $statement_dom->innerHTML;
+
+		$res = [
+			'type' => 'html',
+			'title' => $title,
+			'time_limit' => null,
+			'memory_limit' => null,
+			'difficulty' => -1,
+			'statement' => $statement,
+		];
+
+		if ($oj == 'qoj') { // QOJ PDF
+			$pdf_statement_dom = $dom->getElementById('statements-pdf');
+
+			if ($pdf_statement_dom) {
+				$pdf_url = $pdf_statement_dom->getAttribute('src');
+				$pdf_res = static::curl_get(getAbsoluteUrl($pdf_url, $remote_provider['url']));
+
+				if (str_starts_with($pdf_res['content-type'], 'application/pdf')) {
+					$res['type'] = 'pdf';
+					$res['pdf_data'] = $pdf_res['response'];
+					$res['statement'] = '';
+				}
+			}
+		}
+
+		return $res;
+	}
+
 	private static function getCodeforcesProblemBasicInfo($id) {
 		$res = static::curl_get(static::getCodeforcesProblemUrl($id));
 
@@ -224,14 +287,7 @@ class UOJRemoteProblem {
 				'memory_limit' => null,
 				'difficulty' => -1,
 				'pdf_data' => $res['response'],
-				'statement' => HTML::tag('h3', [], '提示') .
-					HTML::tag(
-						'p',
-						[],
-						'若无法正常加载 PDF，请' .
-							HTML::tag('a', ['href' => static::getCodeforcesProblemUrl($id), 'target' => '_blank'], '点此') .
-							'查看原题面。'
-					),
+				'statement' => '',
 			];
 		} else {
 			return null;
@@ -313,38 +369,19 @@ class UOJRemoteProblem {
 	}
 
 	private static function getUojProblemBasicInfo($id) {
-		$remote_provider = static::$providers['uoj'];
 		$res = static::curl_get(static::getUojProblemUrl($id));
 
 		if (!$res) return null;
 
-		$dom = new \IvoPetkov\HTML5DOMDocument();
-		$dom->loadHTML($res['response']);
+		return static::getUojLikeProblemBasicInfoFromHtml($id, $res['response'], 'uoj');
+	}
 
-		$title_dom = $dom->querySelector('.page-header');
-		$title_matches = [];
-		preg_match('/^#[1-9][0-9]*\. (.*)$/', trim($title_dom->textContent), $title_matches);
-		$title = "【{$remote_provider['short_name']}{$id}】{$title_matches[1]}";
+	private static function getQojProblemBasicInfo($id) {
+		$res = static::curl_get(static::getQojProblemUrl($id));
 
-		$statement_dom = $dom->querySelector('.uoj-article');
-		$statement = HTML::tag('h3', [], '题目描述');
+		if (!$res) return null;
 
-		foreach ($statement_dom->querySelectorAll('a') as &$elem) {
-			$href = $elem->getAttribute('href');
-			$href = getAbsoluteUrl($href, $remote_provider['url']);
-			$elem->setAttribute('href',  $href);
-		}
-
-		$statement .= $statement_dom->innerHTML;
-
-		return [
-			'type' => 'html',
-			'title' => $title,
-			'time_limit' => null,
-			'memory_limit' => null,
-			'difficulty' => -1,
-			'statement' => $statement,
-		];
+		return static::getUojLikeProblemBasicInfoFromHtml($id, $res['response'], 'qoj');
 	}
 
 	private static function getLojProblemBasicInfo($id) {
@@ -490,6 +527,8 @@ class UOJRemoteProblem {
 			return static::getLojProblemUrl($id);
 		} else if ($oj === 'luogu') {
 			return static::getLuoguProblemUrl($id);
+		} else if ($oj === 'qoj') {
+			return static::getQojProblemUrl($id);
 		}
 
 		return null;
@@ -507,6 +546,8 @@ class UOJRemoteProblem {
 			return static::getLojProblemBasicInfo($id);
 		} else if ($oj === 'luogu') {
 			return static::getLuoguProblemBasicInfo($id);
+		} else if ($oj === 'qoj') {
+			return static::getQojProblemBasicInfo($id);
 		}
 
 		return null;

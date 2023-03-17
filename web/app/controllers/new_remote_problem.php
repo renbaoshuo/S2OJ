@@ -61,6 +61,14 @@ $new_remote_problem_form->addInput('remote_problem_id', [
 			$vdata['remote_problem_id'] = $id;
 
 			return '';
+		} else if ($remote_oj === 'qoj') {
+			if (!validateUInt($id)) {
+				return '不合法的题目 ID';
+			}
+
+			$vdata['remote_problem_id'] = $id;
+
+			return '';
 		}
 
 		return '不合法的远程 OJ 类型';
@@ -153,6 +161,7 @@ $new_remote_problem_form->runAtServer();
 									<li><a href="https://uoj.ac/problems">UniversalOJ</a></li>
 									<li><a href="https://loj.ac/p">LibreOJ</a></li>
 									<li><a href="https://www.luogu.com.cn/problem/list">洛谷</a>（不能使用公用账号提交）</li>
+									<li><a href="https://qoj.ac/problems">Qingyu Online Judge</a></li>
 								</ul>
 							</li>
 							<li>在导入题目前请先搜索题库中是否已经存在相应题目，避免重复添加。</li>
