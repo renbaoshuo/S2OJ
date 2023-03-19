@@ -269,11 +269,9 @@ export default class QOJProvider extends UOJProvider implements IBasicProvider {
           continue;
 
         const statusText = summary.children[3]?.children[0]?.innerHTML;
-        const statusMatch = /[A-Z]+/.exec(statusText);
-        const score =
-          statusMatch && statusMatch[0] === 'AC'
-            ? 100
-            : parseInt(statusText || '') || 0;
+        const score = statusText.includes('✓')
+          ? 100
+          : parseInt(statusText || '') || 0;
         const status = score === 100 ? 'Accepted' : 'Unaccepted';
 
         return await end({
