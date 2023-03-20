@@ -215,7 +215,7 @@ export default class QOJProvider extends UOJProvider implements IBasicProvider {
 
     const { text: status } = await this.get(
       `/submissions?problem_id=${id}&submitter=${this.account.handle}`
-    );
+    ).retry(3);
 
     const $dom = new JSDOM(status);
 
@@ -228,12 +228,12 @@ export default class QOJProvider extends UOJProvider implements IBasicProvider {
     let count = 0;
     let fail = 0;
 
-    while (count < 180 && fail < 10) {
+    while (count < 180 && fail < 60) {
       count++;
       await sleep(1000);
 
       try {
-        const { text } = await this.get(`/submission/${id}`);
+        const { text } = await this.get(`/submission/${id}`).retry(3);
         const {
           window: { document },
         } = new JSDOM(text);
