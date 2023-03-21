@@ -380,8 +380,8 @@ export default class LuoguProvider implements IBasicProvider {
     let fail = 0;
     let count = 0;
 
-    while (count < 180 && fail < 10) {
-      await sleep(1000);
+    while (count < 360 && fail < 10) {
+      await sleep(500);
       count++;
 
       try {
@@ -398,7 +398,7 @@ export default class LuoguProvider implements IBasicProvider {
         }
 
         if (result.status == 204) {
-          await next({});
+          await next({ status: '[Luogu] Judging' });
 
           continue;
         }
@@ -458,7 +458,22 @@ export default class LuoguProvider implements IBasicProvider {
 
         if (!data.detail.judgeResult?.subtasks) continue;
 
-        await next({});
+        const finishedTestCases = Object.entries(
+          data.detail.judgeResult.subtasks
+        )
+          .map(o => o[1])
+          .reduce(
+            (acc: number, sub: any) =>
+              acc +
+              Object.entries(sub.testCases as any[])
+                .map(o => o[1])
+                .filter(test => test.status >= 2).length,
+            0
+          );
+
+        await next({
+          status: `[Luogu] Judging (${finishedTestCases} judged)`,
+        });
 
         if (data.status < 2) continue;
 
