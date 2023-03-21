@@ -707,6 +707,7 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 		var input_file_name = name + '_file';
 		var spinner_id = 'spinner-' + name + '_editor';
 		var div_help_language_id = 'div-help-' + name + '_language';
+		var div_help_forbidden_code_id = 'div-help-' + name + '_forbidden_code';
 		var div_editor_id = 'div-' + name + '_editor';
 		var div_file_id = 'div-' + name + '_file';
 		var help_file_id = 'help-' + name + '_file';
@@ -728,13 +729,24 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 				.append(input_file)
 				.append($('<span class="help-block" id="' + help_file_id + '"></span>'))
 		
-		var div_help_language = $('<div id="' + div_help_language_id + '" class="text-warning mb-2">');
+		var div_help_language = $('<div id="' + div_help_language_id + '" class="text-warning-emphasis mb-2">');
+		var div_help_forbidden_code = $('<div id="' + div_help_forbidden_code_id + '" class="text-warning-emphasis mb-2">');
 
 		var show_help_lang = function() {
 			if ($(this).val().startsWith('Java')) {
 				div_help_language.text('注意：Java 程序源代码中不应指定所在的 package。我们会在源代码中找到第一个被定义的类并以它的 main 函数为程序入口点。');
 			} else {
 				div_help_language.text('');
+			}
+		};
+
+		var show_help_forbidden_code = function(lang, code) {
+			if (lang == 'C' || lang.startsWith('C++')) {
+				if (/(^|\n)\s*#pragma/.test(code)) {
+					div_help_forbidden_code.text('注意：C/C++ 程序源代码中不应包含 #pragma 指令，这在正式比赛中是不被允许的。');
+				}
+			} else {
+				//
 			}
 		};
 
@@ -761,11 +773,19 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 
 				$('#' + input_editor_id).val(monaco_editor_instance.getModel().getValue());
 				monaco_editor_instance.onDidChangeModelContent(function () {
-					$('#' + input_editor_id).val(monaco_editor_instance.getModel().getValue());
+					var lang = input_language.val();
+					var new_val = monaco_editor_instance.getModel().getValue();
+
+					$('#' + input_editor_id).val(new_val);
+					show_help_forbidden_code(lang, new_val);
 				});
 				
 				input_language.change(function() {
-					monaco.editor.setModelLanguage(monaco_editor_instance.getModel(), get_monaco_mode(input_language.val()));
+					var new_lang = input_language.val();
+					var val = monaco_editor_instance.getModel().getValue();
+
+					monaco.editor.setModelLanguage(monaco_editor_instance.getModel(), get_monaco_mode(new_lang));
+					show_help_forbidden_code(new_lang, val);
 				});
 			});
 		}
@@ -824,6 +844,7 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 						))
 					)
 				.append(div_help_language)
+				.append(div_help_forbidden_code)
 				.append(div_editor)
 				.append(div_file)
 				.append($('<input type="hidden" name="' + input_editor_name + '" id="' + input_editor_id + '"/>'));
