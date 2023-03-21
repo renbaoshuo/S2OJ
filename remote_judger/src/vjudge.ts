@@ -241,7 +241,7 @@ export async function apply(request: any) {
   await vjudge.addProvider('atcoder');
   await vjudge.addProvider('uoj');
   await vjudge.addProvider('loj');
-  await vjudge.importProvider('luogu');
+  await vjudge.addProvider('luogu');
   await vjudge.addProvider('qoj');
 
   return vjudge;
