@@ -742,7 +742,7 @@ $.fn.source_code_form_group = function(name, text, langs_options_html) {
 
 		var show_help_forbidden_code = function(lang, code) {
 			if (lang == 'C' || lang.startsWith('C++')) {
-				if (/(^|\n)\s*#pragma/.test(code)) {
+				if (/\n\s*#pragma/.test('\n' + code)) {
 					div_help_forbidden_code.text('注意：C/C++ 程序源代码中不应包含 #pragma 指令，这在正式比赛中是不被允许的。');
 				}
 			} else {
