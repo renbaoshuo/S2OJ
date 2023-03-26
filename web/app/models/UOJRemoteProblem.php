@@ -391,7 +391,7 @@ class UOJRemoteProblem {
 		$curl->setHeader('Content-Type', 'application/json');
 
 		$res = retry_loop(function () use (&$curl, $id) {
-			$curl->post('https://api.loj.ac.cn/api/problem/getProblem', json_encode([
+			$curl->post('https://api.loj.ac/api/problem/getProblem', json_encode([
 				'displayId' => (int)$id,
 				'localizedContentsOfLocale' => 'zh_CN',
 				'samples' => true,

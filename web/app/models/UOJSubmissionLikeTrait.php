@@ -158,23 +158,6 @@ trait UOJSubmissionLikeTrait {
 			$card_footer_class = 'text-end mt-2';
 		}
 
-		if ($content['remote_submission_id']) {
-			echo <<<EOD
-				<div class="{$card_class}">
-					<div class="{$card_header_class}">
-						远程提交
-					</div>
-					<div class="{$card_body_class}">
-						远程提交 ID: {$content['remote_submission_id']}
-						<br>
-						源代码请在「详细信息」选项卡查看。
-					</div>
-				</div>
-			EOD;
-
-			return true;
-		}
-
 		$zip_file = new ZipArchive();
 		if ($zip_file->open(UOJContext::storagePath() . $content['file_name'], ZipArchive::RDONLY) !== true) {
 			echo <<<EOD

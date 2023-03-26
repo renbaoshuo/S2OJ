@@ -73,7 +73,7 @@ const LANGS_MAP = {
     name: 'Pascal',
     comment: '//',
   },
-};
+} as const;
 
 const API_LANGS_MAP = {
   C: {
@@ -385,7 +385,10 @@ export default class LuoguProvider implements IBasicProvider {
       count++;
 
       try {
-        let result, data, body;
+        let result,
+          data,
+          body,
+          files = [];
 
         if (this.account.type == 'luogu-api') {
           result = await this.get(`/judge/result?id=${id}`);
@@ -395,6 +398,17 @@ export default class LuoguProvider implements IBasicProvider {
           result = await this.safeGet(`/record/${id}?_contentOnly=1`);
           body = result.body;
           data = body.currentData.record;
+
+          if (data?.sourceCode) {
+            files.push({
+              name: 'answer.code',
+              content: data.sourceCode,
+              lang:
+                Object.keys(LANGS_MAP).find(
+                  lang => LANGS_MAP[lang].id == data.language
+                ) || '/',
+            });
+          }
         }
 
         if (result.status == 204) {
@@ -409,6 +423,7 @@ export default class LuoguProvider implements IBasicProvider {
             id,
             status: 'Judgment Failed',
             message: 'Failed to fetch submission details.',
+            result: { files },
           });
         }
 
@@ -421,6 +436,7 @@ export default class LuoguProvider implements IBasicProvider {
             error: true,
             status: 'Judgment Failed',
             message: 'Submission does not match current problem.',
+            result: { files },
           });
         }
 
@@ -453,6 +469,7 @@ export default class LuoguProvider implements IBasicProvider {
             id,
             status: 'Compile Error',
             message: data.detail.compileResult.message,
+            result: { files },
           });
         }
 
@@ -558,6 +575,7 @@ export default class LuoguProvider implements IBasicProvider {
             this.account.type != 'luogu-api'
               ? `<div>${details}</div>`
               : details,
+          result: { files },
         });
       } catch (e) {
         logger.error(e);
@@ -568,7 +586,7 @@ export default class LuoguProvider implements IBasicProvider {
 
     return await end({
       error: true,
-      id: `R${id}`,
+      id,
       status: 'Judgment Failed',
       message: 'Failed to fetch submission details.',
     });

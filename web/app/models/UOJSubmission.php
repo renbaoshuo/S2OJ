@@ -172,6 +172,13 @@ class UOJSubmission {
 			}
 		}
 
+		$post_result = json_decode($post_result, true);
+
+		if (isset($post_result['files'])) {
+			$files = $post_result['files'];
+			unset($post_result['files']);
+		}
+
 		$set_q = [
 			'status' => 'Judged',
 			'status_details' => '',
@@ -179,14 +186,15 @@ class UOJSubmission {
 
 		if ($submission->info['status'] == 'Judged, Judging') { // for UOJ-OI
 			$result = json_decode($submission->info['result'], true);
-			$result['final_result'] = json_decode($post_result, true);
+			$result['final_result'] = $post_result;
 			$result['final_result']['details'] = uojTextEncode($result['final_result']['details']);
 
 			$set_q += [
 				'result' => json_encode($result, JSON_UNESCAPED_UNICODE),
 			];
 		} elseif ($submission->info['status'] == 'Judging') {
-			$result = json_decode($post_result, true);
+			$result = $post_result;
+
 			if (isset($result['details'])) {
 				$result['details'] = uojTextEncode($result['details']);
 			} else {
@@ -237,6 +245,30 @@ class UOJSubmission {
 		} else {
 			// do nothing...
 			return;
+		}
+
+		if (isset($files)) {
+			$zip_file = new ZipArchive();
+			$zip_file->open(UOJContext::storagePath() . $submission->getContent('file_name'), ZipArchive::CREATE);
+			$tot_size = 0;
+			$language = '/';
+
+			foreach ($files as $file) {
+				$zip_file->addFromString($file['name'], $file['content']);
+
+				if (isset($file['lang'])) {
+					$language = UOJLang::getUpgradedLangCode($file['lang']);
+				}
+
+				$tot_size += $zip_file->statName($file['name'])['size'];
+			}
+
+			$set_q += [
+				'tot_size' => $tot_size,
+				'language' => $language,
+			];
+
+			$zip_file->close();
 		}
 
 		if ($submission->isLatest()) {
@@ -359,7 +391,7 @@ class UOJSubmission {
 								])
 							])
 						], DB::for_update()
-					]);	
+					]);
 					DB::update(["update submissions", "set", $cfg['set_q'], "where", [$cond]]);
 				});
 			} else {

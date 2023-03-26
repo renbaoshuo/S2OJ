@@ -7,7 +7,6 @@ import { IBasicProvider, RemoteAccount, USER_AGENT } from '../interface';
 import Logger from '../utils/logger';
 import { normalize, VERDICT } from '../verdict';
 import htmlspecialchars from '../utils/htmlspecialchars';
-import { stripHtml } from 'string-strip-html';
 
 proxy(superagent);
 const logger = new Logger('remote/loj');
@@ -131,11 +130,13 @@ const LANGS_MAP = {
   },
 };
 
+const parse = (str: string) => crlf(str, LF);
+
 export function getAccountInfoFromEnv(): RemoteAccount | null {
   const {
     LOJ_HANDLE,
     LOJ_TOKEN,
-    LOJ_ENDPOINT = 'https://api.loj.ac.cn/api',
+    LOJ_ENDPOINT = 'https://api.loj.ac/api',
     LOJ_PROXY,
   } = process.env;
 
@@ -155,7 +156,7 @@ export function getAccountInfoFromEnv(): RemoteAccount | null {
 
 export default class LibreojProvider implements IBasicProvider {
   constructor(public account: RemoteAccount) {
-    this.account.endpoint ||= 'https://api.loj.ac.cn/api';
+    this.account.endpoint ||= 'https://api.loj.ac/api';
   }
 
   static constructFromAccountData(data) {
@@ -316,17 +317,29 @@ export default class LibreojProvider implements IBasicProvider {
           .send({ submissionId: String(id), locale: 'zh_CN' })
           .retry(3);
 
+        let files = [];
+
+        if (body.content?.code) {
+          files.push({
+            name: 'answer.code',
+            content: parse(body.content.code),
+          });
+        }
+
         if (body.meta.problem.displayId != problem_id) {
           return await end({
             id,
             error: true,
             status: 'Judgment Failed',
             message: 'Submission does not match current problem.',
+            result: { files },
           });
         }
 
         if (!body.progress) {
-          await next({ status: 'Waiting for Remote Judge' });
+          await next({
+            status: 'Waiting for Remote Judge',
+          });
 
           continue;
         }
@@ -352,6 +365,7 @@ export default class LibreojProvider implements IBasicProvider {
             id,
             status: 'Compile Error',
             message: stripVTControlCharacters(body.progress.compile.message),
+            result: { files },
           });
         }
 
@@ -361,10 +375,9 @@ export default class LibreojProvider implements IBasicProvider {
             id,
             status: 'Judgment Failed',
             message: 'Error occurred on remote online judge.',
+            result: { files },
           });
         }
-
-        const parse = (str: string) => crlf(str, LF);
 
         const getSubtaskStatusDisplayText = (testcases: any): string => {
           let result: string = null;
@@ -479,13 +492,6 @@ export default class LibreojProvider implements IBasicProvider {
           '</remote-result-table>' +
           '</remote-result-container>';
 
-        if (result_show_source) {
-          details +=
-            `<remote-source-code language="${body.content.language}">` +
-            htmlspecialchars(parse(body.content.code)) +
-            '</remote-source-code>';
-        }
-
         // Samples
         if (body.progress.samples) {
           details += `<subtask title="Samples" info="${getSubtaskStatusDisplayText(
@@ -534,6 +540,7 @@ export default class LibreojProvider implements IBasicProvider {
           time: body.meta.timeUsed,
           memory: body.meta.memoryUsed,
           details: `<div>${details}</div>`,
+          result: { files },
         });
       } catch (e) {
         logger.error(e);

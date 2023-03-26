@@ -122,6 +122,7 @@ class VJudge {
               `<info-block>ID = ${payload.id || 'None'}</info-block>` +
               `<error>${htmlspecialchars(payload.message)}</error>` +
               '</div>',
+            ...(payload.result || {}),
           }),
           judge_time,
         });
@@ -143,6 +144,7 @@ class VJudge {
                 payload.id || 'None'
               }\nVERDICT = ${payload.status}</info-block>` +
               '</div>',
+          ...(payload.result || {}),
         }),
         judge_time,
       });
