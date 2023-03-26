@@ -247,7 +247,7 @@ class UOJSubmission {
 			return;
 		}
 
-		if (isset($files)) {
+		if (isset($files) && !empty($files)) {
 			$zip_file = new ZipArchive();
 			$zip_file->open(UOJContext::storagePath() . $submission->getContent('file_name'), ZipArchive::CREATE);
 			$tot_size = 0;
