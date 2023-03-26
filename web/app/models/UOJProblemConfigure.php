@@ -198,6 +198,7 @@ class UOJProblemConfigure {
 		$this->simple_form->succ_href = $this->href;
 		$this->simple_form->config['form']['class'] = 'row gy-3';
 		$this->simple_form->config['submit_container']['class'] = 'col-12 text-center mt-3';
+		$this->simple_form->config['submit_button']['text'] = '检验配置并同步数据';
 		$this->simple_form->config['back_button']['href'] = $this->href;
 		$this->simple_form->config['back_button']['class'] = 'btn btn-secondary me-2';
 
