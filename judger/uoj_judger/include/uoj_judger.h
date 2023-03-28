@@ -50,6 +50,44 @@ inline string htmlspecialchars(const string &s) {
 	return r;
 }
 
+// trim from start (in place)
+inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+// trim from end (in place)
+inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+// trim from both ends (in place)
+inline void trim(std::string &s) {
+    rtrim(s);
+    ltrim(s);
+}
+
+// trim from start (copying)
+inline std::string ltrim_copy(std::string s) {
+    ltrim(s);
+    return s;
+}
+
+// trim from end (copying)
+inline std::string rtrim_copy(std::string s) {
+    rtrim(s);
+    return s;
+}
+
+// trim from both ends (copying)
+inline std::string trim_copy(std::string s) {
+    trim(s);
+    return s;
+}
+
 /*========================== random  ====================== */
 
 inline string gen_token() {
@@ -679,14 +717,22 @@ void print_config() {
 }
 void load_config(const string &filename) {
 	ifstream fin(filename.c_str());
+
 	if (!fin) {
 		return;
 	}
-	string key;
-	string val;
-	while (fin >> key >> val) {
-		config[key] = val;
+
+	string key, val;
+
+	// the first token of a line is key, the rest is value
+	while (fin >> key) {
+		getline(fin, val);
+		config[key] = trim_copy(val);
 	}
+
+	// while (fin >> key >> val) {
+	// 	config[key] = val;
+	// }
 }
 string conf_str(const string &key, int num, const string &val) {
 	ostringstream sout;
@@ -759,7 +805,7 @@ string conf_input_file_name(int num) {
 	if (num < 0) {
 		name << "ex_";
 	}
-	name << conf_str("input_pre", "input") << abs(num) << "." << conf_str("input_suf", "txt");
+	name << conf_str("input_pre", "") << abs(num) << "." << conf_str("input_suf", "in");
 	return name.str();
 }
 string conf_output_file_name(int num) {
@@ -768,7 +814,7 @@ string conf_output_file_name(int num) {
 	if (num < 0) {
 		name << "ex_";
 	}
-	name << conf_str("output_pre", "output") << abs(num) << "." << conf_str("output_suf", "txt");
+	name << conf_str("output_pre", "") << abs(num) << "." << conf_str("output_suf", "out");
 	return name.str();
 }
 runp::limits_t conf_run_limit(string pre, const int &num, const runp::limits_t &val) {

@@ -67,16 +67,16 @@ function getUOJConfVal($conf, $key, $default_val) {
 }
 
 function getUOJProblemInputFileName($problem_conf, $num) {
-	return getUOJConfVal($problem_conf, 'input_pre', 'input') . $num . '.' . getUOJConfVal($problem_conf, 'input_suf', 'txt');
+	return getUOJConfVal($problem_conf, 'input_pre', '') . $num . '.' . getUOJConfVal($problem_conf, 'input_suf', 'in');
 }
 function getUOJProblemOutputFileName($problem_conf, $num) {
-	return getUOJConfVal($problem_conf, 'output_pre', 'output') . $num . '.' . getUOJConfVal($problem_conf, 'output_suf', 'txt');
+	return getUOJConfVal($problem_conf, 'output_pre', '') . $num . '.' . getUOJConfVal($problem_conf, 'output_suf', 'out');
 }
 function getUOJProblemExtraInputFileName($problem_conf, $num) {
-	return 'ex_' . getUOJConfVal($problem_conf, 'input_pre', 'input') . $num . '.' . getUOJConfVal($problem_conf, 'input_suf', 'txt');
+	return 'ex_' . getUOJConfVal($problem_conf, 'input_pre', '') . $num . '.' . getUOJConfVal($problem_conf, 'input_suf', 'in');
 }
 function getUOJProblemExtraOutputFileName($problem_conf, $num) {
-	return 'ex_' . getUOJConfVal($problem_conf, 'output_pre', 'output') . $num . '.' . getUOJConfVal($problem_conf, 'output_suf', 'txt');
+	return 'ex_' . getUOJConfVal($problem_conf, 'output_pre', '') . $num . '.' . getUOJConfVal($problem_conf, 'output_suf', 'out');
 }
 
 function updateBestACSubmissions($username, $problem_id) {

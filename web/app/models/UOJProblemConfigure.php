@@ -85,10 +85,10 @@ class UOJProblemConfigure {
 		$this->simple_form->appendHTML(static::getCardFooter());
 
 		$this->simple_form->appendHTML(static::getCardHeader('文件配置'));
-		$this->addTextInput($this->simple_form, 'input_pre', '输入文件名称', '');
-		$this->addTextInput($this->simple_form, 'input_suf', '输入文件后缀', '');
-		$this->addTextInput($this->simple_form, 'output_pre', '输出文件名称', '');
-		$this->addTextInput($this->simple_form, 'output_suf', '输出文件后缀', '');
+		$this->addTextInput($this->simple_form, 'input_pre', '输入文件名称', '', ['validator_php' => fn ($x) => '']);
+		$this->addTextInput($this->simple_form, 'input_suf', '输入文件后缀', 'in', ['validator_php' => fn ($x) => '']);
+		$this->addTextInput($this->simple_form, 'output_pre', '输出文件名称', '', ['validator_php' => fn ($x) => '']);
+		$this->addTextInput($this->simple_form, 'output_suf', '输出文件后缀', 'out', ['validator_php' => fn ($x) => '']);
 		$this->simple_form->appendHTML(static::getCardFooter());
 
 		$this->simple_form->appendHTML(static::getCardHeader('运行时限制'));
@@ -227,7 +227,7 @@ class UOJProblemConfigure {
 
 	public function addNumberInput(UOJForm $form, $key, $label, $default_val = '', $cfg = []) {
 		$this->conf_keys[$key] = true;
-		$form->addInput($key, [
+		$form->addInput($key,  $cfg + [
 			'type' => 'number',
 			'label' => $label,
 			'div_class' => 'row gx-2',
@@ -237,7 +237,7 @@ class UOJProblemConfigure {
 			'validator_php' => function ($x) {
 				return validateInt($x) ? '' : '必须为一个整数';
 			},
-		] + $cfg);
+		]);
 		$form->appendHTML(<<<EOD
 		<script>
 			$('#input-{$key}').change(function() {
@@ -250,7 +250,7 @@ class UOJProblemConfigure {
 
 	public function addTimeLimitInput(UOJForm $form, $key, $label, $default_val = '', $cfg = []) {
 		$this->conf_keys[$key] = true;
-		$form->addInput($key, [
+		$form->addInput($key,  $cfg + [
 			'type' => 'number',
 			'label' => $label,
 			'input_attrs' => ['step' => 0.001],
@@ -267,7 +267,7 @@ class UOJProblemConfigure {
 					return '';
 				}
 			},
-		] + $cfg);
+		]);
 		$form->appendHTML(<<<EOD
 		<script>
 			$('#input-{$key}').change(function() {
@@ -280,7 +280,7 @@ class UOJProblemConfigure {
 
 	public function addTextInput(UOJForm $form, $key, $label, $default_val = '', $cfg = []) {
 		$this->conf_keys[$key] = true;
-		$form->addInput($key, [
+		$form->addInput($key, $cfg + [
 			'label' => $label,
 			'div_class' => 'row gx-2',
 			'label_class' => 'col-form-label col-4',
@@ -289,7 +289,7 @@ class UOJProblemConfigure {
 			'validator_php' => function ($x) {
 				return ctype_graph($x) ? '' : '必须仅包含除空格以外的可见字符';
 			},
-		] + $cfg);
+		]);
 		$form->appendHTML(<<<EOD
 		<script>
 			$('#input-{$key}').change(function() {

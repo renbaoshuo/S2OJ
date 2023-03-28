@@ -10,24 +10,28 @@ class UOJProblemConf {
 		}
 
 		$conf = [];
+
 		while (!$reader->eof()) {
 			$reader->ignoreWhite();
-			$key = $reader->readString();
-			if ($key === '') {
-				break;
-			}
-			$reader->ignoreWhite();
-			$val = $reader->readString();
-			if ($val === '') {
+
+			$line = $reader->readLine();
+			$line = explode(' ', $line);
+
+			$key = array_shift($line);
+
+			if (!$key) {
 				break;
 			}
 
 			if (isset($conf[$key])) {
 				return -2;
 			}
-			$conf[$key] = $val;
+
+			$conf[$key] = trim(implode(' ', $line));
 		}
+
 		$reader->close();
+
 		return new UOJProblemConf($conf);
 	}
 
@@ -37,9 +41,11 @@ class UOJProblemConf {
 
 	public function putToFile($file_name) {
 		$f = fopen($file_name, 'w');
+
 		foreach ($this->conf as $key => $val) {
 			fwrite($f, "{$key} {$val}\n");
 		}
+
 		fclose($f);
 	}
 
@@ -55,15 +61,16 @@ class UOJProblemConf {
 				return $this->conf[$key];
 			}
 		}
+
 		return $default_val;
 	}
 
 	public function getInputFileName($num) {
-		return $this->getVal('input_pre', 'input') . $num . '.' . $this->getVal('input_suf', 'txt');
+		return $this->getVal('input_pre', '') . $num . '.' . $this->getVal('input_suf', 'txt');
 	}
 
 	public function getOutputFileName($num) {
-		return $this->getVal('output_pre', 'output') . $num . '.' . $this->getVal('output_suf', 'txt');
+		return $this->getVal('output_pre', '') . $num . '.' . $this->getVal('output_suf', 'txt');
 	}
 
 	public function getExtraInputFileName($num) {
