@@ -480,6 +480,10 @@ class UOJSubmission {
 	}
 
 	public function preHackCheck(array $user = null) {
+		if ($this->getContent('remote_judge')) {
+			return false;
+		}
+
 		return $this->info['score'] == 100 && $this->problem->preHackCheck($user);
 	}
 
