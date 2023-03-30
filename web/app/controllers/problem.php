@@ -527,6 +527,13 @@ if (UOJContest::cur()) {
 			</ul>
 		</div>
 
+		<?php if (UOJProblem::info('hackable')) : ?>
+			<div class="alert alert-primary mb-2">
+				<i class="bi bi-info-circle"></i>
+				本题目开放 Hack。
+			</div>
+		<?php endif ?>
+
 		<!-- 附件 -->
 		<div class="card mb-2">
 			<div class="card-header fw-bold">
