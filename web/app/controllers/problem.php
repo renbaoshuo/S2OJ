@@ -580,10 +580,18 @@ if (UOJContest::cur()) {
 
 		// Change hash for page-reload
 		$('.nav-pills a').on('shown.bs.tab', function(e) {
+			var hash = e.target.hash;
+
 			if (e.target.hash == '#statement') {
-				window.location.hash = '';
+				hash = '#';
+			}
+
+			if (window.history.pushState) {
+				// Update the address bar
+				window.history.pushState({}, '', hash);
 			} else {
-				window.location.hash = e.target.hash;
+				// Fallback for the old browsers which do not have `history.pushState()`
+				window.location.hash = hash;
 			}
 		});
 	});

@@ -47,7 +47,13 @@ $(document).ready(function() {
 
 	// Change hash for page-reload
 	$('.nav-tabs a').on('shown.bs.tab', function(e) {
-		window.location.hash = e.target.hash;
+		if (window.history.pushState) {
+			// Update the address bar
+			window.history.pushState({}, '', e.target.hash);
+		} else {
+			// Fallback for the old browsers which do not have `history.pushState()`
+			window.location.hash = e.target.hash;
+		}
 	});
 });
 </script>

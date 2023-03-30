@@ -1340,21 +1340,6 @@ if ($cur_tab == 'index') {
 					</div>
 				</div>
 			</div>
-
-			<script>
-				$(document).ready(function() {
-					// Javascript to enable link to tab
-					var hash = location.hash.replace(/^#/, '');
-					if (hash) {
-						bootstrap.Tab.jQueryInterface.call($('.nav-tabs a[href="#' + hash + '"]'), 'show').blur();
-					}
-
-					// Change hash for page-reload
-					$('.nav-tabs a').on('shown.bs.tab', function(e) {
-						window.location.hash = e.target.hash;
-					});
-				});
-			</script>
 		<?php elseif ($cur_tab == 'users') : ?>
 			<div class="card mt-3 mt-md-0">
 				<div class="card-header">
@@ -1791,7 +1776,13 @@ EOD;
 
 		// Change hash for page-reload
 		$('.nav-tabs a').on('shown.bs.tab', function(e) {
-			window.location.hash = e.target.hash;
+			if (window.history.pushState) {
+				// Update the address bar
+				window.history.pushState({}, '', e.target.hash);
+			} else {
+				// Fallback for the old browsers which do not have `history.pushState()`
+				window.location.hash = e.target.hash;
+			}
 		});
 	});
 </script>
