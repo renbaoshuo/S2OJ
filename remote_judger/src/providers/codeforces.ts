@@ -169,10 +169,8 @@ export default class CodeforcesProvider implements IBasicProvider {
   }
 
   get loggedIn() {
-    return this.get('/enter').then(res => {
+    return this.get('/').then(res => {
       const html = res.text;
-
-      if (html.includes('Login into Codeforces')) return false;
 
       if (html.length < 1000 && html.includes('Redirecting...')) {
         logger.debug('Got a redirect', html);
@@ -188,7 +186,7 @@ export default class CodeforcesProvider implements IBasicProvider {
         if (_39ce7) this.setCookie('39ce7', _39ce7);
       }
 
-      return true;
+      return html.includes('header-bell__img');
     });
   }
 
