@@ -251,7 +251,7 @@ class UOJSubmission {
 			$zip_file = new ZipArchive();
 			$zip_file->open(UOJContext::storagePath() . $submission->getContent('file_name'), ZipArchive::CREATE);
 			$tot_size = 0;
-			$language = '/';
+			$language = $submission->info['language'];
 
 			foreach ($files as $file) {
 				$zip_file->addFromString($file['name'], $file['content']);

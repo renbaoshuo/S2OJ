@@ -396,7 +396,6 @@ export default class CodeforcesProvider implements IBasicProvider {
           files.push({
             name: 'answer.code',
             content: body.source,
-            lang: '/',
           });
         }
 
