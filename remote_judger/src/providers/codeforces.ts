@@ -277,6 +277,8 @@ export default class CodeforcesProvider implements IBasicProvider {
       `(S2OJ Submission #${submissionId})`
     );
 
+    await next({ status: 'Submitting to Codeforces...' });
+
     // TODO: check submit time to ensure submission
     const { text: submit, error } = await this.post(
       `/${
@@ -328,6 +330,8 @@ export default class CodeforcesProvider implements IBasicProvider {
       return null;
     }
 
+    await next({ status: 'Submitted to Codeforces' });
+
     const { text: status } = await this.get(
       type !== 'GYM' ? '/problemset/status?my=on' : `/gym/${contestId}/my`
     ).retry(3);
@@ -350,9 +354,9 @@ export default class CodeforcesProvider implements IBasicProvider {
     let count = 0;
     let fail = 0;
 
-    while (count < 180 && fail < 10) {
+    while (count < 360 && fail < 60) {
       count++;
-      await sleep(1000);
+      await sleep(500);
 
       try {
         const { body } = await this.post('/data/submitSource')

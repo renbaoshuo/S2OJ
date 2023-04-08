@@ -249,6 +249,8 @@ export default class LibreojProvider implements IBasicProvider {
       `(S2OJ Submission #${submissionId})`
     );
 
+    await next({ status: 'Submitting to LibreOJ...' });
+
     const { body, error } = await this.post('/submission/submit').send({
       problemId: id,
       content: {
@@ -267,6 +269,8 @@ export default class LibreojProvider implements IBasicProvider {
 
       return null;
     }
+
+    await next({ status: 'Submitted to LibreOJ' });
 
     return body.submissionId;
   }
@@ -345,7 +349,7 @@ export default class LibreojProvider implements IBasicProvider {
         }
 
         await next({
-          status: `${body.progress.progressType}`,
+          status: `[LibreOJ] ${body.progress.progressType}`,
         });
 
         if (body.progress.progressType !== 'Finished') {

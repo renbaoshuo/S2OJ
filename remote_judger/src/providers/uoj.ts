@@ -217,6 +217,8 @@ export default class UOJProvider implements IBasicProvider {
         code = `${comment[0]} ${msg} ${comment[1]}\n${code}`;
     }
 
+    await next({ status: 'Submitting to UniversalOJ...' });
+
     const _token = await this.getCsrfToken(`/problem/${id}`);
     const { text } = await this.post(`/problem/${id}`).send({
       _token,
@@ -227,6 +229,8 @@ export default class UOJProvider implements IBasicProvider {
     });
 
     if (!text.includes('我的提交记录')) throw new Error('Submit failed');
+
+    await next({ status: 'Submitted to UniversalOJ' });
 
     const { text: status } = await this.get(
       `/submissions?problem_id=${id}&submitter=${this.account.handle}`

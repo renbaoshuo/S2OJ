@@ -205,6 +205,8 @@ export default class AtcoderProvider implements IBasicProvider {
       `(S2OJ Submission #${submissionId})`
     );
 
+    await next({ status: 'Submitting to AtCoder...' });
+
     // TODO: check submit time to ensure submission
     const res = await this.post(`/contests/${contestId}/submit`).send({
       csrf_token: csrf,
@@ -226,6 +228,8 @@ export default class AtcoderProvider implements IBasicProvider {
     if (res.header['set-cookie']) {
       this.cookie = res.header['set-cookie'];
     }
+
+    await next({ status: 'Submitted to AtCoder' });
 
     const { text: status, header: status_header } = await this.get(
       `/contests/${contestId}/submissions/me`
@@ -280,7 +284,7 @@ export default class AtcoderProvider implements IBasicProvider {
           statusElem.title === 'Waiting for Re-judging' ||
           ['WJ', 'WR'].includes(statusElem.innerHTML.trim())
         ) {
-          await next({ test_id: 0 });
+          await next({ status: '[AtCoder] Waiting for Judging' });
 
           continue;
         }

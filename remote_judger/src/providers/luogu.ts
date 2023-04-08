@@ -319,6 +319,8 @@ export default class LuoguProvider implements IBasicProvider {
         code = `${comment[0]} ${msg} ${comment[1]}\n${code}`;
     }
 
+    await next({ status: 'Submitting to Luogu...' });
+
     if (this.account.type == 'luogu-api') {
       const result = await this.post('/judge/problem').send({
         pid: id,

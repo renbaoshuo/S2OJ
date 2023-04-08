@@ -200,6 +200,8 @@ export default class QOJProvider extends UOJProvider implements IBasicProvider {
         code = `${comment[0]} ${msg} ${comment[1]}\n${code}`;
     }
 
+    await next({ status: 'Submitting to QOJ...' });
+
     const _token = await this.getCsrfToken(`/problem/${id}`);
     const { text } = await this.post(`/problem/${id}`).send({
       _token,
