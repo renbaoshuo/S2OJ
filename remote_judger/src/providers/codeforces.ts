@@ -390,6 +390,16 @@ export default class CodeforcesProvider implements IBasicProvider {
 
         if (body.waiting === 'true') continue;
 
+        let files = [];
+
+        if (body?.source) {
+          files.push({
+            name: 'answer.code',
+            content: body.source,
+            lang: '/',
+          });
+        }
+
         const testCount = +body.testCount;
         const status =
           VERDICT[
@@ -450,6 +460,7 @@ export default class CodeforcesProvider implements IBasicProvider {
           time,
           memory,
           details,
+          result: { files },
         });
       } catch (e) {
         logger.error(e);
