@@ -2,7 +2,7 @@
 	<li class="nav-item dropdown">
 		<button class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static">
 			<i class="bi bi-circle-half theme-icon-active" data-icon="bi-circle-half"></i>
-			<span class="d-lg-none">&nbsp;切换主题</span>
+			<span class="d-md-none">&nbsp;切换主题</span>
 		</button>
 		<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme" style="--bs-dropdown-min-width: 6rem;">
 			<li>

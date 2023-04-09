@@ -33,7 +33,7 @@ $new_msg_tot = $new_user_msg_num + $new_system_msg_num;
 	</script>
 
 	<!-- Bootstrap 5 (CSS) -->
-	<?= HTML::css_link('/css/bootstrap.min.css?v=5.3.0-alpha1') ?>
+	<?= HTML::css_link('/css/bootstrap.min.css?v=5.3.0-alpha3') ?>
 	<!-- Bootstrap Icons -->
 	<?= HTML::css_link('/css/bootstrap-icons.min.css?v=2022.9.23') ?>
 
@@ -55,7 +55,7 @@ $new_msg_tot = $new_user_msg_num + $new_system_msg_num;
 	<?= HTML::js_src('/js/jquery.cookie.min.js') ?>
 
 	<!-- Bootstrap 5: JavaScript -->
-	<?= HTML::js_src('/js/bootstrap.bundle.min.js?v=5.3.0-alpha1') ?>
+	<?= HTML::js_src('/js/bootstrap.bundle.min.js?v=5.3.0-alpha3') ?>
 
 	<!-- Color converter -->
 	<?= HTML::js_src('/js/color-converter.min.js') ?>
