@@ -193,7 +193,20 @@ export default class LuoguProvider implements IBasicProvider {
   }
 
   async safeGet(url: string) {
-    const res = await this.get(url);
+    const res = await this.get(url).ok(res => res.status < 400);
+
+    if ([302, 301].includes(res.status)) {
+      if (res.header['set-cookie']) {
+        Array.from(res.header['set-cookie']).forEach((cookie: string) => {
+          const name = cookie.split('=')[0];
+          const value = cookie.split('=')[1].split(';')[0];
+
+          this.setCookie(name, value);
+        });
+      }
+
+      return await this.get(url);
+    }
 
     if (res.text.startsWith('<html><script>document.location.reload()')) {
       const sec = this.getCookie.call(
