@@ -512,6 +512,13 @@ class UOJContest {
 		]));
 	}
 
+	public function getProblemsCount() {
+		return DB::selectCount([
+			DB::lc(), "select count(*) from contests_problems",
+			"where", ['contest_id' => $this->info['id']]
+		]);
+	}
+
 	public function hasProblem(UOJProblem $problem) {
 		return DB::selectFirst([
 			DB::lc(), "select 1 from contests_problems",

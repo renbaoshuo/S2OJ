@@ -153,101 +153,86 @@ if ($cur_tab == 'profile') {
 		dieWithAlert('移除成功！');
 	}
 
-	$add_problem_form = new UOJForm('add_problem');
-	$add_problem_form->addInput('problem_id', [
-		'label' => '题目 ID',
-		'validator_php' => function ($problem_id, &$vdata) {
-			$problem = UOJProblem::query($problem_id);
-			if (!$problem) {
-				return '题目不存在。';
-			}
+	if (UOJContest::cur()->getProblemsCount() >= 26) {
+		$add_problem_form_msg = '比赛中的题目数量已达上限。';
+	} else if (UOJContest::cur()->progress() > CONTEST_IN_PROGRESS) {
+		$add_problem_form_msg = '比赛已结束。';
+	} else {
+		$add_problem_form = new UOJForm('add_problem');
+		$add_problem_form->addInput('problem_id', [
+			'label' => '题目 ID',
+			'validator_php' => function ($problem_id, &$vdata) {
+				$problem = UOJProblem::query($problem_id);
+				if (!$problem) {
+					return '题目不存在。';
+				}
 
-			if (!$problem->userCanManage(Auth::user())) {
-				return "无权添加此题目。";
-			}
+				if (!$problem->userCanManage(Auth::user())) {
+					return "无权添加此题目。";
+				}
 
-			if (UOJContest::cur()->hasProblem($problem)) {
-				return "题目已经在本场比赛中。";
-			}
+				if (UOJContest::cur()->hasProblem($problem)) {
+					return "题目已经在本场比赛中。";
+				}
 
-			$vdata['problem_id'] = $problem_id;
+				$vdata['problem_id'] = $problem_id;
 
-			return '';
-		},
-	]);
-	$add_problem_form->addSelect('judge_config', [
-		'div_class' => 'mt-3',
-		'label' => '评测设置',
-		'options' => [
-			'default' => '默认',
-			'sample' => '只测样例',
-			'no-details' => '测试全部数据，对于每个测试点显示得分但不显示详情',
-			'full' => '测试全部数据',
-		],
-		'default_value' => 'default',
-	]);
-	$add_problem_form->addCheckbox('bonus', [
-		'div_class' => 'form-check mt-3',
-		'label' => '是否为 bonus 题（针对 ACM 赛制）',
-	]);
-	$add_problem_form->handle = function (&$vdata) use ($contest) {
-		$level = DB::selectSingle([
-			"select", "max(level)",
-			"from", "contests_problems",
-			"where", [
-				"contest_id" => UOJContest::info('id'),
-			]
+				return '';
+			},
 		]);
-		DB::insert([
-			"insert ignore into contests_problems",
-			"(contest_id, problem_id, level)",
-			"values", DB::tuple([UOJContest::info('id'), $vdata['problem_id'], $level + 1])
+		$add_problem_form->addSelect('judge_config', [
+			'div_class' => 'mt-3',
+			'label' => '评测设置',
+			'options' => [
+				'default' => '默认',
+				'sample' => '只测样例',
+				'no-details' => '测试全部数据，对于每个测试点显示得分但不显示详情',
+				'full' => '测试全部数据',
+			],
+			'default_value' => 'default',
 		]);
-
-		$judge_type = $_POST['judge_config'];
-		if ($judge_type === 'default') {
-			unset($contest['extra_config']["problem_{$vdata['problem_id']}"]);
-		} else {
-			$contest['extra_config']["problem_{$vdata['problem_id']}"] = $judge_type;
-		}
-
-		if ($_POST['bonus']) {
-			$contest['extra_config']['bonus']["problem_{$vdata['problem_id']}"] = true;
-		} else {
-			unset($contest['extra_config']['bonus']["problem_{$vdata['problem_id']}"]);
-		}
-
-		$esc_extra_config = json_encode($contest['extra_config']);
-		DB::update([
-			"update contests",
-			"set", ["extra_config" => $esc_extra_config],
-			"where", ["id" => UOJContest::info('id')]
+		$add_problem_form->addCheckbox('bonus', [
+			'div_class' => 'form-check mt-3',
+			'label' => '是否为 bonus 题（针对 ACM 赛制）',
 		]);
+		$add_problem_form->handle = function (&$vdata) use ($contest) {
+			$level = DB::selectSingle([
+				"select", "max(level)",
+				"from", "contests_problems",
+				"where", [
+					"contest_id" => UOJContest::info('id'),
+				]
+			]);
+			DB::insert([
+				"insert ignore into contests_problems",
+				"(contest_id, problem_id, level)",
+				"values", DB::tuple([UOJContest::info('id'), $vdata['problem_id'], $level + 1])
+			]);
 
-		dieWithJsonData(['status' => 'success', 'message' => "题目 #{$vdata['problem_id']} 添加成功！"]);
-	};
-	$add_problem_form->config['submit_button']['text'] = '添加';
-	$add_problem_form->config['submit_button']['class'] = 'btn btn-secondary mt-3';
-	$add_problem_form->setAjaxSubmit(<<<EOD
-		function(res) {
-			if (res.status === 'success') {
-				$('#result-alert')
-					.html('添加成功！' + (res.message || ''))
-					.addClass('alert-success')
-					.removeClass('alert-danger')
-					.show();
+			$judge_type = $_POST['judge_config'];
+			if ($judge_type === 'default') {
+				unset($contest['extra_config']["problem_{$vdata['problem_id']}"]);
 			} else {
-				$('#result-alert')
-					.html('添加失败。' + (res.message || ''))
-					.removeClass('alert-success')
-					.addClass('alert-danger')
-					.show();
+				$contest['extra_config']["problem_{$vdata['problem_id']}"] = $judge_type;
 			}
 
-			$(window).scrollTop(0);
-		}
-	EOD);
-	$add_problem_form->runAtServer();
+			if ($_POST['bonus']) {
+				$contest['extra_config']['bonus']["problem_{$vdata['problem_id']}"] = true;
+			} else {
+				unset($contest['extra_config']['bonus']["problem_{$vdata['problem_id']}"]);
+			}
+
+			$esc_extra_config = json_encode($contest['extra_config']);
+			DB::update([
+				"update contests",
+				"set", ["extra_config" => $esc_extra_config],
+				"where", ["id" => UOJContest::info('id')]
+			]);
+		};
+		$add_problem_form->config['submit_button']['text'] = '添加';
+		$add_problem_form->config['submit_button']['class'] = 'btn btn-secondary mt-3';
+		$add_problem_form->runAtServer();
+	}
 } elseif ($cur_tab == 'managers') {
 	$managers_form = newAddDelCmdForm(
 		'managers',
@@ -532,7 +517,7 @@ if ($cur_tab == 'profile') {
 						<div class="col mt-3 mt-md-0">
 							<h5>注意事项</h5>
 							<ul class="mb-0">
-								<li>请为选手预留合理的做题时间。一般而言，CSP 和 NOIP 的比赛时长为 4 小时，省选 / NOI 的比赛时长为 5 小时。</li>
+								<li>请为选手预留合理的做题时间。一般而言，CSP 和 NOIP 的比赛时长为 4 小时，NOI 的比赛时长为 5 小时。</li>
 							</ul>
 						</div>
 					</div>
@@ -593,7 +578,21 @@ if ($cur_tab == 'profile') {
 						<div id="result-alert" class="alert" role="alert" style="display: none"></div>
 						<div class="row row-cols-1 row-cols-md-2">
 							<div class="col">
-								<?php $add_problem_form->printHTML() ?>
+								<?php if (isset($add_problem_form)) : ?>
+									<?php $add_problem_form->printHTML() ?>
+								<?php else : ?>
+									<div class="alert alert-warning d-flex align-items-center my-0" role="alert">
+										<div class="flex-shrink-0 me-3">
+											<i class="fs-4 bi bi-exclamation-triangle-fill"></i>
+										</div>
+										<div>
+											<div class="fw-bold mb-2">当前比赛无法添加新题目</div>
+											<?php if (isset($add_problem_form_msg)) : ?>
+												<div class="small"><?= $add_problem_form_msg ?></div>
+											<?php endif ?>
+										</div>
+									</div>
+								<?php endif ?>
 							</div>
 							<div class="col">
 								<h5>注意事项</h5>
@@ -601,6 +600,7 @@ if ($cur_tab == 'profile') {
 									<li>推荐在比赛结束前将题目设置为隐藏。</li>
 									<li>对于「评测设置」选项，一般情况下保持默认（即只测样例）即可。</li>
 									<li>在 ACM 赛制中，如果设置一道题目为 bonus 题，那么获得 100 分后会总罚时会减少 20 分钟，但排名时不会将此题记入该选手通过的题目总数中。</li>
+									<li>一场比赛中最多添加 26 道题目。</li>
 								</ul>
 							</div>
 						</div>
