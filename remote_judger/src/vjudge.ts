@@ -81,7 +81,13 @@ class VJudge {
     const provider = await import(`./providers/${type}`);
     const account = provider.getAccountInfoFromEnv();
 
-    if (!account) throw new Error(`no account info for ${type}`);
+    if (!account) {
+      // throw new Error(`no account info for ${type}`);
+
+      logger.error(`no account info for ${type}`);
+
+      return;
+    }
 
     this.p_imports[type] = provider.default;
     this.providers[type] = new AccountService(provider.default, account);
