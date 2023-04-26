@@ -545,20 +545,20 @@ class UOJSubmission {
 						$actual_score = $this->getActualScore();
 						if ($actual_score === null) {
 							if ($cfg['result_badge']) {
-								echo $tag_st, ' class="fs-5"><span class="badge text-white bg-warning">', $this->info['result_error'], '</span>', $tag_ed;
+								echo $tag_st, ' class="fs-5 uoj-submission-result-td"><span class="badge text-white bg-warning uoj-result-badge">', $this->info['result_error'], '</span>', $tag_ed;
 							} else {
-								echo $tag_st, ' class="small text-decoration-none">', $this->info['result_error'], $tag_ed;
+								echo $tag_st, ' class="small text-decoration-none uoj-submission-result-td">', $this->info['result_error'], $tag_ed;
 							}
 						} else {
 							echo $tag_st, ' class="vstack d-inline-flex">';
 							if ($cfg['result_badge']) {
-								echo '<span class="fs-5">';
+								echo '<span class="fs-5 uoj-submission-result-td">';
 								if ($actual_score == 100) {
 									// rgb(0, 204, 0)
-									echo '<span class="badge text-white uoj-accepted-badge">', 'Accepted', '</span>';
+									echo '<span class="badge text-white uoj-result-badge uoj-accepted-badge">', 'Accepted', '</span>';
 								} else {
 									// rgb(204, 0, 0)
-									echo '<span class="badge text-white uoj-unaccepted-badge">', 'Unaccepted', '</span>';
+									echo '<span class="badge text-white uoj-result-badge uoj-unaccepted-badge">', 'Unaccepted', '</span>';
 								}
 								echo '</span>';
 							}
@@ -568,9 +568,9 @@ class UOJSubmission {
 					}
 				} else {
 					if ($cfg['result_badge']) {
-						echo $tag_st, ' class="fs-5"><span class="badge text-white bg-primary">', $this->publicStatus(), '</span>', $tag_ed;
+						echo $tag_st, ' class="fs-5 uoj-submission-result-td"><span class="badge text-white bg-primary uoj-result-badge">', $this->publicStatus(), '</span>', $tag_ed;
 					} else {
-						echo $tag_st, ' class="small text-decoration-none">', $this->publicStatus(), $tag_ed;
+						echo $tag_st, ' class="small text-decoration-none uoj-submission-result-td">', $this->publicStatus(), $tag_ed;
 					}
 				}
 				break;
