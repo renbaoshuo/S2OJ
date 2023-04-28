@@ -333,7 +333,7 @@ $comments_pag = new Paginator([
 							</li>
 						</ul>
 						<?php if ($replies) : ?>
-							<div id="replies-<?= $comment['id'] ?>" class="rounded bg-secondary-subtle mt-2 border"></div>
+							<div id="replies-<?= $comment['id'] ?>" class="rounded bg-secondary bg-opacity-10 mt-2 border"></div>
 						<?php endif ?>
 						<script>
 							showCommentReplies('<?= $comment['id'] ?>', <?= $replies_json ?>);
