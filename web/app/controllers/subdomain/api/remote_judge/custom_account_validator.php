@@ -79,7 +79,7 @@ if ($type == 'luogu') {
 	}, 3);
 } else if ($type == 'loj') {
 	retry_loop(function () use (&$curl, &$res) {
-		$curl->get('https://api.loj.ac.cn/api/auth/getSessionInfo?token=' . UOJRequest::post('token', 'is_string', ''));
+		$curl->get('https://api.loj.ac/api/auth/getSessionInfo?token=' . UOJRequest::post('token', 'is_string', ''));
 
 		if ($curl->error) {
 			return false;
