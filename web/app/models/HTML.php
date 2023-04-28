@@ -117,7 +117,7 @@ class HTML {
 			return "https://q1.qlogo.cn/g?b=qq&nk={$user['qq']}&s=$s";
 		}
 
-		return 'https://cravatar.cn/avatar/' . md5(strtolower(trim($user['email']))) . "?d=mm&amp;s=$size";
+		return 'https://cravatar.cn/avatar/' . md5(strtolower(trim($user['email']))) . "?d=404&amp;s=$size";
 	}
 
 	public static function tablist($tabs_info, $cur, $type = 'nav-tabs') {
