@@ -39,7 +39,7 @@ class AccountService {
     } catch (e) {
       logger.error(e);
 
-      await end({ error: true, status: 'Judgment Failed', message: e.message });
+      await end({ error: true, status: 'Judgment Failed', message: e.stack });
     }
   }
 
