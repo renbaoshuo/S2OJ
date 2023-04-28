@@ -7,6 +7,10 @@ $purifier_type = UOJRequest::post('purifier_type', 'is_string', 'default');
 
 $markdown = UOJRequest::post('markdown', 'is_string', '');
 
+if ($markdown == '') {
+	$markdown = '_Nothing to preview._';
+}
+
 $parsedown = HTML::parsedown();
 
 if ($purifier_type == 'inline') {
