@@ -32,6 +32,27 @@ function resetPassword() {
 	$newPW = $_POST['newPW'];
 	$newPW = getPasswordToStore($newPW, $user['username']);
 
+	$oj_name = UOJConfig::$data['profile']['oj-name'];
+	$oj_name_short = UOJConfig::$data['profile']['oj-name-short'];
+	$name = $user['username'];
+	$remote_addr = UOJContext::remoteAddr();
+	$http_x_forwarded_for = UOJContext::httpXForwardedFor();
+	$user_agent = UOJContext::httpUserAgent();
+
+	if ($user['realname']) {
+		$name .= ' (' . $user['realname'] . ')';
+	}
+
+	sendEmail($user['username'], "密码被重置", <<<EOD
+	<p>您刚刚重置了您在 {$oj_name_short} 上账号的密码。如果这是您进行的操作，请忽略本邮件。如果您没有请求重置密码，请立即联系管理员进行处理。</p>
+
+	<ul>
+		<li>请求 IP: {$remote_addr}</li>
+		<li>转发源 IP: {$http_x_forwarded_for} </li>
+		<li>用户代理: {$user_agent}</li>
+	</ul>
+	EOD, 5);
+
 	DB::update([
 		"update user_info",
 		"set", [
