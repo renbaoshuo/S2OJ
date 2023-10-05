@@ -253,7 +253,12 @@ $new_msg_tot = $new_user_msg_num + $new_system_msg_num;
 	<?php endif ?>
 	">
 	<?php if ($ShowPageHeader) : ?>
-		<?php uojIncludeView($PageNav, array('REQUIRE_LIB' => $REQUIRE_LIB)) ?>
+		<?php uojIncludeView($PageNav, [
+			'REQUIRE_LIB' => $REQUIRE_LIB,
+			'new_msg_tot' => $new_msg_tot,
+			'new_user_msg_num' => $new_user_msg_num,
+			'new_system_msg_num' => $new_system_msg_num,
+		]) ?>
 	<?php endif ?>
 
 	<div class="uoj-content <?= $PageContainerClass ?> flex-fill">
