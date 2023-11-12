@@ -35,12 +35,15 @@ $sub_path = UOJRequest::get('sub_path', 'is_string', '');
 if ($sub_path) {
 	$filepath = realpath(UOJProblem::cur()->getResourcesPath(rawurldecode($sub_path)));
 	$realbasepath = realpath(UOJProblem::cur()->getResourcesPath());
+	$filename = basename($filepath);
 
 	if (!strStartWith($filepath, $realbasepath)) {
 		UOJResponse::page406();
 	}
 
-	UOJResponse::xsendfile($filepath);
+	UOJResponse::xsendfile($filepath, [
+		'attachment' => $filename,
+	]);
 }
 
 $global_readonly = !UOJProblem::cur()->userCanManage(Auth::user());
