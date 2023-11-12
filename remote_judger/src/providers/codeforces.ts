@@ -341,9 +341,12 @@ export default class CodeforcesProvider implements IBasicProvider {
     this.csrf = document
       .querySelector('meta[name="X-Csrf-Token"]')
       .getAttribute('content');
-    return document
+
+    const submission = document
       .querySelector('[data-submission-id]')
       .getAttribute('data-submission-id');
+
+    return type !== 'GYM' ? submission : `${contestId}#${submission}`;
   }
 
   async ensureIsOwnSubmission(id: string) {
@@ -354,21 +357,30 @@ export default class CodeforcesProvider implements IBasicProvider {
     let count = 0;
     let fail = 0;
 
+    const contestId = id.includes('#') ? id.split('#')[0] : null;
+    const submissionId = id.includes('#') ? id.split('#')[1] : id;
+
     while (count < 360 && fail < 60) {
       count++;
       await sleep(500);
 
       try {
         const { body } = await this.post('/data/submitSource')
+          .set(
+            'referer',
+            contestId
+              ? `https://codeforces.com/gym/${contestId}/my`
+              : 'https://codeforces.com/problemset/status?my=on'
+          )
           .send({
             csrf_token: this.csrf,
-            submissionId: id,
+            submissionId: submissionId,
           })
           .retry(3);
 
         if (body.compilationError === 'true') {
           return await end({
-            id,
+            id: submissionId,
             error: true,
             status: 'Compile Error',
             message: crlf(body['checkerStdoutAndStderr#1'], LF),
@@ -439,7 +451,7 @@ export default class CodeforcesProvider implements IBasicProvider {
           Object.entries({
             比赛: stripHtml(body.contestName).result,
             题目: stripHtml(body.problemName).result,
-            提交记录: `<a href="https://codeforces.com${body.href}">${id}</a>`,
+            提交记录: `<a href="https://codeforces.com${body.href}">${submissionId}</a>`,
             账号: `<a href="https://codeforces.com/profile/${remote_handle}">${remote_handle}</a>`,
             状态: stripHtml(body.verdict).result,
           })
@@ -453,7 +465,7 @@ export default class CodeforcesProvider implements IBasicProvider {
           '</div>';
 
         return await end({
-          id,
+          id: submissionId,
           status,
           score: status === 'Accepted' ? 100 : 0,
           time,
@@ -469,7 +481,7 @@ export default class CodeforcesProvider implements IBasicProvider {
     }
 
     return await end({
-      id,
+      id: submissionId,
       error: true,
       status: 'Judgment Failed',
       message: 'Failed to fetch submission details.',
