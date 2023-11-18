@@ -7,6 +7,7 @@ return [
 		'admin-email' => 'admin@sjzezoj.com',
 		'QQ-group' => '',
 		'ICP-license' => '冀ICP备2020028886号',
+		'police-license' => '冀公网安备13010502002309号',
 	],
 	'database' => [
 		'database' => 'app_uoj233',

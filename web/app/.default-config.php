@@ -6,7 +6,8 @@ return [
 		'administrator' => 'root',
 		'admin-email' => 'admin@sjzezoj.com',
 		'QQ-group' => '',
-		'ICP-license' => '冀ICP备2020028886号',
+		'ICP-license' => '',
+		'police-license' => '',
 		's2oj-version' => 'dev'
 	],
 	'database' => [

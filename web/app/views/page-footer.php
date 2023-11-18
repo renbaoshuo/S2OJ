@@ -18,9 +18,17 @@ if (!isset($ShowPageFooter)) {
 					&copy; <?= date('Y') ?>
 					<a class="text-decoration-none" href="<?= HTML::url('/') ?>">S2OJ</a>
 					(build: <a class="text-decoration-none" href="https://github.com/renbaoshuo/S2OJ<?= UOJConfig::$data['profile']['s2oj-version'] == "dev" ? '' : '/tree/' . UOJConfig::$data['profile']['s2oj-version'] ?>"><?= UOJConfig::$data['profile']['s2oj-version'] ?></a>)
+				</div>
+				<div class="small mt-1">
 					<?php if (UOJConfig::$data['profile']['ICP-license'] != '') : ?>
-						| <a class="text-muted text-decoration-none" target="_blank" href="https://beian.miit.gov.cn">
+						<a class="text-muted text-decoration-none d-inline-block mr-2" target="_blank" href="https://beian.miit.gov.cn">
 							<?= UOJConfig::$data['profile']['ICP-license'] ?>
+						</a>
+					<?php endif ?>
+					<?php if (UOJConfig::$data['profile']['police-license'] != '') : ?>
+						<a class="text-muted text-decoration-none d-inline-block mr-2" target="_blank" href="https://beian.mps.gov.cn/#/query/webSearch">
+							<img src="<?= HTML::url('/images/police-beian.png') ?>" style="height: 1em; vertical-align: middle" />
+							<?= UOJConfig::$data['profile']['police-license'] ?>
 						</a>
 					<?php endif ?>
 				</div>
