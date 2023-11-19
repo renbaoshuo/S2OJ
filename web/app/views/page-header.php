@@ -242,6 +242,18 @@ $new_msg_tot = $new_user_msg_num + $new_system_msg_num;
 	</script>
 
 	<script async data-domain="sjzezoj.com" src="https://stat.u.sb/js/script.js"></script>
+	<script>
+		window.plausible = window.plausible || function() {
+			(window.plausible.q = window.plausible.q || []).push(arguments)
+		}
+	</script>
+	<script>
+		plausible('Domain', {
+			props: {
+				domain: window.location.host,
+			},
+		});
+	</script>
 </head>
 
 <body class="d-flex flex-column min-vh-100
