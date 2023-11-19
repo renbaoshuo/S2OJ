@@ -21,12 +21,12 @@ if (!isset($ShowPageFooter)) {
 				</div>
 				<div class="small mt-1">
 					<?php if (UOJConfig::$data['profile']['ICP-license'] != '') : ?>
-						<a class="text-muted text-decoration-none d-inline-block mr-2" target="_blank" href="https://beian.miit.gov.cn">
+						<a class="text-muted text-decoration-none d-inline-block me-2" target="_blank" href="https://beian.miit.gov.cn">
 							<?= UOJConfig::$data['profile']['ICP-license'] ?>
 						</a>
 					<?php endif ?>
 					<?php if (UOJConfig::$data['profile']['police-license'] != '') : ?>
-						<a class="text-muted text-decoration-none d-inline-block mr-2" target="_blank" href="https://beian.mps.gov.cn/#/query/webSearch">
+						<a class="text-muted text-decoration-none d-inline-block me-2" target="_blank" href="https://beian.mps.gov.cn/#/query/webSearch">
 							<img src="<?= HTML::url('/images/police-beian.png') ?>" style="height: 1em; vertical-align: middle" />
 							<?= UOJConfig::$data['profile']['police-license'] ?>
 						</a>
