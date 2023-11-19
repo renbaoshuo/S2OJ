@@ -96,10 +96,14 @@ requireLib('mathjax');
 
 				<h4 class="mt-4">开源项目</h4>
 				<p class="card-text">
-					<?= UOJConfig::$data['profile']['oj-name-short'] ?> 的源代码存放于
+					S2OJ 是采用 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="nofollow noreferrer noopener">AGPLv3</a> 协议的自由软件。S2OJ 的源代码存放于
 					<a href="https://github.com/renbaoshuo/S2OJ" target="_blank">https://github.com/renbaoshuo/S2OJ</a>。
-					如果你网不太好，打不开 GitHub 的话，也可以点击 <a href="https://git.m.ac/baoshuo/S2OJ" target="_blank">https://git.m.ac/baoshuo/S2OJ</a> 查看哦！这两个仓库的内容是一模一样的。
+					<br>
+					<small>PS: 如果你网不太好，打不开 GitHub 的话，也可以点击 <a href="https://git.m.ac/baoshuo/S2OJ" target="_blank">https://git.m.ac/baoshuo/S2OJ</a> 查看哦！这两个仓库的内容是一模一样的。</small>
 				</p>
+				<div class="alert alert-warning mb-2 small" role="alert">
+					<b>特别提醒</b>：本项目采用 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="nofollow noreferrer noopener">AGPLv3</a> 协议。任何对本项目进行修改和衍生的行为都需要遵循该协议，并且需要将修改后的代码以相同协议公开发布。
+				</div>
 
 				<h4 class="mt-4">用户手册</h4>
 				<p class="card-text">
