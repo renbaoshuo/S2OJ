@@ -10,23 +10,23 @@ const logger = new Logger('remote/atcoder');
 
 const LANGS_MAP = {
   C: {
-    name: 'C (GCC 9.2.1)',
-    id: 4001,
+    name: 'C (GCC 12.2.0)',
+    id: 5017,
     comment: '//',
   },
   'C++': {
-    name: 'C++ (GCC 9.2.1)',
-    id: 4003,
+    name: 'C++ 20 (GCC 12.2.0)',
+    id: 5001,
     comment: '//',
   },
   Pascal: {
-    name: 'Pascal (FPC 3.0.4)',
-    id: 4041,
+    name: 'Pascal (FPC 3.2.2)',
+    id: 5041,
     comment: '//',
   },
   Python3: {
-    name: 'Python (3.8.2)',
-    id: 4006,
+    name: 'Python (CPython 3.11.4)',
+    id: 5055,
     comment: '#',
   },
 };
