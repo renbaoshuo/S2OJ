@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  REGISTRY: ghcr.io
+  REGISTRY: ${{ startsWith(github.server_url, 'https://github.com') && 'ghcr.io' || 'git.m.ac' }}
   IMAGE_BASENAME: ${{ github.repository }}
 
 jobs:
