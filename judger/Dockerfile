@@ -4,9 +4,11 @@ SHELL ["/bin/bash", "-c"]
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gnupg ca-certificates apt-transport-https && \
+    apt-get install -y --no-install-recommends gnupg curl ca-certificates apt-transport-https && \
+    curl https://git.m.ac/api/packages/baoshuo/debian/repository.key -o /etc/apt/trusted.gpg.d/gitmac-baoshuo.asc && \
+    echo "deb https://git.m.ac/api/packages/baoshuo/debian all main" | tee -a /etc/apt/sources.list.d/gitmac-baoshuo.list && \
     apt-get update && \
-    for pkg in vim ntp zip unzip curl wget build-essential fp-compiler python2.7 python3.10 python3-requests libseccomp-dev openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk tzdata; do \
+    for pkg in vim ntp zip unzip wget build-essential fp-compiler s2oj-gcc python2.7 python3.10 python3-requests libseccomp-dev openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk tzdata; do \
         cnt=10 && \
         while ! apt-get install -y "$pkg"; do \
             if [ $cnt -le 0 ]; then \
