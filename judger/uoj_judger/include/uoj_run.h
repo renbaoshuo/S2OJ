@@ -10,8 +10,8 @@
 #include <stdexcept>
 #include <sys/time.h>
 
-#define UOJ_GCC "/usr/bin/gcc-11"
-#define UOJ_GPLUSPLUS "/usr/bin/g++-11"
+#define UOJ_GCC "/usr/local/bin/s2oj-gcc"
+#define UOJ_GPLUSPLUS "/usr/local/bin/s2oj-g++"
 #define UOJ_PYTHON2_7 "/usr/bin/python2.7"
 #define UOJ_PYTHON3 "/usr/bin/python3.10"
 #define UOJ_FPC "/usr/bin/fpc"
