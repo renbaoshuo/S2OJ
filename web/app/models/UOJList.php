@@ -52,7 +52,7 @@ class UOJList {
 		return array_map(fn ($x) => $x['problem_id'], DB::selectAll([
 			DB::lc(), "select problem_id from lists_problems",
 			"where", ['list_id' => $this->info['id']],
-			"order by problem_id"
+			"order by problem_order, problem_id"
 		]));
 	}
 

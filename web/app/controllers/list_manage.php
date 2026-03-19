@@ -182,10 +182,15 @@ if ($cur_tab == 'profile') {
 		},
 		function ($type, $problem_id) {
 			if ($type == '+') {
+				$max_order = DB::selectFirst([
+					"select max(problem_order) as max_order from lists_problems",
+					"where", ["list_id" => UOJList::info('id')],
+				]);
+				$next_order = ($max_order['max_order'] ?? 0) + 1;
 				DB::insert([
 					"insert into lists_problems",
-					DB::bracketed_fields(["list_id", "problem_id"]),
-					"values", DB::tuple([UOJList::info('id'), $problem_id]),
+					DB::bracketed_fields(["list_id", "problem_id", "problem_order"]),
+					"values", DB::tuple([UOJList::info('id'), $problem_id, $next_order]),
 				]);
 			} else if ($type == '-') {
 				DB::delete([
@@ -203,6 +208,92 @@ if ($cur_tab == 'profile') {
 		]
 	);
 	$problems_form->runAtServer();
+
+	// Reorder form
+	$current_order = DB::selectAll([
+		"select problem_id from lists_problems",
+		"where", ["list_id" => UOJList::info('id')],
+		"order by problem_order asc, problem_id asc",
+	]);
+	$current_order_str = implode("\n", array_map(fn($x) => $x['problem_id'], $current_order));
+
+	$reorder_form = new UOJForm('reorder_problems');
+	$reorder_form->addTextArea('problem_order', [
+		'label' => '题目顺序',
+		'input_class' => 'form-control font-monospace',
+		'default_value' => $current_order_str,
+		'validator_php' => function ($str, &$vdata) {
+			$ids = [];
+			foreach (explode("\n", $str) as $line) {
+				$line = trim($line);
+				if ($line === '') continue;
+				if (!validateUInt($line)) {
+					return "无效题号：{$line}";
+				}
+				$ids[] = intval($line);
+			}
+
+			// Get all problem IDs in current list
+			$current_ids = array_map(
+				fn($x) => intval($x['problem_id']),
+				DB::selectAll([
+					"select problem_id from lists_problems",
+					"where", ["list_id" => UOJList::info('id')],
+				])
+			);
+
+			sort($current_ids);
+			$sorted_ids = $ids;
+			sort($sorted_ids);
+
+			if ($sorted_ids !== $current_ids) {
+				return '题目列表与当前题单中的题目不一致，请确保包含所有题目且无多余题目';
+			}
+
+			if (count($ids) !== count(array_unique($ids))) {
+				return '存在重复的题号';
+			}
+
+			$vdata['order'] = $ids;
+			return '';
+		},
+		'help' => '每行一个题号，按照从上到下的顺序排列。',
+	]);
+	$reorder_form->handle = function ($vdata) {
+		$order = 1;
+		foreach ($vdata['order'] as $problem_id) {
+			DB::update([
+				"update lists_problems",
+				"set", ["problem_order" => $order],
+				"where", [
+					"list_id" => UOJList::info('id'),
+					"problem_id" => $problem_id,
+				],
+			]);
+			$order++;
+		}
+		dieWithJsonData(['status' => 'success', 'message' => '排序更新成功']);
+	};
+	$reorder_form->setAjaxSubmit(<<<EOD
+		function(res) {
+			if (res.status === 'success') {
+				$('#reorder-result-alert')
+					.html('排序更新成功！')
+					.addClass('alert-success')
+					.removeClass('alert-danger')
+					.show();
+				location.reload();
+			} else {
+				$('#reorder-result-alert')
+					.html('排序更新失败。' + (res.message || ''))
+					.removeClass('alert-success')
+					.addClass('alert-danger')
+					.show();
+			}
+		}
+	EOD);
+	$reorder_form->config['submit_button']['text'] = '更新排序';
+	$reorder_form->runAtServer();
 
 	$n_problems = DB::selectCount([
 		"select count(*)",
@@ -258,12 +349,13 @@ if ($cur_tab == 'profile') {
 				<div class="card-body">
 					<?php
 					echoLongTable(
-						['problem_id'],
+						['problem_id', 'problem_order'],
 						"lists_problems",
 						["list_id" => UOJList::info('id')],
-						"order by problem_id asc",
+						"order by problem_order asc, problem_id asc",
 						<<<EOD
 							<tr>
+								<th class="text-center" style="width:3em">#</th>
 								<th class="text-center" style="width:5em">ID</th>
 								<th>标题</th>
 							</tr>
@@ -272,6 +364,7 @@ if ($cur_tab == 'profile') {
 							$problem = UOJProblem::query($row['problem_id']);
 
 							echo HTML::tag_begin('tr');
+							echo HTML::tag('td', ['class' => 'text-center text-muted'], $row['problem_order']);
 							echo HTML::tag('td', ['class' => 'text-center'], $problem->info['id']);
 							echo HTML::tag_begin('td');
 							echo $problem->getLink(['with' => 'none']);
@@ -292,7 +385,25 @@ if ($cur_tab == 'profile') {
 					);
 					?>
 
+					<hr>
+
 					<?php $problems_form->printHTML() ?>
+
+					<hr>
+
+					<div id="reorder-result-alert" class="alert" role="alert" style="display: none"></div>
+					<div class="row">
+						<div class="col-md-8">
+							<?php $reorder_form->printHTML() ?>
+						</div>
+						<div class="col-md-4">
+							<h5>排序说明</h5>
+							<ul class="mb-0">
+								<li>每行一个题号，按照期望的展示顺序排列。</li>
+								<li>必须包含题单中所有题目，不能多也不能少。</li>
+							</ul>
+						</div>
+					</div>
 				</div>
 			</div>
 		<?php endif ?>

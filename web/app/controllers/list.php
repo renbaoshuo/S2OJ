@@ -95,7 +95,7 @@ $pag_config = [
 		],
 	],
 	'cond' => '1',
-	'tail' => "order by id asc",
+	'tail' => "order by lists_problems.problem_order, problems.id asc",
 	'page_len' => 50,
 	'post_filter' => function ($problem) {
 		return (new UOJProblem($problem))->userCanView(Auth::user());

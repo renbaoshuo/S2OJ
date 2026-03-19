@@ -814,6 +814,7 @@ UNLOCK TABLES;
 CREATE TABLE `lists_problems` (
   `list_id` int NOT NULL,
   `problem_id` int NOT NULL,
+  `problem_order` int NOT NULL DEFAULT 0,
   PRIMARY KEY (`list_id`, `problem_id`),
   KEY `list_id` (`list_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
