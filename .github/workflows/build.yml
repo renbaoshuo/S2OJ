@@ -43,21 +43,21 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Replace version
         run: |
           sed -i "s/'s2oj-version' => 'dev'/'s2oj-version' => '$(echo "${{ github.sha }}" | cut -c1-7)'/g" web/app/.default-config.php
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2.1.0
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log in to Tencent Container Registry
-        uses: docker/login-action@v2.1.0
+        uses: docker/login-action@v4
         with:
           registry: hkccr.ccs.tencentyun.com
           username: ${{ secrets.TENCENT_REGISTRY_USERNAME }}
@@ -65,11 +65,11 @@ jobs:
 
       - name: Extract metadata for Docker
         id: meta
-        uses: docker/metadata-action@v4.3.0
+        uses: docker/metadata-action@v6
         with:
           images: |
             ghcr.io/${{ env.IMAGE_BASENAME }}-${{ matrix.image_name }}
-            hkccr.ccs.tencentyun.com/baoshuo/${{ env.IMAGE_BASENAME }}-${{ matrix.image_name }}
+            hkccr.ccs.tencentyun.com/${{ env.IMAGE_BASENAME }}-${{ matrix.image_name }}
           tags: |
             latest
             type=ref,event=branch
@@ -79,7 +79,7 @@ jobs:
             type=sha,prefix=
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3.3.0
+        uses: docker/build-push-action@v7
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
