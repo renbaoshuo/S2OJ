@@ -1,7 +1,7 @@
 version: "3"
 services:
   uoj-db:
-    image: git.m.ac/baoshuo/s2oj-db
+    image: hkccr.ccs.tencentyun.com/baoshuo/s2oj-db
     container_name: uoj-db
     restart: always
     volumes:
@@ -11,7 +11,7 @@ services:
       - MYSQL_ROOT_PASSWORD=root
   
   uoj-judger:
-    image: git.m.ac/baoshuo/s2oj-judger
+    image: hkccr.ccs.tencentyun.com/baoshuo/s2oj-judger
     container_name: uoj-judger
     restart: always
     stdin_open: true
@@ -30,7 +30,7 @@ services:
       - SOCKET_PASSWORD=_judger_socket_password_
   
   uoj-remote-judger:
-    image: git.m.ac/baoshuo/s2oj-remote-judger
+    image: hkccr.ccs.tencentyun.com/baoshuo/s2oj-remote-judger
     container_name: uoj-remote-judger
     restart: always
     environment:
@@ -40,7 +40,7 @@ services:
       - UOJ_JUDGER_PASSWORD=_judger_password_
   
   uoj-web:
-    image: git.m.ac/baoshuo/s2oj-web
+    image: hkccr.ccs.tencentyun.com/baoshuo/s2oj-web
     container_name: uoj-web
     restart: always
     stdin_open: true
